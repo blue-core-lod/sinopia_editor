@@ -56,7 +56,6 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@aws-amplify/auth": "^4.3.5",
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.15",
@@ -82,6 +81,7 @@
     "identity-obj-proxy": "^3.0.0",
     "javascript-time-ago": "^2.3.9",
     "jsonld-streaming-parser": "^2.4.0",
+    "keycloak-js": "^26.2.0",
     "language-subtag-registry": "^0.3.21",
     "lodash": "^4.17.21",
     "merge": "^2.1.1",
@@ -107,7 +107,7 @@
     "redux-thunk": "^2.3.0",
     "stream-browserify": "^3.0.0",
     "uuid": "^8.3.1",
-    "weak-napi": "^2.0.2"
+    "vm-browserify": "^1.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.19.0",

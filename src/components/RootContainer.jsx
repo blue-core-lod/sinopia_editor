@@ -10,17 +10,16 @@ import App from "./App"
 import store from "../store"
 import HoneybadgerNotifier from "Honeybadger"
 import { HoneybadgerErrorBoundary } from "@honeybadger-io/react"
-import Amplify from "@aws-amplify/core"
 import Config from "Config"
 
 // Configure Amplify (which supports Cognito / authentication)
-Amplify.configure({
-  Auth: {
-    region: Config.awsRegion,
-    userPoolId: Config.awsCognitoUserPoolId,
-    userPoolWebClientId: Config.awsClientID,
-  },
-})
+// Amplify.configure({
+//   Auth: {
+//     region: Config.awsRegion,
+//     userPoolId: Config.awsCognitoUserPoolId,
+//     userPoolWebClientId: Config.awsClientID,
+//   },
+// })
 
 const RootContainer = () => {
   const [isMenuOpened, setMenuOpened] = useState(false)

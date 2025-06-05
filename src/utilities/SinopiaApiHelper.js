@@ -1,5 +1,4 @@
 import Config from "../Config"
-import Auth from "@aws-amplify/auth"
 import _ from "lodash"
 
 export const checkResp = (resp) => {

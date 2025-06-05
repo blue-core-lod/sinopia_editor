@@ -84,28 +84,46 @@ class Config {
     return "https://ld4p.github.io/sinopia/help_and_resources/menu_content.html"
   }
 
-  static get awsCognitoDomain() {
+  static get keycloakUrl() {
     return (
-      process.env.AWS_COGNITO_DOMAIN ||
-      "https://sinopia-development.auth.us-west-2.amazoncognito.com"
+      process.env.KEYCLOAK_URL || "http://localhost/keycloak"
     )
   }
 
-  static get awsClientID() {
-    return process.env.COGNITO_CLIENT_ID || "2u6s7pqkc1grq1qs464fsi82at"
+  static get keycloakRealm() {
+    return (
+      process.env.KEYCLOAK_REALM || "bluecore"
+    )
   }
 
-  static get awsCognitoForgotPasswordUrl() {
-    return `${this.awsCognitoDomain}/forgotPassword?response_type=token&client_id=${this.awsClientID}&redirect_uri=${this.sinopiaUrl}`
+  static get keycloakClientId() {
+    return (
+      process.env.KEYCLOAK_CLIENTID || "sinopia"
+    )
   }
 
-  static get awsCognitoResetPasswordUrl() {
-    return `${this.awsCognitoDomain}/signup?response_type=token&client_id=${this.awsClientID}&redirect_uri=${this.sinopiaUrl}`
-  }
+  // static get awsCognitoDomain() {
+  //   return (
+  //     process.env.AWS_COGNITO_DOMAIN ||
+  //     "https://sinopia-development.auth.us-west-2.amazoncognito.com"
+  //   )
+  // }
 
-  static get awsCognitoUserPoolId() {
-    return process.env.COGNITO_USER_POOL_ID || "us-west-2_CGd9Wq136"
-  }
+  // static get awsClientID() {
+  //   return process.env.COGNITO_CLIENT_ID || "2u6s7pqkc1grq1qs464fsi82at"
+  // }
+
+  // static get awsCognitoForgotPasswordUrl() {
+  //   return `${this.awsCognitoDomain}/forgotPassword?response_type=token&client_id=${this.awsClientID}&redirect_uri=${this.sinopiaUrl}`
+  // }
+
+  // static get awsCognitoResetPasswordUrl() {
+  //   return `${this.awsCognitoDomain}/signup?response_type=token&client_id=${this.awsClientID}&redirect_uri=${this.sinopiaUrl}`
+  // }
+
+  // static get awsCognitoUserPoolId() {
+  //   return process.env.COGNITO_USER_POOL_ID || "us-west-2_CGd9Wq136"
+  // }
 
   static get cognitoTestUserName() {
     return process.env.COGNITO_TEST_USER_NAME
