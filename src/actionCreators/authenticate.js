@@ -8,62 +8,63 @@ import { addError, clearErrors } from "actions/errors"
 import { hasUser } from "selectors/authenticate"
 import { loadUserData } from "actionCreators/user"
 
-const keycloak = new Keycloak(
-  {
-    url: Config.keycloakUrl,
-    realm: Config.keycloakRealm,
-    clientId: Config.keycloakClientId
-  }
-)
+const keycloak = new Keycloak({
+  url: Config.keycloakUrl,
+  realm: Config.keycloakRealm,
+  clientId: Config.keycloakClientId,
+})
 
-export const authenticate = () => (dispatch, getState) => {
+let initializationPromise = null
+
+export const initKeycloak = () => {
+  if (!initializationPromise) {
+    initializationPromise = keycloak.init()
+  }
+  return initializationPromise
+}
+
+export const authenticate = () => async (dispatch, getState) => {
   if (hasUser(getState())) return Promise.resolve(true)
-  // return Auth.currentAuthenticatedUser()
-  //   .then((cognitoUser) => {
-  //     dispatch(setUser(toUser(cognitoUser)))
-  //     dispatch(loadUserData(cognitoUser.username))
-  //     return true
-  //   })
-  //   .catch(() => {
-  //     dispatch(removeUser())
-  //     return false
-  //   })
+
+  const keycloakInititialized = await initKeycloak()
+
+  if (keycloakInititialized) {
+    if (keycloak.isTokenExpired(30)) {
+      await keycloak.updateToken(30)
+    }
+    if (keycloak.authenticated) {
+      const userInfo = keycloak.tokenParsed
+      dispatch(setUser(toUser(userInfo)))
+      dispatch(loadUserData(userInfo.preferred_username))
+    }
+    return true
+  }
+  dispatch(removeUser())
+  return false
 }
 
 export const signIn = (username, password, errorKey) => (dispatch) => {
   dispatch(clearErrors(errorKey))
-  console.log(`In login user: ${username} password ${password}`)
-  console.log(`Keycloak url: ${Config.keycloakUrl} ${Config.keycloakRealm} ${Config.keycloakClientId}`)
-  keycloak.init()
-  return keycloak.login({ redirectUri: 'http://localhost:8888'} )
-      .then((keycloak_response) => {
-        console.log(`Logged into Keycloak`)
-        console.log(keycloak_response)
-      })
-  // return Auth.signIn(username, password)
-  //   .then((cognitoUser) => {
-  //     dispatch(setUser(toUser(cognitoUser)))
-  //     dispatch(loadUserData(cognitoUser.username))
-  //   })
-  //   .catch((err) => {
-  //     dispatch(addError(errorKey, `Login failed: ${err.message}`))
-  //     dispatch(removeUser())
-    // })
+
+  const keycloakInititialized = Promise.resolve(initKeycloak())
+
+  if (keycloakInititialized) {
+    return Promise.resolve(keycloak.login({ redirectUri: Config.sinopiaUrl }))
+  }
 }
 
-export const signOut = () => (dispatch) =>
-  // Auth.signOut()
-  //   .then(() => {
-  //     dispatch(removeUser())
-  //   })
-  //   .catch((err) => {
-  //     // Not displaying to user as no action user could take.
-  //     console.error(err)
-  //   })
-  console.log(`In signOut`)
+export const signOut = () => (dispatch) => {
+  const keycloakInititialized = Promise.resolve(initKeycloak())
 
-// Note: User model can be extended as we add additional attributes to Cognito.
-const toUser = (cognitoUser) => ({
-  username: cognitoUser.username,
-  groups: cognitoUser.signInUserSession.idToken.payload["cognito:groups"] || [],
+  if (keycloakInititialized) {
+    dispatch(removeUser())
+    keycloak.logout({ redirectUri: Config.sinopiaUrl }).catch((err) => {
+      console.error(err)
+    })
+  }
+}
+
+const toUser = (keycloakUser) => ({
+  username: keycloakUser.preferred_username,
+  groups: keycloakUser["cognito:groups"] || [],
 })
