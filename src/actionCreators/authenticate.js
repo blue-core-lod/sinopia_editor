@@ -27,7 +27,7 @@ export const authenticate = () => async (dispatch, getState) => {
   if (hasUser(getState())) return Promise.resolve(true)
 
   const keycloakInititialized = await initKeycloak()
-
+  
   if (keycloakInititialized) {
     if (keycloak.isTokenExpired(30)) {
       await keycloak.updateToken(30)
@@ -66,5 +66,5 @@ export const signOut = () => (dispatch) => {
 
 const toUser = (keycloakUser) => ({
   username: keycloakUser.preferred_username,
-  groups: keycloakUser["cognito:groups"] || [],
+  groups: [], // This needs to be a separate call to the api
 })

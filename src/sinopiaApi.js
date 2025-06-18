@@ -116,6 +116,7 @@ export const postResource = (resource, currentUser, group, editGroups) => {
   newResource.uri = uri
   newResource.group = group
   newResource.editGroups = editGroups
+  console.log(`in postResource uri: ${uri}`)
   return putResource(newResource, currentUser, group, editGroups, "POST").then(
     () => uri
   )
@@ -124,8 +125,8 @@ export const postResource = (resource, currentUser, group, editGroups) => {
 // Saves an existing resource
 export const putResource = (resource, currentUser, group, editGroups, method) =>
   saveBodyForResource(resource, currentUser.username, group, editGroups).then(
-    (body) =>
-      getJwt().then((jwt) =>
+    (body) => {
+      const jwt = Promise.resolve(getJwt())
         fetch(resource.uri, {
           method: method || "PUT",
           headers: {
@@ -134,7 +135,7 @@ export const putResource = (resource, currentUser, group, editGroups, method) =>
           },
           body,
         }).then((resp) => checkResp(resp).then(() => true))
-      )
+    }
   )
 
 export const postMarc = (resourceUri) => {
@@ -261,8 +262,8 @@ export const detectLanguage = (text) => {
       },
     ])
   }
-  return getJwt().then((jwt) =>
-    fetch(`${Config.sinopiaApiBase}/helpers/langDetection`, {
+  const jwt = getJwt()
+  return fetch(`${Config.sinopiaApiBase}/helpers/langDetection`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${jwt}`,
@@ -272,5 +273,4 @@ export const detectLanguage = (text) => {
     })
       .then((resp) => checkResp(resp).then(() => resp.json()))
       .then((json) => json.data)
-  )
 }
