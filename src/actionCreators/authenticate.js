@@ -27,7 +27,7 @@ export const authenticate = () => async (dispatch, getState) => {
   if (hasUser(getState())) return Promise.resolve(true)
 
   const keycloakInititialized = await initKeycloak()
-  
+
   if (keycloakInititialized) {
     if (keycloak.isTokenExpired(30)) {
       await keycloak.updateToken(30)
@@ -36,11 +36,12 @@ export const authenticate = () => async (dispatch, getState) => {
       const userInfo = keycloak.tokenParsed
       dispatch(setUser(toUser(userInfo)))
       dispatch(loadUserData(userInfo.preferred_username))
+
+      return Promise.resolve(true)
     }
-    return true
   }
   dispatch(removeUser())
-  return false
+  return Promise.resolve(false)
 }
 
 export const signIn = (username, password, errorKey) => (dispatch) => {
@@ -57,10 +58,10 @@ export const signOut = () => (dispatch) => {
   const keycloakInititialized = Promise.resolve(initKeycloak())
 
   if (keycloakInititialized) {
+    // Keycloak logout uses GET to load window and then redirects
+    // to Sinopia home page and doesn't return any object
     dispatch(removeUser())
-    keycloak.logout({ redirectUri: Config.sinopiaUrl }).catch((err) => {
-      console.error(err)
-    })
+    keycloak.logout({ redirectUri: Config.sinopiaUrl })
   }
 }
 

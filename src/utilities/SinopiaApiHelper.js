@@ -4,7 +4,6 @@ import Keycloak from "keycloak-js"
 
 import { initKeycloak } from "../actionCreators/authenticate"
 
-
 const keycloak = new Keycloak({
   url: Config.keycloakUrl,
   realm: Config.keycloakRealm,
@@ -65,9 +64,9 @@ export const getJwt = () => {
 
   if (keycloakInititialized) {
     if (keycloak.authenticated) {
-        if (keycloak.isTokenExpired(30)) {
-          keycloak.updateToken(30)
-        }
+      if (keycloak.isTokenExpired(30)) {
+        keycloak.updateToken(30)
+      }
     }
     if (!keycloak.token) throw new Error("jwt is undefined")
     return keycloak.token

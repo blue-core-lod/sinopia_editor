@@ -116,7 +116,6 @@ export const postResource = (resource, currentUser, group, editGroups) => {
   newResource.uri = uri
   newResource.group = group
   newResource.editGroups = editGroups
-  console.log(`in postResource uri: ${uri}`)
   return putResource(newResource, currentUser, group, editGroups, "POST").then(
     () => uri
   )
@@ -126,32 +125,29 @@ export const postResource = (resource, currentUser, group, editGroups) => {
 export const putResource = (resource, currentUser, group, editGroups, method) =>
   saveBodyForResource(resource, currentUser.username, group, editGroups).then(
     (body) => {
-      const jwt = Promise.resolve(getJwt())
-        fetch(resource.uri, {
-          method: method || "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${jwt}`,
-          },
-          body,
-        }).then((resp) => checkResp(resp).then(() => true))
+      const jwt = getJwt()
+      return fetch(resource.uri, {
+        method: method || "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+        },
+        body,
+      }).then((resp) => checkResp(resp).then(() => true))
     }
   )
 
 export const postMarc = (resourceUri) => {
   const url = resourceUri.replace("resource", "marc")
-  return getJwt()
-    .then((jwt) =>
-      fetch(url, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      })
-    )
-    .then((resp) =>
-      checkResp(resp).then(() => resp.headers.get("Content-Location"))
-    )
+  const jwt = getJwt()
+  return fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+  }).then((resp) =>
+    checkResp(resp).then(() => resp.headers.get("Content-Location"))
+  )
 }
 
 export const getMarcJob = (marcJobUrl) =>
@@ -182,15 +178,15 @@ export const fetchUser = (userId) =>
     return checkResp(resp).then(() => resp.json())
   })
 
-const postUser = (userId) =>
-  getJwt().then((jwt) =>
-    fetch(userUrlFor(userId), {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    }).then((resp) => checkResp(resp).then(() => resp.json()))
-  )
+const postUser = (userId) => {
+  const jwt = getJwt()
+  return fetch(userUrlFor(userId), {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+  }).then((resp) => checkResp(resp).then(() => resp.json()))
+}
 
 export const putUserHistory = (
   userId,
@@ -201,16 +197,15 @@ export const putUserHistory = (
   const url = `${userUrlFor(userId)}/history/${historyType}/${encodeURI(
     historyItemKey
   )}`
-  return getJwt().then((jwt) =>
-    fetch(url, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ payload: historyItemPayload }),
-    }).then((resp) => checkResp(resp).then(() => resp.json()))
-  )
+  const jwt = getJwt()
+  return fetch(url, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ payload: historyItemPayload }),
+  }).then((resp) => checkResp(resp).then(() => resp.json()))
 }
 
 export const postTransfer = (resourceUri, group, target) => {
@@ -218,16 +213,13 @@ export const postTransfer = (resourceUri, group, target) => {
     "resource",
     "transfer"
   )}/${group}/${target}`
-  return getJwt()
-    .then((jwt) =>
-      fetch(url, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      })
-    )
-    .then((resp) => checkResp(resp))
+  const jwt = getJwt()
+  return fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+  }).then((resp) => checkResp(resp))
 }
 
 const userUrlFor = (userId) =>
@@ -264,13 +256,13 @@ export const detectLanguage = (text) => {
   }
   const jwt = getJwt()
   return fetch(`${Config.sinopiaApiBase}/helpers/langDetection`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-        "Content-Type": "text/plain",
-      },
-      body: text,
-    })
-      .then((resp) => checkResp(resp).then(() => resp.json()))
-      .then((json) => json.data)
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+      "Content-Type": "text/plain",
+    },
+    body: text,
+  })
+    .then((resp) => checkResp(resp).then(() => resp.json()))
+    .then((json) => json.data)
 }
