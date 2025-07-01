@@ -1,12 +1,28 @@
 // Copyright 2019 Stanford University see LICENSE for license
+let mockKeycloak
+
+jest.mock("keycloak-js", () => {
+  mockKeycloak = {
+    init: jest.fn(() => Promise.resolve(true)),
+    token: "Secret-Token",
+    authenticated: true,
+    isTokenExpired: jest.fn(),
+    updateToken: jest.fn(),
+    tokenParsed: {
+      preferred_username: "Foo McBar",
+    },
+  }
+
+  return jest.fn().mockImplementation((config) => {
+    return mockKeycloak
+  })
+})
 import { fireEvent, waitFor, screen } from "@testing-library/react"
 import { createStore, renderApp, createHistory } from "testUtils"
 import { createState } from "stateUtils"
-import Auth from "@aws-amplify/auth"
 import fetchMock from "fetch-mock-jest"
 import { featureSetup, resourceHeaderSelector } from "featureUtils"
-
-jest.mock("@aws-amplify/auth")
+import * as sinopiaApi from "sinopiaApi"
 
 beforeEach(() => {
   fetchMock.mockReset()
@@ -28,8 +44,9 @@ featureSetup()
 
 describe("<App />", () => {
   beforeEach(() => {
-    Auth.currentAuthenticatedUser.mockResolvedValue({ username: "Foo McBar" })
+    jest.clearAllMocks()
   })
+
   it("loads languages", async () => {
     const store = createStore()
     renderApp(store)
@@ -45,26 +62,29 @@ describe("<App />", () => {
     screen.getByText(/v\d+\.\d+\.\d+/)
   })
 
-  it("loads groups from sinopiaAPI into groupMap", async () => {
-    const state = createState({ noGroupMap: true })
-    const store = createStore(state)
-    expect(store.getState().entities.groupMap).toEqual({})
+  //! Once https://github.com/blue-core-lod/bluecore_api/issues/105 and
+  //! Sinopia Editor is updated to use this endpoint, this test
+  //! should be enabled.
+  // it("loads groups from sinopiaAPI into groupMap", async () => {
+  //   const state = createState({ noGroupMap: true })
+  //   const store = createStore(state)
+  //   expect(store.getState().entities.groupMap).toEqual({})
 
-    renderApp(store)
-    await waitFor(() => store.getState().entities.groupMap !== {})
+  //   renderApp(store)
+  //   await waitFor(() => store.getState().entities.groupMap !== {})
 
-    expect(store.getState().entities.groupMap).toEqual({
-      cornell: "Cornell",
-      ld4p: "LD4P",
-      other: "other",
-      pcc: "Program for Cooperative Cataloging",
-      stanford: "Stanford",
-    })
-    expect(fetchMock).toHaveBeenCalledWith("http://localhost:3000/groups", {
-      method: "GET",
-      headers: { Accept: "application/json" },
-    })
-  })
+  //   expect(store.getState().entities.groupMap).toEqual({
+  //     cornell: "Cornell",
+  //     ld4p: "LD4P",
+  //     other: "other",
+  //     pcc: "Program for Cooperative Cataloging",
+  //     stanford: "Stanford",
+  //   })
+  //   expect(fetchMock).toHaveBeenCalledWith("http://localhost:3000/groups", {
+  //     method: "GET",
+  //     headers: { Accept: "application/json" },
+  //   })
+  // })
 
   it("loads exports", async () => {
     const state = createState({ noExports: true })
@@ -77,19 +97,19 @@ describe("<App />", () => {
     await screen.findByText(/sinopia_export_all/)
   })
 
-  it("authenticates", () => {
+  it("authenticates", async () => {
+    sinopiaApi.fetchUser = jest.fn().mockResolvedValue({})
     const state = createState({ notAuthenticated: true })
     const store = createStore(state)
     renderApp(store)
 
-    expect(Auth.currentAuthenticatedUser).toHaveBeenCalled()
+    await screen.findByText("Foo McBar")
   })
 
   describe("when user is not authenticated", () => {
     beforeEach(() => {
-      Auth.currentAuthenticatedUser.mockRejectedValue(
-        new Error("Not authenticated")
-      )
+      jest.clearAllMocks()
+      mockKeycloak.authenticated = false
     })
 
     const state = createState({ notAuthenticated: true })

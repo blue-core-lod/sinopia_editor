@@ -4,7 +4,6 @@ let mockKeycloak
 jest.mock("keycloak-js", () => {
   mockKeycloak = {
     init: jest.fn(() => Promise.resolve(true)),
-    id: "barked",
     isTokenExpired: jest.fn(),
     updateToken: jest.fn(),
     login: jest.fn(() => Promise.resolve(true)),

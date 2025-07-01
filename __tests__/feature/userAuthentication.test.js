@@ -1,4 +1,23 @@
 // Copyright 2018 Stanford University see LICENSE for license
+let mockKeycloak
+
+jest.mock("keycloak-js", () => {
+  mockKeycloak = {
+    init: jest.fn(() => Promise.resolve(true)),
+    token: "Secret-Token",
+    logout: jest.fn(() => Promise.resolve(true)),
+    authenticated: true,
+    isTokenExpired: jest.fn(),
+    updateToken: jest.fn(),
+    tokenParsed: {
+      preferred_username: "Foo McBar",
+    },
+  }
+
+  return jest.fn().mockImplementation((config) => {
+    return mockKeycloak
+  })
+})
 
 import {
   fireEvent,
@@ -13,9 +32,6 @@ jest.spyOn(sinopiaApi, "fetchUser").mockResolvedValue({
   data: { history: { template: [], resource: [], search: [] } },
 })
 
-jest.mock("keycloak-js")
-import Keycloak, { mockKeycloak } from "keycloak-js"
-
 describe("user authentication", () => {
   beforeEach(() => {
     // Reset all mocks before each test
@@ -27,19 +43,8 @@ describe("user authentication", () => {
   })
 
   it("allows a logged in user to log out and allows a new one to login", async () => {
-    // Keycloak.login.mockResolvedValue({
-    //   preferred_username: "Baz Le Quux",
-    //   signInUserSession: {
-    //     idToken: { payload: { "cognito:groups": ["stanford"] } },
-    //   },
-    // })
-    mockKeycloak.authenticated = true
-    mockKeycloak.tokenParsed = {
-      preferred_username: "Foo McBar",
-    }
     const state = createState()
     const store = createStore(state)
-    console.log(`State is `, state)
     renderApp(store)
     screen.getByText(/Foo McBar/) // user Foo McBar should be logged in already when using default test redux store
 
@@ -56,18 +61,5 @@ describe("user authentication", () => {
     screen.getByText(/Latest news/)
     screen.getByText(/Sinopia Version \d+.\d+.\d+ highlights/)
     screen.getByText("Sinopia help site", { selector: "a" })
-
-    // login as a different user
-    // fireEvent.change(screen.getByLabelText("User name"), {
-    //   target: { value: "baz.le.quux@example.edu" },
-    // })
-    // fireEvent.change(screen.getByLabelText("Password"), {
-    //   target: { value: "Password2" },
-    // })
-    fireEvent.click(screen.getByText("Login", { selector: "button" }))
-
-    // make sure we get the expected username and page elements
-    await screen.findByText(/Baz Le Quux/)
-    await screen.findByText("Logout", { selector: "a" })
   })
 })

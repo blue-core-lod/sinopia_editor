@@ -1,4 +1,23 @@
 // Copyright 2019 Stanford University see LICENSE for license
+let mockKeycloak
+
+jest.mock("keycloak-js", () => {
+  mockKeycloak = {
+    init: jest.fn(() => Promise.resolve(true)),
+    token: "Secret-Token",
+    authenticated: true,
+    isTokenExpired: jest.fn(),
+    updateToken: jest.fn(),
+    tokenParsed: {
+      preferred_username: "Foo McBar",
+    },
+  }
+
+  return jest.fn().mockImplementation((config) => {
+    return mockKeycloak
+  })
+})
+
 import configureMockStore from "redux-mock-store"
 import thunk from "redux-thunk"
 import * as sinopiaApi from "sinopiaApi"
