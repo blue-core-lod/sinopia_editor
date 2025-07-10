@@ -1,6 +1,14 @@
 import Config from "../Config"
-import Auth from "@aws-amplify/auth"
 import _ from "lodash"
+import Keycloak from "keycloak-js"
+
+import { initKeycloak } from "../actionCreators/authenticate"
+
+const keycloak = new Keycloak({
+  url: Config.keycloakUrl,
+  realm: Config.keycloakRealm,
+  clientId: Config.keycloakClientId,
+})
 
 export const checkResp = (resp) => {
   if (resp.ok) return Promise.resolve(resp)
@@ -51,13 +59,16 @@ export const templateIdFor = (resource) => {
   return resourceIdProperty.values[0].literal
 }
 
-export const getJwt = () =>
-  Auth.currentSession()
-    .then((data) => {
-      if (!data.idToken.jwtToken) throw new Error("jwt is undefined")
-      return data.idToken.jwtToken
-    })
-    .catch((err) => {
-      if (err) throw err
-      throw new Error("Error getting current authentication session")
-    })
+export const getJwt = () => {
+  const keycloakInititialized = Promise.resolve(initKeycloak())
+
+  if (keycloakInititialized) {
+    if (keycloak.authenticated) {
+      if (keycloak.isTokenExpired(30)) {
+        keycloak.updateToken(30)
+      }
+    }
+    if (!keycloak.token) throw new Error("jwt is undefined")
+    return keycloak.token
+  }
+}

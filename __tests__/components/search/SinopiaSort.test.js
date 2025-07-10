@@ -1,3 +1,22 @@
+let mockKeycloak
+
+jest.mock("keycloak-js", () => {
+  mockKeycloak = {
+    init: jest.fn(() => Promise.resolve(true)),
+    token: "Secret-Token",
+    authenticated: true,
+    isTokenExpired: jest.fn(),
+    updateToken: jest.fn(),
+    tokenParsed: {
+      preferred_username: "Foo McBar",
+    },
+  }
+
+  return jest.fn().mockImplementation((config) => {
+    return mockKeycloak
+  })
+})
+
 import React from "react"
 import SinopiaSort from "components/search/SinopiaSort"
 import * as server from "sinopiaSearch"

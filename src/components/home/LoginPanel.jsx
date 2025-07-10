@@ -34,7 +34,7 @@ const LoginPanel = () => {
       )}
       <form className="login-form" onSubmit={(event) => handleSubmit(event)}>
         <h4>Login to the Linked Data Editor</h4>
-        <div className="row mb-2">
+        {/* <div className="row mb-2">
           <label htmlFor="username" className="col-sm-3 col-form-label">
             User name
           </label>
@@ -70,7 +70,7 @@ const LoginPanel = () => {
               onChange={(event) => setPassword(event.target.value)}
             ></input>
           </div>
-        </div>
+        </div> */}
         <div className="row">
           <div className="col-sm-3">
             <button className="btn btn-block btn-primary" type="submit">

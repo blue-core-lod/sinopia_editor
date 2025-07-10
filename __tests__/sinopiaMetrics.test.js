@@ -1,3 +1,14 @@
+jest.mock("keycloak-js", () => {
+  const mockKeycloak = {
+    init: jest.fn(() => Promise.resolve(true)),
+    token: "Secret-Token",
+  }
+
+  return jest.fn().mockImplementation((config) => {
+    return mockKeycloak
+  })
+})
+
 import {
   getUserCount,
   getTemplateCount,

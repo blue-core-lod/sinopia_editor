@@ -1,50 +1,71 @@
 // Copyright 2019 Stanford University see LICENSE for license
-import Auth from "@aws-amplify/auth"
+import Keycloak from "keycloak-js"
+
+import Config from "../Config"
 
 import { setUser, removeUser } from "actions/authenticate"
 import { addError, clearErrors } from "actions/errors"
 import { hasUser } from "selectors/authenticate"
 import { loadUserData } from "actionCreators/user"
 
-export const authenticate = () => (dispatch, getState) => {
+const keycloak = new Keycloak({
+  url: Config.keycloakUrl,
+  realm: Config.keycloakRealm,
+  clientId: Config.keycloakClientId,
+})
+
+let initializationPromise = null
+
+export const initKeycloak = () => {
+  if (!initializationPromise) {
+    initializationPromise = keycloak.init()
+  }
+  return initializationPromise
+}
+
+export const authenticate = () => async (dispatch, getState) => {
   if (hasUser(getState())) return Promise.resolve(true)
-  return Auth.currentAuthenticatedUser()
-    .then((cognitoUser) => {
-      dispatch(setUser(toUser(cognitoUser)))
-      dispatch(loadUserData(cognitoUser.username))
-      return true
-    })
-    .catch(() => {
-      dispatch(removeUser())
-      return false
-    })
+
+  const keycloakInititialized = await initKeycloak()
+
+  if (keycloakInititialized) {
+    if (keycloak.isTokenExpired(30)) {
+      await keycloak.updateToken(30)
+    }
+    if (keycloak.authenticated) {
+      const userInfo = keycloak.tokenParsed
+      dispatch(setUser(toUser(userInfo)))
+      dispatch(loadUserData(userInfo.preferred_username))
+
+      return Promise.resolve(true)
+    }
+  }
+  dispatch(removeUser())
+  return Promise.resolve(false)
 }
 
 export const signIn = (username, password, errorKey) => (dispatch) => {
   dispatch(clearErrors(errorKey))
-  return Auth.signIn(username, password)
-    .then((cognitoUser) => {
-      dispatch(setUser(toUser(cognitoUser)))
-      dispatch(loadUserData(cognitoUser.username))
-    })
-    .catch((err) => {
-      dispatch(addError(errorKey, `Login failed: ${err.message}`))
-      dispatch(removeUser())
-    })
+
+  const keycloakInititialized = Promise.resolve(initKeycloak())
+
+  if (keycloakInititialized) {
+    return Promise.resolve(keycloak.login({ redirectUri: Config.sinopiaUrl }))
+  }
 }
 
-export const signOut = () => (dispatch) =>
-  Auth.signOut()
-    .then(() => {
-      dispatch(removeUser())
-    })
-    .catch((err) => {
-      // Not displaying to user as no action user could take.
-      console.error(err)
-    })
+export const signOut = () => (dispatch) => {
+  const keycloakInititialized = Promise.resolve(initKeycloak())
 
-// Note: User model can be extended as we add additional attributes to Cognito.
-const toUser = (cognitoUser) => ({
-  username: cognitoUser.username,
-  groups: cognitoUser.signInUserSession.idToken.payload["cognito:groups"] || [],
+  if (keycloakInititialized) {
+    // Keycloak logout uses GET to load window and then redirects
+    // to Sinopia home page and doesn't return any object
+    dispatch(removeUser())
+    keycloak.logout({ redirectUri: Config.sinopiaUrl })
+  }
+}
+
+const toUser = (keycloakUser) => ({
+  username: keycloakUser.preferred_username,
+  groups: [], // This needs to be a separate call to the api
 })
