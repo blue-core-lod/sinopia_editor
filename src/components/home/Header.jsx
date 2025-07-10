@@ -7,13 +7,23 @@ import Config from "Config"
 import { connect } from "react-redux"
 import { selectUser } from "selectors/authenticate"
 import { signOut } from "actionCreators/authenticate"
+
+const bcLogo = require("../../styles/bluecore-small.png")
+
 import { bindActionCreators } from "redux"
 
 const Header = (props) => (
   <div className="navbar homepage-navbar">
     <div className="navbar-header">
       <a className="navbar-brand" href={`${Config.sinopiaUrl}`}>
-        <h1 className="editor-logo"> Sinopia{`${Config.sinopiaEnv}`}</h1>
+        <h1 className="editor-logo">
+          <img
+            src={bcLogo}
+            alt="Blue Core Logo"
+            style={{ paddingBottom: "8px" }}
+          ></img>{" "}
+          | Sinopia{`${Config.sinopiaEnv}`}
+        </h1>
       </a>
     </div>
     <ul className="nav">
