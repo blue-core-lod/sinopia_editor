@@ -12,6 +12,8 @@ import { selectCurrentResourceKey } from "selectors/resources"
 import usePermissions from "hooks/usePermissions"
 import HeaderSearch from "./search/HeaderSearch"
 
+const bcLogo = require("../styles/bluecore-small.png")
+
 const Header = (props) => {
   const { canCreate } = usePermissions()
   const location = useLocation()
@@ -26,7 +28,14 @@ const Header = (props) => {
         <div className="row">
           <div className="col-6">
             <a href="/">
-              <h1 className="editor-logo">Sinopia{`${Config.sinopiaEnv}`}</h1>
+              <h1 className="editor-logo">
+                <img
+                  src={bcLogo}
+                  alt="Blue Core Logo"
+                  style={{ paddingBottom: "8px" }}
+                ></img>{" "}
+                | Sinopia{`${Config.sinopiaEnv}`}
+              </h1>
             </a>
           </div>
           <div className="col-6">
