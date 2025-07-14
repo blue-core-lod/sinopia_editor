@@ -30,6 +30,7 @@ import {
   dispatchResourceForPreview,
   dispatchResourceForEditor,
 } from "actionCreators/resources"
+import { useKeycloak } from "../KeycloakContext"
 import usePermissions from "hooks/usePermissions"
 import { showModal } from "actions/modals"
 import {
@@ -48,7 +49,7 @@ const App = (props) => {
   const history = useHistory()
   const { canCreate, canEdit } = usePermissions()
   const [isFirstMountWithUser, setFirstMountWithUser] = useState(true)
-
+  const { keycloak } = useKeycloak()
   const hasUser = useSelector((state) => hasUserSelector(state))
   const isModalOpen = useSelector((state) => isModalOpenSelector(state))
 
@@ -56,7 +57,6 @@ const App = (props) => {
     dispatch(fetchLanguages())
     dispatch(fetchGroups())
     dispatch(fetchExports(exportsErrorKey))
-    dispatch(authenticate())
   }, [dispatch])
 
   const editorTemplateMatch = useRouteMatch({
@@ -102,6 +102,7 @@ const App = (props) => {
         })
       }
     }
+    dispatch(authenticate(keycloak))
   }, [
     hasUser,
     editorExactMatch,

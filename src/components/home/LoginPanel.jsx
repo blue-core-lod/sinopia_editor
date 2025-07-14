@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { hasUser as hasUserSelector } from "selectors/authenticate"
 import { signIn } from "actionCreators/authenticate"
+import { useKeycloak } from "../../KeycloakContext"
 import Config from "Config"
 import { selectErrors } from "selectors/errors"
 import _ from "lodash"
@@ -14,13 +15,15 @@ const LoginPanel = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
 
+  const { keycloak } = useKeycloak()
+
   const error = _.first(
     useSelector((state) => selectErrors(state, signInErrorKey))
   )
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    dispatch(signIn(username, password, signInErrorKey))
+    dispatch(signIn(keycloak, signInErrorKey))
   }
 
   if (hasUser) return null
@@ -72,18 +75,10 @@ const LoginPanel = () => {
           </div>
         </div> */}
         <div className="row">
-          <div className="col-sm-3">
+          <div className="col-sm-6">
             <button className="btn btn-block btn-primary" type="submit">
               Login
             </button>
-          </div>
-          <div className="col-sm-9">
-            <div className="row">
-              <a href={Config.awsCognitoForgotPasswordUrl}>Forgot Password</a>
-            </div>
-            <div className="row">
-              <a href={Config.awsCognitoResetPasswordUrl}>Request Account</a>
-            </div>
           </div>
         </div>
       </form>
