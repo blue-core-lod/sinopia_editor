@@ -84,7 +84,6 @@ export const getSearchResultsWithFacets = async (query, options = {}) => {
       },
     }
   }
-
   return fetchSearchResults(body)
 }
 
@@ -107,21 +106,12 @@ export const getSearchResultsByUris = (resourceUris) => {
   return fetchSearchResults(body).then((results) => results[0])
 }
 
-const fetchSearchResults = (body) => {
+const fetchSearchResults = (body, keycloak) => {
   const url = `${Config.searchHost}${Config.searchPath}`
   return fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    method: "GET",
   })
     .then((resp) => {
-      if (resp.status >= 300) {
-        return {
-          totalHits: 0,
-          results: [],
-          error: `${resp.status}: ${resp.statusText}`,
-        }
-      }
       return resp.json()
     })
     .then((json) => {
@@ -135,7 +125,8 @@ const fetchSearchResults = (body) => {
           undefined,
         ]
       }
-      return [hitsToResult(json.hits), aggregationsToResult(json.aggregations)]
+      console.log(`Before returning results`, hitsToResult(json))
+      return [hitsToResult(json), aggregationsToResult(json)]
     })
     .catch((err) => [
       {
@@ -147,18 +138,34 @@ const fetchSearchResults = (body) => {
     ])
 }
 
-const hitsToResult = (hits) => ({
-  totalHits: hits.total.value,
-  results: hits.hits.map((row) => ({
-    uri: row._source.uri,
-    label: row._source.label,
-    created: row._source.created,
-    modified: row._source.modified,
-    type: row._source.type,
-    group: row._source.group,
-    editGroups: row._source.editGroups,
-  })),
-})
+const hitsToResult = (payload) => {
+  const results = []
+  payload.items.forEach((hit) => {
+    const types = hit.data["@type"]
+    let rdfTypes = []
+    if (Array.isArray(types)) {
+      types.forEach((type) =>
+        rdfTypes.push(`http://id.loc.gov/ontologies/bibframe/${type}`)
+      )
+    } else {
+      rdfTypes.push(`http://id.loc.gov/ontologies/bibframe/${types}`)
+    }
+    results.push({
+      uri: hit.uri,
+      label: hit.data.title.mainTitle,
+      created: hit.created_at,
+      modified: hit.updated_at,
+      type: rdfTypes,
+      group: "blue core",
+      editGroups: ["blue core"],
+    })
+  })
+  console.log(results)
+  return {
+    totalHits: payload.total,
+    results: results,
+  }
+}
 
 const aggregationsToResult = (aggs) => {
   if (!aggs) return undefined

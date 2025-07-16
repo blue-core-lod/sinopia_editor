@@ -16,10 +16,15 @@ import { isBfWorkInstanceItem } from "utilities/Bibframe"
 import { loadSearchRelationships } from "./relationships"
 
 export const fetchSinopiaSearchResults =
-  (query, options, errorKey) => (dispatch) => {
+  (query, keycloak, options, errorKey) => (dispatch) => {
     dispatch(clearErrors(errorKey))
-    return getSearchResultsWithFacets(query, options).then(
+    return getSearchResultsWithFacets(query, keycloak, options).then(
       ([response, facetResponse]) => {
+        console.log(
+          `Before dispatching in fetchSinopiaSearchResults`,
+          response,
+          facetResponse
+        )
         dispatch(addSearchHistory(sinopiaSearchUri, "Sinopia resources", query))
         dispatch(addApiSearchHistory(sinopiaSearchUri, query))
         dispatch(

@@ -23,6 +23,7 @@ import TemplateGuessSearchResults from "./TemplateGuessSearchResults"
 import PreviewModal from "../editor/preview/PreviewModal"
 
 const Search = (props) => {
+  console.log(`In search props`, props)
   const { fetchSearchResults } = useSearch()
 
   const searchOptions = useSelector((state) =>
