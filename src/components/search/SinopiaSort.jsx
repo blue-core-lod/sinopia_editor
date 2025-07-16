@@ -3,11 +3,13 @@ import React from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { fetchSinopiaSearchResults } from "actionCreators/search"
 import { selectSearchOptions, selectSearchQuery } from "selectors/search"
+import { useKeycloak } from "../../KeycloakContext"
 import useAlerts from "hooks/useAlerts"
 
 const SinopiaSort = () => {
   const query = useSelector((state) => selectSearchQuery(state, "resource"))
   const errorKey = useAlerts()
+  const { keycloak } = useKeycloak()
 
   const searchOptions = useSelector((state) =>
     selectSearchOptions(state, "resource")
@@ -26,7 +28,8 @@ const SinopiaSort = () => {
           sortField,
           sortOrder,
         },
-        errorKey
+        errorKey,
+        keycloak
       )
     )
 

@@ -3,6 +3,7 @@ import _ from "lodash"
 
 export const checkResp = (resp) => {
   if (resp.ok) return Promise.resolve(resp)
+  console.trace()
   return resp
     .json()
     .then((errors) => {

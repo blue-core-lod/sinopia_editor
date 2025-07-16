@@ -8,6 +8,7 @@ import { Popover } from "bootstrap"
 import searchConfig from "../../../static/searchConfig.json"
 import { sinopiaSearchUri } from "utilities/authorityConfig"
 import useSearch from "hooks/useSearch"
+import { useKeycloak } from "../../KeycloakContext"
 import { selectHeaderSearch } from "selectors/search"
 import { setHeaderSearch } from "actions/search"
 import useAlerts from "hooks/useAlerts"
@@ -15,6 +16,7 @@ import useAlerts from "hooks/useAlerts"
 const HeaderSearch = () => {
   const dispatch = useDispatch()
   const currentSearch = useSelector((state) => selectHeaderSearch(state))
+  const { keycloak } = useKeycloak()
   const [uri, setUri] = useState(currentSearch.uri)
   const [query, setQuery] = useState(currentSearch.query || "")
   const popoverRef = useRef()
@@ -73,7 +75,7 @@ const HeaderSearch = () => {
         searchUri = baseUri
       }
     }
-    fetchNewSearchResults(query, searchUri, options)
+    fetchNewSearchResults(query, searchUri, options, keycloak)
     if (uri === "urn:ld4p:sinopia" && query !== "*") {
       fetchTemplateGuessSearchResults(query)
     } else {

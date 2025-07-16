@@ -21,9 +21,12 @@ import ContextAlert from "components/alerts/ContextAlert"
 import { searchErrorKey } from "utilities/errorKeyFactory"
 import TemplateGuessSearchResults from "./TemplateGuessSearchResults"
 import PreviewModal from "../editor/preview/PreviewModal"
+import { useKeycloak } from "../../KeycloakContext"
 
 const Search = (props) => {
   const { fetchSearchResults } = useSearch()
+
+  const { keycloak } = useKeycloak()
 
   const searchOptions = useSelector((state) =>
     selectSearchOptions(state, "resource")
@@ -37,7 +40,7 @@ const Search = (props) => {
   )
 
   const changeSearchPage = (startOfRange) => {
-    fetchSearchResults(queryString, uri, searchOptions, startOfRange)
+    fetchSearchResults(queryString, uri, searchOptions, startOfRange, keycloak)
   }
 
   return (
