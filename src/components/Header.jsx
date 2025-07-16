@@ -9,6 +9,7 @@ import { selectUser } from "selectors/authenticate"
 import { signOut } from "actionCreators/authenticate"
 import { bindActionCreators } from "redux"
 import { selectCurrentResourceKey } from "selectors/resources"
+import { useKeycloak } from "../KeycloakContext"
 import usePermissions from "hooks/usePermissions"
 import HeaderSearch from "./search/HeaderSearch"
 
@@ -21,6 +22,8 @@ const Header = (props) => {
     location.pathname === "/exports" ||
     location.pathname === "/load" ||
     location.pathname.startsWith("/metrics/")
+
+  const { keycloak } = useKeycloak()
 
   return (
     <React.Fragment>
@@ -65,7 +68,7 @@ const Header = (props) => {
                   <a
                     href="#"
                     className="nav-link editor-header-logout"
-                    onClick={() => props.signOut()}
+                    onClick={() => props.signOut(keycloak)}
                   >
                     Logout
                   </a>

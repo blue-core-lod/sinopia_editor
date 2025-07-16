@@ -37,43 +37,6 @@ const LoginPanel = () => {
       )}
       <form className="login-form" onSubmit={(event) => handleSubmit(event)}>
         <h4>Login to the Linked Data Editor</h4>
-        {/* <div className="row mb-2">
-          <label htmlFor="username" className="col-sm-3 col-form-label">
-            User name
-          </label>
-          <div className="col-sm-9">
-            <input
-              id="username"
-              name="username"
-              type="text"
-              className="form-control"
-              placeholder=""
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
-            ></input>
-          </div>
-        </div>
-        <div className="row">
-          <label
-            htmlFor="password"
-            style={{ wordWrap: "normal" }}
-            className="col-sm-3 col-form-label"
-          >
-            Password
-          </label>
-
-          <div className="col-sm-9">
-            <input
-              id="password"
-              name="password"
-              type="password"
-              className="form-control"
-              placeholder=""
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            ></input>
-          </div>
-        </div> */}
         <div className="row">
           <div className="col-sm-6">
             <button className="btn btn-block btn-primary" type="submit">
