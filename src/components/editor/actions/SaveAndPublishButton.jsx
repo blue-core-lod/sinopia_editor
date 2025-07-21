@@ -21,11 +21,14 @@ import {
   showValidationErrors as showValidationErrorsAction,
   hideValidationErrors as hideValidationErrorsAction,
 } from "actions/errors"
+import { useKeycloak } from "../../../KeycloakContext"
+
 import useAlerts from "hooks/useAlerts"
 
 const SaveAndPublishButton = (props) => {
   const dispatch = useDispatch()
   const errorKey = useAlerts()
+  const keycloak = useKeycloak()
 
   const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
   // selectPickSubject and shallowEqual prevents rerender from unrelated changed.
@@ -66,7 +69,8 @@ const SaveAndPublishButton = (props) => {
             resourceKey,
             resource.group,
             resource.editGroups,
-            errorKey
+            errorKey,
+            keycloak
           )
         )
       } else {

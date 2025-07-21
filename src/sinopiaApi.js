@@ -192,12 +192,13 @@ export const putUserHistory = (
   userId,
   historyType,
   historyItemKey,
-  historyItemPayload
+  historyItemPayload,
+  keycloak
 ) => {
   const url = `${userUrlFor(userId)}/history/${historyType}/${encodeURI(
     historyItemKey
   )}`
-  const jwt = getJwt()
+  const jwt = getJwt(keycloak)
   return fetch(url, {
     method: "PUT",
     headers: {
