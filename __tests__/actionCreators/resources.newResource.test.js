@@ -1,22 +1,3 @@
-let mockKeycloak
-
-jest.mock("keycloak-js", () => {
-  mockKeycloak = {
-    init: jest.fn(() => Promise.resolve(true)),
-    token: "Secret-Token",
-    authenticated: true,
-    isTokenExpired: jest.fn(),
-    updateToken: jest.fn(),
-    tokenParsed: {
-      preferred_username: "Foo McBar",
-    },
-  }
-
-  return jest.fn().mockImplementation((config) => {
-    return mockKeycloak
-  })
-})
-
 import { newResource } from "actionCreators/resources"
 import mockConsole from "jest-mock-console"
 import * as sinopiaApi from "sinopiaApi"
@@ -27,6 +8,10 @@ import { createState } from "stateUtils"
 import { nanoid } from "nanoid"
 import { safeAction } from "actionUtils"
 import expectedAction from "../__action_fixtures__/newResource-ADD_SUBJECT"
+
+jest.mock("KeycloakContext", () => ({
+  useKeycloak: jest.fn().mockReturnValue({}),
+}))
 
 jest.useFakeTimers({ now: new Date("2020-08-20T11:34:40.887Z") })
 jest.mock("nanoid")

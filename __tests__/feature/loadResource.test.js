@@ -1,27 +1,12 @@
-let mockKeycloak
-
-jest.mock("keycloak-js", () => {
-  mockKeycloak = {
-    init: jest.fn(() => Promise.resolve(true)),
-    token: "Secret-Token",
-    authenticated: true,
-    isTokenExpired: jest.fn(),
-    updateToken: jest.fn(),
-    tokenParsed: {
-      preferred_username: "Foo McBar",
-    },
-  }
-
-  return jest.fn().mockImplementation((config) => {
-    return mockKeycloak
-  })
-})
-
 import { renderApp } from "testUtils"
 import { fireEvent, screen } from "@testing-library/react"
 import * as sinopiaSearch from "sinopiaSearch"
 import { resourceSearchResults } from "fixtureLoaderHelper"
 import { featureSetup, resourceHeaderSelector } from "featureUtils"
+
+jest.mock("KeycloakContext", () => ({
+  useKeycloak: jest.fn().mockReturnValue({}),
+}))
 
 featureSetup()
 jest.mock("sinopiaSearch")

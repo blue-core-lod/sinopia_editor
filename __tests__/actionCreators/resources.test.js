@@ -1,22 +1,3 @@
-let mockKeycloak
-
-jest.mock("keycloak-js", () => {
-  mockKeycloak = {
-    init: jest.fn(() => Promise.resolve(true)),
-    token: "Secret-Token",
-    authenticated: true,
-    isTokenExpired: jest.fn(),
-    updateToken: jest.fn(),
-    tokenParsed: {
-      preferred_username: "Foo McBar",
-    },
-  }
-
-  return jest.fn().mockImplementation((config) => {
-    return mockKeycloak
-  })
-})
-
 import {
   expandProperty,
   addSiblingValueSubject,
@@ -37,6 +18,10 @@ import { safeAction } from "actionUtils"
 import expectedExpandPropertyAddValueAction from "../__action_fixtures__/expandProperty-ADD_VALUE"
 import expectedExpandPropertyAddPropertyAction from "../__action_fixtures__/expandProperty-ADD_PROPERTY"
 import expectedAddSiblingAddValueAction from "../__action_fixtures__/addSiblingValueSubject-ADD_VALUE"
+
+jest.mock("KeycloakContext", () => ({
+  useKeycloak: jest.fn().mockReturnValue({}),
+}))
 
 jest.useFakeTimers({ now: new Date("2020-08-20T11:34:40.887Z") })
 jest.mock("nanoid")

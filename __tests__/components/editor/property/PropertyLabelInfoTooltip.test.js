@@ -1,4 +1,11 @@
 // Copyright 2021 Stanford University see LICENSE for license
+import React from "react"
+import { createStore, renderComponent } from "testUtils"
+import { screen } from "@testing-library/react"
+import { createState } from "stateUtils"
+import { selectSubjectAndPropertyTemplates } from "selectors/templates"
+import PropertyLabelInfoTooltip from "components/editor/property/PropertyLabelInfoTooltip"
+
 let mockKeycloak
 
 jest.mock("keycloak-js", () => {
@@ -17,13 +24,6 @@ jest.mock("keycloak-js", () => {
     return mockKeycloak
   })
 })
-
-import React from "react"
-import { createStore, renderComponent } from "testUtils"
-import { screen } from "@testing-library/react"
-import { createState } from "stateUtils"
-import { selectSubjectAndPropertyTemplates } from "selectors/templates"
-import PropertyLabelInfoTooltip from "components/editor/property/PropertyLabelInfoTooltip"
 
 describe("<PropertyLabelInfoTooltip />", () => {
   it("displays remark without link", () => {

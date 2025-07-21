@@ -1,4 +1,11 @@
 // Copyright 2019 Stanford University see LICENSE for license
+import React from "react"
+import { createStore, renderComponent } from "testUtils"
+import { screen } from "@testing-library/react"
+import { createState } from "stateUtils"
+import { selectNormSubject } from "selectors/resources"
+import ResourcePreviewHeader from "components/editor/preview/ResourcePreviewHeader"
+
 let mockKeycloak
 
 jest.mock("keycloak-js", () => {
@@ -17,13 +24,6 @@ jest.mock("keycloak-js", () => {
     return mockKeycloak
   })
 })
-
-import React from "react"
-import { createStore, renderComponent } from "testUtils"
-import { screen } from "@testing-library/react"
-import { createState } from "stateUtils"
-import { selectNormSubject } from "selectors/resources"
-import ResourcePreviewHeader from "components/editor/preview/ResourcePreviewHeader"
 
 describe("<ResourcePreviewHeader />", () => {
   it("displays label, url and edit groups", () => {

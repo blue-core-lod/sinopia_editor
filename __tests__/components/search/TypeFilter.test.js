@@ -1,3 +1,11 @@
+import React from "react"
+import TypeFilter from "components/search/TypeFilter"
+import { fireEvent, waitFor, screen } from "@testing-library/react"
+import { createStore, renderComponent } from "testUtils"
+import { createState } from "stateUtils"
+import * as server from "sinopiaSearch"
+import * as sinopiaApi from "sinopiaApi"
+
 let mockKeycloak
 
 jest.mock("keycloak-js", () => {
@@ -16,14 +24,6 @@ jest.mock("keycloak-js", () => {
     return mockKeycloak
   })
 })
-
-import React from "react"
-import TypeFilter from "components/search/TypeFilter"
-import { fireEvent, waitFor, screen } from "@testing-library/react"
-import { createStore, renderComponent } from "testUtils"
-import { createState } from "stateUtils"
-import * as server from "sinopiaSearch"
-import * as sinopiaApi from "sinopiaApi"
 
 /* eslint-disable testing-library/no-node-access */
 describe("<TypeFilter />", () => {

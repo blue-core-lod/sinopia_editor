@@ -1,14 +1,3 @@
-jest.mock("keycloak-js", () => {
-  const mockKeycloak = {
-    init: jest.fn(() => Promise.resolve(true)),
-    token: "Secret-Token",
-  }
-
-  return jest.fn().mockImplementation((config) => {
-    return mockKeycloak
-  })
-})
-
 import {
   getUserCount,
   getTemplateCount,
@@ -19,6 +8,17 @@ import {
   getResourceEditedCount,
   getTemplateUsageCount,
 } from "sinopiaMetrics"
+
+jest.mock("keycloak-js", () => {
+  const mockKeycloak = {
+    init: jest.fn(() => Promise.resolve(true)),
+    token: "Secret-Token",
+  }
+
+  return jest.fn().mockImplementation((config) => {
+    return mockKeycloak
+  })
+})
 
 // Saves global fetch in order to be restored after each test with mocked fetch
 const originalFetch = global.fetch

@@ -1,22 +1,3 @@
-let mockKeycloak
-
-jest.mock("keycloak-js", () => {
-  mockKeycloak = {
-    init: jest.fn(() => Promise.resolve(true)),
-    token: "Secret-Token",
-    authenticated: true,
-    isTokenExpired: jest.fn(),
-    updateToken: jest.fn(),
-    tokenParsed: {
-      preferred_username: "Foo McBar",
-    },
-  }
-
-  return jest.fn().mockImplementation((config) => {
-    return mockKeycloak
-  })
-})
-
 import { newResourceCopy } from "actionCreators/resources"
 import mockConsole from "jest-mock-console"
 import Config from "Config"
@@ -26,6 +7,10 @@ import { createState } from "stateUtils"
 import { nanoid } from "nanoid"
 import expectedAction from "../__action_fixtures__/newResourceCopy-ADD_SUBJECT"
 import { safeAction } from "actionUtils"
+
+jest.mock("KeycloakContext", () => ({
+  useKeycloak: jest.fn().mockReturnValue({}),
+}))
 
 // This won't be required after Jest 27
 jest.useFakeTimers({ now: new Date("2020-08-20T11:34:40.887Z") })

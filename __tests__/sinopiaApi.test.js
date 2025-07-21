@@ -1,14 +1,9 @@
 // Copyright 2020 Stanford University see LICENSE for license
-jest.mock("keycloak-js", () => {
-  const mockKeycloak = {
-    init: jest.fn(() => Promise.resolve(true)),
-    token: "Secret-Token",
-  }
-
-  return jest.fn().mockImplementation((config) => {
-    return mockKeycloak
+jest.mock("KeycloakContext", () => ({
+  useKeycloak: jest.fn().mockReturnValue({
+    "token": "Secret-Token"
   })
-})
+}))
 
 import {
   fetchResource,
@@ -182,18 +177,17 @@ describe("postResource", () => {
   console.log(`currentUser`, currentUser)
 
   describe("with a new resource", () => {
-    // const resource = selectFullSubject(state, "t9zVwg2zO")
+    const resource = selectFullSubject(state, "t9zVwg2zO")
 
     it("saves the new resource and returns uri", async () => {
-      console.log(`IN new save`)
-      // global.fetch = jest.fn().mockResolvedValue({
-      //   json: jest.fn().mockResolvedValue(resource),
-      //   ok: true,
-      // })
-      // const result = await postResource(resource, currentUser, "pcc", [
-      //   "cornell",
-      // ])
-      // expect(result).toContain("http://localhost:3000/resource/")
+      global.fetch = jest.fn().mockResolvedValue({
+         json: jest.fn().mockResolvedValue(resource),
+         ok: true,
+      })
+      const result = await postResource(resource, currentUser, "pcc", [
+         "cornell",
+      ])
+      expect(result).toContain("http://localhost:3000/resource/")
     })
   })
 
@@ -203,25 +197,25 @@ describe("postResource", () => {
     it("saves the new resource template and returns uri", async () => {
       global.fetch = jest.fn().mockResolvedValue({ ok: true })
       // Mocks a resource template
-      // resource.subjectTemplate.id = "sinopia:template:resource"
-      // resource.properties.push({
-      //   propertyTemplate: {
-      //     defaultUri: "http://sinopia.io/vocabulary/hasResourceId",
-      //     type: "literal",
-      //   },
-      //   values: [
-      //     {
-      //       literal: "resourceTemplate:bf2:Note",
-      //       property: { propertyTemplate: { type: "literal" } },
-      //     },
-      //   ],
-      // })
-      // const result = await postResource(resource, currentUser, "pcc", [
-      //   "cornell",
-      // ])
-      // expect(result).toBe(
-      //   "http://localhost:3000/resource/resourceTemplate:bf2:Note"
-      // )
+      resource.subjectTemplate.id = "sinopia:template:resource"
+      resource.properties.push({
+        propertyTemplate: {
+          defaultUri: "http://sinopia.io/vocabulary/hasResourceId",
+          type: "literal",
+        },
+        values: [
+          {
+            literal: "resourceTemplate:bf2:Note",
+            property: { propertyTemplate: { type: "literal" } },
+          },
+        ],
+      })
+      const result = await postResource(resource, currentUser, "pcc", [
+        "cornell",
+      ])
+      expect(result).toBe(
+        "http://localhost:3000/resource/resourceTemplate:bf2:Note"
+      )
     })
   })
 })
