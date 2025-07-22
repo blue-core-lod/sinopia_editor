@@ -300,7 +300,8 @@ export const saveNewResource =
 
 // A thunk that saves an existing resource
 export const saveResource =
-  (resourceKey, group, editGroups, errorKey, keycloak) => (dispatch, getState) => {
+  (resourceKey, group, editGroups, errorKey, keycloak) =>
+  (dispatch, getState) => {
     const state = getState()
     const resource = selectFullSubject(state, resourceKey)
     const currentUser = selectUser(state)

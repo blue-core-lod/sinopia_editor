@@ -9,9 +9,9 @@ import { selectUser } from "selectors/authenticate"
 import { signOut } from "actionCreators/authenticate"
 import { useKeycloak } from "../../KeycloakContext"
 
-const bcLogo = require("../../styles/bluecore-small.png")
-
 import { bindActionCreators } from "redux"
+
+const bcLogo = require("../../styles/bluecore-small.png")
 
 const Header = (props) => {
   const { keycloak } = useKeycloak()
