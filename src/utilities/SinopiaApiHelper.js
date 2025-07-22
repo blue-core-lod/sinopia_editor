@@ -1,7 +1,5 @@
 import Config from "../Config"
 import _ from "lodash"
-import { useKeycloak } from "../KeycloakContext"
-
 
 export const checkResp = (resp) => {
   if (resp.ok) return Promise.resolve(resp)
@@ -53,9 +51,5 @@ export const templateIdFor = (resource) => {
 }
 
 export const getJwt = (keycloak) => {
-  if (!keycloak) {
-    keycloak = useKeycloak()
-  }
-
   return keycloak.token
 }

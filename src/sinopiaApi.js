@@ -108,7 +108,13 @@ export const fetchResourceRelationships = (uri) => {
 export const getGroups = () => getJsonData(`${Config.sinopiaApiBase}/groups`)
 
 // Publishes (saves) a new resource
-export const postResource = (resource, currentUser, group, editGroups) => {
+export const postResource = (
+  resource,
+  currentUser,
+  group,
+  editGroups,
+  keycloak
+) => {
   const newResource = { ...resource }
   // Mint a uri. Resource templates use the template id.
   const resourceId = isTemplate(resource) ? templateIdFor(resource) : uuidv4()
@@ -116,16 +122,28 @@ export const postResource = (resource, currentUser, group, editGroups) => {
   newResource.uri = uri
   newResource.group = group
   newResource.editGroups = editGroups
-  return putResource(newResource, currentUser, group, editGroups, "POST").then(
-    () => uri
-  )
+  return putResource(
+    newResource,
+    currentUser,
+    group,
+    editGroups,
+    "POST",
+    keycloak
+  ).then(() => uri)
 }
 
 // Saves an existing resource
-export const putResource = (resource, currentUser, group, editGroups, method) =>
+export const putResource = (
+  resource,
+  currentUser,
+  group,
+  editGroups,
+  method,
+  keycloak
+) =>
   saveBodyForResource(resource, currentUser.username, group, editGroups).then(
     (body) => {
-      const jwt = getJwt()
+      const jwt = getJwt(keycloak)
       return fetch(resource.uri, {
         method: method || "PUT",
         headers: {
@@ -137,9 +155,9 @@ export const putResource = (resource, currentUser, group, editGroups, method) =>
     }
   )
 
-export const postMarc = (resourceUri) => {
+export const postMarc = (resourceUri, keycloak) => {
   const url = resourceUri.replace("resource", "marc")
-  const jwt = getJwt()
+  const jwt = getJwt(keycloak)
   return fetch(url, {
     method: "POST",
     headers: {
@@ -168,18 +186,18 @@ export const getMarc = (marcUrl, asText) =>
     },
   }).then((resp) => checkResp(resp).then(() => resp.blob()))
 
-export const fetchUser = (userId) =>
+export const fetchUser = (userId, keycloak) =>
   fetch(userUrlFor(userId), {
     headers: {
       Accept: "application/json",
     },
   }).then((resp) => {
-    if (resp.status === 404) return postUser(userId)
+    if (resp.status === 404) return postUser(userId, keycloak)
     return checkResp(resp).then(() => resp.json())
   })
 
-const postUser = (userId) => {
-  const jwt = getJwt()
+const postUser = (userId, keycloak) => {
+  const jwt = getJwt(keycloak)
   return fetch(userUrlFor(userId), {
     method: "POST",
     headers: {
@@ -209,12 +227,12 @@ export const putUserHistory = (
   }).then((resp) => checkResp(resp).then(() => resp.json()))
 }
 
-export const postTransfer = (resourceUri, group, target) => {
+export const postTransfer = (resourceUri, group, target, keycloak) => {
   const url = `${resourceUri.replace(
     "resource",
     "transfer"
   )}/${group}/${target}`
-  const jwt = getJwt()
+  const jwt = getJwt(keycloak)
   return fetch(url, {
     method: "POST",
     headers: {
@@ -246,7 +264,7 @@ const saveBodyForResource = (resource, user, group, editGroups) => {
   )
 }
 
-export const detectLanguage = (text) => {
+export const detectLanguage = (text, keycloak) => {
   if (Config.useResourceTemplateFixtures) {
     return Promise.resolve([
       {
@@ -255,7 +273,7 @@ export const detectLanguage = (text) => {
       },
     ])
   }
-  const jwt = getJwt()
+  const jwt = getJwt(keycloak)
   return fetch(`${Config.sinopiaApiBase}/helpers/langDetection`, {
     method: "POST",
     headers: {
