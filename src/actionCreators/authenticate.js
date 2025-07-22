@@ -1,5 +1,4 @@
 // Copyright 2019 Stanford University see LICENSE for license
-// import Keycloak from "keycloak-js"
 
 import Config from "../Config"
 
