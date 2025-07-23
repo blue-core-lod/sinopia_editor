@@ -1,4 +1,10 @@
 // Copyright 2021 Stanford University see LICENSE for license
+import React from "react"
+import { screen } from "@testing-library/react"
+import UserNotifications from "components/home/UserNotifications"
+import { createStore, renderComponent } from "testUtils"
+import { createState } from "stateUtils"
+
 let mockKeycloak
 
 jest.mock("keycloak-js", () => {
@@ -17,12 +23,6 @@ jest.mock("keycloak-js", () => {
     return mockKeycloak
   })
 })
-
-import React from "react"
-import { screen } from "@testing-library/react"
-import UserNotifications from "components/home/UserNotifications"
-import { createStore, renderComponent } from "testUtils"
-import { createState } from "stateUtils"
 
 describe("<UserNotifications />", () => {
   it("shows a warning if a logged in user is not in any groups", async () => {

@@ -1,4 +1,10 @@
 // Copyright 2021 Stanford University see LICENSE for license
+import React from "react"
+import { createStore, renderComponent } from "testUtils"
+import { screen } from "@testing-library/react"
+import { createState } from "stateUtils"
+import PropertyLabelInfo from "components/editor/property/PropertyLabelInfo"
+
 let mockKeycloak
 
 jest.mock("keycloak-js", () => {
@@ -17,12 +23,6 @@ jest.mock("keycloak-js", () => {
     return mockKeycloak
   })
 })
-
-import React from "react"
-import { createStore, renderComponent } from "testUtils"
-import { screen } from "@testing-library/react"
-import { createState } from "stateUtils"
-import PropertyLabelInfo from "components/editor/property/PropertyLabelInfo"
 
 describe("<PropertyLabelInfo />", () => {
   it("displays remark only when no remark URL is present", () => {

@@ -1,15 +1,4 @@
 // Copyright 2020 Stanford University see LICENSE for license
-jest.mock("keycloak-js", () => {
-  const mockKeycloak = {
-    init: jest.fn(() => Promise.resolve(true)),
-    token: "Secret-Token",
-  }
-
-  return jest.fn().mockImplementation((config) => {
-    return mockKeycloak
-  })
-})
-
 import {
   fetchResource,
   postResource,
@@ -30,6 +19,14 @@ import { selectUser } from "selectors/authenticate"
 import { createState } from "stateUtils"
 
 import Config from "Config"
+
+jest.mock("KeycloakContext", () => ({
+  useKeycloak: jest.fn().mockReturnValue({
+    keycloak: {
+      token: "Secret-Token",
+    },
+  }),
+}))
 
 const resource = {
   data: [
@@ -182,18 +179,24 @@ describe("postResource", () => {
   console.log(`currentUser`, currentUser)
 
   describe("with a new resource", () => {
-    // const resource = selectFullSubject(state, "t9zVwg2zO")
+    const resource = selectFullSubject(state, "t9zVwg2zO")
 
     it("saves the new resource and returns uri", async () => {
-      console.log(`IN new save`)
-      // global.fetch = jest.fn().mockResolvedValue({
-      //   json: jest.fn().mockResolvedValue(resource),
-      //   ok: true,
-      // })
-      // const result = await postResource(resource, currentUser, "pcc", [
-      //   "cornell",
-      // ])
-      // expect(result).toContain("http://localhost:3000/resource/")
+      global.fetch = jest.fn().mockResolvedValue({
+        json: jest.fn().mockResolvedValue(resource),
+        ok: true,
+      })
+
+      const result = await postResource(
+        resource,
+        currentUser,
+        "pcc",
+        ["cornell"],
+        {
+          token: "Secret-Token",
+        }
+      )
+      expect(result).toContain("http://localhost:3000/resource/")
     })
   })
 
@@ -203,25 +206,31 @@ describe("postResource", () => {
     it("saves the new resource template and returns uri", async () => {
       global.fetch = jest.fn().mockResolvedValue({ ok: true })
       // Mocks a resource template
-      // resource.subjectTemplate.id = "sinopia:template:resource"
-      // resource.properties.push({
-      //   propertyTemplate: {
-      //     defaultUri: "http://sinopia.io/vocabulary/hasResourceId",
-      //     type: "literal",
-      //   },
-      //   values: [
-      //     {
-      //       literal: "resourceTemplate:bf2:Note",
-      //       property: { propertyTemplate: { type: "literal" } },
-      //     },
-      //   ],
-      // })
-      // const result = await postResource(resource, currentUser, "pcc", [
-      //   "cornell",
-      // ])
-      // expect(result).toBe(
-      //   "http://localhost:3000/resource/resourceTemplate:bf2:Note"
-      // )
+      resource.subjectTemplate.id = "sinopia:template:resource"
+      resource.properties.push({
+        propertyTemplate: {
+          defaultUri: "http://sinopia.io/vocabulary/hasResourceId",
+          type: "literal",
+        },
+        values: [
+          {
+            literal: "resourceTemplate:bf2:Note",
+            property: { propertyTemplate: { type: "literal" } },
+          },
+        ],
+      })
+      const result = await postResource(
+        resource,
+        currentUser,
+        "pcc",
+        ["cornell"],
+        {
+          token: "Secret-Token",
+        }
+      )
+      expect(result).toBe(
+        "http://localhost:3000/resource/resourceTemplate:bf2:Note"
+      )
     })
   })
 })
@@ -234,7 +243,16 @@ describe("putResource", () => {
 
     it("saves the resource", async () => {
       global.fetch = jest.fn().mockResolvedValue({ ok: true })
-      const result = await putResource(resource, currentUser)
+      const result = await putResource(
+        resource,
+        currentUser,
+        null,
+        null,
+        null,
+        {
+          token: "Secret-Token",
+        }
+      )
       expect(result).toBeTruthy()
     })
 
@@ -244,9 +262,11 @@ describe("putResource", () => {
         json: jest.fn().mockRejectedValue("Parse error"),
         statusText: "Cannot save resource",
       })
-      await expect(putResource(resource, currentUser)).rejects.toThrow(
-        "Sinopia API returned Cannot save resource"
-      )
+      await expect(
+        putResource(resource, currentUser, null, null, null, {
+          token: "Secret-Token",
+        })
+      ).rejects.toThrow("Sinopia API returned Cannot save resource")
     })
   })
 })
@@ -270,7 +290,9 @@ describe("postMarc", () => {
         headers: { get: jest.fn().mockReturnValue(jobUrl) },
       })
 
-      expect(await postMarc(resourceUri)).toEqual(jobUrl)
+      expect(await postMarc(resourceUri, { token: "Secret-Token" })).toEqual(
+        jobUrl
+      )
       expect(global.fetch).toHaveBeenCalledWith(marcPostUrl, {
         method: "POST",
         headers: {
@@ -289,7 +311,9 @@ describe("postMarc", () => {
           .mockResolvedValue([{ title: "Ooops!", details: "It failed." }]),
       })
 
-      await expect(postMarc(resourceUri)).rejects.toThrow("Ooops!: It failed.")
+      await expect(
+        postMarc(resourceUri, { token: "Secret-Token" })
+      ).rejects.toThrow("Ooops!: It failed.")
     })
   })
 })
@@ -399,7 +423,9 @@ describe("fetchUser", () => {
           json: jest.fn().mockResolvedValue(userData),
         })
 
-      expect(await fetchUser("tmann")).toEqual(userData)
+      expect(await fetchUser("tmann", { token: "Secret-Token" })).toEqual(
+        userData
+      )
 
       expect(global.fetch).toHaveBeenCalledWith(
         "http://localhost:3000/user/tmann",
@@ -422,7 +448,9 @@ describe("putUserHistory", () => {
     })
 
     expect(
-      await putUserHistory("tmann", "template", "abc123", "template1")
+      await putUserHistory("tmann", "template", "abc123", "template1", {
+        token: "Secret-Token",
+      })
     ).toEqual(userData)
 
     expect(global.fetch).toHaveBeenCalledWith(
@@ -446,7 +474,9 @@ describe("postTransfer", () => {
         ok: true,
       })
 
-      await postTransfer(resourceUri, "stanford", "ils")
+      await postTransfer(resourceUri, "stanford", "ils", {
+        token: "Secret-Token",
+      })
 
       expect(global.fetch).toHaveBeenCalledWith(
         "https://api.development.sinopia.io/transfer/7b4c275d-b0c7-40a4-80b3-e95a0d9d987c/stanford/ils",
@@ -613,7 +643,9 @@ describe("detectLanguage", () => {
     })
 
     it("retrieves languages", async () => {
-      const result = await detectLanguage("Who am I and why am I here?")
+      const result = await detectLanguage("Who am I and why am I here?", {
+        token: "Secret-Token",
+      })
       expect(result).toStrictEqual([
         { language: "en", score: 0.9719234108924866 },
       ])
@@ -638,7 +670,9 @@ describe("detectLanguage", () => {
         ok: true,
       })
 
-      const result = await detectLanguage("Who am I and why am I here?")
+      const result = await detectLanguage("Who am I and why am I here?", {
+        token: "Secret-Token",
+      })
       expect(result).toStrictEqual(languages)
       expect(global.fetch).toHaveBeenCalledWith(
         "http://localhost:3000/helpers/langDetection",
@@ -667,7 +701,7 @@ describe("detectLanguage", () => {
       })
 
       await expect(
-        detectLanguage("Who am I and why am I here?")
+        detectLanguage("Who am I and why am I here?", { token: "Secret-Token" })
       ).rejects.toThrow("Server error: Something went wrong")
     })
   })

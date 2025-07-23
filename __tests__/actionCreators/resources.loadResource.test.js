@@ -1,22 +1,3 @@
-let mockKeycloak
-
-jest.mock("keycloak-js", () => {
-  mockKeycloak = {
-    init: jest.fn(() => Promise.resolve(true)),
-    token: "Secret-Token",
-    authenticated: true,
-    isTokenExpired: jest.fn(),
-    updateToken: jest.fn(),
-    tokenParsed: {
-      preferred_username: "Foo McBar",
-    },
-  }
-
-  return jest.fn().mockImplementation((config) => {
-    return mockKeycloak
-  })
-})
-
 import {
   loadResourceForEditor,
   loadResourceForPreview,
@@ -34,6 +15,10 @@ import * as relationshipActionCreators from "actionCreators/relationships"
 import expectedAction from "../__action_fixtures__/loadResource-ADD_SUBJECT"
 import expectedMultiplePropertyUrisAction from "../__action_fixtures__/loadResource-ADD_SUBJECT-multiple-property-uris"
 import { safeAction, cloneAddResourceActionAsNewResource } from "actionUtils"
+
+jest.mock("KeycloakContext", () => ({
+  useKeycloak: jest.fn().mockReturnValue({}),
+}))
 
 jest.useFakeTimers({ now: new Date("2020-08-20T11:34:40.887Z") })
 jest.mock("nanoid")

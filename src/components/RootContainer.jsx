@@ -8,6 +8,7 @@ import { Provider } from "react-redux"
 import CanvasMenu from "./menu/CanvasMenu"
 import App from "./App"
 import store from "../store"
+import { KeycloakProvider } from "../KeycloakContext"
 import HoneybadgerNotifier from "Honeybadger"
 import { HoneybadgerErrorBoundary } from "@honeybadger-io/react"
 
@@ -18,29 +19,31 @@ const RootContainer = () => {
 
   return (
     <HoneybadgerErrorBoundary honeybadger={HoneybadgerNotifier}>
-      <div id="home-page">
-        <OffCanvas
-          width={300}
-          transitionDuration={300}
-          isMenuOpened={isMenuOpened}
-          position={"right"}
-          effect={"overlay"}
-        >
-          <OffCanvasBody className={offcanvasClass}>
-            <BrowserRouter>
-              <Provider store={store}>
-                <App
-                  isMenuOpened={isMenuOpened}
-                  handleOffsetMenu={() => setMenuOpened(!isMenuOpened)}
-                />
-              </Provider>
-            </BrowserRouter>
-          </OffCanvasBody>
-          <OffCanvasMenu className="offcanvas-menu">
-            <CanvasMenu closeHandleMenu={() => setMenuOpened(false)} />
-          </OffCanvasMenu>
-        </OffCanvas>
-      </div>
+      <KeycloakProvider>
+        <div id="home-page">
+          <OffCanvas
+            width={300}
+            transitionDuration={300}
+            isMenuOpened={isMenuOpened}
+            position={"right"}
+            effect={"overlay"}
+          >
+            <OffCanvasBody className={offcanvasClass}>
+              <BrowserRouter>
+                <Provider store={store}>
+                  <App
+                    isMenuOpened={isMenuOpened}
+                    handleOffsetMenu={() => setMenuOpened(!isMenuOpened)}
+                  />
+                </Provider>
+              </BrowserRouter>
+            </OffCanvasBody>
+            <OffCanvasMenu className="offcanvas-menu">
+              <CanvasMenu closeHandleMenu={() => setMenuOpened(false)} />
+            </OffCanvasMenu>
+          </OffCanvas>
+        </div>
+      </KeycloakProvider>
     </HoneybadgerErrorBoundary>
   )
 }

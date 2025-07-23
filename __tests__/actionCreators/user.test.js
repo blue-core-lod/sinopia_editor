@@ -1,3 +1,15 @@
+import {
+  loadUserData,
+  addTemplateHistory,
+  addResourceHistory,
+  addSearchHistory,
+} from "actionCreators/user"
+import * as sinopiaApi from "sinopiaApi"
+import configureMockStore from "redux-mock-store"
+import thunk from "redux-thunk"
+import { createState } from "stateUtils"
+import * as sinopiaSearch from "sinopiaSearch"
+
 let mockKeycloak
 
 jest.mock("keycloak-js", () => {
@@ -16,18 +28,6 @@ jest.mock("keycloak-js", () => {
     return mockKeycloak
   })
 })
-
-import {
-  loadUserData,
-  addTemplateHistory,
-  addResourceHistory,
-  addSearchHistory,
-} from "actionCreators/user"
-import * as sinopiaApi from "sinopiaApi"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
-import { createState } from "stateUtils"
-import * as sinopiaSearch from "sinopiaSearch"
 
 const mockStore = configureMockStore([thunk])
 

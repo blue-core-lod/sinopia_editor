@@ -1,4 +1,10 @@
 // Copyright 2019 Stanford University see LICENSE for license
+import React from "react"
+import SinopiaSearchResults from "components/search/SinopiaSearchResults"
+import { screen } from "@testing-library/react"
+import { createStore, renderComponent } from "testUtils"
+import { createState } from "stateUtils"
+
 let mockKeycloak
 
 jest.mock("keycloak-js", () => {
@@ -17,12 +23,6 @@ jest.mock("keycloak-js", () => {
     return mockKeycloak
   })
 })
-
-import React from "react"
-import SinopiaSearchResults from "components/search/SinopiaSearchResults"
-import { screen } from "@testing-library/react"
-import { createStore, renderComponent } from "testUtils"
-import { createState } from "stateUtils"
 
 describe("<SinopiaSearchResults />", () => {
   describe("when there are no search results", () => {

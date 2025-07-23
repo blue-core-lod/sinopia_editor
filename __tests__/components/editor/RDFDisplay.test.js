@@ -1,4 +1,16 @@
 // Copyright 2019 Stanford University see LICENSE for license
+import React from "react"
+import { render, screen } from "@testing-library/react"
+import RDFDisplay from "components/editor/preview/RDFDisplay"
+import GraphBuilder from "GraphBuilder"
+import { createState } from "stateUtils"
+import {
+  selectFullSubject,
+  selectCurrentResourceKey,
+} from "selectors/resources"
+import * as dataSetUtils from "utilities/Utilities"
+import { featureSetup } from "featureUtils"
+
 let mockKeycloak
 
 jest.mock("keycloak-js", () => {
@@ -17,18 +29,6 @@ jest.mock("keycloak-js", () => {
     return mockKeycloak
   })
 })
-
-import React from "react"
-import { render, screen } from "@testing-library/react"
-import RDFDisplay from "components/editor/preview/RDFDisplay"
-import GraphBuilder from "GraphBuilder"
-import { createState } from "stateUtils"
-import {
-  selectFullSubject,
-  selectCurrentResourceKey,
-} from "selectors/resources"
-import * as dataSetUtils from "utilities/Utilities"
-import { featureSetup } from "featureUtils"
 
 featureSetup()
 

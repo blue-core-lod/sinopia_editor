@@ -1,27 +1,12 @@
 // Copyright 2018 Stanford University see LICENSE for license
-let mockKeycloak
-
-jest.mock("keycloak-js", () => {
-  mockKeycloak = {
-    init: jest.fn(() => Promise.resolve(true)),
-    token: "Secret-Token",
-    authenticated: true,
-    isTokenExpired: jest.fn(),
-    updateToken: jest.fn(),
-    tokenParsed: {
-      preferred_username: "Foo McBar",
-    },
-  }
-
-  return jest.fn().mockImplementation((config) => {
-    return mockKeycloak
-  })
-})
-
 import { fireEvent, screen } from "@testing-library/react"
 import { createState } from "stateUtils"
 import { createStore, renderApp } from "testUtils"
 import { featureSetup } from "featureUtils"
+
+jest.mock("KeycloakContext", () => ({
+  useKeycloak: jest.fn().mockReturnValue({}),
+}))
 
 featureSetup()
 

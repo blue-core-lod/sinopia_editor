@@ -1,28 +1,19 @@
-let mockKeycloak
-
-jest.mock("keycloak-js", () => {
-  mockKeycloak = {
-    init: jest.fn(() => Promise.resolve(true)),
-    token: "Secret-Token",
-    authenticated: true,
-    isTokenExpired: jest.fn(),
-    updateToken: jest.fn(),
-    tokenParsed: {
-      preferred_username: "Foo McBar",
-    },
-  }
-
-  return jest.fn().mockImplementation((config) => {
-    return mockKeycloak
-  })
-})
-
 import React from "react"
 import SinopiaSort from "components/search/SinopiaSort"
 import * as server from "sinopiaSearch"
 import { fireEvent, screen } from "@testing-library/react"
 import { createStore, renderComponent } from "testUtils"
 import { createState } from "stateUtils"
+import { putUserHistory } from "../../../src/sinopiaApi"
+
+jest.mock("KeycloakContext", () => ({
+  useKeycloak: jest.fn().mockReturnValue({}),
+}))
+
+jest.mock("sinopiaApi", () => ({
+  getJwt: jest.fn().mockReturnValue("abcded123456"),
+  putUserHistory: jest.fn().mockReturnValue(Promise.resolve(true)),
+}))
 
 describe("<SinopiaSort />", () => {
   it("renders with default", () => {
@@ -45,6 +36,7 @@ describe("<SinopiaSort />", () => {
       },
     }
     const store = createStore(state)
+
     renderComponent(<SinopiaSort />, store)
 
     screen.getByText("Label, ascending", { selector: ".active" })
@@ -75,6 +67,9 @@ describe("<SinopiaSort />", () => {
     }
 
     const store = createStore(state)
+    const keycloak = jest.fn().mockReturnValue({
+      token: "abcdefg12345",
+    })
     renderComponent(<SinopiaSort />, store)
 
     fireEvent.click(screen.getByText("Sort by"))

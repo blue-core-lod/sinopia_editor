@@ -1,28 +1,17 @@
 // Copyright 2019 Stanford University see LICENSE for license
-let mockKeycloak
 
-jest.mock("keycloak-js", () => {
-  mockKeycloak = {
-    init: jest.fn(() => Promise.resolve(true)),
-    token: "Secret-Token",
-    authenticated: true,
-    isTokenExpired: jest.fn(),
-    updateToken: jest.fn(),
-    tokenParsed: {
-      preferred_username: "Foo McBar",
-    },
-  }
-
-  return jest.fn().mockImplementation((config) => {
-    return mockKeycloak
-  })
-})
 import { fireEvent, waitFor, screen } from "@testing-library/react"
 import { createStore, renderApp, createHistory } from "testUtils"
 import { createState } from "stateUtils"
 import fetchMock from "fetch-mock-jest"
 import { featureSetup, resourceHeaderSelector } from "featureUtils"
 import * as sinopiaApi from "sinopiaApi"
+
+const mockUseKeycloak = jest.fn()
+
+jest.mock("../../src/KeycloakContext", () => ({
+  useKeycloak: () => mockUseKeycloak(),
+}))
 
 beforeEach(() => {
   fetchMock.mockReset()
@@ -45,6 +34,11 @@ featureSetup()
 describe("<App />", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockUseKeycloak.mockReturnValue({
+      keycloak: {
+        authenticated: false,
+      },
+    })
   })
 
   it("loads languages", async () => {
@@ -99,7 +93,7 @@ describe("<App />", () => {
 
   it("authenticates", async () => {
     sinopiaApi.fetchUser = jest.fn().mockResolvedValue({})
-    const state = createState({ notAuthenticated: true })
+    const state = createState({ notAuthenticated: false })
     const store = createStore(state)
     renderApp(store)
 
@@ -109,7 +103,11 @@ describe("<App />", () => {
   describe("when user is not authenticated", () => {
     beforeEach(() => {
       jest.clearAllMocks()
-      mockKeycloak.authenticated = false
+      mockUseKeycloak.mockReturnValue({
+        keycloak: {
+          authenticated: false,
+        },
+      })
     })
 
     const state = createState({ notAuthenticated: true })
@@ -146,8 +144,10 @@ describe("<App />", () => {
     })
 
     it("creates new resource and renders editor for /editor/<rtId>", async () => {
+      const state = createState({ notAuthenticated: false })
+      const store = createStore(state)
       const history = createHistory(["/editor/resourceTemplate:bf2:Note"])
-      renderApp(null, history)
+      renderApp(store, history)
 
       await screen.findByText("Note", { selector: resourceHeaderSelector })
     })

@@ -1,27 +1,12 @@
 // Copyright 2020 Stanford University see LICENSE for license
-let mockKeycloak
-
-jest.mock("keycloak-js", () => {
-  mockKeycloak = {
-    init: jest.fn(() => Promise.resolve(true)),
-    token: "Secret-Token",
-    authenticated: true,
-    isTokenExpired: jest.fn(),
-    updateToken: jest.fn(),
-    tokenParsed: {
-      preferred_username: "Foo McBar",
-    },
-  }
-
-  return jest.fn().mockImplementation((config) => {
-    return mockKeycloak
-  })
-})
-
 import React from "react"
 import { renderComponent } from "testUtils"
 import { screen } from "@testing-library/react"
 import Vocab from "components/vocabulary/Vocab"
+
+jest.mock("KeycloakContext", () => ({
+  useKeycloak: jest.fn().mockReturnValue({}),
+}))
 
 describe("Sinopia Vocabulary", () => {
   it("displays the vocabulary used by Sinopia", async () => {
