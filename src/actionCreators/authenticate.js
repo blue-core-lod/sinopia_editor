@@ -16,7 +16,7 @@ export const authenticate = (keycloak) => async (dispatch, getState) => {
     }
     const userInfo = keycloak.tokenParsed
     dispatch(setUser(toUser(userInfo)))
-    dispatch(loadUserData(userInfo.preferred_username))
+    dispatch(loadUserData(userInfo.preferred_username, keycloak))
     return Promise.resolve(true)
   }
   dispatch(removeUser())

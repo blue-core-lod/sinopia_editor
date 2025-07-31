@@ -27,6 +27,7 @@ export const KeycloakProvider = ({ children }) => {
   const [initialized, setInitialized] = useState(false)
 
   useEffect(() => {
+    if (keycloak.initialized) return
     keycloak.init().then((authenticated) => {
       setAuthenticated(authenticated)
       setInitialized(true)

@@ -33,14 +33,19 @@ export const loadTemplateHistory = (templateIds) => (dispatch) => {
     .catch((err) => console.error(err))
 }
 
-export const loadSearchHistory = (searches) => (dispatch) => {
+export const loadSearchHistory = (searches, keycloak) => (dispatch) => {
   if (_.isEmpty(searches)) return
   searches.reverse().forEach((search) => {
     const authorityConfig = findAuthorityConfig(search.authorityUri)
     if (!authorityConfig) return
 
     dispatch(
-      addSearchHistory(search.authorityUri, authorityConfig.label, search.query)
+      addSearchHistory(
+        search.authorityUri,
+        authorityConfig.label,
+        search.query,
+        keycloak
+      )
     )
   })
 }

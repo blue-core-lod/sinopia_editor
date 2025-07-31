@@ -75,7 +75,7 @@ const HeaderSearch = () => {
         searchUri = baseUri
       }
     }
-    fetchNewSearchResults(query, searchUri, keycloak, options)
+    fetchNewSearchResults(query, searchUri, options, keycloak)
     if (uri === "urn:ld4p:sinopia" && query !== "*") {
       fetchTemplateGuessSearchResults(query)
     } else {

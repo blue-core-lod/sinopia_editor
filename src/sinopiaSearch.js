@@ -28,7 +28,11 @@ export const getSearchResults = async (query, options = {}) =>
  * @param {Object} options for the search (resultsPerPage, queryFrom, sortField, sortOrder, typeFilter, noFacetResults)
  * @return {Promise<Object>} promise containing the result of the search.
  */
-export const getSearchResultsWithFacets = async (query, options = {}) => {
+export const getSearchResultsWithFacets = async (
+  query,
+  options = {},
+  keycloak
+) => {
   if (Config.useResourceTemplateFixtures && hasFixtureResource(query))
     return Promise.resolve(resourceSearchResults(query))
 
@@ -84,7 +88,7 @@ export const getSearchResultsWithFacets = async (query, options = {}) => {
       },
     }
   }
-  return fetchSearchResults(body)
+  return fetchSearchResults(body, keycloak)
 }
 
 export const getSearchResultsByUris = (resourceUris) => {
@@ -108,6 +112,7 @@ export const getSearchResultsByUris = (resourceUris) => {
 
 const fetchSearchResults = (body, keycloak) => {
   const url = `${Config.searchHost}${Config.searchPath}`
+
   return fetch(url, {
     method: "GET",
   })
@@ -125,7 +130,6 @@ const fetchSearchResults = (body, keycloak) => {
           undefined,
         ]
       }
-      console.log(`Before returning results`, hitsToResult(json))
       return [hitsToResult(json), aggregationsToResult(json)]
     })
     .catch((err) => [
@@ -160,7 +164,6 @@ const hitsToResult = (payload) => {
       editGroups: ["blue core"],
     })
   })
-  console.log(results)
   return {
     totalHits: payload.total,
     results: results,

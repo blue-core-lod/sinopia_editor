@@ -36,14 +36,17 @@ const addTemplateResult = (state, result) => {
   }
 }
 
-export const addSearchHistory = (state, action) => ({
-  ...state,
-  searches: addToHistory(
-    state.searches,
-    action.payload,
-    (newItem, checkItem) => !_.isEqual(newItem, checkItem)
-  ),
-})
+export const addSearchHistory = (state, action) => {
+  return {
+    ...state,
+    searches: addToHistory(
+      state.searches,
+      action.payload,
+      (newItem, checkItem) => !_.isEqual(newItem, checkItem)
+    ),
+    keycloak: action.payload.keycloak,
+  }
+}
 
 export const addResourceHistoryByResult = (state, action) =>
   addResourceResult(state, action.payload)
