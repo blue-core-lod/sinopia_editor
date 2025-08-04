@@ -296,7 +296,6 @@ describe("newResourceFromDataset", () => {
         (action) => action.type === "ADD_SUBJECT"
       )
 
-      // console.log(JSON.safeStringify(addSubjectAction))
       expect(safeAction(addSubjectAction)).toEqual(expectedOrderedAction)
 
       expect(actions).toHaveAction("SET_UNUSED_RDF", {

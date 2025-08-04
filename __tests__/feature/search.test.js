@@ -68,11 +68,8 @@ describe("sinopia resource search", () => {
       skipped: 0,
       failed: 0,
     },
-    hits: {
-      total: { value: 3 },
-      max_score: 0.2876821,
-      hits: [fooBarHit, fooHit, bazHit],
-    },
+    items: [fooBarHit, fooHit, bazHit],
+    total: 3,
   }
 
   const successResultResorted = {

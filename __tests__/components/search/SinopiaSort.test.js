@@ -44,6 +44,10 @@ describe("<SinopiaSort />", () => {
 
   it("clicking changes the sort order", async () => {
     const mockGetSearchResults = jest.fn()
+    const keycloak = jest.fn().mockReturnValue({
+      token: "abcdefg12345",
+    })
+
     server.getSearchResultsWithFacets = mockGetSearchResults.mockResolvedValue([
       {
         totalHits: 1,
@@ -67,20 +71,22 @@ describe("<SinopiaSort />", () => {
     }
 
     const store = createStore(state)
-    const keycloak = jest.fn().mockReturnValue({
-      token: "abcdefg12345",
-    })
+
     renderComponent(<SinopiaSort />, store)
 
     fireEvent.click(screen.getByText("Sort by"))
     fireEvent.click(screen.getByText("Label, ascending"))
 
     await screen.findByText("Label, ascending", { selector: ".active" })
-    expect(server.getSearchResultsWithFacets).toHaveBeenCalledWith("twain", {
-      startOfRange: 0,
-      resultsPerPage: 15,
-      sortField: "label",
-      sortOrder: "asc",
-    })
+    expect(server.getSearchResultsWithFacets).toHaveBeenCalledWith(
+      "twain",
+      {
+        startOfRange: 0,
+        resultsPerPage: 15,
+        sortField: "label",
+        sortOrder: "asc",
+      },
+      undefined
+    )
   })
 })
