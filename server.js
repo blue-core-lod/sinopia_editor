@@ -11,8 +11,10 @@ import Config from "./src/Config"
 import cors from "cors"
 import proxy from "express-http-proxy"
 
-const port = 8000
+const port = 8004
 const app = express()
+
+app.set('trust proxy', true);
 
 app.use(express.urlencoded({ extended: true })) // handle URL-encoded data
 
