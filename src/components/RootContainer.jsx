@@ -8,6 +8,7 @@ import { Provider } from "react-redux"
 import CanvasMenu from "./menu/CanvasMenu"
 import App from "./App"
 import store from "../store"
+import Config from "../Config"
 import { KeycloakProvider } from "../KeycloakContext"
 import HoneybadgerNotifier from "Honeybadger"
 import { HoneybadgerErrorBoundary } from "@honeybadger-io/react"
@@ -29,7 +30,7 @@ const RootContainer = () => {
             effect={"overlay"}
           >
             <OffCanvasBody className={offcanvasClass}>
-              <BrowserRouter>
+              <BrowserRouter basename="/sinopia">
                 <Provider store={store}>
                   <App
                     isMenuOpened={isMenuOpened}

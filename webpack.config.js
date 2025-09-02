@@ -70,7 +70,7 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, "/dist"),
-    publicPath: "/dist/",
+    publicPath: "/sinopia/dist/",
     filename: "bundle.js",
   },
   plugins: [
