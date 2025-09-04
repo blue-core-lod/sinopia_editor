@@ -8,10 +8,18 @@ export const addTemplateHistoryByResult = (result) => ({
   payload: result,
 })
 
-export const addSearchHistory = (authorityUri, authorityLabel, query) => ({
-  type: "ADD_SEARCH_HISTORY",
-  payload: { authorityUri, authorityLabel, query },
-})
+export const addSearchHistory = (
+  authorityUri,
+  authorityLabel,
+  query,
+  keycloak
+) => {
+  const payload = { authorityUri, authorityLabel, query, keycloak }
+  return {
+    type: "ADD_SEARCH_HISTORY",
+    payload: payload,
+  }
+}
 
 export const addResourceHistory = (resourceUri, type, group, modified) => ({
   type: "ADD_RESOURCE_HISTORY",

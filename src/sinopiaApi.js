@@ -105,7 +105,10 @@ export const fetchResourceRelationships = (uri) => {
 }
 
 // Fetches list of groups
-export const getGroups = () => getJsonData(`${Config.sinopiaApiBase}/groups`)
+export const getGroups = () => {
+  return Promise.resolve([{ id: "blue core",
+                            label: "Blue Core" }])
+}
 
 // Publishes (saves) a new resource
 export const postResource = (

@@ -7,7 +7,7 @@ import {
 } from "actionCreators/history"
 import md5 from "crypto-js/md5"
 
-export const loadUserData = (userId) => (dispatch) =>
+export const loadUserData = (userId, keycloak) => (dispatch) =>
   fetchUser(userId)
     .then((userData) => {
       const templateIds = userData.data.history.template.map(
@@ -17,7 +17,7 @@ export const loadUserData = (userId) => (dispatch) =>
       const searches = userData.data.history.search.map((historyItem) =>
         JSON.parse(historyItem.payload)
       )
-      dispatch(loadSearchHistory(searches))
+      dispatch(loadSearchHistory(searches, keycloak))
       const resourceUris = userData.data.history.resource.map(
         (historyItem) => historyItem.payload
       )
@@ -25,14 +25,15 @@ export const loadUserData = (userId) => (dispatch) =>
     })
     .catch((err) => console.error(err))
 
-const addHistory = (historyType, payload) => (dispatch, getState) => {
+const addHistory = (historyType, payload, keycloak) => (dispatch, getState) => {
   const user = selectUser(getState())
   if (!user) return
   return putUserHistory(
     user.username,
     historyType,
     md5(payload).toString(),
-    payload
+    payload,
+    keycloak
   ).catch((err) => console.error(err))
 }
 
@@ -42,7 +43,8 @@ export const addTemplateHistory = (templateId) => (dispatch) =>
 export const addResourceHistory = (uri) => (dispatch) =>
   dispatch(addHistory("resource", uri))
 
-export const addSearchHistory = (authorityUri, query) => (dispatch) => {
-  const payload = JSON.stringify({ authorityUri, query })
-  return dispatch(addHistory("search", payload))
-}
+export const addSearchHistory =
+  (authorityUri, query, keycloak) => (dispatch) => {
+    const payload = JSON.stringify({ authorityUri, query })
+    return dispatch(addHistory("search", payload, keycloak))
+  }

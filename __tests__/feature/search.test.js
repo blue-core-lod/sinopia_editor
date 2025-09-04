@@ -15,13 +15,13 @@ describe("sinopia resource search", () => {
     _index: "sinopia_resources",
     _type: "sinopia",
     _id: "resource/cornell/34ef053e-f558-4299-a8a7-c8b79a598d99",
-    _score: 0.2876821,
-    _source: {
-      title: ["foo bar"],
-      uri: "http://platform:8080/resource/cornell/34ef053e-f558-4299-a8a7-c8b79a598d99",
-      label: "foo bar",
-      type: ["http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle"],
-      group: "cornell",
+    uri: "http://platform:8080/resource/cornell/34ef053e-f558-4299-a8a7-c8b79a598d99",
+    data: {
+      title: {
+        mainTitle: "foo bar"
+      },
+      "@type": ["http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle"],
+      group: "blue core",
       created: "2019-11-27T19:05:50.496Z",
       modified: "2019-11-27T19:05:50.496Z",
     },
@@ -31,13 +31,13 @@ describe("sinopia resource search", () => {
     _index: "sinopia_resources",
     _type: "sinopia",
     _id: "resource/cornell/a96f16c1-a15c-4f4f-8a25-7ed49ba1eebe",
-    _score: 0.2876819,
-    _source: {
-      title: ["foo"],
-      uri: "http://platform:8080/resource/cornell/a96f16c1-a15c-4f4f-8a25-7ed49ba1eebe",
-      label: "foo",
-      type: ["http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle"],
-      group: "cornell",
+    uri: "http://platform:8080/resource/cornell/a96f16c1-a15c-4f4f-8a25-7ed49ba1eebe",
+    data: {
+      title: {
+        mainTitle: "foo"
+      },
+      "@type": ["http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle"],
+      group: "blue core",
       created: "2019-11-27T19:05:52.496Z",
       modified: "2019-11-27T19:05:52.496Z",
     },
@@ -48,12 +48,13 @@ describe("sinopia resource search", () => {
     _type: "sinopia",
     _id: "resource/stanford/a96f16c1-a15c-4f4f-8a25-7ed49ba1eebe",
     _score: 0.2876822,
-    _source: {
-      title: ["baz"],
-      uri: "http://platform:8080/resource/stanford/d7b0eb50-17bb-4258-83be-2cef2e9fc3ad",
-      label: "baz",
-      type: ["http://id.loc.gov/ontologies/bibframe/Title"],
-      group: "stanford",
+    uri: "http://platform:8080/resource/stanford/d7b0eb50-17bb-4258-83be-2cef2e9fc3ad",
+    data: {
+      title: {
+        mainTitle: "baz"
+      } ,
+      "@type": ["http://id.loc.gov/ontologies/bibframe/Title"],
+      group: "blue core",
       created: "2019-11-27T19:05:48.496Z",
       modified: "2019-11-27T19:05:48.496Z",
     },
@@ -68,11 +69,8 @@ describe("sinopia resource search", () => {
       skipped: 0,
       failed: 0,
     },
-    hits: {
-      total: { value: 3 },
-      max_score: 0.2876821,
-      hits: [fooBarHit, fooHit, bazHit],
-    },
+    results: [fooBarHit, fooHit, bazHit],
+    total: 3,
   }
 
   const successResultResorted = {
@@ -84,11 +82,12 @@ describe("sinopia resource search", () => {
       skipped: 0,
       failed: 0,
     },
-    hits: {
-      total: { value: 3 },
-      max_score: 0.2876821,
-      hits: [bazHit, fooBarHit, fooHit],
-    },
+    results: [bazHit, fooBarHit, fooHit],
+    // hits: {
+    //   total: { value: 3 },
+    //   max_score: 0.2876821,
+    //   results: [bazHit, fooBarHit, fooHit],
+    // },
   }
 
   const successResultPage1 = {

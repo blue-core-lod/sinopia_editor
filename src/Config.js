@@ -69,7 +69,8 @@ class Config {
    * This is the public endpont for the sinopia search.
    */
   static get searchPath() {
-    return "/api/search/sinopia_resources/_search"
+    // return "/api/search/sinopia_resources/_search"
+    return "/search"
   }
 
   static get templateSearchPath() {

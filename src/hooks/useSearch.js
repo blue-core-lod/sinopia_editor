@@ -28,7 +28,8 @@ const useSearch = (errorKey) => {
   const fetchSinopiaSearchResults = (
     queryString,
     searchOptions,
-    startOfRange
+    startOfRange,
+    keycloak
   ) =>
     dispatch(
       fetchSinopiaSearchResultsCreator(
@@ -37,7 +38,8 @@ const useSearch = (errorKey) => {
           ...searchOptions,
           startOfRange,
         },
-        errorKey
+        errorKey,
+        keycloak
       )
     )
 
@@ -45,18 +47,31 @@ const useSearch = (errorKey) => {
     queryString,
     uri,
     searchOptions,
-    startOfRange
+    startOfRange,
+    keycloak
   ) => {
     if (uri === sinopiaSearchUri) {
-      return fetchSinopiaSearchResults(queryString, searchOptions, startOfRange)
+      return fetchSinopiaSearchResults(
+        queryString,
+        searchOptions,
+        startOfRange,
+        keycloak
+      )
     }
     return fetchQASearchResults(queryString, uri, searchOptions, startOfRange)
   }
 
-  const fetchNewSearchResults = (queryString, uri, searchOptions = {}) => {
-    fetchSearchResults(queryString, uri, searchOptions, 0).then((result) => {
-      if (result) history.push("/search")
-    })
+  const fetchNewSearchResults = (
+    queryString,
+    uri,
+    searchOptions = {},
+    keycloak
+  ) => {
+    fetchSearchResults(queryString, uri, searchOptions, 0, keycloak).then(
+      (result) => {
+        if (result) history.push("/search")
+      }
+    )
   }
 
   const fetchTemplateGuessSearchResults = (

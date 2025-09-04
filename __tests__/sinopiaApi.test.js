@@ -175,8 +175,6 @@ describe("fetchResource", () => {
 describe("postResource", () => {
   const state = createState({ hasResourceWithLiteral: true })
   const currentUser = selectUser(state)
-  console.log(`state`, state)
-  console.log(`currentUser`, currentUser)
 
   describe("with a new resource", () => {
     const resource = selectFullSubject(state, "t9zVwg2zO")
