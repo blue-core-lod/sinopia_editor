@@ -7,9 +7,12 @@ ARG SINOPIA_URI=http://localhost/sinopia
 ARG SINOPIA_ENV=bluecore
 ARG INDEX_URL
 ARG EXPORT_BUCKET_URL
+ARG KEYCLOAK_URL
 
 # Set environment variables from the build args
-ENV INDEX_URL ${INDEX_URL}
+ENV INDEX_URL=$INDEX_URL
+ENV KEYCLOAK_URL=$KEYCLOAK_URL
+ENV SINOPIA_URL=$SINOPIA_URL
 
 COPY package.json .
 COPY package-lock.json .
