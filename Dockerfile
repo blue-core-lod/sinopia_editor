@@ -9,7 +9,9 @@ ARG INDEX_URL
 ARG EXPORT_BUCKET_URL
 
 # Set environment variables from the build args
-ENV INDEX_URL ${INDEX_URL}
+ENV INDEX_URL=$INDEX_URL
+ENV KEYCLOAK_URL=$KEYCLOAK_URL
+ENV SINOPIA_URI=$SINOPIA_URI
 
 COPY package.json .
 COPY package-lock.json .
