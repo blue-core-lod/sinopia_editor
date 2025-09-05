@@ -97,6 +97,7 @@ module.exports = {
       EXPORT_BUCKET_URL: null,
       HONEYBADGER_API_KEY: null,
       HONEYBADGER_REVISION: null,
+      KEYCLOAK_URL: null,
     }),
   ],
   devtool: "source-map",

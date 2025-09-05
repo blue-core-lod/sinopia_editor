@@ -70,7 +70,7 @@ class Config {
    */
   static get searchPath() {
     // return "/api/search/sinopia_resources/_search"
-    return "/search"
+    return "/api/search"
   }
 
   static get templateSearchPath() {
