@@ -165,7 +165,7 @@ const aggregationsToResult = (aggs) => {
 
 export const getTemplateSearchResults = (query, options = {}) => {
   const body = getTemplateSearchResultsBody(query, options)
-  return fetchTemplateSearchResults(body, templateHitsToResult).then(
+  return fetchTemplateSearchResults(query, templateHitsToResult).then(
     (searchResults) => {
       if (Config.useResourceTemplateFixtures) {
         const newResults = searchResults.results.filter(
@@ -243,11 +243,10 @@ const fetchTemplateSearchResults = async (body, hitsToResultFunc) => {
     }
   }
 
-  const url = `${Config.searchHost}${Config.templateSearchPath}`
+  const url = `${Config.searchHost}${Config.templateSearchPath}?${body}`
   return fetch(url, {
-    method: "POST",
+    method: "GET",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
   })
     .then((resp) => {
       if (resp.status >= 300) {
@@ -267,7 +266,7 @@ const fetchTemplateSearchResults = async (body, hitsToResultFunc) => {
           error: json.error.reason || json.error,
         }
       }
-      return hitsToResultFunc(json.hits)
+      return hitsToResultFunc(json.results)
     })
     .catch((err) => ({
       totalHits: 0,
@@ -276,9 +275,46 @@ const fetchTemplateSearchResults = async (body, hitsToResultFunc) => {
     }))
 }
 
+const templateModFromBlueCore = (hit) => {
+  // Formats Blue Core Template Result for editor's expectations
+  let resourceAuthor = "Unknown"
+  let resourceId = "Unknown"
+  let resourceDate = "Unknown"
+  let resourceLabel = "Unknown"
+  let resourceRemark = ""
+  let resourceURI = "Unknown"
+  hit.data.map((row) => {
+    if (row["@id"] === hit.uri) {
+      resourceAuthor =
+        row["http://sinopia.io/vocabulary/hasAuthor"][0]["@value"]
+      resourceDate = row["http://sinopia.io/vocabulary/hasDate"][0]["@value"]
+      resourceLabel =
+        row["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"]
+      resourceId =
+        row["http://sinopia.io/vocabulary/hasResourceId"][0]["@value"]
+      resourceURI = row["http://sinopia.io/vocabulary/hasClass"][0]["@id"]
+      resourceRemark = row["http://sinopia.io/vocabulary/hasRemark"]
+        ? row["http://sinopia.io/vocabulary/hasRemark"][0]["@value"]
+        : ""
+    }
+  })
+  const bcURI = `${Config.sinopiaApiBase}/resources/${hit.id}`
+  return {
+    author: resourceAuthor,
+    date: resourceDate,
+    group: "blue core", // hardcoded for now
+    id: resourceId,
+    originalURI: hit.uri,
+    remark: resourceRemark,
+    resourceLabel: resourceLabel,
+    resourceURI: resourceURI,
+    uri: bcURI,
+  }
+}
+
 const templateHitsToResult = (hits) => ({
-  totalHits: hits.total.value,
-  results: hits.hits.map((row) => row._source),
+  totalHits: hits.length,
+  results: hits.map((row) => templateModFromBlueCore(row)),
 })
 
 const templateLookupToResult = (hits) => ({

@@ -43,6 +43,8 @@ import { addResourceHistory } from "actionCreators/history"
 import _ from "lodash"
 import { setCurrentComponent } from "actions/index"
 import { loadRelationships } from "./relationships"
+import { useKeycloak } from "../KeycloakContext"
+
 
 /**
  * A thunk that loads an existing resource from Sinopia API and adds to state.
@@ -52,6 +54,7 @@ export const loadResource =
   (uri, errorKey, { asNewResource = false, version = null } = {}) =>
   (dispatch) => {
     dispatch(clearErrors(errorKey))
+    console.log(`In actionCreators/resources.js loadResource`, uri)
     return fetchResource(uri, { version })
       .then(([dataset, response]) => {
         if (!dataset) return false
@@ -127,7 +130,8 @@ export const dispatchResourceForEditor =
           resource.uri,
           resource.subjectTemplate.class,
           response.group,
-          response.timestamp
+          response.timestamp,
+          keycloak
         )
       )
       dispatch(loadResourceFinished(resource.key))

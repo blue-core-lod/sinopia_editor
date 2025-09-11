@@ -74,7 +74,7 @@ class Config {
   }
 
   static get templateSearchPath() {
-    return "/api/search/sinopia_templates/_search"
+    return "/profile"
   }
 
   static get sinopiaDomainName() {
