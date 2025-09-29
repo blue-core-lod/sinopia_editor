@@ -28,7 +28,7 @@ import useAlerts from "hooks/useAlerts"
 const SaveAndPublishButton = (props) => {
   const dispatch = useDispatch()
   const errorKey = useAlerts()
-  const keycloak = useKeycloak()
+  const { keycloak } = useKeycloak()
 
   const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
   // selectPickSubject and shallowEqual prevents rerender from unrelated changed.

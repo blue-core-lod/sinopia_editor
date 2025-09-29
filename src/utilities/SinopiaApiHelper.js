@@ -16,7 +16,7 @@ export const checkResp = (resp) => {
     })
     .catch((err) => {
       if (err.name === "ApiError") throw err
-      throw new Error(`Sinopia API returned ${resp.statusText}`)
+      throw new Error(`Blue Core API returned ${resp.statusText}`)
     })
 }
 
@@ -50,6 +50,4 @@ export const templateIdFor = (resource) => {
   return resourceIdProperty.values[0].literal
 }
 
-export const getJwt = (keycloak) => {
-  return keycloak.token
-}
+export const getJwt = (keycloak) => keycloak.token

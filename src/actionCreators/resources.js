@@ -43,6 +43,8 @@ import { addResourceHistory } from "actionCreators/history"
 import _ from "lodash"
 import { setCurrentComponent } from "actions/index"
 import { loadRelationships } from "./relationships"
+import { useKeycloak } from "../KeycloakContext"
+
 
 /**
  * A thunk that loads an existing resource from Sinopia API and adds to state.
@@ -101,14 +103,14 @@ export const loadResource =
   }
 
 export const loadResourceForEditor =
-  (uri, errorKey, { asNewResource = false } = {}) =>
+  (uri, errorKey, { asNewResource = false } = {}, keycloak) =>
   (dispatch) =>
     dispatch(loadResource(uri, errorKey, { asNewResource })).then((result) =>
-      dispatch(dispatchResourceForEditor(result, uri, { asNewResource }))
+      dispatch(dispatchResourceForEditor(result, uri, { asNewResource }, keycloak))
     )
 
 export const dispatchResourceForEditor =
-  (result, uri, { asNewResource = false } = {}) =>
+  (result, uri, { asNewResource = false } = {}, keycloak) =>
   (dispatch) => {
     if (!result) return false
     const [response, resource] = result
@@ -121,13 +123,14 @@ export const dispatchResourceForEditor =
     )
     dispatch(setCurrentResource(resource.key))
     if (!asNewResource) {
-      dispatch(addUserResourceHistory(uri))
+      dispatch(addUserResourceHistory(uri, keycloak))
       dispatch(
         addResourceHistory(
           resource.uri,
           resource.subjectTemplate.class,
           response.group,
-          response.timestamp
+          response.timestamp,
+          keycloak
         )
       )
       dispatch(loadResourceFinished(resource.key))
@@ -308,11 +311,11 @@ export const saveResource =
 
     dispatch(clearErrors(errorKey))
 
-    return putResource(resource, currentUser, group, editGroups, keycloak)
+    return putResource(resource, currentUser, group, editGroups, null, keycloak)
       .then(() => {
         dispatch(setResourceGroup(resourceKey, group, editGroups))
         dispatch(saveResourceFinished(resourceKey))
-        dispatch(addUserResourceHistory(resource.uri))
+        dispatch(addUserResourceHistory(resource.uri, keycloak))
         dispatch(
           addResourceHistory(
             resource.uri,

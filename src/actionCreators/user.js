@@ -40,8 +40,8 @@ const addHistory = (historyType, payload, keycloak) => (dispatch, getState) => {
 export const addTemplateHistory = (templateId) => (dispatch) =>
   dispatch(addHistory("template", templateId))
 
-export const addResourceHistory = (uri) => (dispatch) =>
-  dispatch(addHistory("resource", uri))
+export const addResourceHistory = (uri, keycloak) => (dispatch) =>
+  dispatch(addHistory("resource", uri, keycloak))
 
 export const addSearchHistory =
   (authorityUri, query, keycloak) => (dispatch) => {

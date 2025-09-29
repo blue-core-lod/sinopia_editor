@@ -17,6 +17,7 @@ import {
   setCurrentPreviewResource,
 } from "actions/resources"
 import { useHistory } from "react-router-dom"
+import { useKeycloak } from "../KeycloakContext"
 
 const useResource = (
   errorKey,
@@ -24,6 +25,7 @@ const useResource = (
 ) => {
   const dispatch = useDispatch()
   const history = useHistory()
+  const { keycloak } = useKeycloak()
   const errors = useSelector((state) => selectErrors(state, errorKey))
   const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
   // These are resources that are already loaded
@@ -52,7 +54,12 @@ const useResource = (
     if (event) event.preventDefault()
     setStatus("loading copy")
     dispatch(
-      loadResourceForEditor(resourceURI, errorKey, { asNewResource: true })
+      loadResourceForEditor(
+        resourceURI,
+        errorKey,
+        { asNewResource: true },
+        keycloak
+      )
     ).then((result) => {
       setStatus("ready")
       if (result) setNavigateEditor(true)
@@ -67,10 +74,12 @@ const useResource = (
       setNavigateEditor(true)
     } else {
       setStatus("loading edit")
-      dispatch(loadResourceForEditor(resourceURI, errorKey)).then((result) => {
-        setStatus("ready")
-        if (result) setNavigateEditor(true)
-      })
+      dispatch(loadResourceForEditor(resourceURI, errorKey, {}, keycloak)).then(
+        (result) => {
+          setStatus("ready")
+          if (result) setNavigateEditor(true)
+        }
+      )
     }
   }
 
