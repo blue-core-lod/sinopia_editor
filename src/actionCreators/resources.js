@@ -54,7 +54,6 @@ export const loadResource =
   (uri, errorKey, { asNewResource = false, version = null } = {}) =>
   (dispatch) => {
     dispatch(clearErrors(errorKey))
-    console.log(`In actionCreators/resources.js loadResource`, uri)
     return fetchResource(uri, { version })
       .then(([dataset, response]) => {
         if (!dataset) return false
@@ -104,14 +103,14 @@ export const loadResource =
   }
 
 export const loadResourceForEditor =
-  (uri, errorKey, { asNewResource = false } = {}) =>
+  (uri, errorKey, { asNewResource = false } = {}, keycloak) =>
   (dispatch) =>
     dispatch(loadResource(uri, errorKey, { asNewResource })).then((result) =>
-      dispatch(dispatchResourceForEditor(result, uri, { asNewResource }))
+      dispatch(dispatchResourceForEditor(result, uri, { asNewResource }, keycloak))
     )
 
 export const dispatchResourceForEditor =
-  (result, uri, { asNewResource = false } = {}) =>
+  (result, uri, { asNewResource = false } = {}, keycloak) =>
   (dispatch) => {
     if (!result) return false
     const [response, resource] = result
@@ -124,7 +123,7 @@ export const dispatchResourceForEditor =
     )
     dispatch(setCurrentResource(resource.key))
     if (!asNewResource) {
-      dispatch(addUserResourceHistory(uri))
+      dispatch(addUserResourceHistory(uri, keycloak))
       dispatch(
         addResourceHistory(
           resource.uri,
@@ -312,11 +311,11 @@ export const saveResource =
 
     dispatch(clearErrors(errorKey))
 
-    return putResource(resource, currentUser, group, editGroups, keycloak)
+    return putResource(resource, currentUser, group, editGroups, null, keycloak)
       .then(() => {
         dispatch(setResourceGroup(resourceKey, group, editGroups))
         dispatch(saveResourceFinished(resourceKey))
-        dispatch(addUserResourceHistory(resource.uri))
+        dispatch(addUserResourceHistory(resource.uri, keycloak))
         dispatch(
           addResourceHistory(
             resource.uri,

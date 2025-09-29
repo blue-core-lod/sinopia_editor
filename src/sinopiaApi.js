@@ -105,10 +105,7 @@ export const fetchResourceRelationships = (uri) => {
 }
 
 // Fetches list of groups
-export const getGroups = () => {
-  return Promise.resolve([{ id: "blue core",
-                            label: "Blue Core" }])
-}
+export const getGroups = () => Promise.resolve([{ id: "blue core", label: "Blue Core" }])
 
 // Publishes (saves) a new resource
 export const postResource = (
@@ -252,17 +249,17 @@ const saveBodyForResource = (resource, user, group, editGroups) => {
 
   return jsonldFromDataset(dataset).then((jsonld) =>
     JSON.stringify({
-      data: jsonld,
-      user,
-      group,
-      editGroups,
-      templateId: resource.subjectTemplate.id,
-      types: [resource.subjectTemplate.class],
-      bfAdminMetadataRefs: resource.bfAdminMetadataRefs,
-      sinopiaLocalAdminMetadataForRefs: resource.localAdminMetadataForRefs,
-      bfItemRefs: resource.bfItemRefs,
-      bfInstanceRefs: resource.bfInstanceRefs,
-      bfWorkRefs: resource.bfWorkRefs,
+      data: JSON.stringify(jsonld),
+      // user,
+      // group,
+      // editGroups,
+      // templateId: resource.subjectTemplate.id,
+      // types: [resource.subjectTemplate.class],
+      // bfAdminMetadataRefs: resource.bfAdminMetadataRefs,
+      // sinopiaLocalAdminMetadataForRefs: resource.localAdminMetadataForRefs,
+      // bfItemRefs: resource.bfItemRefs,
+      // bfInstanceRefs: resource.bfInstanceRefs,
+      // bfWorkRefs: resource.bfWorkRefs,
     })
   )
 }
