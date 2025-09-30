@@ -674,9 +674,5 @@ const newValueCopy = (valueKey, property) => (dispatch, getState) => {
 
 export const resourceTemplateIdFromDataset = (uri, dataset) => {
   const resourceTemplateId = findRootResourceTemplateId(uri, dataset)
-  if (!resourceTemplateId)
-    throw new Error(
-      "A single resource template must be included as a triple (http://sinopia.io/vocabulary/hasResourceTemplate)"
-    )
-  return resourceTemplateId
+  return resourceTemplateId || null
 }

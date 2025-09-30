@@ -89,6 +89,16 @@ export const setCurrentComponent = (state, action) => {
   }
 }
 
+export const setPendingResourceTemplateSelection = (state, action) => ({
+  ...state,
+  pendingResourceTemplateSelection: action.payload,
+})
+
+export const clearPendingResourceTemplateSelection = (state) => ({
+  ...state,
+  pendingResourceTemplateSelection: null,
+})
+
 const authHandlers = {
   SET_USER: setUser,
   REMOVE_USER: removeUser,
@@ -97,6 +107,8 @@ const authHandlers = {
 const editorHandlers = {
   ADD_ERROR: addError,
   CLEAR_ERRORS: clearErrors,
+  CLEAR_PENDING_RESOURCE_TEMPLATE_SELECTION:
+    clearPendingResourceTemplateSelection,
   CLEAR_RESOURCE: clearResourceFromEditor,
   HIDE_MODAL: hideModal,
   HIDE_VALIDATION_ERRORS: hideValidationErrors,
@@ -106,6 +118,7 @@ const editorHandlers = {
   SET_CURRENT_EDIT_RESOURCE: setCurrentEditResource,
   SET_CURRENT_PREVIEW_RESOURCE: setCurrentPreviewResource,
   SET_HEADER_SEARCH: setHeaderSearch,
+  SET_PENDING_RESOURCE_TEMPLATE_SELECTION: setPendingResourceTemplateSelection,
   SET_UNUSED_RDF: setUnusedRDF,
   SHOW_COPY_NEW_MESSAGE: showCopyNewMessage,
   SHOW_LANG_MODAL: showLangModal,

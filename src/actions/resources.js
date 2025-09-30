@@ -174,3 +174,19 @@ export const setResourceChanged = (resourceKey) => ({
   type: "SET_RESOURCE_CHANGED",
   payload: resourceKey,
 })
+
+export const setPendingResourceTemplateSelection = (
+  uri,
+  dataset,
+  response,
+  asNewResource,
+  errorKey,
+  keycloak
+) => ({
+  type: "SET_PENDING_RESOURCE_TEMPLATE_SELECTION",
+  payload: { uri, dataset, response, asNewResource, errorKey, keycloak },
+})
+
+export const clearPendingResourceTemplateSelection = () => ({
+  type: "CLEAR_PENDING_RESOURCE_TEMPLATE_SELECTION",
+})

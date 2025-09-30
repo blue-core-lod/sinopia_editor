@@ -1,5 +1,10 @@
 import { addTemplateHistory } from "actions/history"
 import { clearErrors, addError } from "actions/errors"
+import { showModal } from "actions/modals"
+import {
+  setPendingResourceTemplateSelection,
+  clearPendingResourceTemplateSelection,
+} from "actions/resources"
 import {
   addResourceFromDataset,
   addEmptyResource,
@@ -45,19 +50,39 @@ import { setCurrentComponent } from "actions/index"
 import { loadRelationships } from "./relationships"
 import { useKeycloak } from "../KeycloakContext"
 
-
 /**
  * A thunk that loads an existing resource from Sinopia API and adds to state.
  * @return {[resource, unusedDataset]} if successful
  */
 export const loadResource =
-  (uri, errorKey, { asNewResource = false, version = null } = {}) =>
+  (
+    uri,
+    errorKey,
+    { asNewResource = false, version = null, keycloak = null } = {}
+  ) =>
   (dispatch) => {
     dispatch(clearErrors(errorKey))
     return fetchResource(uri, { version })
       .then(([dataset, response]) => {
         if (!dataset) return false
         const resourceTemplateId = resourceTemplateIdFromDataset(uri, dataset)
+
+        // If no resource template ID, store pending data and show modal
+        if (!resourceTemplateId) {
+          dispatch(
+            setPendingResourceTemplateSelection(
+              uri,
+              dataset,
+              response,
+              asNewResource,
+              errorKey,
+              keycloak
+            )
+          )
+          dispatch(showModal("ResourceTemplateChoiceModal"))
+          return false
+        }
+
         return dispatch(
           addResourceFromDataset(
             dataset,
@@ -105,8 +130,11 @@ export const loadResource =
 export const loadResourceForEditor =
   (uri, errorKey, { asNewResource = false } = {}, keycloak) =>
   (dispatch) =>
-    dispatch(loadResource(uri, errorKey, { asNewResource })).then((result) =>
-      dispatch(dispatchResourceForEditor(result, uri, { asNewResource }, keycloak))
+    dispatch(loadResource(uri, errorKey, { asNewResource, keycloak })).then(
+      (result) =>
+        dispatch(
+          dispatchResourceForEditor(result, uri, { asNewResource }, keycloak)
+        )
     )
 
 export const dispatchResourceForEditor =
@@ -136,6 +164,60 @@ export const dispatchResourceForEditor =
       dispatch(loadResourceFinished(resource.key))
     }
     return true
+  }
+
+/**
+ * A thunk that completes loading a resource after a template has been selected.
+ * This is used when a resource doesn't have a template ID and the user selects one via modal.
+ */
+export const completeResourceLoadingWithTemplate =
+  (resourceTemplateId) => (dispatch, getState) => {
+    const pending = getState().editor.pendingResourceTemplateSelection
+    if (!pending) {
+      console.error("No pending resource template selection found")
+      return Promise.resolve(false)
+    }
+
+    const { uri, dataset, response, asNewResource, errorKey, keycloak } =
+      pending
+
+    // Clear pending state
+    dispatch(clearPendingResourceTemplateSelection())
+
+    // Load the resource with the selected template
+    return dispatch(
+      addResourceFromDataset(
+        dataset,
+        uri,
+        resourceTemplateId,
+        errorKey,
+        asNewResource,
+        _.pick(response, ["group", "editGroups"])
+      )
+    )
+      .then(([resource, usedDataset]) => {
+        const unusedDataset = dataset.difference(usedDataset)
+        dispatch(
+          setUnusedRDF(
+            resource.key,
+            unusedDataset.size > 0 ? unusedDataset.toCanonical() : null
+          )
+        )
+        dispatch(loadRelationships(resource.key, uri, errorKey))
+        const result = [response, resource, unusedDataset]
+        return dispatch(
+          dispatchResourceForEditor(result, uri, { asNewResource }, keycloak)
+        )
+      })
+      .catch((err) => {
+        if (err.name !== "ResourceTemplateError") {
+          console.error(err)
+          dispatch(
+            addError(errorKey, `Error retrieving ${uri}: ${err.message || err}`)
+          )
+        }
+        return false
+      })
   }
 
 export const loadResourceForPreview =
