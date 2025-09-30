@@ -97,6 +97,7 @@ export const getSearchResultsByUris = (resourceUris) => {
 
 const fetchSearchResults = (body, keycloak) => {
   const url = `${Config.searchHost}${Config.searchPath}?${body}`
+  console.log(`sinopiaSearch searchHost: ${Config.searchHost} searchPath: ${Config.searchPath}`)
   return fetch(url, {
     method: "GET",
   })
