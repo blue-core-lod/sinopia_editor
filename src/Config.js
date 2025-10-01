@@ -61,8 +61,7 @@ class Config {
   }
 
   static get templateSearchResultsPerPage() {
-    // This # should be large enough to return all results.
-    return 250
+    return 10
   }
 
   /*
