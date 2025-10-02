@@ -197,22 +197,21 @@ const getTemplateSearchParams = (query, options) => {
 
 export const getTemplateSearchResultsByIds = (templateIds) => {
   const params = new URLSearchParams()
-  // Add each template ID as a separate parameter
-  templateIds.forEach((id) => params.append("id", id))
-  params.append("limit", templateIds.length)
+  // Blue Core API doesn't support 'id' parameter, use 'q' for query instead
+  // This returns multiple results, so we need to filter by id after
+  templateIds.forEach((id) => params.append("q", id))
+  params.append("limit", 50) // Increase limit to ensure we get all results
   return fetchTemplateSearchResults(params, templateHitsToResult).then(
     (searchResults) => {
-      if (Config.useResourceTemplateFixtures) {
-        const newResults = searchResults.results.filter((hit) =>
-          templateIds.includes(hit.id)
-        )
-        return {
-          totalHits: newResults.length,
-          results: newResults,
-          error: undefined,
-        }
+      // Filter results to only include templates with matching IDs
+      const newResults = searchResults.results.filter((hit) =>
+        templateIds.includes(hit.id)
+      )
+      return {
+        totalHits: newResults.length,
+        results: newResults,
+        error: searchResults.error,
       }
-      return searchResults
     }
   )
 }
@@ -309,7 +308,6 @@ const templateLookupToResult = (payload) => ({
     return {
       ...template,
       label: `${template.resourceLabel} (${template.id})`,
-      uri: template.id,
     }
   }),
   links: payload.links,
