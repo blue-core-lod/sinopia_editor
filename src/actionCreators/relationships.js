@@ -1,7 +1,7 @@
 // Copyright 2020 Stanford University see LICENSE for license
 
 import { setRelationships, setSearchRelationships } from "actions/relationships"
-import { clearErrors, addError } from "actions/errors"
+import { clearErrors } from "actions/errors"
 import { fetchResourceRelationships } from "sinopiaApi"
 
 /**
@@ -23,13 +23,9 @@ export const loadRelationships = (resourceKey, uri, errorKey) => (dispatch) => {
       return true
     })
     .catch((err) => {
-      console.error(err)
-      dispatch(
-        addError(
-          errorKey,
-          `Error retrieving relationships for ${uri}: ${err.message || err}`
-        )
-      )
+      // Relationships endpoint is optional and not supported by all APIs (e.g., Blue Core)
+      // Silently fail without dispatching errors to avoid blocking resource loading
+      console.warn(`Relationships endpoint not available for ${uri}, skipping relationships loading`)
       return false
     })
 }
@@ -47,12 +43,8 @@ export const loadSearchRelationships = (uri, errorKey) => (dispatch) =>
       return true
     })
     .catch((err) => {
-      console.error(err)
-      dispatch(
-        addError(
-          errorKey,
-          `Error retrieving relationships for ${uri}: ${err.message || err}`
-        )
-      )
+      // Relationships endpoint is optional and not supported by all APIs (e.g., Blue Core)
+      // Silently fail without dispatching errors to avoid blocking resource loading
+      console.warn(`Relationships endpoint not available for ${uri}, skipping relationships loading`)
       return false
     })
