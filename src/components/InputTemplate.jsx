@@ -22,6 +22,7 @@ const InputTemplate = ({
       const newOptions = searchResults.results.map((result) => ({
         label: `${result.resourceLabel} (${result.id})`,
         id: result.id,
+        uri: result.uri,
       }))
       setOptions(newOptions)
       setLoading(false)
@@ -40,7 +41,8 @@ const InputTemplate = ({
   const change = (newSelected) => {
     setSelected(newSelected)
     if (newSelected.length === 1) {
-      setTemplateId(newSelected[0].id)
+      // Pass the URI if available (for Blue Core templates), otherwise pass the ID
+      setTemplateId(newSelected[0].uri || newSelected[0].id)
     }
   }
 

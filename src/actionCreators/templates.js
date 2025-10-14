@@ -8,6 +8,7 @@ import TemplatesBuilder from "TemplatesBuilder"
 import { fetchResource } from "sinopiaApi"
 import { resourceToName } from "../utilities/Utilities"
 import { selectUser } from "selectors/authenticate"
+import { getTemplateSearchResultsByIds } from "sinopiaSearch"
 
 /**
  * A thunk that gets a resource template from state or the server.
@@ -61,22 +62,69 @@ export const loadResourceTemplateWithoutValidation =
       return Promise.resolve(subjectTemplate)
     }
 
-    const id = resourceToName(resourceTemplateId)
-    const templateUri = `${Config.sinopiaApiBase}/resource/${id}`
+    // If resourceTemplateId is not a full URI, search for it to get the URI
+    const isFullUri =
+      resourceTemplateId.startsWith("http://") ||
+      resourceTemplateId.startsWith("https://")
 
-    const newResourceTemplatePromise = fetchResource(templateUri, {
-      isTemplate: true,
-    }).then(([dataset, response]) => {
-      const user = selectUser(getState())
-      const subjectTemplate = new TemplatesBuilder(
-        dataset,
-        templateUri,
-        user.username,
-        response.group,
-        response.editGroups
-      ).build()
-      dispatch(addTemplates(subjectTemplate))
-      return subjectTemplate
+    const templateUriPromise = isFullUri
+      ? Promise.resolve(resourceTemplateId)
+      : getTemplateSearchResultsByIds([resourceTemplateId]).then(
+          (searchResults) => {
+            if (searchResults.results && searchResults.results.length > 0) {
+
+              // Filter results to find the one matching the requested template ID
+              // This is necessary because Blue Core search returns multiple results
+              // Try multiple possible field names for the template ID
+              const matchingResult = searchResults.results.find(
+                result => result.resourceId === resourceTemplateId ||
+                         result.id === resourceTemplateId ||
+                         result.templateId === resourceTemplateId
+              )
+
+              if (matchingResult && matchingResult.uri) {
+                const uri = matchingResult.uri
+                return uri
+              }
+
+              // If no exact match found, log the issue and fall back
+              console.warn(`Template search for ${resourceTemplateId} returned ${searchResults.results.length} results but none matched`, searchResults.results)
+            }
+
+            // Fallback to legacy URI construction if search fails
+            const fallbackUri = `${Config.sinopiaApiBase}/resource/${resourceToName(
+              resourceTemplateId
+            )}`
+            console.warn(`Template search failed for ${resourceTemplateId}, using fallback:`, fallbackUri)
+            return fallbackUri
+          }
+        )
+
+    const newResourceTemplatePromise = templateUriPromise.then((templateUri) => {
+      return fetchResource(templateUri, {
+        isTemplate: true,
+      }).then(([dataset, response]) => {
+        const user = selectUser(getState())
+        const subjectTemplate = new TemplatesBuilder(
+          dataset,
+          templateUri,
+          user.username,
+          response.group,
+          response.editGroups
+        ).build()
+        // Validate that the loaded template matches the requested ID
+        // Only check when we used search (not a full URI), to work around Blue Core search
+        if (!isFullUri && subjectTemplate.id !== resourceTemplateId) {
+          const error = new Error(
+            `Search returned wrong template: requested ${resourceTemplateId} but got ${subjectTemplate.id} from ${templateUri}. This indicates the Blue Core API search index is misconfigured.`
+          )
+          console.error(error.message)
+          throw error
+        }
+
+        dispatch(addTemplates(subjectTemplate))
+        return subjectTemplate
+      })
     })
 
     if (resourceTemplatePromises)

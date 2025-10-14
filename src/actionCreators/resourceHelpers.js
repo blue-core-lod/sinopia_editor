@@ -491,9 +491,13 @@ const selectResourceTemplateId =
             resourceTemplatePromises,
             errorKey
           )
-        ).then((subjectTemplate) =>
-          subjectTemplate.class === resourceURI ? resourceTemplateId : undefined
-        )
+        ).then((subjectTemplate) => {
+          // Check if resourceURI matches either the required class or any optional class
+          if (!subjectTemplate) return undefined
+          const allClasses = Object.keys(subjectTemplate.classes || {})
+          const matches = allClasses.includes(resourceURI)
+          return matches ? resourceTemplateId : undefined
+        })
       )
     )
 
@@ -674,9 +678,5 @@ const newValueCopy = (valueKey, property) => (dispatch, getState) => {
 
 export const resourceTemplateIdFromDataset = (uri, dataset) => {
   const resourceTemplateId = findRootResourceTemplateId(uri, dataset)
-  if (!resourceTemplateId)
-    throw new Error(
-      "A single resource template must be included as a triple (http://sinopia.io/vocabulary/hasResourceTemplate)"
-    )
-  return resourceTemplateId
+  return resourceTemplateId || null
 }

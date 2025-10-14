@@ -164,8 +164,8 @@ const aggregationsToResult = (aggs) => {
 }
 
 export const getTemplateSearchResults = (query, options = {}) => {
-  const body = getTemplateSearchResultsBody(query, options)
-  return fetchTemplateSearchResults(query, templateHitsToResult).then(
+  const params = getTemplateSearchParams(query, options)
+  return fetchTemplateSearchResults(params, templateHitsToResult).then(
     (searchResults) => {
       if (Config.useResourceTemplateFixtures) {
         const newResults = searchResults.results.filter(
@@ -183,57 +183,40 @@ export const getTemplateSearchResults = (query, options = {}) => {
   )
 }
 
-const getTemplateSearchResultsBody = (query, options) => {
-  const fields = [
-    "id",
-    "resourceLabel",
-    "resourceURI",
-    "remark",
-    "author",
-    "groupLabel",
-  ]
-  const should = fields.map((field) => ({
-    wildcard: { [field]: { value: `*${query}*` } },
-  }))
-  return {
-    query: {
-      bool: {
-        should,
-      },
-    },
-    sort: sort("resourceLabel"),
-    size: options?.resultsPerPage || Config.templateSearchResultsPerPage,
-    from: options?.startOfRange || 0,
+const getTemplateSearchParams = (query, options) => {
+  const params = new URLSearchParams()
+  if (query) {
+    params.append("q", query)
   }
+  const limit = options?.resultsPerPage || Config.templateSearchResultsPerPage
+  const offset = options?.startOfRange || 0
+  params.append("limit", limit)
+  params.append("offset", offset)
+  return params
 }
 
 export const getTemplateSearchResultsByIds = (templateIds) => {
-  const body = {
-    query: {
-      terms: {
-        id: templateIds,
-      },
-    },
-    size: templateIds.length,
-  }
-  return fetchTemplateSearchResults(body, templateHitsToResult).then(
+  const params = new URLSearchParams()
+  // Blue Core API doesn't support 'id' parameter, use 'q' for query instead
+  // This returns multiple results, so we need to filter by id after
+  templateIds.forEach((id) => params.append("q", id))
+  params.append("limit", 50) // Increase limit to ensure we get all results
+  return fetchTemplateSearchResults(params, templateHitsToResult).then(
     (searchResults) => {
-      if (Config.useResourceTemplateFixtures) {
-        const newResults = searchResults.results.filter((hit) =>
-          templateIds.includes(hit.id)
-        )
-        return {
-          totalHits: newResults.length,
-          results: newResults,
-          error: undefined,
-        }
+      // Filter results to only include templates with matching IDs
+      const newResults = searchResults.results.filter((hit) =>
+        templateIds.includes(hit.id)
+      )
+      return {
+        totalHits: newResults.length,
+        results: newResults,
+        error: searchResults.error,
       }
-      return searchResults
     }
   )
 }
 
-const fetchTemplateSearchResults = async (body, hitsToResultFunc) => {
+const fetchTemplateSearchResults = async (params, hitsToResultFunc) => {
   if (Config.useResourceTemplateFixtures) {
     const results = await getFixtureTemplateSearchResults()
     return {
@@ -243,7 +226,7 @@ const fetchTemplateSearchResults = async (body, hitsToResultFunc) => {
     }
   }
 
-  const url = `${Config.searchHost}${Config.templateSearchPath}?${body}`
+  const url = `${Config.searchHost}${Config.templateSearchPath}?${params}`
   return fetch(url, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
@@ -266,7 +249,7 @@ const fetchTemplateSearchResults = async (body, hitsToResultFunc) => {
           error: json.error.reason || json.error,
         }
       }
-      return hitsToResultFunc(json.results)
+      return hitsToResultFunc(json)
     })
     .catch((err) => ({
       totalHits: 0,
@@ -312,31 +295,27 @@ const templateModFromBlueCore = (hit) => {
   }
 }
 
-const templateHitsToResult = (hits) => ({
-  totalHits: hits.length,
-  results: hits.map((row) => templateModFromBlueCore(row)),
+const templateHitsToResult = (payload) => ({
+  totalHits: payload.total || payload.results?.length || 0,
+  results: (payload.results || []).map((row) => templateModFromBlueCore(row)),
+  links: payload.links,
 })
 
-const templateLookupToResult = (hits) => ({
-  totalHits: hits.total.value,
-  results: hits.hits.map((row) => ({
-    ...row._source,
-    label: `${row._source.resourceLabel} (${row._source.id})`,
-    uri: row._source.id,
-  })),
+const templateLookupToResult = (payload) => ({
+  totalHits: payload.total || payload.results?.length || 0,
+  results: (payload.results || []).map((row) => {
+    const template = templateModFromBlueCore(row)
+    return {
+      ...template,
+      label: `${template.resourceLabel} (${template.id})`,
+    }
+  }),
+  links: payload.links,
 })
-
-const sort = (sortField, sortOrder) => {
-  if (sortField === undefined) {
-    return ["_score"]
-  }
-
-  return [{ [sortField]: sortOrder || "asc" }]
-}
 
 const getTemplateLookupResults = (query, options = {}) => {
-  const body = getTemplateSearchResultsBody(query, options)
-  return fetchTemplateSearchResults(body, templateLookupToResult)
+  const params = getTemplateSearchParams(query, options)
+  return fetchTemplateSearchResults(params, templateLookupToResult)
 }
 
 export const getLookupResult = (query, lookupConfig, options) => {

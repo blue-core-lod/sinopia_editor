@@ -61,16 +61,14 @@ class Config {
   }
 
   static get templateSearchResultsPerPage() {
-    // This # should be large enough to return all results.
-    return 250
+    return 10
   }
 
   /*
    * This is the public endpont for the sinopia search.
    */
   static get searchPath() {
-    // return "/api/search/sinopia_resources/_search"
-    return "/api/search"
+    return process.env.SEARCH_PATH || ""
   }
 
   static get templateSearchPath() {
