@@ -105,7 +105,8 @@ export const fetchResourceRelationships = (uri) => {
 }
 
 // Fetches list of groups
-export const getGroups = () => Promise.resolve([{ id: "blue core", label: "Blue Core" }])
+export const getGroups = () =>
+  Promise.resolve([{ id: "blue core", label: "Blue Core" }])
 
 // Publishes (saves) a new resource
 export const postResource = (
@@ -227,17 +228,17 @@ export const putUserHistory = (
   }).then((resp) => checkResp(resp).then(() => resp.json()))
 }
 
-export const postTransfer = (resourceUri, group, target, keycloak) => {
-  const url = `${resourceUri.replace(
-    "resource",
-    "transfer"
-  )}/${group}/${target}`
+export const postTransfer = (resourceUri, keycloak) => {
+  const url = `${Config.sinopiaApiBase}/export`
   const jwt = getJwt(keycloak)
+
   return fetch(url, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${jwt}`,
+      "Content-Type": "application/json",
     },
+    body: JSON.stringify({ instance_uri: resourceUri }),
   }).then((resp) => checkResp(resp))
 }
 

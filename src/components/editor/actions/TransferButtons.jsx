@@ -8,6 +8,7 @@ import TransferButton from "./TransferButton"
 import { transfer } from "actionCreators/transfer"
 import useAlerts from "hooks/useAlerts"
 import { isBfInstance } from "utilities/Bibframe"
+import { useKeycloak } from "../../../KeycloakContext"
 import _ from "lodash"
 
 const TransferButtons = ({ resourceKey }) => {
@@ -15,6 +16,7 @@ const TransferButtons = ({ resourceKey }) => {
   const errorKey = useAlerts()
   const resource = useSelector((state) => selectNormSubject(state, resourceKey))
   const userGroups = useSelector((state) => selectGroups(state))
+  const { keycloak } = useKeycloak()
 
   const transferTargets = useMemo(() => {
     const newTargets = []
@@ -35,8 +37,8 @@ const TransferButtons = ({ resourceKey }) => {
   // Must be targets
   if (_.isEmpty(transferTargets)) return null
 
-  const handleClick = (event, group, target) => {
-    dispatch(transfer(resource.uri, group, target, errorKey))
+  const handleClick = (event) => {
+    dispatch(transfer(resource.uri, keycloak, errorKey))
     event.preventDefault()
   }
 
@@ -44,7 +46,7 @@ const TransferButtons = ({ resourceKey }) => {
     <TransferButton
       key={`${group}-${target}`}
       label={`Export to ${label}`}
-      handleClick={(event) => handleClick(event, group, target)}
+      handleClick={(event) => handleClick(event)}
     />
   ))
 

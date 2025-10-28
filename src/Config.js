@@ -122,25 +122,7 @@ class Config {
     return {
       ils: {
         // group: label
-        stanford: "Catalog",
-        cornell: "Catalog",
-        penn: "Catalog",
-        ucdavis: "Catalog",
-        princeton: "Catalog",
-        northwestern: "Catalog",
-        dnal: "Catalog",
-        miami: "Catalog",
-        harvard: "Catalog",
-        emory: "Catalog",
-        newcastle: "Catalog",
-        leeds: "Catalog",
-        memorial: "Catalog",
-        jmu: "Catalog",
-        brandeis: "Catalog",
-        PUC: "Catalog",
-        utoronto: "Catalog",
-        ucf: "Catalog",
-        usf: "Catalog",
+        "blue core": "Catalog",
       },
       // Can add additional transfer targets, e.g., discovery
     }
