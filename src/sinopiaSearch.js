@@ -138,9 +138,28 @@ const hitsToResult = (payload) => {
     } else {
       rdfTypes.push(`http://id.loc.gov/ontologies/bibframe/${types}`)
     }
+    // Extract label from JSON-LD format if needed
+    const mainTitle = hit.data.title.mainTitle
+    let label = mainTitle
+
+    // Handle array of titles
+    if (Array.isArray(mainTitle)) {
+      // Map each title to extract @value if it's an object, otherwise use as-is
+      const titles = mainTitle.map(title => {
+        if (title && typeof title === 'object' && '@value' in title) {
+          return title['@value']
+        }
+        return title
+      })
+      // Join multiple titles with a separator
+      label = titles.join(' / ')
+    } else if (mainTitle && typeof mainTitle === 'object' && '@value' in mainTitle) {
+      // Handle single JSON-LD object
+      label = mainTitle['@value']
+    }
     results.push({
       uri: hit.uri,
-      label: hit.data.title.mainTitle,
+      label: label,
       created: hit.created_at,
       modified: hit.updated_at,
       type: rdfTypes,
