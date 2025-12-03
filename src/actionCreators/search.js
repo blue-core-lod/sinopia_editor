@@ -29,6 +29,8 @@ export const fetchSinopiaSearchResults =
           )
         )
         dispatch(addApiSearchHistory(sinopiaSearchUri, query, keycloak))
+        // Use extracted options from response if available, otherwise use passed options
+        const finalOptions = response.options || options
         dispatch(
           setSearchResults(
             "resource",
@@ -37,8 +39,9 @@ export const fetchSinopiaSearchResults =
             response.totalHits,
             facetResponse || {},
             query,
-            options,
-            response.error
+            finalOptions,
+            response.error,
+            response.links
           )
         )
         if (response.results) {

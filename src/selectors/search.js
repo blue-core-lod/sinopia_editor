@@ -24,4 +24,7 @@ export const selectSearchOptions = (state, searchType) =>
 export const selectSearchResults = (state, searchType) =>
   state.search[searchType]?.results
 
+export const selectSearchLinks = (state, searchType) =>
+  state.search[searchType]?.links
+
 export const selectHeaderSearch = (state) => state.editor.currentHeaderSearch

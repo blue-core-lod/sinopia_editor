@@ -36,7 +36,38 @@ export const getSearchResultsWithFacets = async (
   if (Config.useResourceTemplateFixtures && hasFixtureResource(query))
     return Promise.resolve(resourceSearchResults(query))
 
-  const body = new URLSearchParams({ q: query })
+  // Check if query is a full URL (for pagination links)
+  let url
+  const extractedOptions = { ...options }
+
+  if (
+    query &&
+    typeof query === "string" &&
+    (query.startsWith("http://") || query.startsWith("https://"))
+  ) {
+    url = query
+    // Extract offset from URL query parameters
+    try {
+      const urlObj = new URL(query)
+      const offset = urlObj.searchParams.get("offset")
+      const limit = urlObj.searchParams.get("limit")
+      if (offset !== null) {
+        extractedOptions.startOfRange = parseInt(offset, 10)
+      }
+      if (limit !== null) {
+        extractedOptions.resultsPerPage = parseInt(limit, 10)
+      }
+    } catch (e) {
+      // If URL parsing fails, continue with original options
+    }
+  } else if (query) {
+    const body = new URLSearchParams({ q: query })
+    url = `${Config.searchHost}${Config.searchPath}?${body}`
+  } else {
+    // If query is null/undefined, construct URL without query parameter
+    url = `${Config.searchHost}${Config.searchPath}`
+  }
+
   // const termsFilters = []
   // if (options.typeFilter) {
   //   termsFilters.push({
@@ -73,7 +104,7 @@ export const getSearchResultsWithFacets = async (
   //     },
   //   }
   // }
-  return fetchSearchResults(body, keycloak)
+  return fetchSearchResultsFromUrl(url, keycloak, extractedOptions)
 }
 
 export const getSearchResultsByUris = (resourceUris) => {
@@ -84,6 +115,8 @@ export const getSearchResultsByUris = (resourceUris) => {
   )
     return Promise.resolve(resourceSearchResults(resourceUris[0])[0])
 
+  // This function appears to be for a different use case
+  // For now, keeping it as-is since it uses a different body format
   const body = {
     query: {
       terms: {
@@ -92,17 +125,15 @@ export const getSearchResultsByUris = (resourceUris) => {
     },
     size: resourceUris.length,
   }
-  return fetchSearchResults(body).then((results) => results[0])
+  // TODO: This needs to be updated to work with the new API
+  const url = `${Config.searchHost}${Config.searchPath}`
+  return fetchSearchResultsFromUrl(url, null).then((results) => results[0])
 }
 
-const fetchSearchResults = (body, keycloak) => {
-  const url = `${Config.searchHost}${Config.searchPath}?${body}`
-  return fetch(url, {
+const fetchSearchResultsFromUrl = (url, keycloak, extractedOptions) => fetch(url, {
     method: "GET",
   })
-    .then((resp) => {
-      return resp.json()
-    })
+    .then((resp) => resp.json())
     .then((json) => {
       if (json.error) {
         return [
@@ -110,27 +141,31 @@ const fetchSearchResults = (body, keycloak) => {
             totalHits: 0,
             results: [],
             error: json.error.reason || json.error,
+            options: extractedOptions,
           },
           undefined,
         ]
       }
-      return [hitsToResult(json), aggregationsToResult(json)]
+      const result = hitsToResult(json)
+      // Add extracted options to result
+      result.options = extractedOptions
+      return [result, aggregationsToResult(json)]
     })
     .catch((err) => [
       {
         totalHits: 0,
         results: [],
         error: err.toString(),
+        options: extractedOptions,
       },
       undefined,
     ])
-}
 
 const hitsToResult = (payload) => {
   const results = []
   payload.results.forEach((hit) => {
     const types = hit.data["@type"]
-    let rdfTypes = []
+    const rdfTypes = []
     if (Array.isArray(types)) {
       types.forEach((type) =>
         rdfTypes.push(`http://id.loc.gov/ontologies/bibframe/${type}`)
@@ -145,21 +180,25 @@ const hitsToResult = (payload) => {
     // Handle array of titles
     if (Array.isArray(mainTitle)) {
       // Map each title to extract @value if it's an object, otherwise use as-is
-      const titles = mainTitle.map(title => {
-        if (title && typeof title === 'object' && '@value' in title) {
-          return title['@value']
+      const titles = mainTitle.map((title) => {
+        if (title && typeof title === "object" && "@value" in title) {
+          return title["@value"]
         }
         return title
       })
       // Join multiple titles with a separator
-      label = titles.join(' / ')
-    } else if (mainTitle && typeof mainTitle === 'object' && '@value' in mainTitle) {
+      label = titles.join(" / ")
+    } else if (
+      mainTitle &&
+      typeof mainTitle === "object" &&
+      "@value" in mainTitle
+    ) {
       // Handle single JSON-LD object
-      label = mainTitle['@value']
+      label = mainTitle["@value"]
     }
     results.push({
       uri: hit.uri,
-      label: label,
+      label,
       created: hit.created_at,
       modified: hit.updated_at,
       type: rdfTypes,
@@ -168,8 +207,9 @@ const hitsToResult = (payload) => {
     })
   })
   return {
-    totalHits: results.length,
-    results: results,
+    totalHits: payload.total,
+    results,
+    links: payload.links,
   }
 }
 
@@ -308,8 +348,8 @@ const templateModFromBlueCore = (hit) => {
     id: resourceId,
     originalURI: hit.uri,
     remark: resourceRemark,
-    resourceLabel: resourceLabel,
-    resourceURI: resourceURI,
+    resourceLabel,
+    resourceURI,
     uri: bcURI,
   }
 }
