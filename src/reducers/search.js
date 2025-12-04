@@ -26,6 +26,7 @@ export const setSearchResults = (state, action) => ({
       typeFilter: action.payload.options?.typeFilter,
       groupFilter: action.payload.options?.groupFilter,
     },
+    links: action.payload.links,
     error: action.payload.error,
   },
 })

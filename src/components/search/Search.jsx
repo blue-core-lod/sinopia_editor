@@ -13,6 +13,7 @@ import {
   selectSearchUri,
   selectSearchOptions,
   selectSearchTotalResults,
+  selectSearchLinks,
 } from "selectors/search"
 import { sinopiaSearchUri } from "utilities/authorityConfig"
 import useSearch from "hooks/useSearch"
@@ -38,9 +39,10 @@ const Search = (props) => {
   const totalResults = useSelector((state) =>
     selectSearchTotalResults(state, "resource")
   )
+  const links = useSelector((state) => selectSearchLinks(state, "resource"))
 
-  const changeSearchPage = (startOfRange) => {
-    fetchSearchResults(queryString, uri, searchOptions, startOfRange, keycloak)
+  const changeSearchPage = (linkUrl) => {
+    fetchSearchResults(linkUrl, uri, searchOptions, null, keycloak)
   }
 
   return (
@@ -59,6 +61,7 @@ const Search = (props) => {
           resultsPerPage={searchOptions.resultsPerPage}
           startOfRange={searchOptions.startOfRange}
           totalResults={totalResults}
+          links={links}
           changePage={changeSearchPage}
         />
         <SearchResultsMessage />

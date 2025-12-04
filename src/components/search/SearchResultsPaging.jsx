@@ -8,6 +8,36 @@ const SearchResultsPaging = (props) => {
 
   const changePage = (event, page) => {
     event.preventDefault()
+    const lastPage = Math.ceil(props.totalResults / props.resultsPerPage)
+
+    // If we have links and it's a next/previous action, use the link URL
+    if (props.links) {
+      if (page === currentPage + 1) {
+        if (props.links.next) {
+          props.changePage(props.links.next)
+        }
+        return
+      }
+      if (page === currentPage - 1) {
+        if (props.links.prev) {
+          props.changePage(props.links.prev)
+        }
+        return
+      }
+      if (page === 1) {
+        if (props.links.first) {
+          props.changePage(props.links.first)
+        }
+        return
+      }
+      if (page === lastPage) {
+        if (props.links.last) {
+          props.changePage(props.links.last)
+        }
+        return
+      }
+    }
+    // Fallback to offset-based pagination for specific page numbers
     props.changePage((page - 1) * props.resultsPerPage)
   }
 
@@ -25,7 +55,23 @@ const SearchResultsPaging = (props) => {
   const pageButton = (key, label, page, active) => {
     const classes = ["page-item"]
     if (active) classes.push("active")
-    if (page < 1 || page > lastPage) classes.push("disabled")
+
+    // Check if button should be disabled
+    let isDisabled = page < 1 || page > lastPage
+
+    // When using links-based pagination, also check link availability
+    if (props.links && !isDisabled) {
+      if (key === "next" && !props.links.next) {
+        isDisabled = true
+      } else if (key === "previous" && !props.links.prev) {
+        isDisabled = true
+      } else if (key === "first" && !props.links.first) {
+        isDisabled = true
+      }
+    }
+
+    if (isDisabled) classes.push("disabled")
+
     return (
       <li key={key} className={classes.join(" ")}>
         <button
@@ -88,6 +134,7 @@ SearchResultsPaging.propTypes = {
   totalResults: PropTypes.number.isRequired,
   resultsPerPage: PropTypes.number.isRequired,
   startOfRange: PropTypes.number.isRequired,
+  links: PropTypes.object,
 }
 
 export default SearchResultsPaging
