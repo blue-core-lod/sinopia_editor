@@ -4,7 +4,21 @@ import { showModal } from "actions/modals"
 import {
   setPendingResourceTemplateSelection,
   clearPendingResourceTemplateSelection,
-} from "actions/resources"
+
+  addProperty as addPropertyAction,
+  addValue as addValueAction,
+  updateLiteralValue,
+  addSubject as addSubjectAction,
+  showProperty,
+  setBaseURL,
+  setCurrentResource,
+  setCurrentPreviewResource,
+  saveResourceFinished,
+  setUnusedRDF,
+  loadResourceFinished,
+  setResourceGroup,
+  setCurrentDiff,
+  clearVersions} from "actions/resources"
 import {
   addResourceFromDataset,
   addEmptyResource,
@@ -22,22 +36,6 @@ import {
   selectFullSubject,
   selectMainTitleProperty,
 } from "selectors/resources"
-import {
-  addProperty as addPropertyAction,
-  addValue as addValueAction,
-  updateLiteralValue,
-  addSubject as addSubjectAction,
-  showProperty,
-  setBaseURL,
-  setCurrentResource,
-  setCurrentPreviewResource,
-  saveResourceFinished,
-  setUnusedRDF,
-  loadResourceFinished,
-  setResourceGroup,
-  setCurrentDiff,
-  clearVersions,
-} from "actions/resources"
 import { newLiteralValue, newValueSubject } from "utilities/valueFactory"
 import { selectUser } from "selectors/authenticate"
 import {
@@ -250,7 +248,7 @@ export const loadResourceForDiff =
  * @return {boolean} true if successful
  */
 export const newResource =
-  (resourceTemplateId, errorKey, setCurrent = true) =>
+  (resourceTemplateId, errorKey, setCurrent = true, keycloak = null) =>
   (dispatch) => {
     dispatch(clearErrors(errorKey))
     return dispatch(addEmptyResource(resourceTemplateId, errorKey))
@@ -265,7 +263,7 @@ export const newResource =
         if (setCurrent) dispatch(setCurrentResource(resource.key))
         dispatch(setUnusedRDF(resource.key, null))
         dispatch(addTemplateHistory(resource.subjectTemplate))
-        dispatch(addUserTemplateHistory(resourceTemplateId))
+        dispatch(addUserTemplateHistory(resourceTemplateId, keycloak))
         // This will mark the resource has unchanged.
         dispatch(loadResourceFinished(resource.key))
         return resource.key
@@ -358,19 +356,20 @@ export const newResourceFromDataset =
 
 // A thunk that publishes (saves) a new resource
 export const saveNewResource =
-  (resourceKey, group, editGroups, errorKey) => (dispatch, getState) => {
+  (resourceKey, group, editGroups, errorKey, keycloak = null) =>
+  (dispatch, getState) => {
     const state = getState()
     const resource = selectFullSubject(state, resourceKey)
     const currentUser = selectUser(state)
 
     dispatch(clearErrors(errorKey))
 
-    return postResource(resource, currentUser, group, editGroups)
+    return postResource(resource, currentUser, group, editGroups, keycloak)
       .then((resourceUrl) => {
         dispatch(setBaseURL(resourceKey, resourceUrl))
         dispatch(setResourceGroup(resourceKey, group, editGroups))
         dispatch(saveResourceFinished(resourceKey))
-        dispatch(addUserResourceHistory(resourceUrl))
+        dispatch(addUserResourceHistory(resourceUrl, keycloak))
         dispatch(
           addResourceHistory(resourceUrl, resource.subjectTemplate.class, group)
         )
