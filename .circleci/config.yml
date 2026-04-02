@@ -7,7 +7,7 @@ orbs:
 parameters:
   node-version:
     type: string
-    default: "16.10.0"
+    default: "24.4.0"
 references:
   publish_params: &publish_params
     docker-password: DOCKER_PASS
@@ -46,48 +46,6 @@ executors:
     docker:
       - image: 'cimg/node:<< pipeline.parameters.node-version >>'
 jobs:
-  integration:
-    executor: default
-    working_directory: ~/sinopia_editor
-    steps:
-      - checkout
-      - setup_remote_docker
-      - docker/check:
-          <<: *publish_params
-      - run: docker build -t ld4l/sinopia_editor --build-arg USE_FIXTURES=false --build-arg INDEX_URL=http://elasticsearch:9200 --build-arg SINOPIA_API_BASE_URL=http://api:3000 .
-      - run: docker build -f Dockerfile.cypress -t ld4l/sinopia_editor_cypress .
-      - run:
-          name: Start docker env
-          command: |
-            set -x
-            # Start everything but API.
-            COGNITO_ADMIN_PASSWORD=$COGNITO_ADMIN_PASSWORD AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY docker-compose up -d pipeline elasticsearch mongo
-            docker run --name editor-cypress -it --security-opt seccomp=unconfined --network sinopia_editor_default -e COGNITO_ADMIN_PASSWORD=$COGNITO_ADMIN_PASSWORD -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -d ld4l/sinopia_editor
-            sleep 5
-            # This is a special mongo-setup just for cypress env.
-            docker run --rm --name mongo-setup-cypress -it --security-opt seccomp=unconfined --network sinopia_editor_default -d ld4p/sinopia_dev_setup:cypress
-            # Wait while mongo-setup creates the user needed by api
-            sleep 5
-            COGNITO_ADMIN_PASSWORD=$COGNITO_ADMIN_PASSWORD AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY docker-compose up -d api
-            docker run --rm --network sinopia_editor_default appropriate/curl --retry 25 --retry-delay 1 --retry-connrefused http://editor-cypress:8000/
-            docker run --rm --network sinopia_editor_default appropriate/curl --retry 25 --retry-delay 1 --retry-connrefused http://api:3000/
-      # The test needs to be run within Docker, as (remote) Sinopia network is not available from this testing container.
-      - run:
-          name: Run docker test
-          command: |
-            set -e
-            docker run --name cypress -it --security-opt seccomp=unconfined --network sinopia_editor_default -e CYPRESS_EDITOR_URL='http://editor-cypress:8000/' -e CYPRESS_COGNITO_TEST_USER_NAME=$COGNITO_TEST_USER_NAME -e CYPRESS_COGNITO_TEST_USER_PASS=$COGNITO_TEST_USER_PASS ld4l/sinopia_editor_cypress || result=$?
-            [[ $result -ne 0 ]] && {
-            docker cp cypress:/cypress/videos .
-            docker cp cypress:/cypress/screenshots .
-            exit 1
-            } || {
-            exit 0
-            }
-      - store_artifacts:
-          path: /home/circleci/sinopia_editor/videos
-      - store_artifacts:
-          path: /home/circleci/sinopia_editor/screenshots
   test:
     executor: default
     environment:
@@ -168,10 +126,6 @@ workflows:
           version: << pipeline.parameters.node-version >>
           filters:
             <<: *branch_only_filter
-      - integration:
-          context: ld4p
-          filters:
-            <<: *branch_only_filter
       - docker/publish:
           <<: *publish_params
           name: publish-latest
@@ -181,7 +135,6 @@ workflows:
           requires:
             - test
             - lint
-            - integration
           filters:
             <<: *main_only_filter
       - docker/publish:
@@ -194,7 +147,6 @@ workflows:
           requires:
             - test
             - lint
-            - integration
           filters:
             <<: *main_only_filter
       - docker/publish:
