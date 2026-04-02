@@ -13,7 +13,7 @@
     "url": "git+https://github.com/LD4P/sinopia_editor.git"
   },
   "engines": {
-    "node": ">= 14.11.0 <=16.10.0"
+    "node": ">= 24.4.0"
   },
   "contributors": [
     "Kirk Hess <khes@loc.gov>",

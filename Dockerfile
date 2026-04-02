@@ -1,4 +1,4 @@
-FROM node:16.8
+FROM node:24.4.0
 
 # Allow build-time arguments (for, environment variables that need to be encoded into the webpack distribution)
 ARG USE_FIXTURES
