@@ -41,8 +41,12 @@ const Search = (props) => {
   )
   const links = useSelector((state) => selectSearchLinks(state, "resource"))
 
-  const changeSearchPage = (linkUrl) => {
-    fetchSearchResults(linkUrl, uri, searchOptions, null, keycloak)
+  const changeSearchPage = (linkOrOffset) => {
+    if (typeof linkOrOffset === "number") {
+      fetchSearchResults(queryString, uri, searchOptions, linkOrOffset, keycloak)
+    } else {
+      fetchSearchResults(linkOrOffset, uri, searchOptions, null, keycloak)
+    }
   }
 
   return (

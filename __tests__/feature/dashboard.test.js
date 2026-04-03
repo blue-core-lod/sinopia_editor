@@ -55,19 +55,9 @@ describe("viewing the dashboard", () => {
   describe("when user performs a search", () => {
     it("lists the search and allows performing search", async () => {
       const noResult = {
-        took: 8,
-        timed_out: false,
-        _shards: {
-          total: 5,
-          successful: 5,
-          skipped: 0,
-          failed: 0,
-        },
-        hits: {
-          total: { value: 0 },
-          max_score: 0,
-          hits: [],
-        },
+        total: 0,
+        results: [],
+        links: null,
       }
       global.fetch = jest
         .fn()

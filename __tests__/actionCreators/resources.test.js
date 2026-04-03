@@ -146,7 +146,8 @@ describe("saveNewResource", () => {
       "Foo McBar",
       "resource",
       "bf59d4921535b8f951f1db52584c6d6e",
-      "http://localhost:3000/resource/abcdeghij23455"
+      "http://localhost:3000/resource/abcdeghij23455",
+      undefined
     )
   })
 
@@ -202,7 +203,8 @@ describe("saveResource", () => {
       "Foo McBar",
       "resource",
       "3eb9f1444e9ec984fb165fc9c4de826a",
-      "https://api.sinopia.io/resource/0894a8b3"
+      "https://api.sinopia.io/resource/0894a8b3",
+      undefined
     )
   })
 

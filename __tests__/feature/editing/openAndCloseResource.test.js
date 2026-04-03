@@ -9,35 +9,36 @@ jest.mock("KeycloakContext", () => ({
 }))
 
 featureSetup()
-jest.mock("sinopiaSearch")
 
 describe("switching between multiple resources", () => {
   const history = createHistory(["/templates"])
   const state = createState()
   const store = createStore(state)
 
-  sinopiaSearch.getTemplateSearchResults.mockResolvedValue({
-    results: [
-      {
-        id: "resourceTemplate:bf2:Instance",
-        uri: "http://localhost:3000/resource/resourceTemplate:bf2:Instance",
-        remark: "Fake Bibframe Instance",
-        resourceLabel: "BF Instance",
-        resourceURI: "http://id.loc.gov/ontologies/bibframe/Instance",
+  beforeAll(() => {
+    jest.spyOn(sinopiaSearch, "getTemplateSearchResults").mockResolvedValue({
+      results: [
+        {
+          id: "resourceTemplate:bf2:Instance",
+          uri: "http://localhost:3000/resource/resourceTemplate:bf2:Instance",
+          remark: "Fake Bibframe Instance",
+          resourceLabel: "BF Instance",
+          resourceURI: "http://id.loc.gov/ontologies/bibframe/Instance",
+        },
+        {
+          id: "resourceTemplate:bf2:Title:Note",
+          uri: "http://localhost:3000/resource/resourceTemplate:bf2:Title:Note",
+          remark: "Note about the title",
+          resourceLabel: "Title note",
+          resourceURI: "http://id.loc.gov/ontologies/bibframe/Note",
+        },
+      ],
+      totalHits: 2,
+      options: {
+        startOfRange: 0,
+        resultsPerPage: 10,
       },
-      {
-        id: "resourceTemplate:bf2:Title:Note",
-        uri: "http://localhost:3000/resource/resourceTemplate:bf2:Title:Note",
-        remark: "Note about the title",
-        resourceLabel: "Title note",
-        resourceURI: "http://id.loc.gov/ontologies/bibframe/Note",
-      },
-    ],
-    totalHits: 2,
-    options: {
-      startOfRange: 0,
-      resultsPerPage: 10,
-    },
+    })
   })
 
   it("switches between the active and inactive resources and closes resources", async () => {

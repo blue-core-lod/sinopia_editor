@@ -78,17 +78,20 @@ describe("fetchSinopiaSearchResults", () => {
         startOfRange: 5,
         resultsPerPage: 10,
       },
+      links: undefined,
     })
     expect(actions).toHaveAction("ADD_SEARCH_HISTORY", {
       authorityUri: "urn:ld4p:sinopia",
       authorityLabel: "Sinopia resources",
       query: "*",
+      keycloak: undefined,
     })
     expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
       "Foo McBar",
       "search",
       "e983591a38cf0e7a8d9a2a1e3251a1b6",
-      '{"authorityUri":"urn:ld4p:sinopia","query":"*"}'
+      '{"authorityUri":"urn:ld4p:sinopia","query":"*"}',
+      undefined
     )
   })
 })
@@ -186,17 +189,20 @@ describe("fetchQASearchResults", () => {
         options: {},
         error: undefined,
         facetResults: {},
+        links: undefined,
       })
       expect(actions).toHaveAction("ADD_SEARCH_HISTORY", {
         authorityUri: uri,
         authorityLabel: "OCLCFAST Topic (QA) - direct",
         query,
+        keycloak: undefined,
       })
       expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
         "Foo McBar",
         "search",
         "7c944f41fb8b8bba92311b4f4f48ceb3",
-        '{"authorityUri":"urn:ld4p:qa:oclc_fast:topic","query":"*"}'
+        '{"authorityUri":"urn:ld4p:qa:oclc_fast:topic","query":"*"}',
+        undefined
       )
     })
   })
@@ -228,6 +234,7 @@ describe("fetchQASearchResults", () => {
         options: {},
         facetResults: {},
         error: "Ooops...",
+        links: undefined,
       })
       expect(actions).toHaveAction("ADD_ERROR", {
         errorKey: "testerrorkey",
@@ -280,6 +287,7 @@ describe("fetchTemplateGuessSearchResults", () => {
         options: {
           startOfRange: 0,
         },
+        links: undefined,
       })
     })
   })
@@ -317,6 +325,7 @@ describe("fetchTemplateGuessSearchResults", () => {
         options: {
           startOfRange: 0,
         },
+        links: undefined,
       })
       expect(actions).toHaveAction("ADD_ERROR", {
         errorKey: "testerrorkey",

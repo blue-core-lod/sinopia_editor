@@ -17,7 +17,7 @@ export const addSearchHistory = (
   const payload = { authorityUri, authorityLabel, query, keycloak }
   return {
     type: "ADD_SEARCH_HISTORY",
-    payload: payload,
+    payload,
   }
 }
 

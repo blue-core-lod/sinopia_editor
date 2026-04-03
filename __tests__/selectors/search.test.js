@@ -141,7 +141,7 @@ describe("selectSearchOptions()", () => {
     it("returns default options", () => {
       expect(selectSearchOptions(state, "template")).toEqual({
         startOfRange: 0,
-        resultsPerPage: 250,
+        resultsPerPage: 10,
       })
     })
   })

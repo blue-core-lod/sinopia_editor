@@ -3,12 +3,18 @@ import { renderApp } from "testUtils"
 import * as sinopiaSearch from "sinopiaSearch"
 import { resourceSearchResults } from "fixtureLoaderHelper"
 import { featureSetup, resourceHeaderSelector } from "featureUtils"
+import Config from "Config"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
 }))
 
 featureSetup()
+jest.spyOn(Config, "transferConfig", "get").mockReturnValue({
+  ils: {
+    stanford: "Catalog",
+  },
+})
 
 describe("searching and preview a resource", () => {
   describe("for a resource that is not a BF:instance", () => {

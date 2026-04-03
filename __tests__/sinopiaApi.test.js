@@ -72,24 +72,9 @@ afterEach(() => {
 })
 
 describe("getGroups", () => {
-  const groups = [
-    { id: "stanford", label: "Stanford University" },
-    { id: "cornell", label: "Cornell University" },
-  ]
-
   it("retrieves list of groups", async () => {
-    // mocks call to Sinopia API for a resource
-    global.fetch = jest.fn().mockResolvedValue({
-      json: jest.fn().mockResolvedValue({ data: groups }),
-      ok: true,
-    })
-
     const result = await getGroups()
-    expect(result).toEqual(groups)
-    expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/groups", {
-      method: "GET",
-      headers: { Accept: "application/json" },
-    })
+    expect(result).toEqual([{ id: "blue core", label: "Blue Core" }])
   })
 })
 
@@ -166,7 +151,7 @@ describe("fetchResource", () => {
       await expect(
         fetchResource("http://api.sinopia.io/resource/12334")
       ).rejects.toThrow(
-        "Error parsing resource: Sinopia API returned failed to retrieve uri"
+        "Error parsing resource: Blue Core API returned failed to retrieve uri"
       )
     })
   })
@@ -264,7 +249,7 @@ describe("putResource", () => {
         putResource(resource, currentUser, null, null, null, {
           token: "Secret-Token",
         })
-      ).rejects.toThrow("Sinopia API returned Cannot save resource")
+      ).rejects.toThrow("Blue Core API returned Cannot save resource")
     })
   })
 })
@@ -472,17 +457,17 @@ describe("postTransfer", () => {
         ok: true,
       })
 
-      await postTransfer(resourceUri, "stanford", "ils", {
-        token: "Secret-Token",
-      })
+      await postTransfer(resourceUri, { token: "Secret-Token" })
 
       expect(global.fetch).toHaveBeenCalledWith(
-        "https://api.development.sinopia.io/transfer/7b4c275d-b0c7-40a4-80b3-e95a0d9d987c/stanford/ils",
+        "http://localhost:3000/export",
         {
           method: "POST",
           headers: {
             Authorization: "Bearer Secret-Token",
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify({ instance_uri: resourceUri }),
         }
       )
     })

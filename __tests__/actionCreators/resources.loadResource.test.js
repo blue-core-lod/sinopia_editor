@@ -84,7 +84,8 @@ describe("loadResource", () => {
         "Foo McBar",
         "resource",
         "87d27b05d48874c9f80cd4b7e8fc0dcc",
-        uri
+        uri,
+        undefined
       )
 
       // loadRelationships is invoked async and do not wait for results
@@ -205,11 +206,7 @@ describe("loadResource", () => {
 
       const actions = store.getActions()
       expect(actions).toHaveAction("CLEAR_ERRORS")
-      expect(actions).toHaveAction("ADD_ERROR", {
-        errorKey: "testerrorkey",
-        error:
-          "Error retrieving http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f-invalid-template: A single resource template must be included as a triple (http://sinopia.io/vocabulary/hasResourceTemplate)",
-      })
+      expect(actions).toHaveAction("SHOW_MODAL", "ResourceTemplateChoiceModal")
     })
   })
 

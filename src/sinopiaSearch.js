@@ -217,7 +217,9 @@ const aggregationsToResult = (aggs) => {
   if (!aggs) return undefined
   const result = {}
   Object.keys(aggs).forEach((field) => {
-    result[field] = aggs[field].buckets
+    if (aggs[field] && aggs[field].buckets) {
+      result[field] = aggs[field].buckets
+    }
   })
   return result
 }
