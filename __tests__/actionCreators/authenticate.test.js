@@ -48,7 +48,7 @@ describe("authenticate", () => {
 
       expect(store.getActions()).toHaveAction("SET_USER", {
         username: "havram",
-        groups: [],
+        groups: ["blue core"],
       })
       expect(sinopiaApi.fetchUser).toHaveBeenCalledWith("havram")
     })
@@ -88,7 +88,7 @@ describe("signIn", () => {
 
       expect(store.getActions()).toHaveAction("SET_USER", {
         username: "havram",
-        groups: [],
+        groups: ["blue core"],
       })
       expect(sinopiaApi.fetchUser).toHaveBeenCalledWith("havram")
     })

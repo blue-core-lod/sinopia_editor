@@ -8,29 +8,30 @@ jest.mock("KeycloakContext", () => ({
 }))
 
 featureSetup()
-jest.mock("sinopiaSearch")
 
 describe("Copying a template resource", () => {
   const history = createHistory(["/templates"])
   const store = createStore()
 
-  sinopiaSearch.getTemplateSearchResults.mockResolvedValue({
-    results: [
-      {
-        id: "resourceTemplate:bf2:Note",
-        author: null,
-        date: null,
-        remark: null,
-        resourceLabel: "Note",
-        resourceURI: "http://sinopia.io/vocabulary/ResourceTemplate",
-        uri: "http://localhost:3000/resource/resourceTemplate:bf2:Note",
+  beforeAll(() => {
+    jest.spyOn(sinopiaSearch, "getTemplateSearchResults").mockResolvedValue({
+      results: [
+        {
+          id: "resourceTemplate:bf2:Note",
+          author: null,
+          date: null,
+          remark: null,
+          resourceLabel: "Note",
+          resourceURI: "http://sinopia.io/vocabulary/ResourceTemplate",
+          uri: "http://localhost:3000/resource/resourceTemplate:bf2:Note",
+        },
+      ],
+      totalHits: 1,
+      options: {
+        startOfRange: 0,
+        resultsPerPage: 10,
       },
-    ],
-    totalHits: 1,
-    options: {
-      startOfRange: 0,
-      resultsPerPage: 10,
-    },
+    })
   })
 
   it("clicks on the copy button", async () => {

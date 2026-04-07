@@ -114,7 +114,7 @@ describe("<GroupFilter />", () => {
       sortField: undefined,
       sortOrder: undefined,
       groupFilter: ["cornell", "yale", "princeton"],
-    })
+    }, undefined)
   })
 
   it("allows selecting / deselecting all", async () => {
@@ -172,7 +172,7 @@ describe("<GroupFilter />", () => {
       sortField: undefined,
       sortOrder: undefined,
       groupFilter: null,
-    })
+    }, undefined)
   })
 
   it("allows reselecting cleared filters before using them", async () => {

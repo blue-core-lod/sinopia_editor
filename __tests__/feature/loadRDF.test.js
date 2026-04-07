@@ -8,7 +8,6 @@ jest.mock("KeycloakContext", () => ({
 }))
 
 featureSetup({ noMockSinopiaApi: true })
-jest.mock("sinopiaSearch")
 
 describe("loading from RDF", () => {
   describe("when RDF", () => {
@@ -109,18 +108,6 @@ describe("loading from RDF", () => {
   })
 
   describe("when RDF without resource template provided", () => {
-    sinopiaSearch.getTemplateSearchResults.mockResolvedValue({
-      totalHits: 1,
-      results: [
-        {
-          id: "ld4p:RT:bf2:Title:AbbrTitle",
-          resourceLabel: "Abbreviated Title",
-          resourceURI: "http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle",
-        },
-      ],
-      error: undefined,
-    })
-
     it("asks for the resource template id", async () => {
       renderApp()
 

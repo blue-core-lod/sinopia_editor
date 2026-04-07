@@ -8,7 +8,6 @@ module.exports = {
     'react',
     'react-hooks',
     'security',
-    'cypress'
   ],
   extends: [
     'eslint:recommended',
@@ -19,7 +18,6 @@ module.exports = {
     'plugin:jsx-a11y/recommended',
     'plugin:security/recommended',
     'airbnb-base',
-    'plugin:cypress/recommended',
     'prettier'
   ],
   parser: '@babel/eslint-parser',
@@ -171,12 +169,6 @@ module.exports = {
       ],
       rules: {
         'node/no-unpublished-import': 'off',
-      },
-    },
-    {
-      files: ['cypress/plugins/index.js'],
-      rules: {
-        'no-unused-vars': 'off',
       },
     },
   ],

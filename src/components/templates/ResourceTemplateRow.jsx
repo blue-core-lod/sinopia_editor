@@ -31,7 +31,7 @@ const ResourceTemplateRow = ({ row }) => {
     isLoadingEdit,
     isLoadingView,
   } = useResource(errorKey, {
-    resourceURI: row.originalURI,
+    resourceURI: row.originalURI || row.uri,
     resourceTemplateId: row.id,
   })
 

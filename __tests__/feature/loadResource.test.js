@@ -9,22 +9,16 @@ jest.mock("KeycloakContext", () => ({
 }))
 
 featureSetup()
-jest.mock("sinopiaSearch")
 
 describe("loading saved resource", () => {
-  sinopiaSearch.getTemplateSearchResults.mockResolvedValue({
-    totalHits: 0,
-    results: [],
-    error: undefined,
-  })
 
   describe("when RDF", () => {
     it("opens the resource", async () => {
       const uri =
         "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f"
-      sinopiaSearch.getSearchResultsWithFacets.mockResolvedValue(
-        resourceSearchResults(uri)
-      )
+      jest
+        .spyOn(sinopiaSearch, "getSearchResultsWithFacets")
+        .mockResolvedValue(resourceSearchResults(uri))
 
       renderApp()
 
@@ -89,9 +83,9 @@ describe("loading saved resource", () => {
     it("displays error", async () => {
       const uri =
         "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f-invalid"
-      sinopiaSearch.getSearchResultsWithFacets.mockResolvedValue(
-        resourceSearchResults(uri)
-      )
+      jest
+        .spyOn(sinopiaSearch, "getSearchResultsWithFacets")
+        .mockResolvedValue(resourceSearchResults(uri))
 
       renderApp()
 

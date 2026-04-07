@@ -74,7 +74,8 @@ describe("newResource", () => {
         "Foo McBar",
         "template",
         "e2bb9b57c5d91394dc6f7e1d32d7a97b",
-        resourceTemplateId
+        resourceTemplateId,
+        undefined
       )
     })
   })

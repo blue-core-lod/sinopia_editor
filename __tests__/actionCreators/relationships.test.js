@@ -95,10 +95,10 @@ describe("loadRelationships()", () => {
         .mockRejectedValue("Ooops")
     })
 
-    it("dispatches error", async () => {
+    it("silently handles error (relationships endpoint optional for Blue Core)", async () => {
       const store = mockStore(createState())
 
-      await store.dispatch(
+      const result = await store.dispatch(
         loadRelationships(
           "7d7d-40ac-b38e",
           "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
@@ -107,15 +107,9 @@ describe("loadRelationships()", () => {
       )
       const actions = store.getActions()
 
-      expect(actions).toHaveLength(2)
-
+      expect(result).toBe(false)
+      expect(actions).toHaveLength(1)
       expect(actions).toHaveAction("CLEAR_ERRORS")
-
-      expect(actions).toHaveAction("ADD_ERROR", {
-        errorKey: "testerrorkey",
-        error:
-          "Error retrieving relationships for http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f: Ooops",
-      })
     })
   })
 })
@@ -165,10 +159,10 @@ describe("loadSearchRelationships()", () => {
         .mockRejectedValue("Ooops")
     })
 
-    it("dispatches error", async () => {
+    it("silently handles error (relationships endpoint optional for Blue Core)", async () => {
       const store = mockStore(createState())
 
-      await store.dispatch(
+      const result = await store.dispatch(
         loadSearchRelationships(
           "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
           "testerrorkey"
@@ -176,13 +170,8 @@ describe("loadSearchRelationships()", () => {
       )
       const actions = store.getActions()
 
-      expect(actions).toHaveLength(1)
-
-      expect(actions).toHaveAction("ADD_ERROR", {
-        errorKey: "testerrorkey",
-        error:
-          "Error retrieving relationships for http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f: Ooops",
-      })
+      expect(result).toBe(false)
+      expect(actions).toHaveLength(0)
     })
   })
 })

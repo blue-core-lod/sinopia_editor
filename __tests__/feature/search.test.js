@@ -91,51 +91,21 @@ describe("sinopia resource search", () => {
   }
 
   const successResultPage1 = {
-    took: 8,
-    timed_out: false,
-    _shards: {
-      total: 5,
-      successful: 5,
-      skipped: 0,
-      failed: 0,
-    },
-    hits: {
-      total: { value: 3 },
-      max_score: 0.2876821,
-      hits: [fooBarHit, fooHit],
-    },
+    total: 3,
+    results: [fooBarHit, fooHit],
+    links: null,
   }
 
   const successResultPage2 = {
-    took: 8,
-    timed_out: false,
-    _shards: {
-      total: 5,
-      successful: 5,
-      skipped: 0,
-      failed: 0,
-    },
-    hits: {
-      total: { value: 3 },
-      max_score: 0.2876821,
-      hits: [bazHit],
-    },
+    total: 3,
+    results: [bazHit],
+    links: null,
   }
 
   const noResult = {
-    took: 8,
-    timed_out: false,
-    _shards: {
-      total: 5,
-      successful: 5,
-      skipped: 0,
-      failed: 0,
-    },
-    hits: {
-      total: { value: 0 },
-      max_score: 0,
-      hits: [],
-    },
+    total: 0,
+    results: [],
+    links: null,
   }
 
   // Saves global fetch in order to be restored after each test with mocked fetch
@@ -274,7 +244,7 @@ describe("sinopia resource search", () => {
       results: [
         {
           id: "testing:defaultDate",
-          uri: "http://localhost:3000/resource/testing:defaultDate",
+          uri: "https://bcld.info/resource/testing:defaultDate",
           resourceLabel: "Default date",
           resourceURI: "http://testing/defaultDate",
           group: "other",

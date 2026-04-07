@@ -100,8 +100,7 @@ export const loadResourceTemplateWithoutValidation =
           }
         )
 
-    const newResourceTemplatePromise = templateUriPromise.then((templateUri) => {
-      return fetchResource(templateUri, {
+    const newResourceTemplatePromise = templateUriPromise.then((templateUri) => fetchResource(templateUri, {
         isTemplate: true,
       }).then(([dataset, response]) => {
         const user = selectUser(getState())
@@ -124,8 +123,7 @@ export const loadResourceTemplateWithoutValidation =
 
         dispatch(addTemplates(subjectTemplate))
         return subjectTemplate
-      })
-    })
+      }))
 
     if (resourceTemplatePromises)
       resourceTemplatePromises[resourceTemplateId] = newResourceTemplatePromise

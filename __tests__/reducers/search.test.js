@@ -53,6 +53,7 @@ const searchExample = {
   },
   uri: "https://sinopia.io",
   error: undefined,
+  links: undefined,
 }
 
 const templatesSearchExample = {
@@ -135,7 +136,7 @@ describe("setSearchResults()", () => {
       },
     }
     const newState = reducer(oldState, action)
-    expect(newState.template.options.resultsPerPage).toEqual(250)
+    expect(newState.template.options.resultsPerPage).toEqual(10)
     expect(newState.template.options.startOfRange).toEqual(0)
   })
 

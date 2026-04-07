@@ -49,10 +49,7 @@
     "lint": "npm run pretty && npm run eslint",
     "start": "npx babel-node server.js",
     "test": "jest --colors --silent --runInBand --logHeapUsage",
-    "test-verbose": "jest --colors --runInBand",
-    "cypress-verify": "cypress verify",
-    "cypress-open": "cypress open",
-    "cypress-run": "cypress run -b chrome --headless"
+    "test-verbose": "jest --colors --runInBand"
   },
   "license": "Apache-2.0",
   "dependencies": {
@@ -61,7 +58,7 @@
     "@fortawesome/react-fontawesome": "^0.1.15",
     "@honeybadger-io/react": "^2.0.0",
     "@popperjs/core": "^2.10.1",
-    "@rdfjs/serializer-jsonld-ext": "^3.0.0",
+    "@rdfjs/serializer-jsonld-ext": "^4.0.2",
     "@reach/dialog": "^0.16.2",
     "assert": "^2.0.0",
     "bootstrap": "^5.1.1",
@@ -132,8 +129,7 @@
     "eslint-config-airbnb-base": "~14.2.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-import-resolver-webpack": "^0.13.1",
-    "eslint-plugin-cypress": "^2.12.1",
-    "eslint-plugin-import": "^2.24.2",
+"eslint-plugin-import": "^2.24.2",
     "eslint-plugin-jest": "^24.4.0",
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-node": "^11.1.0",
@@ -179,7 +175,8 @@
     ],
     "moduleNameMapper": {
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
-      "\\.(css|scss|sass|less)$": "identity-obj-proxy"
+      "\\.(css|scss|sass|less)$": "identity-obj-proxy",
+      "^@digitalbazaar/http-client$": "<rootDir>/__mocks__/@digitalbazaar/http-client.js"
     },
     "collectCoverageFrom": [
       "src/**/*.js",
@@ -187,6 +184,7 @@
       "!src/index.js"
     ],
     "setupFiles": [
+      "./__tests__/testUtilities/setupNodeGlobals.js",
       "jest-localstorage-mock",
       "jest-prop-type-error",
       "dotenv/config"
@@ -203,6 +201,9 @@
       "lcov"
     ],
     "resolver": "<rootDir>/__tests__/testUtilities/resolver.js",
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(@rdfjs/(serializer-jsonld-ext|sink)|stream-chunks)/)"
+    ],
     "reporters": [
       [
         "jest-summarizing-reporter",
@@ -212,9 +213,6 @@
       ]
     ]
   },
-  "optionalDependencies": {
-    "cypress": "^9.0.0"
-  },
-  "main": ".eslintrc.js",
+"main": ".eslintrc.js",
   "author": ""
 }

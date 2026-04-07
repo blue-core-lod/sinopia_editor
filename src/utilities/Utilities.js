@@ -7,10 +7,10 @@ import CryptoJS from "crypto-js"
 import { JsonLdParser } from "jsonld-streaming-parser"
 import { Writer as N3Writer } from "n3"
 import dateFormat from "date-and-time"
+import SerializerJsonld from "@rdfjs/serializer-jsonld-ext"
 
 const concatStream = require("concat-stream")
 const Readable = require("stream").Readable
-const SerializerJsonld = require("@rdfjs/serializer-jsonld-ext")
 
 export const isResourceWithValueTemplateRef = (property) =>
   property?.type === "resource" &&
@@ -78,7 +78,7 @@ export const n3FromDataset = (dataset, format) =>
   })
 
 export const jsonldFromDataset = (dataset) => {
-  const serializerJsonld = new SerializerJsonld({ expand: true })
+  const serializerJsonld = new SerializerJsonld()
 
   const output = serializerJsonld.import(dataset.toStream())
 

@@ -120,7 +120,7 @@ describe("<TypeFilter />", () => {
         "http://id.loc.gov/ontologies/bibframe/Barcode",
         "http://id.loc.gov/ontologies/bibframe/Chronology",
       ],
-    })
+    }, undefined)
   })
 
   it("allows selecting / deselecting all", async () => {
@@ -181,7 +181,7 @@ describe("<TypeFilter />", () => {
       sortField: undefined,
       sortOrder: undefined,
       typeFilter: null,
-    })
+    }, undefined)
   })
 
   it("allows reselecting cleared filters before using them", async () => {

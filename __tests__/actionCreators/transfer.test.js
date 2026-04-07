@@ -19,25 +19,17 @@ describe("transfer", () => {
     it("dispatches actions to add user", async () => {
       sinopiaApi.postTransfer = jest.fn().mockResolvedValue()
       const store = mockStore(createState())
-      await store.dispatch(
-        transfer(resourceUri, "stanford", "ils", "testerrorkey")
-      )
+      await store.dispatch(transfer(resourceUri, undefined, "testerrorkey"))
 
       expect(store.getActions()).toHaveLength(0)
-      expect(sinopiaApi.postTransfer).toHaveBeenCalledWith(
-        resourceUri,
-        "stanford",
-        "ils"
-      )
+      expect(sinopiaApi.postTransfer).toHaveBeenCalledWith(resourceUri, undefined)
     })
   })
   describe("failure", () => {
     it("dispatches actions to remove user", async () => {
       sinopiaApi.postTransfer = jest.fn().mockRejectedValue("Ooops!")
       const store = mockStore(createState())
-      await store.dispatch(
-        transfer(resourceUri, "stanford", "ils", "testerrorkey")
-      )
+      await store.dispatch(transfer(resourceUri, undefined, "testerrorkey"))
 
       expect(store.getActions()).toHaveAction("ADD_ERROR", {
         errorKey: "testerrorkey",

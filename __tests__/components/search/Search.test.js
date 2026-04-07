@@ -116,7 +116,7 @@ describe("<Search />", () => {
     fireEvent.click(screen.getByTestId("Submit search"))
 
     // Called once
-    expect(mockGetSearchResults).toBeCalledWith("foo", { startOfRange: 0 })
+    expect(mockGetSearchResults).toBeCalledWith("foo", { startOfRange: 0 }, undefined)
 
     // Result
     await screen.findByText(/foo/)
@@ -151,7 +151,7 @@ describe("<Search />", () => {
     })
 
     // Called once
-    expect(mockGetSearchResults).toBeCalledWith("foo", { startOfRange: 0 })
+    expect(mockGetSearchResults).toBeCalledWith("foo", { startOfRange: 0 }, undefined)
   })
 
   it("ignores when query is blank", () => {
@@ -258,7 +258,7 @@ describe("<Search />", () => {
     })
 
     expect(mockGetSearchResults.mock.calls).toEqual([
-      ["foo", { startOfRange: 0 }],
+      ["foo", { startOfRange: 0 }, undefined],
       [
         "foo",
         {
@@ -267,6 +267,7 @@ describe("<Search />", () => {
           sortField: "modified",
           sortOrder: "desc",
         },
+        undefined,
       ],
       [
         "foo",
@@ -276,6 +277,7 @@ describe("<Search />", () => {
           sortField: "modified",
           sortOrder: "desc",
         },
+        undefined,
       ],
     ])
   })
