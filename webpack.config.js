@@ -108,6 +108,10 @@ module.exports = {
     port: 8888,
     proxy: {
       "/api/search": "http://localhost:8000",
+      "/keycloak": {
+        target: "http://localhost",
+        changeOrigin: true,
+      },
     },
   },
 }
