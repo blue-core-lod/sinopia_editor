@@ -130,7 +130,8 @@ export const getSearchResultsByUris = (resourceUris) => {
   return fetchSearchResultsFromUrl(url, null).then((results) => results[0])
 }
 
-const fetchSearchResultsFromUrl = (url, keycloak, extractedOptions) => fetch(url, {
+const fetchSearchResultsFromUrl = (url, keycloak, extractedOptions) =>
+  fetch(url, {
     method: "GET",
   })
     .then((resp) => resp.json())
@@ -174,28 +175,14 @@ const hitsToResult = (payload) => {
       rdfTypes.push(`http://id.loc.gov/ontologies/bibframe/${types}`)
     }
     // Extract label from JSON-LD format if needed
-    const mainTitle = hit.data.title.mainTitle
-    let label = mainTitle
-
-    // Handle array of titles
-    if (Array.isArray(mainTitle)) {
-      // Map each title to extract @value if it's an object, otherwise use as-is
-      const titles = mainTitle.map((title) => {
-        if (title && typeof title === "object" && "@value" in title) {
-          return title["@value"]
-        }
-        return title
-      })
-      // Join multiple titles with a separator
-      label = titles.join(" / ")
-    } else if (
-      mainTitle &&
-      typeof mainTitle === "object" &&
-      "@value" in mainTitle
-    ) {
-      // Handle single JSON-LD object
-      label = mainTitle["@value"]
+    // title may be a single object or an array of typed title objects
+    let titleObj = hit.data.title
+    if (Array.isArray(titleObj)) {
+      titleObj = titleObj.find((t) => t["@type"] === "Title") || titleObj[0]
     }
+    const mainTitle = titleObj?.mainTitle
+    const label = mainTitle
+
     results.push({
       uri: hit.uri,
       label,
