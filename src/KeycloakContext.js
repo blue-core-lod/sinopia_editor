@@ -28,10 +28,16 @@ export const KeycloakProvider = ({ children }) => {
 
   useEffect(() => {
     if (keycloak.initialized) return
-    keycloak.init().then((authenticated) => {
-      setAuthenticated(authenticated)
-      setInitialized(true)
-    })
+    keycloak
+      .init({ checkLoginIframe: false })
+      .then((authenticated) => {
+        setAuthenticated(authenticated)
+        setInitialized(true)
+      })
+      .catch((err) => {
+        console.error("Keycloak initialization failed:", err)
+        setInitialized(true)
+      })
   }, [keycloak])
 
   return (
