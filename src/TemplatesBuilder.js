@@ -9,11 +9,22 @@ export default class TemplatesBuilder {
   constructor(dataset, uri, userId, group = null, editGroups = []) {
     this.dataset = dataset
     this.uri = uri
-    this.resourceTerm = rdf.namedNode(uri)
     this.subjectTemplate = null
     this.group = group
     this.editGroups = editGroups
     this.userId = userId
+
+    // Use the type triple to find the actual subject URI rather than assuming
+    // the fetch URL matches the @id in the JSON-LD (they can differ via proxies).
+    const typeQuads = dataset
+      .match(
+        null,
+        rdf.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
+        rdf.namedNode("http://sinopia.io/vocabulary/ResourceTemplate")
+      )
+      .toArray()
+    this.resourceTerm =
+      typeQuads.length > 0 ? typeQuads[0].subject : rdf.namedNode(uri)
   }
 
   /**
@@ -92,7 +103,7 @@ export default class TemplatesBuilder {
     // Property templates is a list.
     const quads = this.dataset
       .match(
-        this.subjectTerm,
+        this.resourceTerm,
         rdf.namedNode("http://sinopia.io/vocabulary/hasPropertyTemplate")
       )
       .toArray()
