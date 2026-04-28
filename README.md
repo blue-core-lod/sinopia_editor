@@ -49,7 +49,7 @@ Start the Express web server (via `npm run dev-start`) with the following variab
 
 Full command:
 
-`SINOPIA_URI=http://localhost:8888 SINOPIA_API_BASE_URL=http://localhost/api SEARCH_HOST=http://localhost/api/ KEYCLOAK_URL=http://localhost:8888/keycloak search npm run dev-start` 
+`SINOPIA_URI=http://localhost:8888 SINOPIA_API_BASE_URL=http://localhost/api SEARCH_HOST=http://localhost/api/ KEYCLOAK_URL=http://localhost:8888/keycloak npm run dev-start` 
 
 Sinopia in development mode will be available at [http://localhost:8888](http://localhost:8888).
 
@@ -60,7 +60,7 @@ Specify the environment variable `USE_FIXTURES=true` as shown below if you would
 The fixtures are listed in `__tests__/testUtilities/fixtureLoaderHelper.js`. Fixture resource templates will be listed on the
 templates list page and fixture resources can be searched on by entering the resource's URI in the Sinopia search box.
 
-`SINOPIA_URI=http://localhost:8888 SINOPIA_API_BASE_URL=http://localhost/api SEARCH_HOST=http://localhost/api/ KEYCLOAK_URL=http://localhost:8888/keycloak search npm run dev-start USE_FIXTURES=true npm run dev-start`
+`SINOPIA_URI=http://localhost:8888 SINOPIA_API_BASE_URL=http://localhost/api SEARCH_HOST=http://localhost/api/search KEYCLOAK_URL=http://localhost:8888/keycloak npm run dev-start`
 
 ## Developers
 
