@@ -45,20 +45,30 @@ export const getSearchResultsWithFacets = async (
     typeof query === "string" &&
     (query.startsWith("http://") || query.startsWith("https://"))
   ) {
-    url = query
-    // Extract offset from URL query parameters
+    // Determine if this is a pagination URL (has limit/offset params) or a
+    // resource URI being used as a search term.
     try {
       const urlObj = new URL(query)
       const offset = urlObj.searchParams.get("offset")
       const limit = urlObj.searchParams.get("limit")
-      if (offset !== null) {
-        extractedOptions.startOfRange = parseInt(offset, 10)
-      }
-      if (limit !== null) {
-        extractedOptions.resultsPerPage = parseInt(limit, 10)
+      if (offset !== null || limit !== null) {
+        // Pagination link from the search API — use directly
+        url = query
+        if (offset !== null) {
+          extractedOptions.startOfRange = parseInt(offset, 10)
+        }
+        if (limit !== null) {
+          extractedOptions.resultsPerPage = parseInt(limit, 10)
+        }
+      } else {
+        // Resource URI used as a search term — pass as q= parameter
+        const body = new URLSearchParams({ q: query })
+        url = `${Config.searchHost}${Config.searchPath}?${body}`
       }
     } catch (e) {
-      // If URL parsing fails, continue with original options
+      // URL parsing failed; fall back to treating it as a search term
+      const body = new URLSearchParams({ q: query })
+      url = `${Config.searchHost}${Config.searchPath}?${body}`
     }
   } else if (query) {
     const body = new URLSearchParams({ q: query })

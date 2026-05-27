@@ -1,19 +1,19 @@
 // Copyright 2019 Stanford University see LICENSE for license
-import { setSearchResults } from "actions/search"
+import { setSearchResults } from 'actions/search'
 import {
   getSearchResultsWithFacets,
   getTemplateSearchResults,
-} from "sinopiaSearch"
-import { createLookupPromise } from "utilities/QuestioningAuthority"
+} from 'sinopiaSearch'
+import { createLookupPromise } from 'utilities/QuestioningAuthority'
 import {
   findAuthorityConfig,
   sinopiaSearchUri,
-} from "utilities/authorityConfig"
-import { addSearchHistory as addApiSearchHistory } from "actionCreators/user"
-import { addSearchHistory } from "actions/history"
-import { clearErrors, addError } from "actions/errors"
-import { isBfWorkInstanceItem } from "utilities/Bibframe"
-import { loadSearchRelationships } from "./relationships"
+} from 'utilities/authorityConfig'
+import { addSearchHistory as addApiSearchHistory } from 'actionCreators/user'
+import { addSearchHistory } from 'actions/history'
+import { clearErrors, addError } from 'actions/errors'
+import { isBfWorkInstanceItem } from 'utilities/Bibframe'
+import { loadSearchRelationships } from './relationships'
 
 export const fetchSinopiaSearchResults =
   (query, options, errorKey, keycloak) => (dispatch) => {
@@ -23,17 +23,17 @@ export const fetchSinopiaSearchResults =
         dispatch(
           addSearchHistory(
             sinopiaSearchUri,
-            "Sinopia resources",
+            'Sinopia resources',
             query,
-            keycloak
-          )
+            keycloak,
+          ),
         )
         dispatch(addApiSearchHistory(sinopiaSearchUri, query, keycloak))
         // Use extracted options from response if available, otherwise use passed options
         const finalOptions = response.options || options
         dispatch(
           setSearchResults(
-            "resource",
+            'resource',
             sinopiaSearchUri,
             response.results,
             response.totalHits,
@@ -41,8 +41,8 @@ export const fetchSinopiaSearchResults =
             query,
             finalOptions,
             response.error,
-            response.links
-          )
+            response.links,
+          ),
         )
         if (response.results) {
           response.results
@@ -55,13 +55,13 @@ export const fetchSinopiaSearchResults =
           dispatch(
             addError(
               errorKey,
-              `An error occurred while searching: ${response.error.toString()}`
-            )
+              `An error occurred while searching: ${response.error.toString()}`,
+            ),
           )
           return false
         }
         return true
-      }
+      },
     )
   }
 
@@ -76,21 +76,21 @@ export const fetchQASearchResults =
       if (response.isError) {
         dispatch(
           setSearchResults(
-            "resource",
+            'resource',
             uri,
             [],
             0,
             {},
             query,
             options,
-            response.errorObject.message
-          )
+            response.errorObject.message,
+          ),
         )
         dispatch(
           addError(
             errorKey,
-            `An error occurred while searching: ${response.errorObject.message}`
-          )
+            `An error occurred while searching: ${response.errorObject.message}`,
+          ),
         )
         return false
       }
@@ -98,14 +98,14 @@ export const fetchQASearchResults =
       dispatch(addApiSearchHistory(uri, query))
       dispatch(
         setSearchResults(
-          "resource",
+          'resource',
           uri,
           response.results,
           response.response_header.total_records,
           {},
           query,
-          options
-        )
+          options,
+        ),
       )
       return true
     })
@@ -118,19 +118,22 @@ export const fetchTemplateGuessSearchResults =
     getTemplateSearchResults(queryString, options).then((response) => {
       dispatch(
         setSearchResults(
-          "templateguess",
+          'templateguess',
           null,
           response.results,
           response.totalHits,
           {},
           queryString,
           options,
-          response.error
-        )
+          response.error,
+        ),
       )
       if (response.error) {
         dispatch(
-          addError(errorKey, `Error searching for templates: ${response.error}`)
+          addError(
+            errorKey,
+            `Error searching for templates: ${response.error}`,
+          ),
         )
       }
     })
