@@ -181,7 +181,7 @@ const hitsToResult = (payload) => {
       titleObj = titleObj.find((t) => t["@type"] === "Title") || titleObj[0]
     }
     const mainTitle = titleObj?.mainTitle
-    const label = mainTitle
+    const label = mainTitle?.["@value"] ?? mainTitle
 
     results.push({
       uri: hit.uri,

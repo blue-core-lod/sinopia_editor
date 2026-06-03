@@ -133,6 +133,37 @@ describe("getSearchResults", () => {
       options: { noFacetResults: true },
     })
   })
+
+  it("extracts a string label from JSON-LD mainTitle object", async () => {
+    const jsonLdResult = {
+      total: 1,
+      results: [
+        {
+          uri: "https://dev.bcld.info/works/89b8c5b2-9b88-477b-bf5c-a9be977dd1d3",
+          data: {
+            "@type": ["Text", "Monograph", "Work"],
+            title: {
+              "@type": "Title",
+              mainTitle: { "@value": "Encyclopedia of radical helping", "@language": "en" },
+            },
+          },
+          created_at: "2025-11-18T21:53:24.747972",
+          updated_at: "2025-11-18T21:53:24.747972",
+        },
+      ],
+      links: null,
+    }
+
+    global.fetch = jest
+      .fn()
+      .mockImplementation(() =>
+        Promise.resolve({ json: () => jsonLdResult })
+      )
+
+    const results = await getSearchResults("an encyclopedia of radical helping")
+    expect(typeof results.results[0].label).toBe("string")
+    expect(results.results[0].label).toBe("Encyclopedia of radical helping")
+  })
 })
 
 describe("getSearchResultsWithFacets", () => {
