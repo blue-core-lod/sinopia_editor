@@ -181,7 +181,14 @@ const hitsToResult = (payload) => {
       titleObj = titleObj.find((t) => t["@type"] === "Title") || titleObj[0]
     }
     const mainTitle = titleObj?.mainTitle
-    const label = mainTitle?.["@value"] ?? mainTitle
+    let label
+    if (Array.isArray(mainTitle)) {
+      const first =
+        mainTitle.find((m) => typeof m === "string") ?? mainTitle[0]
+      label = first?.["@value"] ?? first
+    } else {
+      label = mainTitle?.["@value"] ?? mainTitle
+    }
 
     results.push({
       uri: hit.uri,

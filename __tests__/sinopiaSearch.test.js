@@ -164,6 +164,40 @@ describe("getSearchResults", () => {
     expect(typeof results.results[0].label).toBe("string")
     expect(results.results[0].label).toBe("Encyclopedia of radical helping")
   })
+
+  it("extracts a string label from mainTitle array containing language-tagged objects", async () => {
+    const jsonLdResult = {
+      total: 1,
+      results: [
+        {
+          uri: "https://dev.bcld.info/works/a85c7d32-7138-4ebb-bdd2-8748b2489820",
+          data: {
+            "@type": ["Monograph", "Work", "Text"],
+            title: {
+              "@type": "Title",
+              mainTitle: [
+                "Hineh yamim baʼim",
+                { "@value": "הנה ימים באים", "@language": "he-hebr" },
+              ],
+            },
+          },
+          created_at: "2025-02-08T01:48:48.515037",
+          updated_at: "2025-02-08T01:48:48.515037",
+        },
+      ],
+      links: null,
+    }
+
+    global.fetch = jest
+      .fn()
+      .mockImplementation(() =>
+        Promise.resolve({ json: () => jsonLdResult })
+      )
+
+    const results = await getSearchResults("Hineh yamim")
+    expect(typeof results.results[0].label).toBe("string")
+    expect(results.results[0].label).toBe("Hineh yamim baʼim")
+  })
 })
 
 describe("getSearchResultsWithFacets", () => {
