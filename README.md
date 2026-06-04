@@ -49,7 +49,7 @@ Start the Express web server (via `npm run dev-start`) with the following variab
 
 Full command:
 
-`SINOPIA_URI=http://localhost:8888 SINOPIA_API_BASE_URL=http://localhost/api SEARCH_HOST=http://localhost/api/ KEYCLOAK_URL=http://localhost:8888/keycloak npm run dev-start` 
+`SINOPIA_URI=http://localhost:8888 SINOPIA_API_BASE_URL=http://localhost/api SEARCH_HOST=http://localhost/api/search KEYCLOAK_URL=http://localhost:8888/keycloak npm run dev-start` 
 
 Sinopia in development mode will be available at [http://localhost:8888](http://localhost:8888).
 
