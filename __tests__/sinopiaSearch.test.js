@@ -198,6 +198,52 @@ describe("getSearchResults", () => {
     expect(typeof results.results[0].label).toBe("string")
     expect(results.results[0].label).toBe("Hineh yamim baʼim")
   })
+
+  it("extracts a string label when title is an array of typed title objects and mainTitle contains language-tagged objects", async () => {
+    const jsonLdResult = {
+      total: 1,
+      results: [
+        {
+          uri: "https://dev.bcld.info/works/9d545a93-2baa-423a-8f62-a0f510ece78c",
+          data: {
+            "@type": ["Work", "Text", "Monograph"],
+            title: [
+              {
+                "@type": "VariantTitle",
+                mainTitle: [
+                  "Hŭk esŏ ch'ajŭn yŏngwŏn han sam",
+                  { "@value": "흙 에서 찾은 영원 한 삶", "@language": "ko-kore" },
+                ],
+                variantType: "portion",
+              },
+              {
+                "@type": "Title",
+                mainTitle: [
+                  "Palgul sokpo! hŭk esŏ ch'ajŭn yŏngwŏn han sam",
+                  { "@value": "발굴 속보! 흙 에서 찾은 영원 한 삶", "@language": "ko-kore" },
+                ],
+              },
+            ],
+          },
+          created_at: "2025-07-10T03:28:19.651996",
+          updated_at: "2025-07-10T03:28:19.651996",
+        },
+      ],
+      links: null,
+    }
+
+    global.fetch = jest
+      .fn()
+      .mockImplementation(() =>
+        Promise.resolve({ json: () => jsonLdResult })
+      )
+
+    const results = await getSearchResults("Palgul sokpo")
+    expect(typeof results.results[0].label).toBe("string")
+    expect(results.results[0].label).toBe(
+      "Palgul sokpo! hŭk esŏ ch'ajŭn yŏngwŏn han sam"
+    )
+  })
 })
 
 describe("getSearchResultsWithFacets", () => {
