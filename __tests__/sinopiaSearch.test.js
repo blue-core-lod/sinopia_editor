@@ -133,6 +133,117 @@ describe("getSearchResults", () => {
       options: { noFacetResults: true },
     })
   })
+
+  it("extracts a string label from JSON-LD mainTitle object", async () => {
+    const jsonLdResult = {
+      total: 1,
+      results: [
+        {
+          uri: "https://dev.bcld.info/works/89b8c5b2-9b88-477b-bf5c-a9be977dd1d3",
+          data: {
+            "@type": ["Text", "Monograph", "Work"],
+            title: {
+              "@type": "Title",
+              mainTitle: { "@value": "Encyclopedia of radical helping", "@language": "en" },
+            },
+          },
+          created_at: "2025-11-18T21:53:24.747972",
+          updated_at: "2025-11-18T21:53:24.747972",
+        },
+      ],
+      links: null,
+    }
+
+    global.fetch = jest
+      .fn()
+      .mockImplementation(() =>
+        Promise.resolve({ json: () => jsonLdResult })
+      )
+
+    const results = await getSearchResults("an encyclopedia of radical helping")
+    expect(typeof results.results[0].label).toBe("string")
+    expect(results.results[0].label).toBe("Encyclopedia of radical helping")
+  })
+
+  it("extracts a string label from mainTitle array containing language-tagged objects", async () => {
+    const jsonLdResult = {
+      total: 1,
+      results: [
+        {
+          uri: "https://dev.bcld.info/works/a85c7d32-7138-4ebb-bdd2-8748b2489820",
+          data: {
+            "@type": ["Monograph", "Work", "Text"],
+            title: {
+              "@type": "Title",
+              mainTitle: [
+                "Hineh yamim baʼim",
+                { "@value": "הנה ימים באים", "@language": "he-hebr" },
+              ],
+            },
+          },
+          created_at: "2025-02-08T01:48:48.515037",
+          updated_at: "2025-02-08T01:48:48.515037",
+        },
+      ],
+      links: null,
+    }
+
+    global.fetch = jest
+      .fn()
+      .mockImplementation(() =>
+        Promise.resolve({ json: () => jsonLdResult })
+      )
+
+    const results = await getSearchResults("Hineh yamim")
+    expect(typeof results.results[0].label).toBe("string")
+    expect(results.results[0].label).toBe("Hineh yamim baʼim")
+  })
+
+  it("extracts a string label when title is an array of typed title objects and mainTitle contains language-tagged objects", async () => {
+    const jsonLdResult = {
+      total: 1,
+      results: [
+        {
+          uri: "https://dev.bcld.info/works/9d545a93-2baa-423a-8f62-a0f510ece78c",
+          data: {
+            "@type": ["Work", "Text", "Monograph"],
+            title: [
+              {
+                "@type": "VariantTitle",
+                mainTitle: [
+                  "Hŭk esŏ ch'ajŭn yŏngwŏn han sam",
+                  { "@value": "흙 에서 찾은 영원 한 삶", "@language": "ko-kore" },
+                ],
+                variantType: "portion",
+              },
+              {
+                "@type": "Title",
+                mainTitle: [
+                  "Palgul sokpo! hŭk esŏ ch'ajŭn yŏngwŏn han sam",
+                  { "@value": "발굴 속보! 흙 에서 찾은 영원 한 삶", "@language": "ko-kore" },
+                ],
+              },
+            ],
+          },
+          created_at: "2025-07-10T03:28:19.651996",
+          updated_at: "2025-07-10T03:28:19.651996",
+        },
+      ],
+      links: null,
+    }
+
+    global.fetch = jest
+      .fn()
+      .mockImplementation(() =>
+        Promise.resolve({ json: () => jsonLdResult })
+      )
+
+    const results = await getSearchResults("Palgul sokpo")
+    expect(typeof results.results[0].label).toBe("string")
+    expect(results.results[0].label).toBe(
+      "Palgul sokpo! hŭk esŏ ch'ajŭn yŏngwŏn han sam"
+    )
+  })
 })
 
 describe("getSearchResultsWithFacets", () => {
