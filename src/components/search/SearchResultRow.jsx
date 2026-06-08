@@ -83,7 +83,7 @@ const SearchResultRow = ({
           <ul className="list-unstyled">
             {row.type?.map((type) => (
               <li key={type}>
-                {resourceToName(type)} ({type})
+                {resourceToName(type)} (<a href={type} target="_blank" rel="noreferrer">{type}</a>)
               </li>
             ))}
           </ul>

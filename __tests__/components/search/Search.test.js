@@ -116,14 +116,21 @@ describe("<Search />", () => {
     fireEvent.click(screen.getByTestId("Submit search"))
 
     // Called once
-    expect(mockGetSearchResults).toBeCalledWith("foo", { startOfRange: 0 }, undefined)
+    expect(mockGetSearchResults).toBeCalledWith(
+      "foo",
+      { startOfRange: 0 },
+      undefined
+    )
 
     // Result
     await screen.findByText(/foo/)
 
-    screen.getByText("http://id.loc.gov/ontologies/bibframe/Title", {
-      selector: "li",
+    const classLink = screen.getByRole("link", {
+      name: "http://id.loc.gov/ontologies/bibframe/Title",
     })
+    expect(classLink.closest("li")).toHaveTextContent(
+      "Title (http://id.loc.gov/ontologies/bibframe/Title)"
+    )
   })
 
   it("requests on enter", () => {
@@ -151,7 +158,11 @@ describe("<Search />", () => {
     })
 
     // Called once
-    expect(mockGetSearchResults).toBeCalledWith("foo", { startOfRange: 0 }, undefined)
+    expect(mockGetSearchResults).toBeCalledWith(
+      "foo",
+      { startOfRange: 0 },
+      undefined
+    )
   })
 
   it("ignores when query is blank", () => {
