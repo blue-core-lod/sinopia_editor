@@ -11,6 +11,7 @@ import useResource from "hooks/useResource"
 import useAlerts from "hooks/useAlerts"
 import { hasSearchRelationships } from "selectors/relationships"
 import RelationshipResults from "./RelationshipResults"
+import { resourceToName } from "utilities/Utilities"
 
 /**
  * Generates HTML row of all search results
@@ -81,7 +82,9 @@ const SearchResultRow = ({
         <td>
           <ul className="list-unstyled">
             {row.type?.map((type) => (
-              <li key={type}>{type}</li>
+              <li key={type}>
+                {resourceToName(type)} ({type})
+              </li>
             ))}
           </ul>
         </td>
