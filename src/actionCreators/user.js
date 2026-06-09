@@ -37,8 +37,8 @@ const addHistory = (historyType, payload, keycloak) => (dispatch, getState) => {
   ).catch((err) => console.error(err))
 }
 
-export const addTemplateHistory = (templateId) => (dispatch) =>
-  dispatch(addHistory("template", templateId))
+export const addTemplateHistory = (templateId, keycloak) => (dispatch) =>
+  dispatch(addHistory("template", templateId, keycloak))
 
 export const addResourceHistory = (uri, keycloak) => (dispatch) =>
   dispatch(addHistory("resource", uri, keycloak))

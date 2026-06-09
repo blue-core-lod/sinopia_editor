@@ -115,9 +115,10 @@ describe("saveNewResource", () => {
   it("saves a new resource", async () => {
     const store = mockStore(createState({ hasResourceWithLiteral: true }))
     sinopiaApi.postResource = jest.fn().mockResolvedValue(uri)
+    const keycloak = { token: "test-token" }
 
     await store.dispatch(
-      saveNewResource("t9zVwg2zO", "stanford", ["cornell"], "testerror")
+      saveNewResource("t9zVwg2zO", "stanford", ["cornell"], "testerror", keycloak)
     )
 
     const actions = store.getActions()
@@ -147,7 +148,7 @@ describe("saveNewResource", () => {
       "resource",
       "bf59d4921535b8f951f1db52584c6d6e",
       "http://localhost:3000/resource/abcdeghij23455",
-      undefined
+      keycloak
     )
   })
 
