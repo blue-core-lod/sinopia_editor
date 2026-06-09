@@ -69,7 +69,6 @@ describe("<SinopiaSearchResults />", () => {
       // It has filters
       screen.getByText("Class", { selector: "th" })
       screen.getByText("Filter by")
-      screen.getByText("Filter by group")
 
       // First row of search results
       screen.queryByText(/An item title/)

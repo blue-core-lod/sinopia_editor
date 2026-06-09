@@ -8,7 +8,6 @@ import {
   selectFilteredSearchResults,
 } from "selectors/search"
 import ClassFilter from "./ClassFilter"
-import GroupFilter from "./GroupFilter"
 import SearchResultRows from "./SearchResultRows"
 import SinopiaSort from "./SinopiaSort"
 import MarcModal from "../editor/actions/MarcModal"
@@ -43,11 +42,6 @@ const SinopiaSearchResults = () => {
     <React.Fragment>
       <MarcModal />
       <ResourceTemplateChoiceModal choose={chooseResourceTemplate} />
-      <div className="row">
-        <div className="col" style={{ marginBottom: "5px" }}>
-          <GroupFilter />
-        </div>
-      </div>
       <div
         id="search-results"
         className="row"

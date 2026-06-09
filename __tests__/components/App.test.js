@@ -175,7 +175,7 @@ describe("<App />", () => {
       const history = createHistory(["/search"])
       renderApp(store, history)
 
-      screen.getByText("Filter by class")
+      screen.getByText("Filter by")
     })
 
     it("renders load for /load", () => {
