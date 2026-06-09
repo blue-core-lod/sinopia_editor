@@ -9,6 +9,7 @@ import {
   selectSearchFacetResults,
 } from "selectors/search"
 import useAlerts from "hooks/useAlerts"
+import { useKeycloak } from "../../KeycloakContext"
 import _ from "lodash"
 
 const SearchFilter = ({
@@ -19,6 +20,7 @@ const SearchFilter = ({
 }) => {
   const dispatch = useDispatch()
   const errorKey = useAlerts()
+  const { keycloak } = useKeycloak()
   const query = useSelector((state) => selectSearchQuery(state, "resource"))
   const searchOptions = useSelector((state) =>
     selectSearchOptions(state, "resource")
@@ -32,8 +34,15 @@ const SearchFilter = ({
 
   useEffect(() => {
     if (_.isEmpty(facetResults)) return
-    setSelectedFilters(facetResults.map((result) => result.key))
-    setAllSelected(true)
+    const activeFilter = searchOptions[filterSearchOption]
+    if (activeFilter != null) {
+      const activeArray = Array.isArray(activeFilter) ? activeFilter : [activeFilter]
+      setSelectedFilters(activeArray)
+      setAllSelected(activeArray.length === facetResults.length)
+    } else {
+      setSelectedFilters(facetResults.map((result) => result.key))
+      setAllSelected(true)
+    }
   }, [facetResults])
 
   const performFilter = (selectedFilters) => {
@@ -45,7 +54,8 @@ const SearchFilter = ({
           startOfRange: 0,
           [filterSearchOption]: selectedFilters,
         },
-        errorKey
+        errorKey,
+        keycloak
       )
     )
   }

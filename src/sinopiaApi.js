@@ -218,14 +218,22 @@ export const putUserHistory = (
     historyItemKey
   )}`
   const jwt = getJwt(keycloak)
-  return fetch(url, {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${jwt}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ payload: historyItemPayload }),
-  }).then((resp) => checkResp(resp).then(() => resp.json()))
+  const doPut = () =>
+    fetch(url, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ payload: historyItemPayload }),
+    })
+  return doPut().then((resp) => {
+    if (resp.status === 404)
+      return postUser(userId, keycloak).then(() =>
+        doPut().then((resp2) => checkResp(resp2).then(() => resp2.json()))
+      )
+    return checkResp(resp).then(() => resp.json())
+  })
 }
 
 export const postTransfer = (resourceUri, keycloak) => {
