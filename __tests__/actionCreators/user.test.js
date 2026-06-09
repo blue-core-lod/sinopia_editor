@@ -95,15 +95,16 @@ describe("addTemplateHistory()", () => {
   it("sends to API", async () => {
     sinopiaApi.putUserHistory = jest.fn().mockResolvedValue()
     const store = mockStore(createState())
+    const keycloak = { token: "test-token" }
 
-    await store.dispatch(addTemplateHistory("template1"))
+    await store.dispatch(addTemplateHistory("template1", keycloak))
 
     expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
       "Foo McBar",
       "template",
       "5860e2660bd44eab2be5190cd2cafb8b",
       "template1",
-      undefined
+      keycloak
     )
   })
 })

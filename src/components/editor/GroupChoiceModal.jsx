@@ -17,6 +17,7 @@ import { selectGroupMap } from "selectors/groups"
 import usePermissions from "hooks/usePermissions"
 import useAlerts from "hooks/useAlerts"
 import ModalWrapper from "../ModalWrapper"
+import { useKeycloak } from "KeycloakContext"
 
 const groupsToGroupValues = (groupIds, groupMap, ownerGroupId = null) =>
   groupIds
@@ -51,6 +52,7 @@ const GroupChoiceModal = () => {
   const { canChangeGroups } = usePermissions()
   const canChange = canChangeGroups(resource) || !resource.uri
   const dispatch = useDispatch()
+  const { keycloak } = useKeycloak()
 
   const ownerGroupOptions = userGroupIds.map((groupId) => (
     <option key={groupId} value={groupId}>
@@ -85,11 +87,11 @@ const GroupChoiceModal = () => {
     )
     if (resource.uri) {
       dispatch(
-        saveResourceAction(resourceKey, ownerGroupId, editGroupIds, errorKey)
+        saveResourceAction(resourceKey, ownerGroupId, editGroupIds, errorKey, keycloak)
       )
     } else {
       dispatch(
-        saveNewResource(resourceKey, ownerGroupId, editGroupIds, errorKey)
+        saveNewResource(resourceKey, ownerGroupId, editGroupIds, errorKey, keycloak)
       )
     }
     dispatch(hideModal())

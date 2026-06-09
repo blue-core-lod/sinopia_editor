@@ -44,10 +44,12 @@ const useResource = (
   const handleNew = (event) => {
     if (event) event.preventDefault()
     setStatus("loading new")
-    dispatch(newResource(resourceTemplateId, errorKey)).then((result) => {
-      setStatus("ready")
-      if (result) setNavigateEditor(true)
-    })
+    dispatch(newResource(resourceTemplateId, errorKey, true, keycloak)).then(
+      (result) => {
+        setStatus("ready")
+        if (result) setNavigateEditor(true)
+      }
+    )
   }
 
   const handleCopy = (event) => {
