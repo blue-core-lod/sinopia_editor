@@ -31,12 +31,6 @@ describe("user that can edit, but not an owner, can view groups", () => {
     fireEvent.change(ownerSelect, { target: { value: "pcc" } })
     expect(ownerSelect).toHaveValue("pcc")
 
-    // Select editing groups
-    screen.getByText("Who else can edit?")
-    fireEvent.click(screen.getByText("Cornell University"))
-    fireEvent.click(screen.getByText("Duke University"))
-    screen.getByText("Cornell University, Duke University")
-
     // A modal for group choice and save appears
     const modalSave = screen.getByTestId("Save Group")
     fireEvent.click(modalSave)

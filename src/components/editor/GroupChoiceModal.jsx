@@ -2,7 +2,6 @@
 
 import React, { useState, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux"
-import { MultiSelect } from "react-multi-select-component"
 import { hideModal } from "actions/modals"
 import {
   saveNewResource,
@@ -19,18 +18,6 @@ import useAlerts from "hooks/useAlerts"
 import ModalWrapper from "../ModalWrapper"
 import { useKeycloak } from "KeycloakContext"
 
-const groupsToGroupValues = (groupIds, groupMap, ownerGroupId = null) =>
-  groupIds
-    .filter((groupId) => ownerGroupId !== groupId)
-    .sort((groupId1, groupId2) =>
-      groupMap[groupId1]?.localeCompare(groupMap[groupId2])
-    )
-    .map((groupId) => ({
-      value: groupId,
-      label: groupMap[groupId],
-      disabled: groupId === ownerGroupId,
-    }))
-
 const GroupChoiceModal = () => {
   const errorKey = useAlerts()
   const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
@@ -40,15 +27,9 @@ const GroupChoiceModal = () => {
   const [ownerGroupId, setOwnerGroupId] = useState(
     resource.group || userGroupIds[0]
   )
-  const [editGroupValues, setEditGroupValues] = useState(
-    groupsToGroupValues(resource.editGroups, groupMap)
-  )
   const initialInputRef = useRef()
 
   const ownerGroupLabel = groupMap[ownerGroupId]
-  const editGroupLabels = editGroupValues
-    .map((groupValue) => groupValue.label)
-    .join(", ")
   const { canChangeGroups } = usePermissions()
   const canChange = canChangeGroups(resource) || !resource.uri
   const dispatch = useDispatch()
@@ -60,38 +41,19 @@ const GroupChoiceModal = () => {
     </option>
   ))
 
-  const editGroupOptions = groupsToGroupValues(
-    Object.keys(groupMap),
-    groupMap,
-    ownerGroupId
-  )
-
   const handleOwnerChange = (event) => {
-    const newOwnerGroupId = event.target.value
-    setOwnerGroupId(newOwnerGroupId)
-    setEditGroupValues(
-      editGroupValues.filter(
-        (groupValue) => groupValue.value !== newOwnerGroupId
-      )
-    )
+    setOwnerGroupId(event.target.value)
     event.preventDefault()
   }
 
-  const handleEditChange = (values) => {
-    setEditGroupValues(values)
-  }
-
   const saveAndClose = (event) => {
-    const editGroupIds = editGroupValues.map(
-      (editGroupValue) => editGroupValue.value
-    )
     if (resource.uri) {
       dispatch(
-        saveResourceAction(resourceKey, ownerGroupId, editGroupIds, errorKey, keycloak)
+        saveResourceAction(resourceKey, ownerGroupId, [], errorKey, keycloak)
       )
     } else {
       dispatch(
-        saveNewResource(resourceKey, ownerGroupId, editGroupIds, errorKey, keycloak)
+        saveNewResource(resourceKey, ownerGroupId, [], errorKey, keycloak)
       )
     }
     dispatch(hideModal())
@@ -122,18 +84,6 @@ const GroupChoiceModal = () => {
         </select>
       ) : (
         <p>{ownerGroupLabel}</p>
-      )}
-      <h4 id="editSelectLabel">Who else can edit?</h4>
-      {canChange ? (
-        <MultiSelect
-          options={editGroupOptions}
-          value={editGroupValues}
-          onChange={handleEditChange}
-          hasSelectAll={false}
-          labelledBy="editSelectLabel"
-        />
-      ) : (
-        <p>{editGroupLabels} </p>
       )}
     </React.Fragment>
   )

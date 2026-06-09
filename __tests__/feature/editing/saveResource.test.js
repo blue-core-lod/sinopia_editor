@@ -47,14 +47,6 @@ describe("saving a resource", () => {
       fireEvent.change(ownerSelect, { target: { value: "pcc" } })
       expect(ownerSelect).toHaveValue("pcc")
 
-      // Select editing groups
-      screen.getByLabelText("Who else can edit?")
-      fireEvent.click(screen.getByText("Select..."))
-      fireEvent.click(screen.getByText("Cornell University"))
-      fireEvent.click(screen.getByText("Duke University"))
-
-      expect(screen.getByText("Cornell University, Duke University"))
-
       // A modal for group choice and save appears
       const modalSave = screen.getByRole("button", { name: "Save Group" })
       fireEvent.click(modalSave)
