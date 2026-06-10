@@ -35,7 +35,7 @@ app.use(
 
 app.use(
   "/api/qa",
-  proxy(Config.qaUrl, {
+  proxy(Config.qaUpstreamUrl, {
     parseReqBody: false,
     proxyReqOptDecorator(proxyReqOpts) {
       delete proxyReqOpts.headers.origin

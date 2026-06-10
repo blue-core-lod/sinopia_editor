@@ -108,6 +108,11 @@ module.exports = {
     port: 8888,
     proxy: {
       "/api/search": "http://localhost:8000",
+      "/api/qa": {
+        target: "https://lookup.ld4l.org",
+        changeOrigin: true,
+        pathRewrite: { "^/api/qa": "" },
+      },
       "/keycloak": {
         target: "http://localhost",
         changeOrigin: true,

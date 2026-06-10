@@ -5,7 +5,7 @@ import { findAuthorityConfig } from "utilities/authorityConfig"
 describe("createLookupPromise()", () => {
   const response = {
     ok: true,
-    url: "https://lookup.ld4l.org/authorities/search/linked_data/humord_direct?q=Corn&maxRecords=20&lang=no&context=true&response_header=true&startRecord=1",
+    url: "/api/qa/authorities/search/linked_data/humord_direct?q=Corn&maxRecords=20&lang=no&context=true&response_header=true&startRecord=1",
     status: 200,
     statusText: "OK",
     json: () => {
@@ -56,7 +56,7 @@ describe("createLookupPromise()", () => {
       const authorityConfig = findAuthorityConfig("urn:ld4p:qa:oclc_fast:topic")
       await createLookupPromise("Artic Sea", authorityConfig)
       expect(global.fetch).toHaveBeenCalledWith(
-        "https://lookup.ld4l.org/authorities/search/linked_data/oclcfast_direct/topic?q=Artic+Sea&maxRecords=20&lang=en&context=true&response_header=true&startRecord=1"
+        "/api/qa/authorities/search/linked_data/oclcfast_direct/topic?q=Artic+Sea&maxRecords=20&lang=en&context=true&response_header=true&startRecord=1"
       )
     })
   })
@@ -66,7 +66,7 @@ describe("createLookupPromise()", () => {
       const authorityConfig = findAuthorityConfig("urn:discogs:release")
       await createLookupPromise("twain", authorityConfig)
       expect(global.fetch).toHaveBeenCalledWith(
-        "https://lookup.ld4l.org/authorities/search/discogs/release?q=twain&maxRecords=20&lang=en&context=true&response_header=true&startRecord=1"
+        "/api/qa/authorities/search/discogs/release?q=twain&maxRecords=20&lang=en&context=true&response_header=true&startRecord=1"
       )
     })
   })
@@ -76,7 +76,7 @@ describe("createLookupPromise()", () => {
       global.fetch = jest.fn().mockImplementation(() =>
         Promise.resolve({
           ok: true,
-          url: "https://lookup.ld4l.org/authorities/search/local/publisher_cities_select_list?q=new+york&maxRecords=8&lang=en&context=true&response_header=true&startRecord=1",
+          url: "/api/qa/authorities/search/local/publisher_cities_select_list?q=new+york&maxRecords=8&lang=en&context=true&response_header=true&startRecord=1",
           status: 200,
           statusText: "OK",
           json: () => {
@@ -154,7 +154,7 @@ describe("getTerm", () => {
 
     expect(global.fetch).toHaveBeenCalledTimes(1)
     const url =
-      "https://lookup.ld4l.org/authorities/fetch/linked_data/geonames_direct?format=n3&uri=https://sws.geonames.org/3023622/"
+      "/api/qa/authorities/fetch/linked_data/geonames_direct?format=n3&uri=https://sws.geonames.org/3023622/"
     expect(global.fetch).toHaveBeenCalledWith(url)
   })
   it("fetches N3 from QA with id", async () => {
@@ -171,7 +171,7 @@ describe("getTerm", () => {
 
     expect(global.fetch).toHaveBeenCalledTimes(1)
     const url =
-      "https://lookup.ld4l.org/authorities/show/discogs/master/132553?format=n3"
+      "/api/qa/authorities/show/discogs/master/132553?format=n3"
     expect(global.fetch).toHaveBeenCalledWith(url)
   })
 })
