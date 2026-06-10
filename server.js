@@ -33,6 +33,17 @@ app.use(
   })
 )
 
+app.use(
+  "/api/qa",
+  proxy(Config.qaUrl, {
+    parseReqBody: false,
+    proxyReqOptDecorator(proxyReqOpts) {
+      delete proxyReqOpts.headers.origin
+      return proxyReqOpts
+    },
+  })
+)
+
 app.get("/", (req, res) => {
   res.sendFile(`${__dirname}/dist/index.html`)
 })
