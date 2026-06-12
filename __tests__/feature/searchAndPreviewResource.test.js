@@ -39,7 +39,7 @@ describe("searching and preview a resource", () => {
 
       await screen.findByText(uri)
       expect(
-        screen.getByText("http://id.loc.gov/ontologies/bibframe/Fixture")
+        screen.getByText("Fixture", { selector: "span.resource-label" })
       ).toBeInTheDocument()
 
       // Relationships toggle not shown since not VF
@@ -234,7 +234,7 @@ describe("searching and preview a resource", () => {
       fireEvent.click(screen.getByTestId("Submit search"))
 
       await screen.findByText(uri)
-      screen.getByText("http://id.loc.gov/ontologies/bibframe/Fixture")
+      screen.getByText("Fixture", { selector: "span.resource-label" })
 
       // Modal hasn't rendered yet
       expect(

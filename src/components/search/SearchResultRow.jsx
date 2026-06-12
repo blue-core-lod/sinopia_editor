@@ -87,15 +87,7 @@ const SearchResultRow = ({
                 <ResourceTitle
                   resource={{
                     classes: [type],
-                    label: (
-                      <>
-                        {resourceToName(type)} (
-                        <a href={type} target="_blank" rel="noreferrer">
-                          {type}
-                        </a>
-                        )
-                      </>
-                    ),
+                    label: <>{resourceToName(type)}</>,
                   }}
                 />
               </li>

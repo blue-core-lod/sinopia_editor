@@ -125,12 +125,7 @@ describe("<Search />", () => {
     // Result
     await screen.findByText(/foo/)
 
-    const classLink = screen.getByRole("link", {
-      name: "http://id.loc.gov/ontologies/bibframe/Title",
-    })
-    expect(classLink.closest("li")).toHaveTextContent(
-      "Title (http://id.loc.gov/ontologies/bibframe/Title)"
-    )
+    screen.getByText("Title", { selector: "span.resource-label" })
   })
 
   it("requests on enter", () => {
