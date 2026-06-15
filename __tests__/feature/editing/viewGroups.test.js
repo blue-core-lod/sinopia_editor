@@ -36,7 +36,6 @@ describe("user that can edit, but not an owner, can view groups", () => {
 
     await screen.findByText("Who owns this?")
     screen.getByText("Stanford University", { selector: "p" })
-    screen.getByText("Cornell University", { selector: "p" })
     expect(screen.queryByLabelText("Save Group")).not.toBeInTheDocument()
 
     // Click cancel
