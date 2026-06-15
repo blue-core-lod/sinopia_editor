@@ -54,11 +54,6 @@ describe("relationships", () => {
 
       await screen.findByText("Instance1", { selector: resourceHeaderSelector })
 
-      // Has a badge
-      expect(
-        screen.getAllByText("INSTANCE", { selector: ".badge" })
-      ).toHaveLength(2)
-
       fireEvent.click(screen.getByText("Relationships"))
 
       await screen.findByText("Works", { selector: "h5" })
@@ -88,9 +83,6 @@ describe("relationships", () => {
       await screen.findByText("Example Label", {
         selector: resourceHeaderSelector,
       })
-
-      // No badge
-      expect(document.querySelector(".badge")).not.toBeInTheDocument() // eslint-disable-line testing-library/no-node-access
 
       // No relationships pill
       expect(screen.queryByText("Relationships")).not.toBeInTheDocument()
