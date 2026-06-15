@@ -59,7 +59,6 @@ const SinopiaSearchResults = () => {
                 <th style={{ width: "30%" }}>
                   Class <ClassFilter />
                 </th>
-                <th style={{ width: "15%" }}>Group</th>
                 <th style={{ width: "10%" }}>Modified</th>
                 <th style={{ width: "10%" }}>
                   <SinopiaSort />

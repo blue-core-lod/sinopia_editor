@@ -60,7 +60,6 @@ describe("<SinopiaSearchResults />", () => {
       // Search table headers
       screen.queryByText("Label / ID")
       screen.queryByText("Class")
-      screen.queryByText("Group")
       screen.getByText("Modified", { selector: "th" })
 
       // It has a sort button
@@ -75,7 +74,6 @@ describe("<SinopiaSearchResults />", () => {
       screen.queryByText(/https:\/\/api.sinopia.io\/resource\/some\/path/)
       screen.queryByText("Oct 23, 2019")
       screen.queryByText("http://schema.org/Thing")
-      screen.queryByText("Stanford University")
     })
   })
 })

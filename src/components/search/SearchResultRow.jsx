@@ -21,7 +21,6 @@ const SearchResultRow = ({
   row,
   canEdit,
   canCreate,
-  groupMap,
   withRelationships = true,
 }) => {
   const errorKey = useAlerts()
@@ -94,7 +93,6 @@ const SearchResultRow = ({
             ))}
           </ul>
         </td>
-        <td>{groupMap[row.group] || "Unknown"}</td>
         <td>
           <LongDate datetime={row.modified} />
         </td>
@@ -124,7 +122,7 @@ const SearchResultRow = ({
       </tr>
       {showRelationships && (
         <tr className="search-no-top-border table-light">
-          <td colSpan="5" className="px-0 search-no-top-border">
+          <td colSpan="4" className="px-0 search-no-top-border">
             <RelationshipResults uri={row.uri} />
           </td>
         </tr>
@@ -137,7 +135,6 @@ SearchResultRow.propTypes = {
   row: PropTypes.object.isRequired,
   canEdit: PropTypes.bool.isRequired,
   canCreate: PropTypes.bool.isRequired,
-  groupMap: PropTypes.object.isRequired,
   withRelationships: PropTypes.bool,
 }
 
