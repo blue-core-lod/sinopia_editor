@@ -3,9 +3,11 @@
 
 import React from "react"
 import { useSelector, useDispatch } from "react-redux"
-import { selectSearchResults } from "selectors/search"
-import TypeFilter from "./TypeFilter"
-import GroupFilter from "./GroupFilter"
+import {
+  selectSearchResults,
+  selectFilteredSearchResults,
+} from "selectors/search"
+import ClassFilter from "./ClassFilter"
 import SearchResultRows from "./SearchResultRows"
 import SinopiaSort from "./SinopiaSort"
 import MarcModal from "../editor/actions/MarcModal"
@@ -19,6 +21,9 @@ const SinopiaSearchResults = () => {
   const history = useHistory()
   const searchResults = useSelector((state) =>
     selectSearchResults(state, "resource")
+  )
+  const filteredResults = useSelector((state) =>
+    selectFilteredSearchResults(state, "resource")
   )
 
   const chooseResourceTemplate = (resourceTemplateId) => {
@@ -37,12 +42,6 @@ const SinopiaSearchResults = () => {
     <React.Fragment>
       <MarcModal />
       <ResourceTemplateChoiceModal choose={chooseResourceTemplate} />
-      <div className="row">
-        <div className="col" style={{ marginBottom: "5px" }}>
-          <TypeFilter />
-          <GroupFilter />
-        </div>
-      </div>
       <div
         id="search-results"
         className="row"
@@ -57,7 +56,9 @@ const SinopiaSearchResults = () => {
             <thead>
               <tr>
                 <th>Label / ID</th>
-                <th style={{ width: "30%" }}>Class</th>
+                <th style={{ width: "30%" }}>
+                  Class <ClassFilter />
+                </th>
                 <th style={{ width: "15%" }}>Group</th>
                 <th style={{ width: "10%" }}>Modified</th>
                 <th style={{ width: "10%" }}>
@@ -66,7 +67,7 @@ const SinopiaSearchResults = () => {
               </tr>
             </thead>
             <tbody>
-              <SearchResultRows searchResults={searchResults} />
+              <SearchResultRows searchResults={filteredResults} />
             </tbody>
           </table>
         </div>

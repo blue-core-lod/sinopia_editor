@@ -25,6 +25,10 @@ jest.mock("keycloak-js", () => {
   })
 })
 
+jest.mock("KeycloakContext", () => ({
+  useKeycloak: jest.fn().mockReturnValue({ keycloak: { token: "Secret-Token" } }),
+}))
+
 /* eslint-disable testing-library/no-node-access */
 describe("<TypeFilter />", () => {
   const facetResults = {
@@ -120,7 +124,7 @@ describe("<TypeFilter />", () => {
         "http://id.loc.gov/ontologies/bibframe/Barcode",
         "http://id.loc.gov/ontologies/bibframe/Chronology",
       ],
-    }, undefined)
+    }, { token: "Secret-Token" })
   })
 
   it("allows selecting / deselecting all", async () => {
@@ -181,7 +185,7 @@ describe("<TypeFilter />", () => {
       sortField: undefined,
       sortOrder: undefined,
       typeFilter: null,
-    }, undefined)
+    }, { token: "Secret-Token" })
   })
 
   it("allows reselecting cleared filters before using them", async () => {

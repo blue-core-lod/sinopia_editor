@@ -1,5 +1,21 @@
 // Copyright 2019 Stanford University see LICENSE for license
 import { setSearchResults } from 'actions/search'
+
+const computeSearchFacets = (results) => {
+  if (!results?.length) return {}
+  const typeCounts = {}
+  const groupCounts = {}
+  results.forEach(({ type, group }) => {
+    type?.forEach((t) => {
+      typeCounts[t] = (typeCounts[t] || 0) + 1
+    })
+    if (group) groupCounts[group] = (groupCounts[group] || 0) + 1
+  })
+  return {
+    types: Object.entries(typeCounts).map(([key, doc_count]) => ({ key, doc_count })),
+    groups: Object.entries(groupCounts).map(([key, doc_count]) => ({ key, doc_count })),
+  }
+}
 import {
   getSearchResultsWithFacets,
   getTemplateSearchResults,
@@ -31,13 +47,16 @@ export const fetchSinopiaSearchResults =
         dispatch(addApiSearchHistory(sinopiaSearchUri, query, keycloak))
         // Use extracted options from response if available, otherwise use passed options
         const finalOptions = response.options || options
+        const facets = (facetResponse && Object.keys(facetResponse).length)
+          ? facetResponse
+          : computeSearchFacets(response.results)
         dispatch(
           setSearchResults(
             'resource',
             sinopiaSearchUri,
             response.results,
             response.totalHits,
-            facetResponse || {},
+            facets,
             query,
             finalOptions,
             response.error,

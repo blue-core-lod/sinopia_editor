@@ -17,7 +17,7 @@ describe("<SinopiaSearchResults />", () => {
       expect(
         screen.queryByTestId("sinopia-search-results")
       ).not.toBeInTheDocument()
-      expect(screen.queryByText("Filter by class")).not.toBeInTheDocument()
+      expect(screen.queryByText("Class", { selector: "th" })).not.toBeInTheDocument()
     })
   })
 
@@ -67,8 +67,8 @@ describe("<SinopiaSearchResults />", () => {
       screen.getByText("Sort by")
 
       // It has filters
-      screen.getByText("Filter by class")
-      screen.getByText("Filter by group")
+      screen.getByText("Class", { selector: "th" })
+      screen.getByText("Filter by")
 
       // First row of search results
       screen.queryByText(/An item title/)
