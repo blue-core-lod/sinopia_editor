@@ -60,7 +60,7 @@ describe("searching and view relationships for a resource", () => {
       fireEvent.click(screen.getByTestId("Submit search"))
 
       await screen.findByText(uri)
-      screen.getByText("http://id.loc.gov/ontologies/bibframe/Instance")
+      screen.getByText("Instance", { selector: "span.resource-label" })
 
       fireEvent.click(
         await screen.findByTestId(`Show relationships for ${uri}`)
@@ -72,7 +72,7 @@ describe("searching and view relationships for a resource", () => {
         /http:\/\/localhost:3000\/resource\/f6ee6410-5206-492b-8e48-3b6333010c33/
       )
       screen.getByText(/Work1/)
-      screen.getByText("http://id.loc.gov/ontologies/bibframe/Work")
+      screen.getByText("Work", { selector: "span.resource-label" })
     }, 10000)
   })
 })
