@@ -14,10 +14,12 @@ import { selectNormSubject, selectMainTitleValue } from "selectors/resources"
 import { setCurrentResource } from "actions/resources"
 
 import useAlerts from "hooks/useAlerts"
+import { useKeycloak } from "../../../KeycloakContext"
 import _ from "lodash"
 
 const ResourceList = (props) => {
   const dispatch = useDispatch()
+  const { keycloak } = useKeycloak()
   const [newResourceList, setNewResourceList] = useState([])
   const errorKey = useAlerts()
   const topRef = useRef(null)
@@ -40,7 +42,9 @@ const ResourceList = (props) => {
     let isMounted = true
     const handleChange = (resourceTemplateId, event) => {
       event.preventDefault()
-      dispatch(newResource(resourceTemplateId, errorKey, false)).then(
+      dispatch(
+        newResource(resourceTemplateId, errorKey, false, keycloak)
+      ).then(
         (resourceKey) => {
           if (resourceKey && mainTitleValue) {
             dispatch(addMainTitle(resourceKey, mainTitleValue))
@@ -94,6 +98,7 @@ const ResourceList = (props) => {
     subjectTemplate.class,
     errorKey,
     mainTitleValue,
+    keycloak,
   ])
 
   const dropdown = (items) => (
