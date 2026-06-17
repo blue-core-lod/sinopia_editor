@@ -11,10 +11,12 @@ import _ from "lodash"
 import Config from "Config"
 import usePermissions from "hooks/usePermissions"
 import useAlerts from "hooks/useAlerts"
+import { useKeycloak } from "../../KeycloakContext"
 import LoadingButton from "../buttons/LoadingButton"
 
 const NewResourceTemplateButton = (props) => {
   const dispatch = useDispatch()
+  const { keycloak } = useKeycloak()
   const { canCreate } = usePermissions()
   const errorKey = useAlerts()
   const [isLoading, setIsLoading] = useState(false)
@@ -34,7 +36,9 @@ const NewResourceTemplateButton = (props) => {
   const handleClick = (event) => {
     event.preventDefault()
     setIsLoading(true)
-    dispatch(newResource(Config.rootResourceTemplateId, errorKey)).then(
+    dispatch(
+      newResource(Config.rootResourceTemplateId, errorKey, true, keycloak)
+    ).then(
       (result) => {
         setNavigateEditor(result)
       }
