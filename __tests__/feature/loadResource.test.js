@@ -32,7 +32,6 @@ describe("loading saved resource", () => {
       // The result
       await screen.findByText(uri)
       screen.getByText("Fixture", { selector: "span.resource-label" })
-      screen.getByText("Stanford University")
       screen.getByText("Jul 15, 2020")
 
       // Click edit
@@ -99,7 +98,6 @@ describe("loading saved resource", () => {
       // The result
       await screen.findByText(uri)
       screen.getByText("Fixture", { selector: "span.resource-label" })
-      screen.getByText("Stanford University")
       screen.getByText("Jul 15, 2020")
 
       // Click edit

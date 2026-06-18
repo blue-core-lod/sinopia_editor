@@ -5,7 +5,6 @@ import { selectSearchRelationships } from "selectors/relationships"
 import { getSearchResultsByUris } from "sinopiaSearch"
 import useAlerts from "hooks/useAlerts"
 import usePermissions from "hooks/usePermissions"
-import { selectGroupMap } from "selectors/groups"
 import SearchResultRow from "./SearchResultRow"
 import { addError } from "actions/errors"
 import _ from "lodash"
@@ -17,7 +16,6 @@ const RelationshipResults = ({ uri }) => {
     selectSearchRelationships(state, uri)
   )
   const { canEdit, canCreate } = usePermissions()
-  const groupMap = useSelector((state) => selectGroupMap(state))
 
   // These are results from search
   const [resourceRowMap, setResourceRowMap] = useState({})
@@ -65,7 +63,6 @@ const RelationshipResults = ({ uri }) => {
         <SearchResultRow
           key={row.uri}
           row={row}
-          groupMap={groupMap}
           canCreate={canCreate}
           canEdit={canEdit(row)}
           withRelationships={false}
@@ -79,7 +76,6 @@ const RelationshipResults = ({ uri }) => {
           <colgroup>
             <col span="1" />
             <col span="1" style={{ width: "30%" }} />
-            <col span="1" style={{ width: "15%" }} />
             <col span="1" style={{ width: "10%" }} />
             <col span="1" style={{ width: "10%" }} />
           </colgroup>
