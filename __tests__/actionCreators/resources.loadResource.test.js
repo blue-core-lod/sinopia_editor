@@ -54,8 +54,9 @@ describe("loadResource", () => {
     jest.spyOn(relationshipActionCreators, "loadRelationships")
 
     it("dispatches actions", async () => {
+      const keycloak = { token: "test-token" }
       const result = await store.dispatch(
-        loadResourceForEditor(uri, "testerrorkey")
+        loadResourceForEditor(uri, "testerrorkey", {}, keycloak)
       )
       expect(result).toBe(true)
 
@@ -85,7 +86,7 @@ describe("loadResource", () => {
         "resource",
         "87d27b05d48874c9f80cd4b7e8fc0dcc",
         uri,
-        undefined
+        keycloak
       )
 
       // loadRelationships is invoked async and do not wait for results

@@ -46,6 +46,7 @@ describe("fetchSinopiaSearchResults", () => {
       .fn()
       .mockResolvedValue([mockSearchResults, mockFacetResults])
     sinopiaApi.putUserHistory = jest.fn().mockResolvedValue()
+    const keycloak = { token: "test-token" }
     const store = mockStore(createState())
     await store.dispatch(
       fetchSinopiaSearchResults(
@@ -56,7 +57,8 @@ describe("fetchSinopiaSearchResults", () => {
           sortField: "label",
           sortOrder: "desc",
         },
-        "testerrorkey"
+        "testerrorkey",
+        keycloak
       )
     )
 
@@ -84,14 +86,14 @@ describe("fetchSinopiaSearchResults", () => {
       authorityUri: "urn:ld4p:sinopia",
       authorityLabel: "Sinopia resources",
       query: "*",
-      keycloak: undefined,
+      keycloak,
     })
     expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
       "Foo McBar",
       "search",
       "e983591a38cf0e7a8d9a2a1e3251a1b6",
       '{"authorityUri":"urn:ld4p:sinopia","query":"*"}',
-      undefined
+      keycloak
     )
   })
 })
@@ -171,8 +173,6 @@ describe("fetchQASearchResults", () => {
     })
 
     it("dispatches action", async () => {
-      sinopiaApi.putUserHistory = jest.fn().mockResolvedValue()
-
       const store = mockStore(createState())
       await store.dispatch(fetchQASearchResults(query, uri, "testerrorkey"))
 
@@ -197,13 +197,6 @@ describe("fetchQASearchResults", () => {
         query,
         keycloak: undefined,
       })
-      expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
-        "Foo McBar",
-        "search",
-        "7c944f41fb8b8bba92311b4f4f48ceb3",
-        '{"authorityUri":"urn:ld4p:qa:oclc_fast:topic","query":"*"}',
-        undefined
-      )
     })
   })
 

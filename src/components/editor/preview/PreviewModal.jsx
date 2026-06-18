@@ -55,7 +55,7 @@ const PreviewModal = () => {
 
   const handleCloseClick = (event) => {
     close(event)
-    dispatch(clearResource(currentResourceKey))
+    if (currentResourceKey) dispatch(clearResource(currentResourceKey))
   }
 
   const header = (

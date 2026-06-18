@@ -180,9 +180,10 @@ describe("saveResource", () => {
     const state = createState({ hasResourceWithLiteral: true })
     state.entities.subjects.t9zVwg2zO.group = "stanford"
     const store = mockStore(state)
+    const keycloak = { token: "test-token" }
 
     await store.dispatch(
-      saveResource("t9zVwg2zO", "stanford", ["cornell"], "testerror")
+      saveResource("t9zVwg2zO", "stanford", ["cornell"], "testerror", keycloak)
     )
     const actions = store.getActions()
 
@@ -205,7 +206,7 @@ describe("saveResource", () => {
       "resource",
       "3eb9f1444e9ec984fb165fc9c4de826a",
       "https://api.sinopia.io/resource/0894a8b3",
-      undefined
+      keycloak
     )
   })
 

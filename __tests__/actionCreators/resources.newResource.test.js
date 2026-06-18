@@ -43,8 +43,9 @@ describe("newResource", () => {
     const store = mockStore(createState())
 
     it("dispatches actions", async () => {
+      const keycloak = { token: "test-token" }
       const result = await store.dispatch(
-        newResource(resourceTemplateId, "testerrorkey")
+        newResource(resourceTemplateId, "testerrorkey", true, keycloak)
       )
       expect(result).toBe("abc123")
 
@@ -75,7 +76,7 @@ describe("newResource", () => {
         "template",
         "e2bb9b57c5d91394dc6f7e1d32d7a97b",
         resourceTemplateId,
-        undefined
+        keycloak
       )
     })
   })
