@@ -62,7 +62,7 @@ export const fetchResource = (
     fetchPromise = Promise.reject(new Error("Not found"))
   } else {
     fetchPromise = fetch(fetchUri, {
-      headers: { Accept: "application/json" },
+      headers: { Accept: "application/vnd.sinopia+json" },
     }).then((resp) => checkResp(resp).then(() => resp.json()))
   }
 
