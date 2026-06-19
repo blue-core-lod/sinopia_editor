@@ -1,50 +1,49 @@
 // Copyright 2020 Stanford University see LICENSE for license
 
-import { setRelationships, setSearchRelationships } from "actions/relationships"
-import { clearErrors } from "actions/errors"
-import { fetchResourceRelationships } from "sinopiaApi"
+import { setSearchRelationships } from "actions/relationships"
+import { fetchResource } from "sinopiaApi"
+import rdf from "rdf-ext"
 
-/**
- * A thunk that loads inferred relationships from the Sinopia API and adds to state.
- * @return true if successful
- */
-export const loadRelationships = (resourceKey, uri, errorKey) => (dispatch) => {
-  dispatch(clearErrors(errorKey))
-  return fetchResourceRelationships(uri)
-    .then((relationships) => {
-      dispatch(
-        setRelationships(resourceKey, {
-          bfAdminMetadataRefs: relationships.bfAdminMetadataInferredRefs,
-          bfItemRefs: relationships.bfItemInferredRefs,
-          bfInstanceRefs: relationships.bfInstanceInferredRefs,
-          bfWorkRefs: relationships.bfWorkInferredRefs,
-        })
-      )
-      return true
-    })
-    .catch((err) => {
-      // Relationships endpoint is optional and not supported by all APIs (e.g., Blue Core)
-      // Silently fail without dispatching errors to avoid blocking resource loading
-      console.warn(`Relationships endpoint not available for ${uri}, skipping relationships loading`)
-      return false
-    })
+const BF = "http://id.loc.gov/ontologies/bibframe/"
+
+const refsFromDataset = (dataset) => {
+  const getObjectUris = (predicate) =>
+    dataset
+      .match(null, rdf.namedNode(predicate), null)
+      .toArray()
+      .map((quad) => quad.object.value)
+      .filter((v) => v.startsWith("http"))
+
+  return {
+    bfAdminMetadataRefs: getObjectUris(`${BF}adminMetadata`),
+    bfItemRefs: getObjectUris(`${BF}hasItem`),
+    bfInstanceRefs: [
+      ...getObjectUris(`${BF}hasInstance`),
+      ...getObjectUris(`${BF}itemOf`),
+    ],
+    bfWorkRefs: getObjectUris(`${BF}instanceOf`),
+  }
 }
 
-export const loadSearchRelationships = (uri, errorKey) => (dispatch) =>
-  fetchResourceRelationships(uri)
-    .then((relationships) => {
-      dispatch(
-        setSearchRelationships(uri, {
-          bfItemRefs: relationships.bfItemAllRefs,
-          bfInstanceRefs: relationships.bfInstanceAllRefs,
-          bfWorkRefs: relationships.bfWorkAllRefs,
-        })
-      )
+/**
+ * Relationships for resources in the editor are already tracked on the subject
+ * via updateBibframeRefs as values are loaded. No separate API call is needed.
+ */
+export const loadRelationships = () => () => Promise.resolve(true)
+
+/**
+ * A thunk that loads relationships for a search result by fetching the resource
+ * and extracting BIBFRAME ref predicates from its dataset.
+ */
+export const loadSearchRelationships = (uri) => (dispatch) =>
+  fetchResource(uri)
+    .then(([dataset]) => {
+      dispatch(setSearchRelationships(uri, refsFromDataset(dataset)))
       return true
     })
     .catch((err) => {
-      // Relationships endpoint is optional and not supported by all APIs (e.g., Blue Core)
-      // Silently fail without dispatching errors to avoid blocking resource loading
-      console.warn(`Relationships endpoint not available for ${uri}, skipping relationships loading`)
+      console.warn(
+        `Could not load relationships for ${uri}: ${err.message || err}`
+      )
       return false
     })

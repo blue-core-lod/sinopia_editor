@@ -6,6 +6,8 @@ import * as sinopiaApi from "sinopiaApi"
 import configureMockStore from "redux-mock-store"
 import thunk from "redux-thunk"
 import { createState } from "stateUtils"
+import { datasetFromJsonld } from "utilities/Utilities"
+import instanceWithRefs from "../__resource_fixtures__/instance_with_refs.json"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -13,165 +15,60 @@ jest.mock("KeycloakContext", () => ({
 
 const mockStore = configureMockStore([thunk])
 
-const relationships = {
-  bfAdminMetadataInferredRefs: [
-    "http://localhost:3000/resource/72f2f457-31f5-432c-8acf-b4037f7754g",
-  ],
-  bfItemInferredRefs: [],
-  bfInstanceInferredRefs: [],
-  bfWorkInferredRefs: [
-    "http://localhost:3000/resource/83f2f457-31f5-432c-8acf-b4037f7754h",
-  ],
-  bfAdminMetadataRefs: [
-    "http://localhost:3000/resource/94f2f457-31f5-432c-8acf-b4037f7754i",
-  ],
-  bfItemRefs: [
-    "http://localhost:3000/resource/05f2f457-31f5-432c-8acf-b4037f7754j",
-  ],
-  bfInstanceRefs: [],
-  bfWorkRefs: [],
-  sinopiaLocalAdminMetadataForRefs: [],
-  sinopiaHasLocalAdminMetadataInferredRefs: [],
-  bfAdminMetadataAllRefs: [
-    "http://localhost:3000/resource/72f2f457-31f5-432c-8acf-b4037f7754g",
-    "http://localhost:3000/resource/94f2f457-31f5-432c-8acf-b4037f7754i",
-  ],
-  bfItemAllRefs: [
-    "http://localhost:3000/resource/05f2f457-31f5-432c-8acf-b4037f7754j",
-  ],
-  bfInstanceAllRefs: [],
-  bfWorkAllRefs: [
-    "http://localhost:3000/resource/83f2f457-31f5-432c-8acf-b4037f7754h",
-  ],
-  id: "c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
-}
+const uri =
+  "http://localhost:3000/resource/a5c5f4c0-e7cd-4ca5-a20f-2a37fe1080d5"
 
 describe("loadRelationships()", () => {
-  beforeEach(() => {
-    sinopiaApi.fetchResourceRelationships = jest
-      .fn()
-      .mockResolvedValue(relationships)
-  })
-
-  it("fetches from Sinopia API and dispatches", async () => {
+  it("is a no-op — refs are tracked on the subject via updateBibframeRefs", async () => {
     const store = mockStore(createState())
 
-    await store.dispatch(
+    const result = await store.dispatch(
       loadRelationships(
         "7d7d-40ac-b38e",
         "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
         "testerrorkey"
       )
     )
-    const actions = store.getActions()
 
-    expect(actions).toHaveLength(2)
-
-    expect(actions).toHaveAction("CLEAR_ERRORS")
-
-    expect(actions).toHaveAction("SET_RELATIONSHIPS", {
-      resourceKey: "7d7d-40ac-b38e",
-      relationships: {
-        bfAdminMetadataRefs: [
-          "http://localhost:3000/resource/72f2f457-31f5-432c-8acf-b4037f7754g",
-        ],
-        bfItemRefs: [],
-        bfInstanceRefs: [],
-        bfWorkRefs: [
-          "http://localhost:3000/resource/83f2f457-31f5-432c-8acf-b4037f7754h",
-        ],
-      },
-    })
-
-    expect(sinopiaApi.fetchResourceRelationships).toHaveBeenCalledWith(
-      "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f"
-    )
-  })
-
-  describe("when an error", () => {
-    beforeEach(() => {
-      sinopiaApi.fetchResourceRelationships = jest
-        .fn()
-        .mockRejectedValue("Ooops")
-    })
-
-    it("silently handles error (relationships endpoint optional for Blue Core)", async () => {
-      const store = mockStore(createState())
-
-      const result = await store.dispatch(
-        loadRelationships(
-          "7d7d-40ac-b38e",
-          "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
-          "testerrorkey"
-        )
-      )
-      const actions = store.getActions()
-
-      expect(result).toBe(false)
-      expect(actions).toHaveLength(1)
-      expect(actions).toHaveAction("CLEAR_ERRORS")
-    })
+    expect(result).toBe(true)
+    expect(store.getActions()).toHaveLength(0)
   })
 })
 
 describe("loadSearchRelationships()", () => {
-  beforeEach(() => {
-    sinopiaApi.fetchResourceRelationships = jest
-      .fn()
-      .mockResolvedValue(relationships)
-  })
+  it("fetches resource and dispatches refs extracted from BIBFRAME predicates", async () => {
+    const dataset = await datasetFromJsonld(instanceWithRefs)
+    sinopiaApi.fetchResource = jest.fn().mockResolvedValue([dataset, {}])
 
-  it("fetches from Sinopia API and dispatches", async () => {
     const store = mockStore(createState())
+    await store.dispatch(loadSearchRelationships(uri))
 
-    await store.dispatch(
-      loadSearchRelationships(
-        "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
-        "testerrorkey"
-      )
-    )
     const actions = store.getActions()
-
     expect(actions).toHaveLength(1)
-
     expect(actions).toHaveAction("SET_SEARCH_RELATIONSHIPS", {
-      uri: "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
+      uri,
       relationships: {
-        bfItemRefs: [
-          "http://localhost:3000/resource/05f2f457-31f5-432c-8acf-b4037f7754j",
-        ],
+        bfAdminMetadataRefs: [],
+        bfItemRefs: [],
         bfInstanceRefs: [],
         bfWorkRefs: [
-          "http://localhost:3000/resource/83f2f457-31f5-432c-8acf-b4037f7754h",
+          "http://localhost:3000/resource/f6ee6410-5206-492b-8e48-3b6333010c33",
         ],
       },
     })
 
-    expect(sinopiaApi.fetchResourceRelationships).toHaveBeenCalledWith(
-      "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f"
-    )
+    expect(sinopiaApi.fetchResource).toHaveBeenCalledWith(uri)
   })
 
-  describe("when an error", () => {
-    beforeEach(() => {
-      sinopiaApi.fetchResourceRelationships = jest
-        .fn()
-        .mockRejectedValue("Ooops")
-    })
+  describe("when fetchResource errors", () => {
+    it("silently handles error", async () => {
+      sinopiaApi.fetchResource = jest.fn().mockRejectedValue(new Error("Ooops"))
 
-    it("silently handles error (relationships endpoint optional for Blue Core)", async () => {
       const store = mockStore(createState())
-
-      const result = await store.dispatch(
-        loadSearchRelationships(
-          "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
-          "testerrorkey"
-        )
-      )
-      const actions = store.getActions()
+      const result = await store.dispatch(loadSearchRelationships(uri))
 
       expect(result).toBe(false)
-      expect(actions).toHaveLength(0)
+      expect(store.getActions()).toHaveLength(0)
     })
   })
 })

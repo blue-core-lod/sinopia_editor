@@ -1,0 +1,19 @@
+[
+  {
+    "@id": "http://localhost:3000/resource/f6ee6410-5206-492b-8e48-3b6333010c33",
+    "http://sinopia.io/vocabulary/hasResourceTemplate": [
+      {
+        "@value": "resourceTemplate:bf2:Work"
+      }
+    ],
+    "@type": [
+      "http://id.loc.gov/ontologies/bibframe/Work"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Work1",
+        "@language": "en"
+      }
+    ]
+  }
+]

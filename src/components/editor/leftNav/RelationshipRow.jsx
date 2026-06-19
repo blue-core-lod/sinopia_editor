@@ -22,6 +22,12 @@ const RelationshipRow = ({ errorKey, row, displayActions }) => {
   return (
     <li>
       {row.label}
+      {row.label !== row.uri && (
+        <>
+          <br />
+          {row.uri}
+        </>
+      )}
       {displayActions && (
         <div
           className="btn-group ps-3"

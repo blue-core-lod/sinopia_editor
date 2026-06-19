@@ -1,7 +1,6 @@
 import { fireEvent, screen } from "@testing-library/react"
 import { renderApp } from "testUtils"
 import * as sinopiaSearch from "sinopiaSearch"
-import * as sinopiaApi from "sinopiaApi"
 import { resourceSearchResults } from "fixtureLoaderHelper"
 import { featureSetup } from "featureUtils"
 
@@ -25,28 +24,6 @@ describe("searching and view relationships for a resource", () => {
             "http://id.loc.gov/ontologies/bibframe/Instance"
           )
         )
-
-      jest.spyOn(sinopiaApi, "fetchResourceRelationships").mockResolvedValue({
-        bfAdminMetadataAllRefs: [],
-        bfItemAllRefs: [],
-        bfInstanceAllRefs: [],
-        bfWorkAllRefs: [
-          "http://localhost:3000/resource/f6ee6410-5206-492b-8e48-3b6333010c33",
-        ],
-      })
-      jest.spyOn(sinopiaSearch, "getSearchResultsByUris").mockResolvedValue({
-        totalHits: 1,
-        results: [
-          {
-            uri: "http://localhost:3000/resource/f6ee6410-5206-492b-8e48-3b6333010c33",
-            label: "Work1",
-            modified: "2021-10-30T18:06:01.265Z",
-            type: ["http://id.loc.gov/ontologies/bibframe/Work"],
-            group: "stanford",
-            editGroups: [],
-          },
-        ],
-      })
     })
 
     it("renders relationships", async () => {

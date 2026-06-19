@@ -208,19 +208,6 @@ describe("searching and preview a resource", () => {
         .spyOn(sinopiaSearch, "getSearchResultsWithFacets")
         .mockResolvedValue(resourceSearchResults(uri))
 
-      jest.spyOn(sinopiaSearch, "getSearchResultsByUris").mockResolvedValue({
-        totalHits: 1,
-        results: [
-          {
-            uri: "http://localhost:3000/resource/f6ee6410-5206-492b-8e48-3b6333010c33",
-            label: "Work1",
-            modified: "2021-10-30T18:06:01.265Z",
-            type: ["http://id.loc.gov/ontologies/bibframe/Work"],
-            group: "stanford",
-            editGroups: [],
-          },
-        ],
-      })
     })
 
     it("renders a modal without edit controls but with MARC button and Export button", async () => {
@@ -263,7 +250,7 @@ describe("searching and preview a resource", () => {
         target: { value: "relationships" },
       })
       await screen.findByText("Works", { selector: "h5" })
-      screen.getByText("Work1", { selector: "li" })
+      screen.getByText("Work1", { selector: "li", exact: false })
     }, 10000)
   })
 })
