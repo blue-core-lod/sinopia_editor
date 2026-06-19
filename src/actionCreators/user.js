@@ -27,7 +27,7 @@ export const loadUserData = (userId, keycloak) => (dispatch) =>
 
 const addHistory = (historyType, payload, keycloak) => (dispatch, getState) => {
   const user = selectUser(getState())
-  if (!user) return
+  if (!user || !keycloak) return
   return putUserHistory(
     user.username,
     historyType,
