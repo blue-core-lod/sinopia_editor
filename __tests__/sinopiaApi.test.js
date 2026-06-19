@@ -118,7 +118,7 @@ describe("fetchResource", () => {
       expect(result[1].user).toBe("tat2")
       expect(global.fetch).toHaveBeenCalledWith(
         "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f",
-        { headers: { Accept: "application/json" } }
+        { headers: { Accept: "application/vnd.sinopia+json" } }
       )
     })
 
@@ -137,7 +137,7 @@ describe("fetchResource", () => {
       expect(result[1].user).toBe("tat2")
       expect(global.fetch).toHaveBeenCalledWith(
         "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f/version/2019-10-16T17:13:45.084Z",
-        { headers: { Accept: "application/json" } }
+        { headers: { Accept: "application/vnd.sinopia+json" } }
       )
     })
 

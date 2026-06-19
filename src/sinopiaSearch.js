@@ -68,11 +68,11 @@ export const getSearchResultsWithFacets = async (
     } catch (e) {
       // URL parsing failed; fall back to treating it as a search term
       const body = new URLSearchParams({ q: query })
-      url = `${Config.searchHost}${Config.searchPath}?${body}`
+      url = `${Config.searchHost}${Config.searchPath}/?${body}`
     }
   } else if (query) {
     const body = new URLSearchParams({ q: query })
-    url = `${Config.searchHost}${Config.searchPath}?${body}`
+    url = `${Config.searchHost}${Config.searchPath}/?${body}`
   } else {
     // If query is null/undefined, construct URL without query parameter
     url = `${Config.searchHost}${Config.searchPath}`

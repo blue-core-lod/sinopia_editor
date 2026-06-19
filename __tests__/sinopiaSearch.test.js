@@ -88,7 +88,7 @@ describe("getSearchResults", () => {
       links: null,
       options: { noFacetResults: true },
     })
-    expect(global.fetch).toHaveBeenCalledWith("?q=foo", { method: "GET" })
+    expect(global.fetch).toHaveBeenCalledWith("/?q=foo", { method: "GET" })
   })
 
   it("performs a search with specified page and sort order and returns results", async () => {
@@ -103,7 +103,7 @@ describe("getSearchResults", () => {
       sortField: "label",
       sortOrder: "desc",
     })
-    expect(global.fetch).toHaveBeenCalledWith("?q=foo", { method: "GET" })
+    expect(global.fetch).toHaveBeenCalledWith("/?q=foo", { method: "GET" })
   })
 
   it("performs a search and handles error response", async () => {
@@ -261,7 +261,7 @@ describe("getSearchResultsWithFacets", () => {
       links: null,
       options: {},
     })
-    expect(global.fetch).toHaveBeenCalledWith("?q=foo", { method: "GET" })
+    expect(global.fetch).toHaveBeenCalledWith("/?q=foo", { method: "GET" })
   })
 
   it("performs a search with specified filters and returns results", async () => {
@@ -276,7 +276,7 @@ describe("getSearchResultsWithFacets", () => {
       groupFilter: ["cornell"],
       noFacetResults: true,
     })
-    expect(global.fetch).toHaveBeenCalledWith("?q=foo", { method: "GET" })
+    expect(global.fetch).toHaveBeenCalledWith("/?q=foo", { method: "GET" })
   })
 })
 
