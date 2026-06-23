@@ -39,6 +39,17 @@ with latest published Sinopia image. From that repositories root directory, run:
 Note that this will bring up the sinopia-editor app at [http://localhost/sinopia, but it will NOT be in a mode where
 you can make code changes and see them live.  
 
+You may need to configure Keycloak to accept login requests from the development Sinopia Editor
+running at http://localhost:8888:
+
+1. Go to http://localhost/
+2. Click Keycloak and login with username admin and password from bluecore-stack README.
+3. Switch from "master" domain to "bluecore".
+4. Click "Clients" in the menu on the left.
+5. Click the "bluecore_api" client.
+6. Add http://localhost:8888 to the "Valid redirect URLs" section.
+7. Add http://localhost:8888 to the "Web origins" section.
+
 ### Running the application in development mod
 Start the Express web server (via `npm run dev-start`) with the following variables:
 
