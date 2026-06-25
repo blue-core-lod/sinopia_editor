@@ -13,6 +13,7 @@ const resourceFilenames = {
   "a4181509-8046-47c8-9327-6e576c517d70": "test2.json",
   "9c5bd9f5-1804-45bd-99ed-b6e3774c896e": "instance.json",
   "a5c5f4c0-e7cd-4ca5-a20f-2a37fe1080d5": "instance_with_refs.json",
+  "f6ee6410-5206-492b-8e48-3b6333010c33": "work_with_refs.json",
   "b6c5f4c0-e7cd-4ca5-a20f-2a37fe1080d6": "test-inputs.json",
   "c7c5f4c0-e7cd-4ca5-a20f-2a37fe1080d7": "test-multiple_property_uris.json",
 }

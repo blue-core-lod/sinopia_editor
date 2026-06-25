@@ -10,6 +10,7 @@ import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import * as sinopiaApi from "sinopiaApi"
 import * as QuestioningAuthority from "utilities/QuestioningAuthority"
+import rdf from "rdf-ext"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -39,7 +40,7 @@ describe("fetchSinopiaSearchResults", () => {
     ],
   }
 
-  jest.spyOn(sinopiaApi, "fetchResourceRelationships").mockResolvedValue({})
+  jest.spyOn(sinopiaApi, "fetchResource").mockResolvedValue([rdf.dataset(), {}])
 
   it("dispatches actions", async () => {
     server.getSearchResultsWithFacets = jest
