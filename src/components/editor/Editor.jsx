@@ -8,6 +8,7 @@ import Header from "../Header"
 import GroupChoiceModal from "./GroupChoiceModal"
 import EditorActions from "./EditorActions"
 import ErrorMessages from "./ErrorMessages"
+import ContextSuccess from "components/alerts/ContextSuccess"
 import ResourcesNav from "./ResourcesNav"
 import {
   displayResourceValidations,
@@ -81,6 +82,7 @@ const Editor = (props) => {
         <Header triggerEditorMenu={props.triggerHandleOffsetMenu} />
         <EditorPreviewModal />
         <ContextAlert />
+        <ContextSuccess />
         {displayErrors && hasValidationErrors && (
           <ErrorMessages resourceKey={resourceKey} />
         )}

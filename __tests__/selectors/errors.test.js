@@ -2,6 +2,7 @@ import { createState } from "stateUtils"
 import {
   displayResourceValidations,
   selectErrors,
+  selectSuccesses,
   selectValidationErrors,
 } from "selectors/errors"
 
@@ -42,6 +43,25 @@ describe("selectErrors()", () => {
     expect(Object.keys(errors).length).toBe(2)
     expect(errors.dairdj42u).toEqual(["error 3"])
     expect(errors.fQMouMqB0).toEqual(["error 4"])
+  })
+})
+
+describe("selectSuccesses()", () => {
+  it("returns undefined when no successes exist", () => {
+    const state = createState()
+    expect(selectSuccesses(state, "abc123")).toBeUndefined()
+  })
+
+  it("returns messages for a given success key", () => {
+    const state = createState()
+    state.editor.successes = { abc123: ["Saved successfully"] }
+    expect(selectSuccesses(state, "abc123")).toEqual(["Saved successfully"])
+  })
+
+  it("returns undefined for a key with no messages", () => {
+    const state = createState()
+    state.editor.successes = { other: ["Something else"] }
+    expect(selectSuccesses(state, "abc123")).toBeUndefined()
   })
 })
 

@@ -29,6 +29,25 @@ export const clearErrors = (state, action) => ({
   },
 })
 
+export const addSuccess = (state, action) => ({
+  ...state,
+  successes: {
+    ...state.successes,
+    [action.payload.successKey]: [
+      ...(state.successes?.[action.payload.successKey] || []),
+      action.payload.message,
+    ],
+  },
+})
+
+export const clearSuccesses = (state, action) => ({
+  ...state,
+  successes: {
+    ...state.successes,
+    [action.payload]: [],
+  },
+})
+
 /**
  * Close modals and show validation errors
  * @param {Object} state the previous redux state
