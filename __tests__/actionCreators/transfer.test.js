@@ -16,13 +16,16 @@ const resourceUri =
 
 describe("transfer", () => {
   describe("successful", () => {
-    it("dispatches actions to add user", async () => {
+    it("dispatches ADD_SUCCESS with the resource URI", async () => {
       sinopiaApi.postTransfer = jest.fn().mockResolvedValue()
       const store = mockStore(createState())
       await store.dispatch(transfer(resourceUri, undefined, "testerrorkey"))
 
-      expect(store.getActions()).toHaveLength(0)
       expect(sinopiaApi.postTransfer).toHaveBeenCalledWith(resourceUri, undefined)
+      expect(store.getActions()).toHaveAction("ADD_SUCCESS", {
+        successKey: "testerrorkey",
+        message: `Export of ${resourceUri} requested. You will be notified by email once processed.`,
+      })
     })
   })
   describe("failure", () => {
