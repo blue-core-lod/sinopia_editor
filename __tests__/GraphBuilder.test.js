@@ -42,6 +42,34 @@ describe("GraphBuilder", () => {
       expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
     })
 
+    it("uses a blank node subject when useBlankNode is set and the resource has no uri", () => {
+      const resource = build.subject({
+        subjectTemplate: build.subjectTemplate({
+          id: "resourceTemplate:testing:uber1",
+          clazz: "http://id.loc.gov/ontologies/bibframe/Uber1",
+        }),
+        properties: [
+          build.literalProperty({
+            values: [
+              build.literalValue({
+                literal: "literal1",
+                lang: null,
+                propertyUri:
+                  "http://id.loc.gov/ontologies/bibframe/uber/template1/property2",
+              }),
+            ],
+          }),
+        ],
+      })
+
+      const canonical = new GraphBuilder(resource, true).graph.toCanonical()
+      // Subject is a blank node, not an empty-uri named node (<>).
+      expect(canonical).not.toContain("<>")
+      expect(canonical).toContain(
+        '_:c14n0 <http://id.loc.gov/ontologies/bibframe/uber/template1/property2> "literal1" .'
+      )
+    })
+
     it("builds a graph for literal with validationDataType", () => {
       const resource = build.subject({
         subjectTemplate: build.subjectTemplate({

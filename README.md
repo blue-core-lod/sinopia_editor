@@ -55,13 +55,12 @@ Start the Express web server (via `npm run dev-start`) with the following variab
 
 - **SINOPIA_URI**: http://localhost:8888 
 - **SINOPIA_API_BASE_URL**: http://localhost/api 
-- **SEARCH_HOST**: http://localhost/api/ 
 - **KEYCLOAK_URL**: http://localhost:8888/keycloak
 
 Full command:
 
 ```
-SINOPIA_URI=http://localhost:8888 SINOPIA_API_BASE_URL=http://localhost/api SEARCH_HOST=http://localhost/api/search/ KEYCLOAK_URL=http://localhost:8888/keycloak npm run dev-start
+SINOPIA_URI=http://localhost:8888 SINOPIA_API_BASE_URL=http://localhost/api KEYCLOAK_URL=http://localhost:8888/keycloak npm run dev-start
 ``` 
 
 Sinopia in development mode will be available at [http://localhost:8888](http://localhost:8888).
@@ -73,7 +72,7 @@ Specify the environment variable `USE_FIXTURES=true` as shown below if you would
 The fixtures are listed in `__tests__/testUtilities/fixtureLoaderHelper.js`. Fixture resource templates will be listed on the
 templates list page and fixture resources can be searched on by entering the resource's URI in the Sinopia search box.
 
-`SINOPIA_URI=http://localhost:8888 SINOPIA_API_BASE_URL=http://localhost/api SEARCH_HOST=http://localhost/api/search KEYCLOAK_URL=http://localhost:8888/keycloak npm run dev-start`
+`SINOPIA_URI=http://localhost:8888 SINOPIA_API_BASE_URL=http://localhost/api KEYCLOAK_URL=http://localhost:8888/keycloak npm run dev-start`
 
 ## Developers
 
@@ -150,7 +149,7 @@ Proxying allows using the Sinopia API and search from a different environment, r
 To proxy to development:
 1. Build the proxy image: `docker build -t proxy-apache2:latest -f Dockerfile.proxy .`
 2. Start the proxy: `docker run --rm --name proxy-apache2 -p 8080:8080 -e ENV_HOSTNAME=development.sinopia.io proxy-apache2:latest`
-3. Start the Sinopia Editor: `SINOPIA_API_BASE_URL=http://localhost:8080 SEARCH_HOST=http://localhost:8080 npm run dev-start`
+3. Start the Sinopia Editor: `SINOPIA_API_BASE_URL=http://localhost:8080 npm run dev-start`
 
 Note that proxying to other environments may require additional Cognito configuration.
 

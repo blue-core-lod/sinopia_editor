@@ -10,7 +10,7 @@ import {
   getFixtureResourceRelationships,
 } from "../__tests__/testUtilities/fixtureLoaderHelper"
 import GraphBuilder from "GraphBuilder"
-import { v4 as uuidv4 } from "uuid"
+import { isBfWork, isBfInstance, isBfHub } from "utilities/Bibframe"
 import rtLiteralPropertyAttrs from "../static/templates/rt_literal_property_attrs_doc.json"
 import rtLookupPropertyAttrs from "../static/templates/rt_lookup_property_attrs_doc.json"
 import rtPropertyTemplate from "../static/templates/rt_property_template_doc.json"
@@ -19,10 +19,8 @@ import rtResourceRemplate from "../static/templates/rt_resource_template_doc.jso
 import rtUriPropertyAttrs from "../static/templates/rt_uri_property_attrs_doc.json"
 import {
   checkResp,
-  getJsonData,
   getJson,
   isTemplate,
-  templateIdFor,
   getJwt,
 } from "./utilities/SinopiaApiHelper"
 
@@ -108,7 +106,34 @@ export const fetchResourceRelationships = (uri) => {
 export const getGroups = () =>
   Promise.resolve([{ id: "blue core", label: "Blue Core" }])
 
-// Publishes (saves) a new resource
+// Sends a serialized resource body to the Blue Core API with the appropriate
+// auth header. Shared by postResource and putResource.
+const sendResourceBody = (url, body, method, keycloak) => {
+  const jwt = getJwt(keycloak)
+  return fetch(url, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${jwt}`,
+    },
+    body,
+  })
+}
+
+// Determines the Blue Core API collection a new resource should be POSTed to,
+// based on its class. The server mints the uri and returns it in the response.
+const apiCollectionPathFor = (resource) => {
+  if (isTemplate(resource)) return "profiles"
+  const classes = [resource.subjectTemplate.class]
+  if (isBfWork(classes)) return "works"
+  if (isBfInstance(classes)) return "instances"
+  if (isBfHub(classes)) return "hubs"
+  return "resources"
+}
+
+// Publishes (saves) a new resource by POSTing to the appropriate Blue Core API
+// collection endpoint. The resource is sent without a uri (blank node subject) so
+// the API mints one; the minted uri is read from the response and returned.
 export const postResource = (
   resource,
   currentUser,
@@ -116,21 +141,20 @@ export const postResource = (
   editGroups,
   keycloak
 ) => {
-  const newResource = { ...resource }
-  // Mint a uri. Resource templates use the template id.
-  const resourceId = isTemplate(resource) ? templateIdFor(resource) : uuidv4()
-  const uri = `${Config.sinopiaApiBase}/resource/${resourceId}`
-  newResource.uri = uri
-  newResource.group = group
-  newResource.editGroups = editGroups
-  return putResource(
+  const newResource = { ...resource, group, editGroups }
+  const url = `${Config.sinopiaApiBase}/${apiCollectionPathFor(resource)}/`
+  return saveBodyForResource(
     newResource,
-    currentUser,
+    currentUser.username,
     group,
     editGroups,
-    "POST",
-    keycloak
-  ).then(() => uri)
+    true
+  ).then((body) =>
+    sendResourceBody(url, body, "POST", keycloak)
+      .then((resp) => checkResp(resp))
+      .then((resp) => resp.json())
+      .then((json) => json.uri)
+  )
 }
 
 // Saves an existing resource
@@ -143,17 +167,10 @@ export const putResource = (
   keycloak
 ) =>
   saveBodyForResource(resource, currentUser.username, group, editGroups).then(
-    (body) => {
-      const jwt = getJwt(keycloak)
-      return fetch(resource.uri, {
-        method: method || "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
-        body,
-      }).then((resp) => checkResp(resp).then(() => true))
-    }
+    (body) =>
+      sendResourceBody(resource.uri, body, method || "PUT", keycloak).then(
+        (resp) => checkResp(resp).then(() => true)
+      )
   )
 
 export const postMarc = (resourceUri, keycloak) => {
@@ -253,8 +270,14 @@ export const postTransfer = (resourceUri, keycloak) => {
 const userUrlFor = (userId) =>
   `${Config.sinopiaApiBase}/user/${encodeURI(userId)}`
 
-const saveBodyForResource = (resource, user, group, editGroups) => {
-  const dataset = new GraphBuilder(resource).graph
+const saveBodyForResource = (
+  resource,
+  user,
+  group,
+  editGroups,
+  useBlankNode = false
+) => {
+  const dataset = new GraphBuilder(resource, useBlankNode).graph
 
   return jsonldFromDataset(dataset).then((jsonld) =>
     JSON.stringify({

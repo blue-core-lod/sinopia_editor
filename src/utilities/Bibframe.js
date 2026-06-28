@@ -43,6 +43,11 @@ export const isBfItem = (classes) => {
   return classes.includes("http://id.loc.gov/ontologies/bibframe/Item")
 }
 
+export const isBfHub = (classes) => {
+  if (!classes) return false
+  return classes.includes("http://id.loc.gov/ontologies/bibframe/Hub")
+}
+
 export const isBfWorkInstanceItem = (classes) =>
   isBfWork(classes) || isBfInstance(classes) || isBfItem(classes)
 
