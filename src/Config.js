@@ -45,34 +45,12 @@ class Config {
     return process.env.INDEX_URL || "http://localhost:9200"
   }
 
-  /*
-   * The host for the public endpoint for the Sinopia search.  This is different than
-   * the indexURL because it's the path to the public proxy endpoint, not directly to elasticsearch.
-   * In development we may want to set this to `//localhost:8000`, but when deployed typically
-   * the default (empty string) will work as the search is proxied through the same server
-   * that hosts the client javascript.
-   */
-  static get searchHost() {
-    return process.env.SEARCH_HOST || ""
-  }
-
   static get searchResultsPerPage() {
     return 10
   }
 
   static get templateSearchResultsPerPage() {
     return 10
-  }
-
-  /*
-   * This is the public endpont for the sinopia search.
-   */
-  static get searchPath() {
-    return process.env.SEARCH_PATH || ""
-  }
-
-  static get templateSearchPath() {
-    return "/profile"
   }
 
   static get sinopiaDomainName() {

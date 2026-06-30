@@ -9,9 +9,13 @@ import _ from "lodash"
 export default class GraphBuilder {
   /**
    * @param {Object} resource to be converted to graph
+   * @param {boolean} useBlankNode when the resource has no uri, use a blank node
+   *   as the subject (rather than an empty-uri named node). This lets the Blue Core
+   *   API mint a uri for a brand-new resource without recording a bogus derivedFrom.
    */
-  constructor(resource) {
+  constructor(resource, useBlankNode = false) {
     this.resource = resource
+    this.useBlankNode = useBlankNode
     this.dataset = rdf.dataset()
   }
 
@@ -20,7 +24,14 @@ export default class GraphBuilder {
    */
   get graph() {
     if (this.resource) {
-      const resourceTerm = rdf.namedNode(this.resource.uri || "")
+      let resourceTerm
+      if (this.resource.uri) {
+        resourceTerm = rdf.namedNode(this.resource.uri)
+      } else if (this.useBlankNode) {
+        resourceTerm = rdf.blankNode()
+      } else {
+        resourceTerm = rdf.namedNode("")
+      }
       this.addGeneratedByTriple(resourceTerm, this.resource.subjectTemplate.id)
       this.buildSubject(this.resource, resourceTerm)
     }

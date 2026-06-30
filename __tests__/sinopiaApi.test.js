@@ -158,63 +158,98 @@ describe("fetchResource", () => {
 })
 
 describe("postResource", () => {
-  const state = createState({ hasResourceWithLiteral: true })
-  const currentUser = selectUser(state)
-
-  describe("with a new resource", () => {
-    const resource = selectFullSubject(state, "t9zVwg2zO")
-
-    it("saves the new resource and returns uri", async () => {
-      global.fetch = jest.fn().mockResolvedValue({
-        json: jest.fn().mockResolvedValue(resource),
-        ok: true,
-      })
-
-      const result = await postResource(
-        resource,
-        currentUser,
-        "pcc",
-        ["cornell"],
-        {
-          token: "Secret-Token",
-        }
-      )
-      expect(result).toContain("http://localhost:3000/resource/")
+  // Mocks fetch to return a 201 with the server-minted uri in the body.
+  const mockPost = (uri) => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({ uri }),
     })
+  }
+
+  // Builds a fresh resource so routing-class mutations don't leak between tests.
+  const newResourceFixture = () => {
+    const state = createState({ hasResourceWithLiteral: true })
+    return {
+      resource: selectFullSubject(state, "t9zVwg2zO"),
+      currentUser: selectUser(state),
+    }
+  }
+
+  const post = (resource, currentUser) =>
+    postResource(resource, currentUser, "pcc", ["cornell"], {
+      token: "Secret-Token",
+    })
+
+  it("POSTs to the resources endpoint and returns the minted uri", async () => {
+    const { resource, currentUser } = newResourceFixture()
+    mockPost("https://bcld.info/resources/abc123")
+
+    const result = await post(resource, currentUser)
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      "http://localhost:3000/resources/",
+      expect.objectContaining({ method: "POST" })
+    )
+    expect(result).toBe("https://bcld.info/resources/abc123")
   })
 
-  describe("with a new resource template", () => {
-    const resource = selectFullSubject(state, "t9zVwg2zO")
+  it("POSTs a BIBFRAME Work to the works endpoint", async () => {
+    const { resource, currentUser } = newResourceFixture()
+    resource.subjectTemplate.class =
+      "http://id.loc.gov/ontologies/bibframe/Work"
+    mockPost("https://bcld.info/works/abc123")
 
-    it("saves the new resource template and returns uri", async () => {
-      global.fetch = jest.fn().mockResolvedValue({ ok: true })
-      // Mocks a resource template
-      resource.subjectTemplate.id = "sinopia:template:resource"
-      resource.properties.push({
-        propertyTemplate: {
-          defaultUri: "http://sinopia.io/vocabulary/hasResourceId",
-          type: "literal",
-        },
-        values: [
-          {
-            literal: "resourceTemplate:bf2:Note",
-            property: { propertyTemplate: { type: "literal" } },
-          },
-        ],
-      })
-      const result = await postResource(
-        resource,
-        currentUser,
-        "pcc",
-        ["cornell"],
-        {
-          token: "Secret-Token",
-        }
-      )
-      expect(result).toBe(
-        "http://localhost:3000/resource/resourceTemplate:bf2:Note"
-      )
-    })
+    const result = await post(resource, currentUser)
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      "http://localhost:3000/works/",
+      expect.objectContaining({ method: "POST" })
+    )
+    expect(result).toBe("https://bcld.info/works/abc123")
+  })
+
+  it("POSTs a BIBFRAME Instance to the instances endpoint", async () => {
+    const { resource, currentUser } = newResourceFixture()
+    resource.subjectTemplate.class =
+      "http://id.loc.gov/ontologies/bibframe/Instance"
+    mockPost("https://bcld.info/instances/abc123")
+
+    const result = await post(resource, currentUser)
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      "http://localhost:3000/instances/",
+      expect.objectContaining({ method: "POST" })
+    )
+    expect(result).toBe("https://bcld.info/instances/abc123")
+  })
+
+  it("POSTs a BIBFRAME Hub to the hubs endpoint", async () => {
+    const { resource, currentUser } = newResourceFixture()
+    resource.subjectTemplate.class = "http://id.loc.gov/ontologies/bibframe/Hub"
+    mockPost("https://bcld.info/hubs/abc123")
+
+    const result = await post(resource, currentUser)
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      "http://localhost:3000/hubs/",
+      expect.objectContaining({ method: "POST" })
+    )
+    expect(result).toBe("https://bcld.info/hubs/abc123")
+  })
+
+  it("POSTs a resource template to the profiles endpoint", async () => {
+    const { resource, currentUser } = newResourceFixture()
+    // Mark the resource as a template (profile)
+    resource.subjectTemplate.id = "sinopia:template:resource"
+    mockPost("https://bcld.info/profiles/abc123")
+
+    const result = await post(resource, currentUser)
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      "http://localhost:3000/profiles/",
+      expect.objectContaining({ method: "POST" })
+    )
+    expect(result).toBe("https://bcld.info/profiles/abc123")
   })
 })
 

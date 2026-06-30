@@ -88,7 +88,7 @@ describe("getSearchResults", () => {
       links: null,
       options: { noFacetResults: true },
     })
-    expect(global.fetch).toHaveBeenCalledWith("/?q=foo", { method: "GET" })
+    expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/search/?q=foo", { method: "GET" })
   })
 
   it("performs a search with specified page and sort order and returns results", async () => {
@@ -103,7 +103,7 @@ describe("getSearchResults", () => {
       sortField: "label",
       sortOrder: "desc",
     })
-    expect(global.fetch).toHaveBeenCalledWith("/?q=foo", { method: "GET" })
+    expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/search/?q=foo", { method: "GET" })
   })
 
   it("performs a search and handles error response", async () => {
@@ -261,7 +261,7 @@ describe("getSearchResultsWithFacets", () => {
       links: null,
       options: {},
     })
-    expect(global.fetch).toHaveBeenCalledWith("/?q=foo", { method: "GET" })
+    expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/search/?q=foo", { method: "GET" })
   })
 
   it("performs a search with specified filters and returns results", async () => {
@@ -276,7 +276,7 @@ describe("getSearchResultsWithFacets", () => {
       groupFilter: ["cornell"],
       noFacetResults: true,
     })
-    expect(global.fetch).toHaveBeenCalledWith("/?q=foo", { method: "GET" })
+    expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/search/?q=foo", { method: "GET" })
   })
 })
 
@@ -378,11 +378,11 @@ describe("getLookupResult", () => {
             label:
               "Cartographic Item (BIBFRAME) (ld4p:RT:bf2:Cartographic:Item)",
             originalURI:
-              "http://localhost:3000/resource/ld4p:RT:bf2:Cartographic:Item",
+              "http://localhost:3000/profiles/29908869-339b-4cec-9ef6-4baa06cfb297",
             remark: "based on LC template ld4p:RT:bf2:Cartographic:Item",
             resourceLabel: "Cartographic Item (BIBFRAME)",
             resourceURI: "http://id.loc.gov/ontologies/bibframe/Item",
-            uri: "http://localhost:3000/resources/ld4p:RT:bf2:Cartographic:Item",
+            uri: "http://localhost:3000/profiles/29908869-339b-4cec-9ef6-4baa06cfb297",
           },
         ],
         links: null,
@@ -396,11 +396,13 @@ const templateResult = {
   total: 1,
   results: [
     {
-      id: "ld4p:RT:bf2:Cartographic:Item",
-      uri: "http://localhost:3000/resource/ld4p:RT:bf2:Cartographic:Item",
+      id: 201,
+      uuid: "29908869-339b-4cec-9ef6-4baa06cfb297",
+      uri: "http://localhost:3000/profiles/29908869-339b-4cec-9ef6-4baa06cfb297",
       data: [
         {
-          "@id": "http://localhost:3000/resource/ld4p:RT:bf2:Cartographic:Item",
+          "@id": "http://localhost:3000/profiles/29908869-339b-4cec-9ef6-4baa06cfb297",
+          "@type": ["http://sinopia.io/vocabulary/ResourceTemplate"],
           "http://sinopia.io/vocabulary/hasAuthor": [{ "@value": "LD4P" }],
           "http://sinopia.io/vocabulary/hasDate": [{ "@value": "2019-08-19" }],
           "http://www.w3.org/2000/01/rdf-schema#label": [
@@ -430,11 +432,11 @@ const expectedTemplateResult = {
   date: "2019-08-19",
   group: "blue core",
   id: "ld4p:RT:bf2:Cartographic:Item",
-  originalURI: "http://localhost:3000/resource/ld4p:RT:bf2:Cartographic:Item",
+  originalURI: "http://localhost:3000/profiles/29908869-339b-4cec-9ef6-4baa06cfb297",
   remark: "based on LC template ld4p:RT:bf2:Cartographic:Item",
   resourceLabel: "Cartographic Item (BIBFRAME)",
   resourceURI: "http://id.loc.gov/ontologies/bibframe/Item",
-  uri: "http://localhost:3000/resources/ld4p:RT:bf2:Cartographic:Item",
+  uri: "http://localhost:3000/profiles/29908869-339b-4cec-9ef6-4baa06cfb297",
 }
 
 describe("getTemplateSearchResults", () => {
@@ -451,7 +453,7 @@ describe("getTemplateSearchResults", () => {
     })
 
     expect(global.fetch).toHaveBeenCalledWith(
-      "/profile?q=Cartographic%3AItem&limit=10&offset=0",
+      "http://localhost:3000/search/profile?q=Cartographic%3AItem&limit=10&offset=0",
       {
         headers: { "Content-Type": "application/json" },
         method: "GET",
@@ -490,7 +492,7 @@ describe("getTemplateSearchResultsByIds", () => {
     })
 
     expect(global.fetch).toHaveBeenCalledWith(
-      "/profile?q=ld4p%3ART%3Abf2%3ACartographic%3AItem&limit=50",
+      "http://localhost:3000/search/profile?q=ld4p%3ART%3Abf2%3ACartographic%3AItem&limit=50",
       {
         headers: { "Content-Type": "application/json" },
         method: "GET",
@@ -546,6 +548,6 @@ describe("getSearchResultsByUris", () => {
       links: null,
       options: undefined,
     })
-    expect(global.fetch).toHaveBeenCalledWith("", { method: "GET" })
+    expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/search/", { method: "GET" })
   })
 })

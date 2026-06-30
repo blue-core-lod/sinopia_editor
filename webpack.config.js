@@ -93,7 +93,6 @@ module.exports = {
       COGNITO_CLIENT_ID: null,
       COGNITO_USER_POOL_ID: null,
       INDEX_URL: null,
-      SEARCH_HOST: null,
       EXPORT_BUCKET_URL: null,
       HONEYBADGER_API_KEY: null,
       HONEYBADGER_REVISION: null,

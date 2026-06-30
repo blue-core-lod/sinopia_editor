@@ -63,19 +63,19 @@ export const getSearchResultsWithFacets = async (
       } else {
         // Resource URI used as a search term — pass as q= parameter
         const body = new URLSearchParams({ q: query })
-        url = `${Config.searchHost}${Config.searchPath}?${body}`
+        url = `${Config.sinopiaApiBase}/search/?${body}`
       }
     } catch (e) {
       // URL parsing failed; fall back to treating it as a search term
       const body = new URLSearchParams({ q: query })
-      url = `${Config.searchHost}${Config.searchPath}/?${body}`
+      url = `${Config.sinopiaApiBase}/search/?${body}`
     }
   } else if (query) {
     const body = new URLSearchParams({ q: query })
-    url = `${Config.searchHost}${Config.searchPath}/?${body}`
+    url = `${Config.sinopiaApiBase}/search/?${body}`
   } else {
     // If query is null/undefined, construct URL without query parameter
-    url = `${Config.searchHost}${Config.searchPath}`
+    url = `${Config.sinopiaApiBase}/search/`
   }
 
   // const termsFilters = []
@@ -136,7 +136,7 @@ export const getSearchResultsByUris = (resourceUris) => {
     size: resourceUris.length,
   }
   // TODO: This needs to be updated to work with the new API
-  const url = `${Config.searchHost}${Config.searchPath}`
+  const url = `${Config.sinopiaApiBase}/search/`
   return fetchSearchResultsFromUrl(url, null).then((results) => results[0])
 }
 
@@ -291,7 +291,7 @@ const fetchTemplateSearchResults = async (params, hitsToResultFunc) => {
     }
   }
 
-  const url = `${Config.searchHost}${Config.templateSearchPath}?${params}`
+  const url = `${Config.sinopiaApiBase}/search/profile?${params}`
   return fetch(url, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
@@ -346,7 +346,10 @@ const templateModFromBlueCore = (hit) => {
         : ""
     }
   })
-  const bcURI = `${Config.sinopiaApiBase}/resources/${hit.id}`
+  // The Profile's own uri is the fetchable URL -- the same one the edit path
+  // uses via originalURI. The old `${sinopiaApiBase}/resources/${hit.id}` path
+  // no longer resolves now that profiles live at /profiles/{uuid}.
+  const bcURI = hit.uri
   return {
     author: resourceAuthor,
     date: resourceDate,
