@@ -1,7 +1,6 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import Config from "../Config"
-
 import { setUser, removeUser } from "actions/authenticate"
 import { addError, clearErrors } from "actions/errors"
 import { hasUser } from "selectors/authenticate"
@@ -25,7 +24,7 @@ export const authenticate = (keycloak) => async (dispatch, getState) => {
 
 export const signIn = (keycloak, errorKey) => (dispatch) => {
   dispatch(clearErrors(errorKey))
-  return Promise.resolve(keycloak.login({ redirectUri: Config.sinopiaUrl }))
+  return Promise.resolve(keycloak.login({ redirect_uri: window.location.href }))
 }
 
 export const signOut = (keycloak) => (dispatch) => {

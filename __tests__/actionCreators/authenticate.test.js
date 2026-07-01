@@ -78,7 +78,10 @@ describe("signIn", () => {
         updateToken: jest.fn(),
       }
       await store.dispatch(signIn(mockKeycloak, "testerrorkey"))
-      // After successful signIn, redirected to Sinopia home-page
+      expect(mockKeycloak.login).toHaveBeenCalledWith({
+        redirectUri: window.location.href,
+      })
+      // After successful signIn, redirected to the original URL
       mockKeycloak.authenticated = true
       mockKeycloak.tokenParsed = {
         preferred_username: "havram",

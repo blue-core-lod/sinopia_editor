@@ -85,7 +85,7 @@ const App = (props) => {
       } else if (editorExactMatch) {
         history.push("/dashboard")
       } else if (editorResourceMatch) {
-        const uri = `${Config.sinopiaApiBase}/resource/${editorResourceMatch.params.resourceId}`
+        const uri = `${Config.sinopiaApiBase}/works/${editorResourceMatch.params.resourceId}`
         dispatch(loadResource(uri, dashboardErrorKey)).then((result) => {
           if (!result) {
             history.push("/dashboard")
