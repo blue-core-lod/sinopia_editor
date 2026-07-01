@@ -47,6 +47,9 @@ describe("transfer saved bf:Instance when user belongs to a transfer group", () 
     const transferBtn = screen.getByText("Export to Catalog")
     fireEvent.click(transferBtn)
     await screen.findByText("Requesting")
+    await screen.findByText(
+      `Export of ${bfUri} requested. You will be notified by email once processed.`
+    )
   }, 15000)
 })
 

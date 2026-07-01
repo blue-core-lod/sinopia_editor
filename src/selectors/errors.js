@@ -20,6 +20,12 @@ export const hasValidationErrors = (state, resourceKey) => {
  */
 export const selectErrors = (state, errorKey) => state.editor.errors[errorKey]
 
+/**
+ * @returns {Array} the success messages for a given success key
+ */
+export const selectSuccesses = (state, successKey) =>
+  state.editor.successes?.[successKey]
+
 export const selectValidationErrors = (state, resourceKey) => {
   const subject = selectSubject(state, resourceKey)
   if (subject == null || !subject.descWithErrorPropertyKeys) return []
