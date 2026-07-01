@@ -78,7 +78,11 @@ class Config {
   }
 
   static get qaUrl() {
-    return process.env.QA_URL || "https://lookup.ld4l.org"
+    return process.env.QA_URL || "/api/qa"
+  }
+
+  static get qaUpstreamUrl() {
+    return process.env.QA_UPSTREAM_URL || "https://lookup.ld4l.org"
   }
 
   static get exportBucketUrl() {
