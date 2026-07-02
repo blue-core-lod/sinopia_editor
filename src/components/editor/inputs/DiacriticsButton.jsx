@@ -1,5 +1,7 @@
 import React from "react"
 import PropTypes from "prop-types"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faBolt } from "@fortawesome/free-solid-svg-icons"
 
 const DiacriticsButton = ({ id, content, handleClick, handleBlur }) => (
   <button
@@ -10,7 +12,7 @@ const DiacriticsButton = ({ id, content, handleClick, handleBlur }) => (
     onClick={handleClick}
     onBlur={handleBlur}
   >
-    &auml;
+    <FontAwesomeIcon icon={faBolt} />
   </button>
 )
 
