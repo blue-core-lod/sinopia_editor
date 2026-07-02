@@ -113,6 +113,10 @@ class Config {
   static get defaultLanguageId() {
     return "en"
   }
+
+  static get scriptShifterUrl() {
+    return process.env.SCRIPT_SHIFTER_URL || "https://bibframe.org/scriptshifter"
+  }
 }
 
 export default Config
