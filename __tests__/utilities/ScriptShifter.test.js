@@ -1,9 +1,23 @@
 import { languages, translate } from "utilities/ScriptShifter"
 
-const mockLanguagesResponse = [
-  { id: "cherokee", label: "Cherokee" },
-  { id: "chinese", label: "Chinese" },
-]
+const mockLanguagesResponse = {
+  cherokee: {
+    label: "Cherokee",
+    description: null,
+    has_r2s: true,
+    has_s2r: false,
+    case_sensitive: false,
+    marc_code: "chr",
+  },
+  chinese: {
+    label: "Chinese",
+    description: null,
+    has_r2s: false,
+    has_s2r: true,
+    case_sensitive: true,
+    marc_code: "chi",
+  },
+}
 
 const mockTranslateResponse = {
   output: "ᎣᏏᏲ",

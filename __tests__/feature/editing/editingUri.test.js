@@ -141,10 +141,11 @@ describe("editing a URI property", () => {
     fireEvent.keyDown(labelInput, { key: "o", code: "Keyo", charCode: 111 })
     expect(labelInput).toHaveValue("Fo")
 
-    // Click diacritic button
+    // Click diacritic button to open dropdown, then select option
     expect(screen.queryAllByText("Latin")).toHaveLength(0)
     const diacriticBtn = screen.getByTestId("Select diacritics for Fo")
     fireEvent.click(diacriticBtn)
+    fireEvent.click(screen.getByText("Set language and script"))
 
     // Click a diacritic
     await screen.findByText("Latin")
@@ -164,6 +165,7 @@ describe("editing a URI property", () => {
 
     // Close it
     fireEvent.click(diacriticBtn)
+    fireEvent.click(screen.getByText("Set language and script"))
     expect(screen.queryAllByText("Latin")).toHaveLength(0)
   }, 15000)
 

@@ -7,10 +7,13 @@ import TextareaAutosize from "react-textarea-autosize"
 import {
   updateURIValue as updateURIValueAction,
   removeValue,
+  addValue,
 } from "actions/resources"
+import { newLiteralValue } from "utilities/valueFactory"
 import LanguageButton from "./LanguageButton"
 import DiacriticsButton from "./DiacriticsButton"
 import DiacriticsSelection from "components/editor/diacritics/DiacriticsSelection"
+import ScriptShifterSelection from "components/editor/diacritics/ScriptShifterSelection"
 import useDiacritics from "hooks/useDiacritics"
 import { isHttp } from "utilities/Utilities"
 import RemoveButton from "./RemoveButton"
@@ -32,8 +35,10 @@ const InputURIValue = ({
   const [showLink, setShowLink] = useState(isHttp(value.uri))
   const uriId = `inputuri-${value.key}`
   const labelId = `inputuri-label-${value.key}`
+  const [showScriptShifter, setShowScriptShifter] = useState(false)
   const diacriticsId = `diacritics-${value.key}`
   const diacriticsBtnId = `diacritics-btn-${value.key}`
+  const scriptShifterId = `script-shifter-${value.key}`
   const {
     showDiacritics,
     toggleDiacritics,
@@ -77,6 +82,35 @@ const InputURIValue = ({
       updateURIValue()
       event.preventDefault()
     }
+  }
+
+  const handleDiacriticsClick = (event) => {
+    setShowScriptShifter(false)
+    toggleDiacritics(event)
+  }
+
+  const handleOpenScriptShifter = () => {
+    closeDiacritics()
+    setShowScriptShifter(true)
+  }
+
+  const handleCloseScriptShifter = () => {
+    setShowScriptShifter(false)
+    inputLabelRef.current.focus()
+  }
+
+  const handleTranslate = (translatedText, marcCode) => {
+    dispatch(
+      addValue(
+        newLiteralValue(
+          value.property,
+          value.propertyUri,
+          translatedText,
+          marcCode
+        ),
+        value.key
+      )
+    )
   }
 
   const handleRemoveClick = (event) => {
@@ -206,8 +240,9 @@ const InputURIValue = ({
               <DiacriticsButton
                 id={diacriticsBtnId}
                 content={currentLabelContent}
-                handleClick={toggleDiacritics}
+                handleClick={handleDiacriticsClick}
                 handleBlur={handleLabelBlur}
+                onScriptShifter={handleOpenScriptShifter}
               />
               {showLang && <LanguageButton value={value} />}
             </div>
@@ -218,6 +253,13 @@ const InputURIValue = ({
               handleAddCharacter={handleAddCharacter}
               closeDiacritics={closeDiacritics}
               showDiacritics={showDiacritics}
+            />
+            <ScriptShifterSelection
+              id={scriptShifterId}
+              show={showScriptShifter}
+              text={currentLabelContent}
+              onTranslate={handleTranslate}
+              close={handleCloseScriptShifter}
             />
           </div>
         </React.Fragment>
