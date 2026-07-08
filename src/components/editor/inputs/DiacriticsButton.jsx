@@ -12,19 +12,34 @@ const DiacriticsButton = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
 
+  const menuItems = [
+    {
+      label: "Set language and script",
+      action: (e) => {
+        setIsOpen(false)
+        handleClick(e)
+      },
+    },
+    {
+      label: "ScriptShifter",
+      action: () => {
+        setIsOpen(false)
+        onScriptShifter()
+      },
+    },
+  ]
+
   const handleToggle = (event) => {
     setIsOpen((prev) => !prev)
     event.preventDefault()
   }
 
-  const handleSetLanguage = (event) => {
-    setIsOpen(false)
-    handleClick(event)
-  }
-
-  const handleScriptShifter = () => {
-    setIsOpen(false)
-    onScriptShifter()
+  const handleKeyDown = (event) => {
+    const index = parseInt(event.key, 10) - 1
+    if (index >= 0 && index < menuItems.length) {
+      event.preventDefault()
+      menuItems[index].action(event)
+    }
   }
 
   return (
@@ -36,22 +51,21 @@ const DiacriticsButton = ({
         data-testid={`Select diacritics for ${content}`}
         aria-expanded={isOpen}
         onClick={handleToggle}
+        onKeyDown={handleKeyDown}
         onBlur={handleBlur}
       >
         <FontAwesomeIcon icon={faBolt} />
       </button>
       {isOpen && (
         <ul className="dropdown-menu show" aria-labelledby={id}>
-          <li>
-            <button className="dropdown-item" onClick={handleSetLanguage}>
-              Set language and script
-            </button>
-          </li>
-          <li>
-            <button className="dropdown-item" onClick={handleScriptShifter}>
-              ScriptShifter
-            </button>
-          </li>
+          {menuItems.map((item, index) => (
+            <li key={item.label}>
+              <button className="dropdown-item" onClick={item.action}>
+                <span className="text-muted me-2">{index + 1}</span>
+                {item.label}
+              </button>
+            </li>
+          ))}
         </ul>
       )}
     </div>
