@@ -78,7 +78,6 @@ const InputLiteralValue = ({
   }
 
   const handleTranslate = (translatedText, marcCode) => {
-    dispatch(updateLiteralValue(value.key, currentContent, marcCode))
     dispatch(
       addValue(
         newLiteralValue(

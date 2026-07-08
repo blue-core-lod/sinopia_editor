@@ -45,7 +45,7 @@ const DiacriticsButton = ({
   return (
     <div className={`dropdown${isOpen ? " show" : ""}`}>
       <button
-        className="btn btn-link fs-4 py-0 dropdown-toggle"
+        className="btn btn-outline-secondary fs-4 py-0"
         id={id}
         aria-label={`Select diacritics for ${content}`}
         data-testid={`Select diacritics for ${content}`}
