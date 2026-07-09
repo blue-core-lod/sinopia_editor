@@ -2,7 +2,9 @@
 
 import {
   addError,
+  addSuccess,
   clearErrors,
+  clearSuccesses,
   hideValidationErrors,
   showValidationErrors,
 } from "reducers/errors"
@@ -11,7 +13,9 @@ import { createReducer } from "reducers/index"
 
 const handlers = {
   ADD_ERROR: addError,
+  ADD_SUCCESS: addSuccess,
   CLEAR_ERRORS: clearErrors,
+  CLEAR_SUCCESSES: clearSuccesses,
   HIDE_VALIDATION_ERRORS: hideValidationErrors,
   SHOW_VALIDATION_ERRORS: showValidationErrors,
 }
@@ -96,6 +100,71 @@ describe("hideValidationErrors()", () => {
     const newState = reducer(oldState, action)
 
     expect(newState.resourceValidation.u230f67).toBeFalsy()
+  })
+})
+
+describe("addSuccess()", () => {
+  it("adds a message when no successes exist yet", () => {
+    const oldState = { successes: {} }
+
+    const action = {
+      type: "ADD_SUCCESS",
+      payload: { successKey: "abc123", message: "Resource saved" },
+    }
+
+    const newState = reducer(oldState, action)
+    expect(newState.successes).toStrictEqual({
+      abc123: ["Resource saved"],
+    })
+  })
+
+  it("appends a message to existing successes for the same key", () => {
+    const oldState = {
+      successes: { abc123: ["First success"] },
+    }
+
+    const action = {
+      type: "ADD_SUCCESS",
+      payload: { successKey: "abc123", message: "Second success" },
+    }
+
+    const newState = reducer(oldState, action)
+    expect(newState.successes.abc123).toStrictEqual([
+      "First success",
+      "Second success",
+    ])
+  })
+
+  it("does not affect successes under other keys", () => {
+    const oldState = {
+      successes: { other: ["Unrelated success"] },
+    }
+
+    const action = {
+      type: "ADD_SUCCESS",
+      payload: { successKey: "abc123", message: "Resource saved" },
+    }
+
+    const newState = reducer(oldState, action)
+    expect(newState.successes.other).toStrictEqual(["Unrelated success"])
+  })
+})
+
+describe("clearSuccesses()", () => {
+  it("sets successes to empty for a given successKey", () => {
+    const oldState = {
+      successes: {
+        abc123: ["Resource saved", "Another success"],
+      },
+    }
+
+    const action = {
+      type: "CLEAR_SUCCESSES",
+      payload: "abc123",
+    }
+
+    const newState = reducer(oldState, action)
+    expect(newState.successes.abc123).toStrictEqual([])
   })
 })
 

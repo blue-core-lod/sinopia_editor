@@ -46,6 +46,8 @@ import {
   addError,
   clearErrors,
   showValidationErrors,
+  addSuccess,
+  clearSuccesses,
 } from "./errors"
 import { showModal, hideModal, showLangModal, showMarcModal } from "./modals"
 import { showCopyNewMessage } from "./messages"
@@ -106,7 +108,9 @@ const authHandlers = {
 
 const editorHandlers = {
   ADD_ERROR: addError,
+  ADD_SUCCESS: addSuccess,
   CLEAR_ERRORS: clearErrors,
+  CLEAR_SUCCESSES: clearSuccesses,
   CLEAR_PENDING_RESOURCE_TEMPLATE_SELECTION:
     clearPendingResourceTemplateSelection,
   CLEAR_RESOURCE: clearResourceFromEditor,
