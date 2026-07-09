@@ -2,11 +2,13 @@ import React, { useRef, useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
 import PropTypes from "prop-types"
 import TextareaAutosize from "react-textarea-autosize"
-import { updateLiteralValue, removeValue } from "actions/resources"
+import { updateLiteralValue, removeValue, addValue } from "actions/resources"
+import { newLiteralValue } from "utilities/valueFactory"
 import LanguageButton from "./LanguageButton"
 import DiacriticsButton from "./DiacriticsButton"
 import RemoveButton from "./RemoveButton"
 import DiacriticsSelection from "components/editor/diacritics/DiacriticsSelection"
+import ScriptShifterSelection from "components/editor/diacritics/ScriptShifterSelection"
 import useDiacritics from "hooks/useDiacritics"
 import ValuePropertyURI from "../property/ValuePropertyURI"
 import LiteralTypeLabel from "../property/LiteralTypeLabel"
@@ -22,9 +24,11 @@ const InputLiteralValue = ({
   const dispatch = useDispatch()
   const inputLiteralRef = useRef(null)
   const [focusHasBeenSet, setFocusHasBeenSet] = useState(false)
+  const [showScriptShifter, setShowScriptShifter] = useState(false)
   const id = `inputliteral-${value.key}`
   const diacriticsId = `diacritics-${value.key}`
   const diacriticsBtnId = `diacritics-btn-${value.key}`
+  const scriptShifterId = `script-shifter-${value.key}`
   const {
     showDiacritics,
     toggleDiacritics,
@@ -56,6 +60,35 @@ const InputLiteralValue = ({
       dispatch(updateLiteralValue(value.key, currentContent, value.lang))
       event.preventDefault()
     }
+  }
+
+  const handleDiacriticsClick = (event) => {
+    setShowScriptShifter(false)
+    toggleDiacritics(event)
+  }
+
+  const handleOpenScriptShifter = () => {
+    closeDiacritics()
+    setShowScriptShifter(true)
+  }
+
+  const handleCloseScriptShifter = () => {
+    setShowScriptShifter(false)
+    inputLiteralRef.current.focus()
+  }
+
+  const handleTranslate = (translatedText, marcCode) => {
+    dispatch(
+      addValue(
+        newLiteralValue(
+          value.property,
+          value.propertyUri,
+          translatedText,
+          marcCode
+        ),
+        value.key
+      )
+    )
   }
 
   const handleRemoveClick = (event) => {
@@ -106,8 +139,9 @@ const InputLiteralValue = ({
           <DiacriticsButton
             id={diacriticsBtnId}
             content={currentContent}
-            handleClick={toggleDiacritics}
+            handleClick={handleDiacriticsClick}
             handleBlur={handleBlur}
+            onScriptShifter={handleOpenScriptShifter}
           />
           {showLang && <LanguageButton value={value} />}
         </div>
@@ -124,6 +158,13 @@ const InputLiteralValue = ({
           handleAddCharacter={handleAddCharacter}
           closeDiacritics={closeDiacritics}
           showDiacritics={showDiacritics}
+        />
+        <ScriptShifterSelection
+          id={scriptShifterId}
+          show={showScriptShifter}
+          text={currentContent}
+          onTranslate={handleTranslate}
+          close={handleCloseScriptShifter}
         />
       </div>
     </React.Fragment>

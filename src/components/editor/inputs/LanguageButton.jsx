@@ -29,7 +29,7 @@ const LanguageButton = ({ value }) => {
         title={langLabel}
         className="btn btn-link"
       >
-        {value.lang || "No language specified"}
+        {value.lang ? `Language: ${value.lang}` : "No language specified"}
       </button>
     </React.Fragment>
   )

@@ -7,8 +7,11 @@ import {
   updateLiteralValue,
   updateURIValue,
   removeValue,
+  addValue,
 } from "actions/resources"
+import { newLiteralValue } from "utilities/valueFactory"
 import DiacriticsSelection from "components/editor/diacritics/DiacriticsSelection"
+import ScriptShifterSelection from "components/editor/diacritics/ScriptShifterSelection"
 import useDiacritics from "hooks/useDiacritics"
 import DiacriticsButton from "./DiacriticsButton"
 import Lookup from "./Lookup"
@@ -34,9 +37,11 @@ const InputLookupValue = ({
   const [showLookup, setShowLookup] = useState(false)
   // currentContent is what appears in the input. Query is sent to Lookup.
   const [query, setQuery] = useState("")
+  const [showScriptShifter, setShowScriptShifter] = useState(false)
   const id = `inputlookup-${value.key}`
   const diacriticsId = `diacritics-${value.key}`
   const diacriticsBtnId = `diacritics-btn-${value.key}`
+  const scriptShifterId = `script-shifter-${value.key}`
   const {
     showDiacritics,
     toggleDiacritics,
@@ -55,6 +60,35 @@ const InputLookupValue = ({
       setFocusHasBeenSet(true)
     }
   }, [focusHasBeenSet, shouldFocus, value.literal])
+
+  const handleDiacriticsClick = (event) => {
+    setShowScriptShifter(false)
+    toggleDiacritics(event)
+  }
+
+  const handleOpenScriptShifter = () => {
+    closeDiacritics()
+    setShowScriptShifter(true)
+  }
+
+  const handleCloseScriptShifter = () => {
+    setShowScriptShifter(false)
+    inputRef.current.focus()
+  }
+
+  const handleTranslate = (translatedText, marcCode) => {
+    dispatch(
+      addValue(
+        newLiteralValue(
+          value.property,
+          value.propertyUri,
+          translatedText,
+          marcCode
+        ),
+        value.key
+      )
+    )
+  }
 
   const handleRemoveClick = (event) => {
     dispatch(removeValue(value.key))
@@ -173,8 +207,9 @@ const InputLookupValue = ({
           <DiacriticsButton
             id={diacriticsBtnId}
             content={currentContent}
-            handleClick={toggleDiacritics}
+            handleClick={handleDiacriticsClick}
             handleBlur={handleBlurDiacritics}
+            onScriptShifter={handleOpenScriptShifter}
           />
         </div>
         <div className="col-sm-1 d-flex align-items-end">
@@ -197,6 +232,13 @@ const InputLookupValue = ({
           handleAddCharacter={handleAddCharacter}
           closeDiacritics={closeDiacritics}
           showDiacritics={showDiacritics}
+        />
+        <ScriptShifterSelection
+          id={scriptShifterId}
+          show={showScriptShifter}
+          text={currentContent}
+          onTranslate={handleTranslate}
+          close={handleCloseScriptShifter}
         />
       </div>
       <ResourceList property={value.property} />

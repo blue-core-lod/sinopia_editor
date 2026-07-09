@@ -136,12 +136,16 @@ describe("editing a language", () => {
     })
 
     // Changed for this input and other inputs
-    expect(screen.getAllByText("taw", { selector: "button" })).toHaveLength(2)
+    expect(
+      screen.getAllByText("Language: taw", { selector: "button" })
+    ).toHaveLength(2)
 
     // Adding a new input also has default
     fireEvent.click(screen.getByTestId("Add Literal input"))
     await screen.findByText(/http:\/\/sinopia.io\/testing\/Inputs\/property4/)
-    expect(screen.getAllByText("taw", { selector: "button" })).toHaveLength(3)
+    expect(
+      screen.getAllByText("Language: taw", { selector: "button" })
+    ).toHaveLength(3)
   }, 15000)
 
   it("suggests a language", async () => {
