@@ -1,5 +1,4 @@
-const LOC_SUGGEST_BASE_URL =
-  "https://id.loc.gov/authorities/subjects/suggest2/"
+import Config from "Config"
 
 /**
  * Queries the LOC Suggest Service.
@@ -17,7 +16,7 @@ const suggest = (query, type, offset = 0) => {
     searchtype: "left",
   })
 
-  return fetch(`${LOC_SUGGEST_BASE_URL}?${urlParams}`)
+  return fetch(`${Config.locSuggestBaseUrl}?${urlParams}`)
     .then((resp) => {
       if (!resp.ok)
         throw new Error(`LOC Suggest Service returned ${resp.statusText}`)

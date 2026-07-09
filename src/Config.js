@@ -117,6 +117,13 @@ class Config {
   static get scriptShifterUrl() {
     return process.env.SCRIPT_SHIFTER_URL || "https://bibframe.org/scriptshifter"
   }
+
+  static get locSuggestBaseUrl() {
+    return (
+      process.env.LOC_SUGGEST_BASE_URL ||
+      "https://id.loc.gov/authorities/subjects/suggest2/"
+    )
+  }
 }
 
 export default Config
