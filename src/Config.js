@@ -124,6 +124,13 @@ class Config {
       "https://id.loc.gov/authorities/subjects/suggest2/"
     )
   }
+
+  static get locSubjectUrl() {
+    return (
+      process.env.LOC_SUBJECT_URL ||
+      "https://id.loc.gov/authorities/subjects/"
+    )
+  }
 }
 
 export default Config
