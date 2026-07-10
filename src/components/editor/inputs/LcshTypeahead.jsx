@@ -77,6 +77,7 @@ DetailSection.propTypes = {
 
 const LcshTypeahead = ({ query, onSelect }) => {
   const [simpleResults, setSimpleResults] = useState([])
+  const [lcnafResults, setLcnafResults] = useState([])
   const [complexResults, setComplexResults] = useState([])
   const [selectedId, setSelectedId] = useState(null)
   const [selectedKind, setSelectedKind] = useState(null)
@@ -89,6 +90,7 @@ const LcshTypeahead = ({ query, onSelect }) => {
   useEffect(() => {
     if (!query || query.length < 3) {
       setSimpleResults([])
+      setLcnafResults([])
       setComplexResults([])
       setSelectedId(null)
       setDetails(null)
@@ -100,17 +102,21 @@ const LcshTypeahead = ({ query, onSelect }) => {
     timerRef.current = setTimeout(() => {
       Promise.all([
         suggest(query, "SimpleType"),
+        suggest(query, "Geographic"),
         suggest(query, "ComplexSubject"),
       ])
-        .then(([simpleResp, complexResp]) => {
+        .then(([simpleResp, lcnafResp, complexResp]) => {
           const simple = parseResults(simpleResp, "simple")
+          const lcnaf = parseResults(lcnafResp, "lcnaf")
           const complex = parseResults(complexResp, "complex")
           setSimpleResults(simple)
+          setLcnafResults(lcnaf)
           setComplexResults(complex)
-          const hasResults = simple.length > 0 || complex.length > 0
+          const hasResults =
+            simple.length > 0 || lcnaf.length > 0 || complex.length > 0
           setShow(hasResults)
           if (hasResults) {
-            const first = simple[0] || complex[0]
+            const first = simple[0] || lcnaf[0] || complex[0]
             setSelectedId(first.id)
             setSelectedKind(first.kind)
           }
@@ -350,7 +356,12 @@ const LcshTypeahead = ({ query, onSelect }) => {
     )
   }
 
-  const firstIsFirst = simpleResults.length > 0
+  const firstGroup =
+    simpleResults.length > 0
+      ? "simple"
+      : lcnafResults.length > 0
+      ? "lcnaf"
+      : "complex"
 
   return (
     <div className="lcsh-typeahead">
@@ -361,8 +372,9 @@ const LcshTypeahead = ({ query, onSelect }) => {
             role="listbox"
             aria-label="LCSH suggestions"
           >
-            {renderGroup(simpleResults, "Simple", firstIsFirst)}
-            {renderGroup(complexResults, "Complex", !firstIsFirst)}
+            {renderGroup(simpleResults, "Simple", firstGroup === "simple")}
+            {renderGroup(lcnafResults, "LCNAF", firstGroup === "lcnaf")}
+            {renderGroup(complexResults, "Complex", firstGroup === "complex")}
           </div>
         </div>
         <div className="col-7 lcsh-details-col">{renderDetails()}</div>
