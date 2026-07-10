@@ -13,7 +13,10 @@ import useDiacritics from "hooks/useDiacritics"
 import ValuePropertyURI from "../property/ValuePropertyURI"
 import LiteralTypeLabel from "../property/LiteralTypeLabel"
 import useResourceHasChanged from "hooks/useResourcHasChanged"
+import LcshTypeahead from "./LcshTypeahead"
 import _ from "lodash"
+
+const MADS_AUTH_LABEL = "http://www.loc.gov/mads/rdf/v1#authoritativeLabel"
 
 const InputLiteralValue = ({
   value,
@@ -35,6 +38,7 @@ const InputLiteralValue = ({
     closeDiacritics,
     handleBlurDiacritics,
     currentContent,
+    setCurrentContent,
     handleChangeDiacritics,
     handleKeyDownDiacritics,
     handleAddCharacter,
@@ -106,6 +110,13 @@ const InputLiteralValue = ({
     handleKeyDownDiacritics(event)
   }
 
+  const isLcshAuthLabel = value.propertyUri === MADS_AUTH_LABEL
+
+  const handleLcshSelect = (label) => {
+    setCurrentContent(label)
+    dispatch(updateLiteralValue(value.key, label, value.lang))
+  }
+
   const showLang =
     (!propertyTemplate.languageSuppressed || value.lang) &&
     !propertyTemplate.validationDataType
@@ -167,6 +178,9 @@ const InputLiteralValue = ({
           close={handleCloseScriptShifter}
         />
       </div>
+      {isLcshAuthLabel && (
+        <LcshTypeahead query={currentContent} onSelect={handleLcshSelect} />
+      )}
     </React.Fragment>
   )
 }

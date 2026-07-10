@@ -19,10 +19,17 @@ const elementToJson = (el) => {
 
   for (const child of el.children) {
     const key = child.localName
+    // Prefer text content for leaf elements that have attributes (e.g. xml:lang)
+    // but no child elements. Void elements (empty text) still use elementToJson
+    // so their attributes (e.g. rdf:resource) are preserved.
     const value =
-      child.children.length > 0 || child.attributes.length > 0
+      child.children.length > 0
         ? elementToJson(child)
-        : child.textContent
+        : child.attributes.length > 0 && child.textContent.trim()
+          ? child.textContent.trim()
+          : child.attributes.length > 0
+            ? elementToJson(child)
+            : child.textContent
 
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
       if (!Array.isArray(obj[key])) obj[key] = [obj[key]]

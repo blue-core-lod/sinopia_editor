@@ -1,3 +1,142 @@
+.lcsh-typeahead {
+  margin-top: 0.75rem;
+  border-top: 1px solid $nobel;
+  padding-top: 0.5rem;
+  font-size: 0.875rem;
+
+  .lcsh-results-list {
+    max-height: 320px;
+    overflow-y: auto;
+    border-right: 1px solid $nobel;
+    padding-right: 0.5rem;
+  }
+
+  .lcsh-result-group {
+    margin-bottom: 0.5rem;
+  }
+
+  .lcsh-result-group-heading {
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: #555;
+    border-bottom: 1px solid $nobel;
+    padding: 0.15rem 0;
+    margin-bottom: 0.2rem;
+  }
+
+  .lcsh-result-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 0.2rem 0.25rem;
+    cursor: pointer;
+    line-height: 1.3;
+    color: inherit;
+
+    &:hover {
+      background-color: #f0f0f0;
+    }
+
+    &--selected {
+      background-color: #004372;
+      color: white;
+
+      &:hover {
+        background-color: #003261;
+      }
+    }
+  }
+
+  .lcsh-result-marker {
+    display: inline-block;
+    width: 1rem;
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+
+  .lcsh-details-col {
+    padding-left: 0.75rem;
+  }
+
+  .lcsh-details {
+  }
+
+  .lcsh-details-loading {
+    padding: 0.5rem 0;
+  }
+
+  .lcsh-details-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .lcsh-type-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    background-color: #e0e0e0;
+    border: 1px solid #999;
+    font-weight: 700;
+    font-size: 0.75rem;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .lcsh-details-label {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .lcsh-details-id {
+    color: #555;
+    font-size: 0.8rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .lcsh-details-type {
+    color: #555;
+    margin-bottom: 0.5rem;
+  }
+
+  .lcsh-detail-section {
+    margin-bottom: 0.4rem;
+
+    strong {
+      display: block;
+    }
+  }
+
+  .lcsh-detail-list {
+    list-style: none;
+    padding-left: 0.5rem;
+    margin: 0.15rem 0 0;
+    font-size: 0.8rem;
+
+    li {
+      margin-bottom: 0.15rem;
+    }
+  }
+
+  .lcsh-variants-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.5rem;
+    padding-left: 0.5rem;
+    margin-top: 0.15rem;
+  }
+
+  .lcsh-variant-item {
+    font-size: 0.8rem;
+  }
+}
+
 .resource-header {
   background-color: $body-bg;
 }
