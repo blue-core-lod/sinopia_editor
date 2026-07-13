@@ -55,7 +55,7 @@ const SinopiaSearchResults = () => {
           >
             <thead>
               <tr>
-                <th>Label / ID</th>
+                <th>Label</th>
                 <th style={{ width: "30%" }}>
                   Class <ClassFilter />
                 </th>

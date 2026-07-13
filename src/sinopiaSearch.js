@@ -200,9 +200,28 @@ const hitsToResult = (payload) => {
       label = mainTitle?.["@value"] ?? mainTitle
     }
 
+    const contributions = hit.data.contribution
+    let primaryContributor
+    if (Array.isArray(contributions)) {
+      const primary = contributions.find(
+        (c) => c["@type"] === "PrimaryContribution"
+      )
+      const agentLabel = primary?.agent?.label
+      if (agentLabel !== undefined) {
+        if (Array.isArray(agentLabel)) {
+          const first =
+            agentLabel.find((l) => typeof l === "string") ?? agentLabel[0]
+          primaryContributor = first?.["@value"] ?? first
+        } else {
+          primaryContributor = agentLabel?.["@value"] ?? agentLabel
+        }
+      }
+    }
+
     results.push({
       uri: hit.uri,
       label,
+      ...(primaryContributor !== undefined && { primaryContributor }),
       created: hit.created_at,
       modified: hit.updated_at,
       type: rdfTypes,

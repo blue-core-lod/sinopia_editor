@@ -78,7 +78,7 @@ describe("<Search />", () => {
     fireEvent.click(screen.getByTestId("Submit search"))
 
     // Display results
-    await screen.findByText("Label / ID")
+    await screen.findByText("Label")
     await screen.findByText(/These twain/)
 
     // Display paging

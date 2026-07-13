@@ -20,7 +20,7 @@ const ResourceList = (props) => {
           >
             <thead>
               <tr>
-                <th style={{ width: "35%" }}>Label / ID</th>
+                <th style={{ width: "35%" }}>Label</th>
                 <th style={{ width: "35%" }}>Class</th>
                 <th style={{ width: "20%" }}>Group</th>
                 <th style={{ width: "10%" }}>Modified</th>

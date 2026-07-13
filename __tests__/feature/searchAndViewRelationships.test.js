@@ -45,9 +45,6 @@ describe("searching and view relationships for a resource", () => {
       await screen.findByTestId(`Hide relationships for ${uri}`)
 
       screen.getByText("Works", { selector: "h5" })
-      screen.getByText(
-        /http:\/\/localhost:3000\/resource\/f6ee6410-5206-492b-8e48-3b6333010c33/
-      )
       screen.getByText(/Work1/)
       screen.getByText("Work", { selector: "span.resource-label" })
     }, 10000)

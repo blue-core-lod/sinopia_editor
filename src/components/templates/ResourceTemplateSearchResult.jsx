@@ -18,7 +18,7 @@ const ResourceTemplateSearchResult = ({ results }) => {
         <table className="table table-bordered resource-template-list">
           <thead>
             <tr>
-              <th style={{ width: "28%" }}>Label / ID</th>
+              <th style={{ width: "28%" }}>Label</th>
               <th style={{ width: "18%" }}>Resource URI</th>
               <th style={{ width: "10%" }}>Author</th>
               <th style={{ width: "8%" }}>Group</th>

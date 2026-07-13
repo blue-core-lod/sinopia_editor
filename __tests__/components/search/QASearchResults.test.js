@@ -99,7 +99,7 @@ describe("<QASearchResults />", () => {
     renderComponent(<QASearchResults history={{}} />, store)
 
     // Headers
-    screen.getByText("Label / ID")
+    screen.getByText("Label")
     screen.getByText("Class")
 
     // Rows
