@@ -23,7 +23,11 @@ const LoginPanel = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    dispatch(signIn(keycloak, signInErrorKey))
+    const resourceParam = new URLSearchParams(window.location.search).get(
+      "resource"
+    )
+    const redirectUri = resourceParam ? window.location.href : undefined
+    dispatch(signIn(keycloak, signInErrorKey, redirectUri))
   }
 
   if (hasUser) return null
