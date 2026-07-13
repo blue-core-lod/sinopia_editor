@@ -23,7 +23,16 @@ const LoadByRDFForm = () => {
   const [rdf, setRdf] = useState("")
   const [dataset, setDataset] = useState(false)
   const [resourceTemplateId, setResourceTemplateId] = useState("")
+  const [marcText, setMarcText] = useState("")
   useRdfResource(dataset, baseURI, resourceTemplateId, errorKey)
+
+  const handleMarcFileChange = (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (e) => setMarcText(e.target.result)
+    reader.readAsText(file)
+  }
 
   // Passed into resource template chooser to allow it to pass back selected resource template id.
   const chooseResourceTemplate = (resourceTemplateId) => {
@@ -86,6 +95,31 @@ const LoadByRDFForm = () => {
 
   return (
     <div>
+      <h3>Load MARC into Editor</h3>
+      <p className="text-muted">
+        Convert a MARC record to BIBFRAME and save to Blue Core
+      </p>
+      <div className="mb-3">
+        <label htmlFor="marcFileInput">Choose MARC file</label>
+        <input
+          type="file"
+          className="form-control"
+          id="marcFileInput"
+          onChange={handleMarcFileChange}
+        />
+      </div>
+      <div className="mb-3">
+        <label htmlFor="marcTextArea">File contents</label>
+        <textarea
+          className="form-control"
+          id="marcTextArea"
+          rows="15"
+          value={marcText}
+          onChange={(event) => setMarcText(event.target.value)}
+          placeholder="File contents will appear here after choosing a file above."
+        ></textarea>
+      </div>
+      <hr />
       <h3>Load RDF into Editor</h3>
       <form id="loadForm" onSubmit={handleSubmit}>
         <div className="mb-3">
