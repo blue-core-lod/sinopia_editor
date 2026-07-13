@@ -12,6 +12,7 @@ import { clearErrors, addError } from "actions/errors"
 import { showModal } from "actions/modals"
 import ResourceTemplateChoiceModal from "../ResourceTemplateChoiceModal"
 import useAlerts from "hooks/useAlerts"
+import { marcToMarcXml, marcToBibframe } from "utilities/Marc"
 
 import _ from "lodash"
 
@@ -23,7 +24,50 @@ const LoadByRDFForm = () => {
   const [rdf, setRdf] = useState("")
   const [dataset, setDataset] = useState(false)
   const [resourceTemplateId, setResourceTemplateId] = useState("")
+  const [marcText, setMarcText] = useState("")
+  const [isConvertingMarc, setIsConvertingMarc] = useState(false)
   useRdfResource(dataset, baseURI, resourceTemplateId, errorKey)
+
+  const handleMarcFileChange = (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+
+    if (file.name.endsWith(".mrc")) {
+      setIsConvertingMarc(true)
+      setMarcText("")
+      dispatch(clearErrors(errorKey))
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        let marcXml
+        try {
+          marcXml = marcToMarcXml(e.target.result)
+          console.log(marcXml)
+        } catch (err) {
+          dispatch(
+            addError(errorKey, `Error parsing MARC file: ${err.message || err}`)
+          )
+          setIsConvertingMarc(false)
+          return
+        }
+        marcToBibframe(marcXml)
+          .then((rdf) => setMarcText(rdf))
+          .catch((err) =>
+            dispatch(
+              addError(
+                errorKey,
+                `Error converting MARC to RDF: ${err.message || err}`
+              )
+            )
+          )
+          .finally(() => setIsConvertingMarc(false))
+      }
+      reader.readAsArrayBuffer(file)
+    } else {
+      const reader = new FileReader()
+      reader.onload = (e) => setMarcText(e.target.result)
+      reader.readAsText(file)
+    }
+  }
 
   // Passed into resource template chooser to allow it to pass back selected resource template id.
   const chooseResourceTemplate = (resourceTemplateId) => {
@@ -86,6 +130,46 @@ const LoadByRDFForm = () => {
 
   return (
     <div>
+      <h3>Load MARC into Editor</h3>
+      <p className="text-muted">
+        Convert a MARC record to BIBFRAME and save to Blue Core
+      </p>
+      <div className="mb-3">
+        <label htmlFor="marcFileInput">Choose MARC file</label>
+        <input
+          type="file"
+          className="form-control"
+          id="marcFileInput"
+          accept=".mrc"
+          onChange={handleMarcFileChange}
+        />
+      </div>
+      <div className="mb-3">
+        <label htmlFor="marcTextArea">
+          {isConvertingMarc ? (
+            <>
+              <span
+                className="spinner-border spinner-border-sm me-2"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              Converting to RDF&hellip;
+            </>
+          ) : (
+            "RDF output"
+          )}
+        </label>
+        <textarea
+          className="form-control"
+          id="marcTextArea"
+          rows="15"
+          value={marcText}
+          onChange={(event) => setMarcText(event.target.value)}
+          placeholder="Upload a .mrc file above to convert to RDF, or paste RDF directly."
+          disabled={isConvertingMarc}
+        ></textarea>
+      </div>
+      <hr />
       <h3>Load RDF into Editor</h3>
       <form id="loadForm" onSubmit={handleSubmit}>
         <div className="mb-3">
