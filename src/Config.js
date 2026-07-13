@@ -131,6 +131,13 @@ class Config {
       "https://id.loc.gov/authorities/subjects/"
     )
   }
+
+  static get marc2BibframeUrl() {
+    return (
+      process.env.MARC2BIBFRAME_URL ||
+      "https://id.loc.gov/transform/marc2bibframe2"
+    )
+  }
 }
 
 export default Config
