@@ -26,10 +26,10 @@ const elementToJson = (el) => {
       child.children.length > 0
         ? elementToJson(child)
         : child.attributes.length > 0 && child.textContent.trim()
-          ? child.textContent.trim()
-          : child.attributes.length > 0
-            ? elementToJson(child)
-            : child.textContent
+        ? child.textContent.trim()
+        : child.attributes.length > 0
+        ? elementToJson(child)
+        : child.textContent
 
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
       if (!Array.isArray(obj[key])) obj[key] = [obj[key]]
@@ -70,9 +70,7 @@ const fetchSubjectDetails = (id) =>
       return resources.length === 1 ? resources[0] : resources
     })
     .catch((err) => {
-      console.error(
-        `Error fetching LOC subject details: ${err.message || err}`
-      )
+      console.error(`Error fetching LOC subject details: ${err.message || err}`)
       throw err
     })
 
