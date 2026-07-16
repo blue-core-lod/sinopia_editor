@@ -2,7 +2,7 @@
 
 import React from "react"
 import PropTypes from "prop-types"
-import { useSelector } from "react-redux"
+import { useSelector, useDispatch } from "react-redux"
 import {
   selectHistoricalTemplates,
   selectHistoricalSearches,
@@ -18,8 +18,13 @@ import AlertsContextProvider from "components/alerts/AlertsContextProvider"
 import ContextAlert from "components/alerts/ContextAlert"
 import { dashboardErrorKey } from "utilities/errorKeyFactory"
 import MarcModal from "../editor/actions/MarcModal"
+import ResourceTemplateChoiceModal from "../ResourceTemplateChoiceModal"
+import { completeResourceLoadingWithTemplate } from "actionCreators/resources"
+import { useHistory } from "react-router-dom"
 
 const Dashboard = (props) => {
+  const dispatch = useDispatch()
+  const history = useHistory()
   const historicalTemplates = useSelector((state) =>
     selectHistoricalTemplates(state)
   )
@@ -29,6 +34,14 @@ const Dashboard = (props) => {
   const historicalResources = useSelector((state) =>
     selectHistoricalResources(state)
   )
+
+  const chooseResourceTemplate = (resourceTemplateId) => {
+    dispatch(completeResourceLoadingWithTemplate(resourceTemplateId)).then(
+      (result) => {
+        if (result) history.push("/editor")
+      }
+    )
+  }
 
   const showWelcome =
     _.isEmpty(historicalTemplates) &&
@@ -42,6 +55,7 @@ const Dashboard = (props) => {
         <ContextAlert />
         <PreviewModal />
         <MarcModal />
+        <ResourceTemplateChoiceModal choose={chooseResourceTemplate} />
         {showWelcome && (
           <div>
             <h2>Welcome to Sinopia.</h2>

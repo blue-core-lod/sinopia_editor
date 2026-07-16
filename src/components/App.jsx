@@ -92,7 +92,7 @@ const App = (props) => {
           history.push("/dashboard")
         }
       } else if (resourceParam) {
-        dispatch(loadResource(resourceParam, dashboardErrorKey)).then(
+        dispatch(loadResource(resourceParam, dashboardErrorKey, { keycloak })).then(
           (result) => {
             if (!result) {
               history.push("/dashboard")
