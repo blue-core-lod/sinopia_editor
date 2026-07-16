@@ -4,7 +4,6 @@ import { showModal } from "actions/modals"
 import {
   setPendingResourceTemplateSelection,
   clearPendingResourceTemplateSelection,
-
   addProperty as addPropertyAction,
   addValue as addValueAction,
   updateLiteralValue,
@@ -18,7 +17,8 @@ import {
   loadResourceFinished,
   setResourceGroup,
   setCurrentDiff,
-  clearVersions} from "actions/resources"
+  clearVersions,
+} from "actions/resources"
 import {
   addResourceFromDataset,
   addEmptyResource,
@@ -38,6 +38,7 @@ import {
 } from "selectors/resources"
 import { newLiteralValue, newValueSubject } from "utilities/valueFactory"
 import { selectUser } from "selectors/authenticate"
+import { selectUnusedRDF } from "selectors/modals"
 import {
   addTemplateHistory as addUserTemplateHistory,
   addResourceHistory as addUserResourceHistory,
@@ -361,10 +362,18 @@ export const saveNewResource =
     const state = getState()
     const resource = selectFullSubject(state, resourceKey)
     const currentUser = selectUser(state)
+    const unusedRDF = selectUnusedRDF(state, resourceKey)
 
     dispatch(clearErrors(errorKey))
 
-    return postResource(resource, currentUser, group, editGroups, keycloak)
+    return postResource(
+      resource,
+      currentUser,
+      group,
+      editGroups,
+      keycloak,
+      unusedRDF
+    )
       .then((resourceUrl) => {
         dispatch(setBaseURL(resourceKey, resourceUrl))
         dispatch(setResourceGroup(resourceKey, group, editGroups))
@@ -389,10 +398,19 @@ export const saveResource =
     const state = getState()
     const resource = selectFullSubject(state, resourceKey)
     const currentUser = selectUser(state)
+    const unusedRDF = selectUnusedRDF(state, resourceKey)
 
     dispatch(clearErrors(errorKey))
 
-    return putResource(resource, currentUser, group, editGroups, null, keycloak)
+    return putResource(
+      resource,
+      currentUser,
+      group,
+      editGroups,
+      null,
+      keycloak,
+      unusedRDF
+    )
       .then(() => {
         dispatch(setResourceGroup(resourceKey, group, editGroups))
         dispatch(saveResourceFinished(resourceKey))
