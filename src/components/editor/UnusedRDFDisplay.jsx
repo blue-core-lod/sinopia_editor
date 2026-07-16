@@ -44,8 +44,8 @@ const UnusedRDFDisplay = () => {
       <div className="row mb-3 gx-2">
         <div className="col-auto">
           <strong>
-            Unable to load the entire resource. The unused triples are listed
-            below.{" "}
+            Some triples are not editable with this template. However, they are
+            preserved when you save and are listed below.{" "}
           </strong>
           <label htmlFor="rdfFormat" className="col-form-label">
             View as:

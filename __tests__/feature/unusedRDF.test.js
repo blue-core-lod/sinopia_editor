@@ -36,7 +36,7 @@ describe("loading RDF with unused triples", () => {
       selector: resourceHeaderSelector,
     })
 
-    screen.getByText(/Unable to load the entire resource/)
+    screen.getByText(/Some triples are not editable with this template/)
 
     // Switch to turtle
     fireEvent.change(screen.getByLabelText(/Format/), {

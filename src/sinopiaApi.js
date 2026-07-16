@@ -1,6 +1,10 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
-import { datasetFromJsonld, jsonldFromDataset } from "utilities/Utilities"
+import {
+  datasetFromJsonld,
+  datasetFromN3,
+  jsonldFromDataset,
+} from "utilities/Utilities"
 import Config from "Config"
 /* eslint-disable node/no-unpublished-import */
 import {
@@ -139,7 +143,8 @@ export const postResource = (
   currentUser,
   group,
   editGroups,
-  keycloak
+  keycloak,
+  unusedRDF = null
 ) => {
   const newResource = { ...resource, group, editGroups }
   const url = `${Config.sinopiaApiBase}/${apiCollectionPathFor(resource)}/`
@@ -148,7 +153,8 @@ export const postResource = (
     currentUser.username,
     group,
     editGroups,
-    true
+    true,
+    unusedRDF
   ).then((body) =>
     sendResourceBody(url, body, "POST", keycloak)
       .then((resp) => checkResp(resp))
@@ -164,13 +170,20 @@ export const putResource = (
   group,
   editGroups,
   method,
-  keycloak
+  keycloak,
+  unusedRDF = null
 ) =>
-  saveBodyForResource(resource, currentUser.username, group, editGroups).then(
-    (body) =>
-      sendResourceBody(resource.uri, body, method || "PUT", keycloak).then(
-        (resp) => checkResp(resp).then(() => true)
-      )
+  saveBodyForResource(
+    resource,
+    currentUser.username,
+    group,
+    editGroups,
+    false,
+    unusedRDF
+  ).then((body) =>
+    sendResourceBody(resource.uri, body, method || "PUT", keycloak).then(
+      (resp) => checkResp(resp).then(() => true)
+    )
   )
 
 export const postMarc = (resourceUri, keycloak) => {
@@ -275,25 +288,36 @@ const saveBodyForResource = (
   user,
   group,
   editGroups,
-  useBlankNode = false
+  useBlankNode = false,
+  unusedRDF = null
 ) => {
   const dataset = new GraphBuilder(resource, useBlankNode).graph
 
-  return jsonldFromDataset(dataset).then((jsonld) =>
-    JSON.stringify({
-      data: JSON.stringify(jsonld),
-      // user,
-      // group,
-      // editGroups,
-      // templateId: resource.subjectTemplate.id,
-      // types: [resource.subjectTemplate.class],
-      // bfAdminMetadataRefs: resource.bfAdminMetadataRefs,
-      // sinopiaLocalAdminMetadataForRefs: resource.localAdminMetadataForRefs,
-      // bfItemRefs: resource.bfItemRefs,
-      // bfInstanceRefs: resource.bfInstanceRefs,
-      // bfWorkRefs: resource.bfWorkRefs,
-    })
-  )
+  // Merge back any triples that the template did not cover on load so they are
+  // preserved rather than stripped on save. See issue #134.
+  const mergeUnused = unusedRDF
+    ? datasetFromN3(unusedRDF).then((unusedDataset) =>
+        dataset.addAll(unusedDataset)
+      )
+    : Promise.resolve()
+
+  return mergeUnused
+    .then(() => jsonldFromDataset(dataset))
+    .then((jsonld) =>
+      JSON.stringify({
+        data: JSON.stringify(jsonld),
+        // user,
+        // group,
+        // editGroups,
+        // templateId: resource.subjectTemplate.id,
+        // types: [resource.subjectTemplate.class],
+        // bfAdminMetadataRefs: resource.bfAdminMetadataRefs,
+        // sinopiaLocalAdminMetadataForRefs: resource.localAdminMetadataForRefs,
+        // bfItemRefs: resource.bfItemRefs,
+        // bfInstanceRefs: resource.bfInstanceRefs,
+        // bfWorkRefs: resource.bfWorkRefs,
+      })
+    )
 }
 
 export const detectLanguage = (text, keycloak) => {
