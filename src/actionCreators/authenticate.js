@@ -23,10 +23,12 @@ export const authenticate = (keycloak) => async (dispatch, getState) => {
   return Promise.resolve(false)
 }
 
-export const signIn = (keycloak, errorKey) => (dispatch) => {
-  dispatch(clearErrors(errorKey))
-  return Promise.resolve(keycloak.login({ redirectUri: Config.sinopiaUrl }))
-}
+export const signIn =
+  (keycloak, errorKey, redirectUri = Config.sinopiaUrl) =>
+  (dispatch) => {
+    dispatch(clearErrors(errorKey))
+    return Promise.resolve(keycloak.login({ redirectUri }))
+  }
 
 export const signOut = (keycloak) => (dispatch) => {
   // Keycloak logout uses GET to load window and then redirects

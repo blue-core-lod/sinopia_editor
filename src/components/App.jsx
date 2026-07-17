@@ -10,7 +10,13 @@ import "../styles/main.scss"
 import Editor from "./editor/Editor"
 import Footer from "./Footer"
 import Dashboard from "./dashboard/Dashboard"
-import { Route, Switch, useHistory, useRouteMatch } from "react-router-dom"
+import {
+  Route,
+  Switch,
+  useHistory,
+  useLocation,
+  useRouteMatch,
+} from "react-router-dom"
 import ResourceTemplate from "./templates/ResourceTemplate"
 import LoadResource from "./load/LoadResource"
 import Search from "./search/Search"
@@ -59,6 +65,9 @@ const App = (props) => {
     dispatch(fetchExports(exportsErrorKey))
   }, [dispatch])
 
+  const location = useLocation()
+  const resourceParam = new URLSearchParams(location.search).get("resource")
+
   const editorTemplateMatch = useRouteMatch({
     path: "/editor/:templateId",
     exact: true,
@@ -82,6 +91,24 @@ const App = (props) => {
         } else {
           history.push("/dashboard")
         }
+      } else if (resourceParam) {
+        dispatch(loadResource(resourceParam, dashboardErrorKey, { keycloak })).then(
+          (result) => {
+            if (!result) {
+              history.push("/dashboard")
+              return
+            }
+            const [, resource] = result
+            if (canEdit(resource)) {
+              dispatch(dispatchResourceForEditor(result, resourceParam))
+              history.push("/editor")
+            } else {
+              dispatch(dispatchResourceForPreview(result))
+              dispatch(showModal("PreviewModal"))
+              history.push("/dashboard")
+            }
+          }
+        )
       } else if (editorExactMatch) {
         history.push("/dashboard")
       } else if (editorResourceMatch) {
@@ -105,6 +132,7 @@ const App = (props) => {
     dispatch(authenticate(keycloak))
   }, [
     hasUser,
+    resourceParam,
     editorExactMatch,
     editorTemplateMatch,
     editorResourceMatch,

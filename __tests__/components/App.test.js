@@ -143,6 +143,19 @@ describe("<App />", () => {
       screen.getByTestId("news-item")
     })
 
+    it("navigates to editor for /?resource=<uri>", async () => {
+      const state = createState({ notAuthenticated: false })
+      const store = createStore(state)
+      const resourceUri =
+        "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f"
+      const history = createHistory([
+        `/?resource=${encodeURIComponent(resourceUri)}`,
+      ])
+      renderApp(store, history)
+
+      await waitFor(() => expect(history.location.pathname).toContain("editor"))
+    })
+
     it("creates new resource and renders editor for /editor/<rtId>", async () => {
       const state = createState({ notAuthenticated: false })
       const store = createStore(state)
