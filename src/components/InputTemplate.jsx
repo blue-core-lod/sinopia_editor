@@ -1,6 +1,6 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
-import React, { useState, useCallback, useEffect } from "react"
+import React, { useState, useCallback, useEffect, useRef } from "react"
 import PropTypes from "prop-types"
 import { Typeahead, withAsync } from "react-bootstrap-typeahead"
 import { getTemplateSearchResults } from "sinopiaSearch"
@@ -12,9 +12,14 @@ const InputTemplate = ({
   defaultTemplateId = null,
   ...props
 }) => {
+  const typeaheadRef = useRef(null)
   const [isLoading, setLoading] = useState(false)
   const [options, setOptions] = useState([])
   const [selected, setSelected] = useState([])
+
+  useEffect(() => {
+    typeaheadRef.current?.focus()
+  }, [])
 
   const search = useCallback((query) => {
     setLoading(true)
@@ -48,6 +53,7 @@ const InputTemplate = ({
 
   return (
     <AsyncTypeahead
+      ref={typeaheadRef}
       onSearch={search}
       onChange={change}
       options={options}
