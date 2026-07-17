@@ -184,7 +184,7 @@ const QASearchResults = () => {
             <thead>
               <tr>
                 <th className="search-header" style={{ width: "40%" }}>
-                  Label / ID
+                  Label
                 </th>
                 <th className="search-header" style={{ width: "25%" }}>
                   Class

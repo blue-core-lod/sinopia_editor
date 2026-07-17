@@ -134,6 +134,54 @@ describe("getSearchResults", () => {
     })
   })
 
+  it("extracts primaryContributor from bf:PrimaryContribution", async () => {
+    const resultWithContribution = {
+      total: 1,
+      results: [
+        {
+          uri: "https://bcld.info/resource/abc123",
+          data: {
+            "@type": ["Work"],
+            title: { mainTitle: "Some Work" },
+            contribution: [
+              {
+                "@type": "Contribution",
+                agent: { label: "Secondary, Author" },
+              },
+              {
+                "@type": "PrimaryContribution",
+                agent: { label: "Smith, John" },
+              },
+            ],
+          },
+          created_at: "2024-01-01T00:00:00.000Z",
+          updated_at: "2024-01-01T00:00:00.000Z",
+        },
+      ],
+      links: null,
+    }
+
+    global.fetch = jest
+      .fn()
+      .mockImplementation(() =>
+        Promise.resolve({ json: () => resultWithContribution })
+      )
+
+    const results = await getSearchResults("Some Work")
+    expect(results.results[0].primaryContributor).toBe("Smith, John")
+  })
+
+  it("omits primaryContributor when no PrimaryContribution exists", async () => {
+    global.fetch = jest
+      .fn()
+      .mockImplementation(() =>
+        Promise.resolve({ json: () => blueCoreResourceResult })
+      )
+
+    const results = await getSearchResults("foo")
+    expect(results.results[0]).not.toHaveProperty("primaryContributor")
+  })
+
   it("extracts a string label from JSON-LD mainTitle object", async () => {
     const jsonLdResult = {
       total: 1,

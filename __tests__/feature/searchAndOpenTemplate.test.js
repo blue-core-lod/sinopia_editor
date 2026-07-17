@@ -87,7 +87,7 @@ describe("searching and opening a resource", () => {
       "Most recently used templates"
     )
     fireEvent.click(histTemplateBtn)
-    const rtHeaders = screen.getAllByText("Label / ID")
+    const rtHeaders = screen.getAllByText("Label")
     expect(rtHeaders).toHaveLength(2)
 
     // open the recenly used RTs and click

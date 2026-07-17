@@ -58,7 +58,7 @@ describe("<SinopiaSearchResults />", () => {
       screen.getByTestId("sinopia-search-results-list")
 
       // Search table headers
-      screen.queryByText("Label / ID")
+      screen.queryByText("Label")
       screen.queryByText("Class")
       screen.getByText("Modified", { selector: "th" })
 
@@ -71,7 +71,9 @@ describe("<SinopiaSearchResults />", () => {
 
       // First row of search results
       screen.queryByText(/An item title/)
-      screen.queryByText(/https:\/\/api.sinopia.io\/resource\/some\/path/)
+      expect(
+        screen.queryByText(/https:\/\/api.sinopia.io\/resource\/some\/path/)
+      ).not.toBeInTheDocument()
       screen.queryByText("Oct 23, 2019")
       screen.queryByText("http://schema.org/Thing")
     })

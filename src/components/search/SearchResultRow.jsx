@@ -58,10 +58,10 @@ const SearchResultRow = ({
       <tr key={row.uri} className={tableRowClassName}>
         <td className={firstCellClassName}>
           {row.label}
-          {row.label !== row.uri && (
+          {row.primaryContributor && (
             <React.Fragment>
               <br />
-              {row.uri}
+              {row.primaryContributor}
             </React.Fragment>
           )}
           {hasRelationships && (

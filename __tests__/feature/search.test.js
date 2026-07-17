@@ -156,11 +156,12 @@ describe("sinopia resource search", () => {
 
     await screen.findByText(/Displaying 1 - 3 of 3/)
 
-    const resources = screen.getAllByText(/http:\/\/platform:8080\/resource\//)
-    expect(resources).toHaveLength(3)
-    within(resources[0]).getByText(/foo bar/)
-    within(resources[1]).getByText(/foo/)
-    within(resources[2]).getByText(/baz/)
+    const table = screen.getByTestId("sinopia-search-results-list")
+    const rows = within(table).getAllByRole("row")
+    expect(rows).toHaveLength(4) // 1 header + 3 data rows
+    within(rows[1]).getByText(/foo bar/)
+    within(rows[2]).getByText(/foo/)
+    within(rows[3]).getByText(/baz/)
 
     global.fetch = jest
       .fn()
@@ -173,13 +174,12 @@ describe("sinopia resource search", () => {
 
     await screen.findByText(/Displaying 1 - 3 of 3/)
 
-    const resourcesResorted = screen.getAllByText(
-      /http:\/\/platform:8080\/resource\//
-    )
-    expect(resourcesResorted).toHaveLength(3)
-    within(resourcesResorted[0]).getByText(/baz/)
-    within(resourcesResorted[1]).getByText(/foo bar/)
-    within(resourcesResorted[2]).getByText(/foo/)
+    const tableResorted = screen.getByTestId("sinopia-search-results-list")
+    const rowsResorted = within(tableResorted).getAllByRole("row")
+    expect(rowsResorted).toHaveLength(4)
+    within(rowsResorted[1]).getByText(/baz/)
+    within(rowsResorted[2]).getByText(/foo bar/)
+    within(rowsResorted[3]).getByText(/foo/)
   })
 
   it("pages results when the total number exceeds searchResultsPerPage", async () => {
