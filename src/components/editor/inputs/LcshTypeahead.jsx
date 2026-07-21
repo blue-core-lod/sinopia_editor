@@ -150,7 +150,7 @@ const LcshTypeahead = ({ query, onSelect }) => {
   const handleClickItem = (item) => {
     setSelectedId(item.id)
     setSelectedKind(item.kind)
-    onSelect(item.label)
+    onSelect({ label: item.label, uri: item.uri })
   }
 
   const renderResultItem = (item, isFirst) => {

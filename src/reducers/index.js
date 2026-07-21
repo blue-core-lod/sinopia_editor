@@ -35,6 +35,7 @@ import {
   setPropertyPropertyURI,
   setClasses,
   setResourceChanged,
+  setSubjectComponentList,
 } from "./resources"
 import {
   setRelationships,
@@ -153,6 +154,7 @@ const entityHandlers = {
   SAVE_RESOURCE_FINISHED: saveResourceFinished,
   SET_BASE_URL: setBaseURL,
   SET_CLASSES: setClasses,
+  SET_SUBJECT_COMPONENT_LIST: setSubjectComponentList,
   SET_DEFAULT_LANG: setDefaultLang,
   SET_VALUE_PROPERTY_URI: setValuePropertyURI,
   SET_PROPERTY_PROPERTY_URI: setPropertyPropertyURI,
