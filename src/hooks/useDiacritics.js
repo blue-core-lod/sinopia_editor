@@ -80,6 +80,7 @@ const useDiacritics = (
     handleAddCharacter,
     handleClickDiacritics,
     currentContent,
+    setCurrentContent,
     showDiacritics,
   }
 }

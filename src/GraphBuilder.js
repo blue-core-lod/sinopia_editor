@@ -43,6 +43,30 @@ export default class GraphBuilder {
     subject.properties.forEach((property) =>
       this.buildProperty(property, subjectTerm)
     )
+    if (subject.componentListUri) {
+      this.buildComponentList(subjectTerm, subject.componentListUri)
+    }
+  }
+
+  buildComponentList(subjectTerm, componentListUri) {
+    const madsComponentList = rdf.namedNode(
+      "http://www.loc.gov/mads/rdf/v1#componentList"
+    )
+    const rdfFirst = rdf.namedNode(
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#first"
+    )
+    const rdfRest = rdf.namedNode(
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"
+    )
+    const rdfNil = rdf.namedNode(
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"
+    )
+    const listNode = rdf.blankNode()
+    this.dataset.add(rdf.quad(subjectTerm, madsComponentList, listNode))
+    this.dataset.add(
+      rdf.quad(listNode, rdfFirst, rdf.namedNode(componentListUri))
+    )
+    this.dataset.add(rdf.quad(listNode, rdfRest, rdfNil))
   }
 
   buildProperty(property, subjectTerm) {

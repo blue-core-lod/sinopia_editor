@@ -170,6 +170,14 @@ export const setClasses = (subjectKey, classes) => ({
   },
 })
 
+export const setSubjectComponentList = (subjectKey, uri) => ({
+  type: "SET_SUBJECT_COMPONENT_LIST",
+  payload: {
+    subjectKey,
+    uri,
+  },
+})
+
 export const setResourceChanged = (resourceKey) => ({
   type: "SET_RESOURCE_CHANGED",
   payload: resourceKey,

@@ -591,5 +591,12 @@ export const setClasses = (state, action) => {
   return mergeSubjectPropsToNewState(state, subjectKey, { classes })
 }
 
+export const setSubjectComponentList = (state, action) => {
+  const { subjectKey, uri } = action.payload
+  return mergeSubjectPropsToNewState(state, subjectKey, {
+    componentListUri: uri,
+  })
+}
+
 export const setResourceChanged = (state, action) =>
   mergeSubjectPropsToNewState(state, action.payload, { changed: true })

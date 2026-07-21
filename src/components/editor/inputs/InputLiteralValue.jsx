@@ -1,8 +1,13 @@
 import React, { useRef, useEffect, useState } from "react"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import PropTypes from "prop-types"
 import TextareaAutosize from "react-textarea-autosize"
-import { updateLiteralValue, removeValue, addValue } from "actions/resources"
+import {
+  updateLiteralValue,
+  removeValue,
+  addValue,
+  setSubjectComponentList,
+} from "actions/resources"
 import { newLiteralValue } from "utilities/valueFactory"
 import LanguageButton from "./LanguageButton"
 import DiacriticsButton from "./DiacriticsButton"
@@ -13,7 +18,10 @@ import useDiacritics from "hooks/useDiacritics"
 import ValuePropertyURI from "../property/ValuePropertyURI"
 import LiteralTypeLabel from "../property/LiteralTypeLabel"
 import useResourceHasChanged from "hooks/useResourcHasChanged"
+import LcshTypeahead from "./LcshTypeahead"
 import _ from "lodash"
+
+const MADS_AUTH_LABEL = "http://www.loc.gov/mads/rdf/v1#authoritativeLabel"
 
 const InputLiteralValue = ({
   value,
@@ -35,6 +43,7 @@ const InputLiteralValue = ({
     closeDiacritics,
     handleBlurDiacritics,
     currentContent,
+    setCurrentContent,
     handleChangeDiacritics,
     handleKeyDownDiacritics,
     handleAddCharacter,
@@ -106,6 +115,20 @@ const InputLiteralValue = ({
     handleKeyDownDiacritics(event)
   }
 
+  const subjectKey = useSelector(
+    (state) => state.entities.properties[value.propertyKey]?.subjectKey
+  )
+
+  const isLcshAuthLabel = value.propertyUri === MADS_AUTH_LABEL
+
+  const handleLcshSelect = ({ label, uri }) => {
+    setCurrentContent(label)
+    dispatch(updateLiteralValue(value.key, label, value.lang))
+    if (uri && subjectKey) {
+      dispatch(setSubjectComponentList(subjectKey, uri))
+    }
+  }
+
   const showLang =
     (!propertyTemplate.languageSuppressed || value.lang) &&
     !propertyTemplate.validationDataType
@@ -167,6 +190,9 @@ const InputLiteralValue = ({
           close={handleCloseScriptShifter}
         />
       </div>
+      {isLcshAuthLabel && (
+        <LcshTypeahead query={currentContent} onSelect={handleLcshSelect} />
+      )}
     </React.Fragment>
   )
 }
