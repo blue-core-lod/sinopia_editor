@@ -1,0 +1,93 @@
+[
+  {
+    "@id": "_:b8",
+    "@type": [
+      "http://sinopia.io/vocabulary/PropertyTemplate"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Literal input",
+        "@language": "en"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasPropertyUri": [
+      {
+        "@id": "http://sinopia.io/testing/MergeDefaultsMatch/property1"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasPropertyType": [
+      {
+        "@id": "http://sinopia.io/vocabulary/propertyType/literal"
+      }
+    ]
+  },
+  {
+    "@id": "http://localhost:3000/resource/resourceTemplate:testing:mergeDefaultsMatch",
+    "http://sinopia.io/vocabulary/hasResourceTemplate": [
+      {
+        "@value": "sinopia:template:resource"
+      }
+    ],
+    "@type": [
+      "http://sinopia.io/vocabulary/ResourceTemplate"
+    ],
+    "http://sinopia.io/vocabulary/hasResourceId": [
+      {
+        "@value": "resourceTemplate:testing:mergeDefaultsMatch",
+        "@language": "en"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasClass": [
+      {
+        "@id": "http://sinopia.io/testing/MergeDefaultsMatch"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Merge Defaults Match",
+        "@language": "en"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasRemark": [
+      {
+        "@value": "A template that contains a single literal input and no default. This is the valueSubjectTemplateKeys entry that real dataset values match.",
+        "@language": "en"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasPropertyTemplate": [
+      {
+        "@list": [
+          {
+            "@id": "_:b8"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "@id": "http://sinopia.io/testing/MergeDefaultsMatch",
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Merge Defaults Match",
+        "@language": "en"
+      }
+    ]
+  },
+  {
+    "@id": "http://sinopia.io/testing/MergeDefaultsMatch/property1",
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Property1",
+        "@language": "en"
+      }
+    ]
+  },
+  {
+    "@id": "http://sinopia.io/vocabulary/propertyType/literal",
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "literal"
+      }
+    ]
+  }
+]
