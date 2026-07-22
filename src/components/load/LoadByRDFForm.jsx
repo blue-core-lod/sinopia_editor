@@ -12,13 +12,41 @@ import { clearErrors, addError } from "actions/errors"
 import { showModal } from "actions/modals"
 import ResourceTemplateChoiceModal from "../ResourceTemplateChoiceModal"
 import useAlerts from "hooks/useAlerts"
-import { marcToMarcXml, marcToBibframe } from "utilities/Marc"
-
+import { useHistory } from "react-router-dom"
+import { useKeycloak } from "../../KeycloakContext"
+import { getJwt } from "utilities/SinopiaApiHelper"
 import _ from "lodash"
+
+const prettyXml = (xml) => {
+  const doc = new DOMParser().parseFromString(xml, "application/xml")
+  const serialize = (node, depth) => {
+    const indent = "  ".repeat(depth)
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = node.textContent.trim()
+      return text ? `${indent}${text}` : ""
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) return ""
+    const tag = node.tagName
+    const attrs = Array.from(node.attributes)
+      .map((a) => ` ${a.name}="${a.value}"`)
+      .join("")
+    const children = Array.from(node.childNodes)
+      .map((n) => serialize(n, depth + 1))
+      .filter(Boolean)
+    if (children.length === 0) return `${indent}<${tag}${attrs}/>`
+    if (children.length === 1 && !children[0].includes("\n"))
+      return `${indent}<${tag}${attrs}>${children[0].trim()}</${tag}>`
+    return `${indent}<${tag}${attrs}>\n${children.join("\n")}\n${indent}</${tag}>`
+  }
+  const root = doc.documentElement
+  return `<?xml version="1.0" encoding="UTF-8"?>\n${serialize(root, 0)}`
+}
 
 const LoadByRDFForm = () => {
   const dispatch = useDispatch()
   const errorKey = useAlerts()
+  const { keycloak } = useKeycloak()
+  const history = useHistory()
 
   const [baseURI, setBaseURI] = useState("")
   const [rdf, setRdf] = useState("")
@@ -26,47 +54,63 @@ const LoadByRDFForm = () => {
   const [resourceTemplateId, setResourceTemplateId] = useState("")
   const [marcText, setMarcText] = useState("")
   const [isConvertingMarc, setIsConvertingMarc] = useState(false)
+  const [isMarcBibframe, setIsMarcBibframe] = useState(false)
   useRdfResource(dataset, baseURI, resourceTemplateId, errorKey)
 
   const handleMarcFileChange = (event) => {
     const file = event.target.files[0]
     if (!file) return
 
-    if (file.name.endsWith(".mrc")) {
-      setIsConvertingMarc(true)
-      setMarcText("")
-      dispatch(clearErrors(errorKey))
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        let marcXml
-        try {
-          marcXml = marcToMarcXml(e.target.result)
-          console.log(marcXml)
-        } catch (err) {
+    setIsConvertingMarc(true)
+    setMarcText("")
+    dispatch(clearErrors(errorKey))
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      fetch("/api/marc2xml", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/marc",
+          Authorization: `Bearer ${getJwt(keycloak)}`,
+        },
+        body: e.target.result,
+      })
+        .then((resp) => {
+          if (!resp.ok)
+            throw new Error(`marc2xml service returned ${resp.statusText}`)
+          return resp.text()
+        })
+        .then((marcXml) => {
+          setMarcText(prettyXml(marcXml))
+          return fetch("/api/marc2bibframe", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/xml",
+              Authorization: `Bearer ${getJwt(keycloak)}`,
+            },
+            body: marcXml,
+          })
+        })
+        .then((resp) => {
+          if (!resp.ok)
+            throw new Error(`marc2bibframe service returned ${resp.statusText}`)
+          return resp.text()
+        })
+        .then((rdfText) => {
+          setRdf(rdfText)
+          setIsMarcBibframe(true)
+        })
+        .catch((err) =>
           dispatch(
-            addError(errorKey, `Error parsing MARC file: ${err.message || err}`)
-          )
-          setIsConvertingMarc(false)
-          return
-        }
-        marcToBibframe(marcXml)
-          .then((rdf) => setMarcText(rdf))
-          .catch((err) =>
-            dispatch(
-              addError(
-                errorKey,
-                `Error converting MARC to RDF: ${err.message || err}`
-              )
+            addError(
+              errorKey,
+              `Error converting MARC: ${err.message || err}`
             )
           )
-          .finally(() => setIsConvertingMarc(false))
-      }
-      reader.readAsArrayBuffer(file)
-    } else {
-      const reader = new FileReader()
-      reader.onload = (e) => setMarcText(e.target.result)
-      reader.readAsText(file)
+        )
+        .finally(() => setIsConvertingMarc(false))
     }
+    reader.readAsArrayBuffer(file)
   }
 
   // Passed into resource template chooser to allow it to pass back selected resource template id.
@@ -84,6 +128,7 @@ const LoadByRDFForm = () => {
   const changeRdf = (event) => {
     dispatch(clearErrors(errorKey))
     setRdf(event.target.value)
+    setIsMarcBibframe(false)
     // This will get set on submit.
     setDataset(false)
     event.preventDefault()
@@ -93,6 +138,31 @@ const LoadByRDFForm = () => {
     event.preventDefault()
     setDataset(false)
     dispatch(clearErrors(errorKey))
+
+    if (isMarcBibframe) {
+      fetch("/api/works", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getJwt(keycloak)}`,
+        },
+        body: JSON.stringify({ data: rdf }),
+      })
+        .then((resp) => {
+          if (!resp.ok)
+            throw new Error(`Error creating work: ${resp.statusText}`)
+          return resp.json()
+        })
+        .then((json) => {
+          console.log("/api/works response:", json)
+          history.push(`/editor/${json.uuid}`)
+        })
+        .catch((err) =>
+          dispatch(addError(errorKey, `Error creating work: ${err.message || err}`))
+        )
+      return
+    }
+
     // Try parsing
     datasetFromRdf(rdf)
       .then((newDataset) => {
@@ -131,9 +201,7 @@ const LoadByRDFForm = () => {
   return (
     <div>
       <h3>Load MARC into Editor</h3>
-      <p className="text-muted">
-        Convert a MARC record to BIBFRAME and save to Blue Core
-      </p>
+      <p className="text-muted">Convert a MARC record to MARCXML</p>
       <div className="mb-3">
         <label htmlFor="marcFileInput">Choose MARC file</label>
         <input
@@ -153,10 +221,10 @@ const LoadByRDFForm = () => {
                 role="status"
                 aria-hidden="true"
               ></span>
-              Converting to RDF&hellip;
+              Converting&hellip;
             </>
           ) : (
-            "RDF output"
+            "MARCXML output"
           )}
         </label>
         <textarea
@@ -165,7 +233,7 @@ const LoadByRDFForm = () => {
           rows="15"
           value={marcText}
           onChange={(event) => setMarcText(event.target.value)}
-          placeholder="Upload a .mrc file above to convert to RDF, or paste RDF directly."
+          placeholder="Upload a .mrc file above to convert to MARCXML."
           disabled={isConvertingMarc}
         ></textarea>
       </div>
