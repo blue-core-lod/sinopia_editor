@@ -411,4 +411,214 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       })
     })
   })
+
+  describe("loading a resource with a nested resource property that has multiple valueSubjectTemplateKeys", () => {
+    // Only one of the two valueSubjectTemplateKeys (mergeDefaultsMatch) has real
+    // data in the dataset. The other (mergeDefaultsSibling) has a configured
+    // default. Loading should not populate that sibling's default value: doing
+    // so would let template defaults masquerade as (and, on save, silently
+    // overwrite) data that was never in the source RDF.
+    const mergeDefaultsUri =
+      "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3d"
+    const mergeDefaultsN3 = `<${mergeDefaultsUri}> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:mergeDefaultsHost" .
+    <${mergeDefaultsUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/MergeDefaultsHost> .
+    <${mergeDefaultsUri}> <http://sinopia.io/testing/MergeDefaultsHost/property1> _:b1 .
+    _:b1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/MergeDefaultsMatch> .
+    _:b1 <http://sinopia.io/testing/MergeDefaultsMatch/property1> "Real value"@en .
+    `
+
+    const store = mockStore(createState())
+
+    it("does not apply the unmatched sibling template's default value", async () => {
+      const dataset = await datasetFromN3(mergeDefaultsN3)
+      const result = await store.dispatch(
+        newResourceFromDataset(
+          dataset,
+          mergeDefaultsUri,
+          null,
+          "testerrorkey"
+        )
+      )
+      expect(result).toBe(true)
+
+      const actions = store.getActions()
+      const addSubjectAction = actions.find(
+        (action) => action.type === "ADD_SUBJECT"
+      )
+      expect(addSubjectAction).not.toBeNull()
+
+      const resource = addSubjectAction.payload
+      const property = resource.properties[0]
+
+      const matchValue = property.values.find(
+        (value) =>
+          value.valueSubject.subjectTemplate.id ===
+          "resourceTemplate:testing:mergeDefaultsMatch"
+      )
+      expect(matchValue.valueSubject.properties[0].values[0].literal).toBe(
+        "Real value"
+      )
+
+      const siblingValue = property.values.find(
+        (value) =>
+          value.valueSubject.subjectTemplate.id ===
+          "resourceTemplate:testing:mergeDefaultsSibling"
+      )
+      expect(siblingValue).not.toBeUndefined()
+      // Should be null/empty, not populated from the sibling's configured default.
+      expect(siblingValue.valueSubject.properties[0].values).toBeFalsy()
+
+      // And on save, the unmatched sibling (having no real content) should not
+      // be written to the graph at all -- confirming no phantom default value
+      // is persisted.
+      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
+      expect(actualRdf).not.toMatch("Sibling default value")
+      expect(actualRdf).toMatch("Real value")
+    })
+  })
+
+  describe("loading a suppressed nested resource with no local rdf:type", () => {
+    // Unlike "loading a suppressed nested resource" above, <http://foo/bar>
+    // has no local rdf:type triple -- the normal shape for a reference to an
+    // external, shared vocabulary term. There is exactly one candidate
+    // template (resourceTemplate:testing:suppressedUri) and it is marked
+    // suppressible, so the value should still be recovered.
+    const n3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:suppressible" .
+    <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Suppressible> .
+    <> <http://sinopia.io/testing/Suppressible/property1> <http://foo/bar> .
+    <http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en .
+    `
+
+    const store = mockStore(createState())
+
+    it("recovers the value using the sole suppressible candidate", async () => {
+      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const result = await store.dispatch(
+        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      )
+      expect(result).toBe(true)
+
+      const actions = store.getActions()
+      const addSubjectAction = actions.find(
+        (action) => action.type === "ADD_SUBJECT"
+      )
+      expect(addSubjectAction).not.toBeNull()
+
+      const property = addSubjectAction.payload.properties[0]
+      const recoveredValue =
+        property.values[0].valueSubject.properties[0].values[0]
+      expect(recoveredValue.uri).toBe("http://foo/bar")
+      expect(recoveredValue.label).toBe("Foo Bar")
+
+      // On save, the recovered value round-trips as a flat, suppressed URI --
+      // the real reference is written out, not silently dropped or replaced.
+      const actualRdf = new GraphBuilder(
+        addSubjectAction.payload
+      ).graph.toCanonical()
+      expect(actualRdf).toMatch(
+        "<http://sinopia.io/testing/Suppressible/property1> <http://foo/bar>"
+      )
+      expect(actualRdf).toMatch(
+        '<http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en'
+      )
+      // Since no local rdf:type triple was found for the recovered value,
+      // the recovered subject has no known classes, so (unlike a value
+      // matched by a real local type) no rdf:type is re-stamped on save.
+      // The core reference is preserved either way -- this only documents
+      // the known asymmetry with a genuinely Sinopia-authored round-trip.
+      expect(actualRdf).not.toMatch(
+        '<http://foo/bar> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'
+      )
+    })
+  })
+
+  describe("loading a resource property with two suppressible candidates and no local rdf:type", () => {
+    // resourceTemplate:testing:suppressedUri and :suppressedUri2 are both
+    // suppressible and have the identical shape (a bare uri + label). With no
+    // local rdf:type on the value to disambiguate them, the loader must not
+    // guess -- the real value should not appear under either candidate.
+    const ambiguousUri =
+      "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3c"
+    const n3 = `<${ambiguousUri}> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:suppressibleAmbiguous" .
+    <${ambiguousUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/SuppressibleAmbiguous> .
+    <${ambiguousUri}> <http://sinopia.io/testing/SuppressibleAmbiguous/property1> <http://foo/bar> .
+    <http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en .
+    `
+
+    const store = mockStore(createState())
+
+    it("does not guess which candidate the value represents", async () => {
+      const dataset = await datasetFromN3(n3)
+      const result = await store.dispatch(
+        newResourceFromDataset(dataset, ambiguousUri, null, "testerrorkey")
+      )
+      expect(result).toBe(true)
+
+      const actions = store.getActions()
+      const addSubjectAction = actions.find(
+        (action) => action.type === "ADD_SUBJECT"
+      )
+      expect(addSubjectAction).not.toBeNull()
+
+      const property = addSubjectAction.payload.properties[0]
+      expect(property.values).toHaveLength(2)
+
+      const uris = property.values.map(
+        (value) => value.valueSubject.properties[0].values?.[0]?.uri
+      )
+      expect(uris).not.toContain("http://foo/bar")
+
+      // Both candidate placeholders are empty, so on save neither is written
+      // -- the real reference is lost from the editor, but nothing wrong (or
+      // guessed) is persisted either.
+      const actualRdf = new GraphBuilder(
+        addSubjectAction.payload
+      ).graph.toCanonical()
+      expect(actualRdf).not.toMatch("http://foo/bar")
+    })
+  })
+
+  describe("loading a resource with a required nested resource property that has no data at all", () => {
+    // resourceTemplate:testing:mergeDefaultsSibling has a configured literal
+    // default (see the merge-defaults describe block above), but here it's
+    // the SOLE valueSubjectTemplateKeys entry for a REQUIRED property, and
+    // the dataset has no triple at all for that property -- unlike the
+    // merge-defaults case, this never reaches newValuesFromDatasetByPropertyUri's
+    // "resource" branch (there's no object to try matching), so it goes
+    // through newProperty's required-property pre-population
+    // (valuesForExpandedProperty) instead. That path threads noDefaults
+    // through just like the dataset-merge path, so the default should not
+    // appear here either.
+    const requiredUri =
+      "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3b"
+    const n3 = `<${requiredUri}> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:requiredSingleDefaultHost" .
+    <${requiredUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/RequiredSingleDefaultHost> .
+    `
+
+    const store = mockStore(createState())
+
+    it("does not apply the candidate template's default value", async () => {
+      const dataset = await datasetFromN3(n3)
+      const result = await store.dispatch(
+        newResourceFromDataset(dataset, requiredUri, null, "testerrorkey")
+      )
+      expect(result).toBe(true)
+
+      const actions = store.getActions()
+      const addSubjectAction = actions.find(
+        (action) => action.type === "ADD_SUBJECT"
+      )
+      expect(addSubjectAction).not.toBeNull()
+
+      const resource = addSubjectAction.payload
+      const property = resource.properties[0]
+      expect(property.values).toHaveLength(1)
+
+      const innerProperty = property.values[0].valueSubject.properties[0]
+      expect(innerProperty.values).toBeFalsy()
+
+      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
+      expect(actualRdf).not.toMatch("Sibling default value")
+    })
+  })
 })

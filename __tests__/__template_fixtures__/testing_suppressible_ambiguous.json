@@ -1,0 +1,130 @@
+[
+  {
+    "@id": "http://localhost:3000/resource/resourceTemplate:testing:suppressibleAmbiguous",
+    "http://sinopia.io/vocabulary/hasResourceTemplate": [
+      {
+        "@value": "sinopia:template:resource"
+      }
+    ],
+    "@type": [
+      "http://sinopia.io/vocabulary/ResourceTemplate"
+    ],
+    "http://sinopia.io/vocabulary/hasResourceId": [
+      {
+        "@value": "resourceTemplate:testing:suppressibleAmbiguous",
+        "@language": "en"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasClass": [
+      {
+        "@id": "http://sinopia.io/testing/SuppressibleAmbiguous"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Suppressible ambiguous nested resource",
+        "@language": "en"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasRemark": [
+      {
+        "@value": "A template with a nested resource property that has two suppressible valueSubjectTemplateKeys, used to test that an untyped URI value is not disambiguated by guessing.",
+        "@language": "en"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasPropertyTemplate": [
+      {
+        "@list": [
+          {
+            "@id": "_:b5"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "@id": "_:b5",
+    "@type": [
+      "http://sinopia.io/vocabulary/PropertyTemplate"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Suppressible ambiguous nested resource",
+        "@language": "en"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasPropertyUri": [
+      {
+        "@id": "http://sinopia.io/testing/SuppressibleAmbiguous/property1"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasPropertyType": [
+      {
+        "@id": "http://sinopia.io/vocabulary/propertyType/resource"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasResourceAttributes": [
+      {
+        "@id": "_:b6"
+      }
+    ]
+  },
+  {
+    "@id": "_:b6",
+    "@type": [
+      "http://sinopia.io/vocabulary/ResourcePropertyTemplate"
+    ],
+    "http://sinopia.io/vocabulary/hasResourceTemplateId": [
+      {
+        "@id": "resourceTemplate:testing:suppressedUri"
+      },
+      {
+        "@id": "resourceTemplate:testing:suppressedUri2"
+      }
+    ]
+  },
+  {
+    "@id": "http://sinopia.io/testing/SuppressibleAmbiguous/property1",
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Property1",
+        "@language": "en"
+      }
+    ]
+  },
+  {
+    "@id": "http://sinopia.io/testing/SuppressibleAmbiguous",
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "SuppressibleAmbiguous",
+        "@language": "en"
+      }
+    ]
+  },
+  {
+    "@id": "http://sinopia.io/vocabulary/propertyType/resource",
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "nested resource"
+      }
+    ]
+  },
+  {
+    "@id": "resourceTemplate:testing:suppressedUri",
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "URI",
+        "@language": "en"
+      }
+    ]
+  },
+  {
+    "@id": "resourceTemplate:testing:suppressedUri2",
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "URI2",
+        "@language": "en"
+      }
+    ]
+  }
+]
