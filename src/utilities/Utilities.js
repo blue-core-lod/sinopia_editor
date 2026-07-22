@@ -8,6 +8,7 @@ import { JsonLdParser } from "jsonld-streaming-parser"
 import { Writer as N3Writer } from "n3"
 import dateFormat from "date-and-time"
 import SerializerJsonld from "@rdfjs/serializer-jsonld-ext"
+import Config from "Config"
 
 const concatStream = require("concat-stream")
 const Readable = require("stream").Readable
@@ -38,6 +39,23 @@ export const isValidURI = (value) => {
 
 export const isHttp = (uri) =>
   _.startsWith(uri, "http://") || _.startsWith(uri, "https://")
+
+/**
+ * Determines whether a URI identifies a Blue Core resource, i.e. one that can
+ * be fetched as application/vnd.sinopia+json. Blue Core resources share an
+ * origin with the Blue Core API; external URIs (e.g. id.loc.gov) do not.
+ * Note: the API base includes a path (.../api) while resources are siblings
+ * (.../instances, .../works, ...), so we compare origin rather than prefix.
+ * @param {string} uri to test
+ * @return {boolean} true if the URI is a Blue Core resource URI
+ */
+export const isBlueCoreUri = (uri) => {
+  try {
+    return new URL(uri).origin === new URL(Config.sinopiaApiBase).origin
+  } catch (e) {
+    return false
+  }
+}
 
 /**
  * Loads N3 into a dataset.

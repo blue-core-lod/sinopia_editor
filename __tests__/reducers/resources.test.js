@@ -864,6 +864,29 @@ describe("addValue()", () => {
     })
   })
 
+  describe("new uri value that is a bf Item ref to an external resource", () => {
+    it("does not add the external ref", () => {
+      const oldState = createState({ hasResourceWithLookup: true })
+
+      const newAddUriAction = {
+        ...addUriAction,
+        payload: {
+          ...addUriAction.payload,
+          value: {
+            ...addUriAction.payload.value,
+            uri: "http://id.loc.gov/resources/items/14300125",
+            propertyUri: "http://id.loc.gov/ontologies/bibframe/hasItem",
+          },
+        },
+      }
+
+      const newState = reducer(oldState.entities, newAddUriAction)
+
+      // The external item is omitted since it is not a Blue Core resource.
+      expect(newState.subjects["wihOjn-0Z"].bfItemRefs).toHaveLength(0)
+    })
+  })
+
   describe("new uri value that is a bf Admin Metadata ref", () => {
     it("updates state", () => {
       const oldState = createState({ hasResourceWithLookup: true })

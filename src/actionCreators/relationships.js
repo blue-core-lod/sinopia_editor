@@ -2,17 +2,20 @@
 
 import { setSearchRelationships } from "actions/relationships"
 import { fetchResource } from "sinopiaApi"
+import { isBlueCoreUri } from "utilities/Utilities"
 import rdf from "rdf-ext"
 
 const BF = "http://id.loc.gov/ontologies/bibframe/"
 
 const refsFromDataset = (dataset) => {
+  // Only Blue Core resources can be fetched and displayed as relationships.
+  // External refs (e.g. bf:hasItem pointing at id.loc.gov) are omitted.
   const getObjectUris = (predicate) =>
     dataset
       .match(null, rdf.namedNode(predicate), null)
       .toArray()
       .map((quad) => quad.object.value)
-      .filter((v) => v.startsWith("http"))
+      .filter(isBlueCoreUri)
 
   return {
     bfAdminMetadataRefs: getObjectUris(`${BF}adminMetadata`),
