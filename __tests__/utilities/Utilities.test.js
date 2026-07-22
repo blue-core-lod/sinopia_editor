@@ -5,6 +5,7 @@ import {
   datasetFromN3,
   formatISODate,
   formatLocalDate,
+  isBlueCoreUri,
 } from "utilities/Utilities"
 import timezoneMock from "timezone-mock"
 
@@ -151,6 +152,29 @@ describe("Utilities", () => {
       expect(formatLocalDate(new Date("2019-05-14T01:01:58.135Z"))).toEqual(
         "2019-05-13"
       )
+    })
+  })
+
+  describe("isBlueCoreUri()", () => {
+    // Config.sinopiaApiBase defaults to http://localhost:3000 in tests.
+    it("is true for a URI sharing an origin with the Blue Core API", () => {
+      expect(
+        isBlueCoreUri(
+          "http://localhost:3000/resource/a5c5f4c0-e7cd-4ca5-a20f-2a37fe1080d5"
+        )
+      ).toBe(true)
+      expect(isBlueCoreUri("http://localhost:3000/instances/abc123")).toBe(true)
+    })
+
+    it("is false for an external URI", () => {
+      expect(
+        isBlueCoreUri("http://id.loc.gov/resources/items/14300125")
+      ).toBe(false)
+    })
+
+    it("is false for a non-URI value", () => {
+      expect(isBlueCoreUri("not a uri")).toBe(false)
+      expect(isBlueCoreUri("")).toBe(false)
     })
   })
 })

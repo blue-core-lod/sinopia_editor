@@ -60,6 +60,34 @@ describe("loadSearchRelationships()", () => {
     expect(sinopiaApi.fetchResource).toHaveBeenCalledWith(uri)
   })
 
+  it("omits refs to non-Blue Core (external) resources", async () => {
+    const jsonld = [
+      {
+        "@id": "http://localhost:3000/resource/instance-with-items",
+        "@type": ["http://id.loc.gov/ontologies/bibframe/Instance"],
+        "http://id.loc.gov/ontologies/bibframe/hasItem": [
+          { "@id": "http://localhost:3000/resource/blue-core-item" },
+          { "@id": "http://id.loc.gov/resources/items/14300125" },
+        ],
+      },
+    ]
+    const dataset = await datasetFromJsonld(jsonld)
+    sinopiaApi.fetchResource = jest.fn().mockResolvedValue([dataset, {}])
+
+    const store = mockStore(createState())
+    await store.dispatch(loadSearchRelationships(uri))
+
+    expect(store.getActions()).toHaveAction("SET_SEARCH_RELATIONSHIPS", {
+      uri,
+      relationships: {
+        bfAdminMetadataRefs: [],
+        bfItemRefs: ["http://localhost:3000/resource/blue-core-item"],
+        bfInstanceRefs: [],
+        bfWorkRefs: [],
+      },
+    })
+  })
+
   describe("when fetchResource errors", () => {
     it("silently handles error", async () => {
       sinopiaApi.fetchResource = jest.fn().mockRejectedValue(new Error("Ooops"))
