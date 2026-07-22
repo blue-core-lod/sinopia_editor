@@ -330,7 +330,13 @@ const templatePromisesFor = (property, errorKey, dispatch) =>
   property.propertyTemplate.valueSubjectTemplateKeys.map((resourceTemplateId) =>
     dispatch(newSubject(null, resourceTemplateId, {}, errorKey)).then(
       (subject) =>
-        dispatch(newPropertiesFromTemplates(subject, false, errorKey)).then(
+        // noDefaults is true: these subjects are placeholders for every
+        // valueSubjectTemplateKeys entry, used by mergeValues to find the one
+        // matching the dataset. Populating them with template defaults would let
+        // those defaults leak into merged values as extra siblings, or entirely
+        // replace real data whenever the dataset value isn't recognized (e.g., an
+        // external authority URI with no local rdf:type triple to match against).
+        dispatch(newPropertiesFromTemplates(subject, true, errorKey)).then(
           (properties) => {
             subject.properties = properties
             return newValueSubject(
@@ -459,23 +465,41 @@ const newNestedResourceFromObject =
       if (compactChildRtIds.length > 1) {
         throw `More than one resource template matches: ${compactChildRtIds}`
       }
-      // No matching resource template, so do nothing
-      if (_.isEmpty(compactChildRtIds)) {
+
+      if (!_.isEmpty(compactChildRtIds)) {
+        context.usedDataset.addAll(typeQuads)
+
+        // One resource template
+        const suppress = obj.termType === "NamedNode"
+        return dispatch(
+          recursiveResourceFromDataset(
+            obj,
+            null,
+            compactChildRtIds[0],
+            suppress,
+            context
+          )
+        ).then((subject) => newValueSubject(property, propertyUri, subject))
+      }
+
+      // No local rdf:type triple matched a candidate template -- e.g. the
+      // object is a bare reference to an external, shared vocabulary term or
+      // resource, which has no reason to restate its own type locally. If the
+      // object is a plain URI and exactly one candidate template is marked
+      // suppressible (i.e., designed to round-trip as a flat URI with no
+      // local type assertion), use that template directly rather than
+      // discarding real data.
+      if (obj.termType !== "NamedNode") {
         return null
       }
-      context.usedDataset.addAll(typeQuads)
-
-      // One resource template
-      const suppress = obj.termType === "NamedNode"
       return dispatch(
-        recursiveResourceFromDataset(
-          obj,
-          null,
-          compactChildRtIds[0],
-          suppress,
-          context
-        )
-      ).then((subject) => newValueSubject(property, propertyUri, subject))
+        selectSuppressibleResourceTemplateId(property.propertyTemplate, context)
+      ).then((suppressibleRtId) => {
+        if (!suppressibleRtId) return null
+        return dispatch(
+          recursiveResourceFromDataset(obj, null, suppressibleRtId, true, context)
+        ).then((subject) => newValueSubject(property, propertyUri, subject))
+      })
     })
   }
 
@@ -500,6 +524,30 @@ const selectResourceTemplateId =
         })
       )
     )
+
+// Used only when no candidate template's class matched a local rdf:type
+// triple on the object. Safe to use only when exactly one candidate is
+// suppressible -- with more than one, there's no way to know which the value
+// represents, so the caller should decline (return undefined) rather than guess.
+const selectSuppressibleResourceTemplateId =
+  (propertyTemplate, { resourceTemplatePromises, errorKey }) =>
+  (dispatch) =>
+    Promise.all(
+      propertyTemplate.valueSubjectTemplateKeys.map((resourceTemplateId) =>
+        dispatch(
+          loadResourceTemplate(
+            resourceTemplateId,
+            resourceTemplatePromises,
+            errorKey
+          )
+        ).then((subjectTemplate) =>
+          subjectTemplate?.suppressible ? resourceTemplateId : undefined
+        )
+      )
+    ).then((resourceTemplateIds) => {
+      const compactIds = _.compact(resourceTemplateIds)
+      return compactIds.length === 1 ? compactIds[0] : undefined
+    })
 
 const newLiteralFromObject = (obj, property, propertyUri) =>
   newLiteralValue(property, propertyUri, obj.value, obj.language)
