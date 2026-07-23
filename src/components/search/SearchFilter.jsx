@@ -36,7 +36,9 @@ const SearchFilter = ({
     if (_.isEmpty(facetResults)) return
     const activeFilter = searchOptions[filterSearchOption]
     if (activeFilter != null) {
-      const activeArray = Array.isArray(activeFilter) ? activeFilter : [activeFilter]
+      const activeArray = Array.isArray(activeFilter)
+        ? activeFilter
+        : [activeFilter]
       setSelectedFilters(activeArray)
       setAllSelected(activeArray.length === facetResults.length)
     } else {

@@ -25,7 +25,12 @@ const ScriptShifterSelection = ({ id, show, text, onTranslate, close }) => {
 
   const handleTranslate = (lang, tDir) => {
     setTranslating(`${lang.id}-${tDir}`)
-    translate(text, lang.id, tDir, capitalize ? "capitalize_first" : "no_change")
+    translate(
+      text,
+      lang.id,
+      tDir,
+      capitalize ? "capitalize_first" : "no_change"
+    )
       .then((result) => {
         if (result?.output) {
           onTranslate(result.output, lang.marc_code)

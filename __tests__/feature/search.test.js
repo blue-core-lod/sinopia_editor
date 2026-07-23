@@ -18,7 +18,7 @@ describe("sinopia resource search", () => {
     uri: "http://platform:8080/resource/cornell/34ef053e-f558-4299-a8a7-c8b79a598d99",
     data: {
       title: {
-        mainTitle: "foo bar"
+        mainTitle: "foo bar",
       },
       "@type": ["http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle"],
       group: "blue core",
@@ -34,7 +34,7 @@ describe("sinopia resource search", () => {
     uri: "http://platform:8080/resource/cornell/a96f16c1-a15c-4f4f-8a25-7ed49ba1eebe",
     data: {
       title: {
-        mainTitle: "foo"
+        mainTitle: "foo",
       },
       "@type": ["http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle"],
       group: "blue core",
@@ -51,8 +51,8 @@ describe("sinopia resource search", () => {
     uri: "http://platform:8080/resource/stanford/d7b0eb50-17bb-4258-83be-2cef2e9fc3ad",
     data: {
       title: {
-        mainTitle: "baz"
-      } ,
+        mainTitle: "baz",
+      },
       "@type": ["http://id.loc.gov/ontologies/bibframe/Title"],
       group: "blue core",
       created: "2019-11-27T19:05:48.496Z",

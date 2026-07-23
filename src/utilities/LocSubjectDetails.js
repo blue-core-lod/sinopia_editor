@@ -63,9 +63,7 @@ const fetchSubjectDetails = (id) =>
       return resources.length === 1 ? resources[0] : resources
     })
     .catch((err) => {
-      console.error(
-        `Error fetching LOC subject details: ${err.message || err}`
-      )
+      console.error(`Error fetching LOC subject details: ${err.message || err}`)
       throw err
     })
 

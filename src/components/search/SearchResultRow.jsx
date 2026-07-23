@@ -1,18 +1,22 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useState } from "react"
-import { useSelector } from "react-redux"
+import { useSelector, useDispatch } from "react-redux"
 import PropTypes from "prop-types"
 import LongDate from "components/LongDate"
 import ViewButton from "../buttons/ViewButton"
 import EditButton from "../buttons/EditButton"
 import CopyButton from "../buttons/CopyButton"
+import DeleteButton from "../buttons/DeleteButton"
 import useResource from "hooks/useResource"
 import useAlerts from "hooks/useAlerts"
 import { hasSearchRelationships } from "selectors/relationships"
 import RelationshipResults from "./RelationshipResults"
 import { resourceToName } from "utilities/Utilities"
 import ResourceTitle from "components/editor/ResourceTitle"
+import { selectSearchQuery, selectSearchOptions } from "selectors/search"
+import { fetchSinopiaSearchResults } from "actionCreators/search"
+import { useKeycloak } from "KeycloakContext"
 
 /**
  * Generates HTML row of all search results
@@ -23,15 +27,28 @@ const SearchResultRow = ({
   canCreate,
   withRelationships = true,
 }) => {
+  const dispatch = useDispatch()
+  const { keycloak } = useKeycloak()
   const errorKey = useAlerts()
+  const searchQuery = useSelector((state) => selectSearchQuery(state, "resource"))
+  const searchOptions = useSelector((state) =>
+    selectSearchOptions(state, "resource")
+  )
+
+  const onDelete = () => {
+    dispatch(fetchSinopiaSearchResults(searchQuery, searchOptions, errorKey, keycloak))
+  }
+
   const {
     handleView,
     handleEdit,
     handleCopy,
+    handleDelete,
     isLoadingView,
     isLoadingEdit,
     isLoadingCopy,
-  } = useResource(errorKey, { resourceURI: row.uri })
+    isLoadingDelete,
+  } = useResource(errorKey, { resourceURI: row.uri, onDelete })
   const hasRelationships =
     useSelector((state) => hasSearchRelationships(state, row.uri)) &&
     withRelationships
@@ -115,6 +132,13 @@ const SearchResultRow = ({
                 label={row.label}
                 handleClick={handleCopy}
                 isLoading={isLoadingCopy}
+              />
+            )}
+            {canEdit && (
+              <DeleteButton
+                label={row.label}
+                handleClick={handleDelete}
+                isLoading={isLoadingDelete}
               />
             )}
           </div>

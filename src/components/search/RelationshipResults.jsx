@@ -49,7 +49,9 @@ const RelationshipResults = ({ uri }) => {
     Promise.all(
       uris.map((refUri) =>
         fetchResource(refUri)
-          .then(([dataset, response]) => rowFromDataset(refUri, dataset, response))
+          .then(([dataset, response]) =>
+            rowFromDataset(refUri, dataset, response)
+          )
           .catch((err) => {
             dispatch(
               addError(

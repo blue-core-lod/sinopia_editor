@@ -72,14 +72,14 @@ export const loadResourceTemplateWithoutValidation =
       : getTemplateSearchResultsByIds([resourceTemplateId]).then(
           (searchResults) => {
             if (searchResults.results && searchResults.results.length > 0) {
-
               // Filter results to find the one matching the requested template ID
               // This is necessary because Blue Core search returns multiple results
               // Try multiple possible field names for the template ID
               const matchingResult = searchResults.results.find(
-                result => result.resourceId === resourceTemplateId ||
-                         result.id === resourceTemplateId ||
-                         result.templateId === resourceTemplateId
+                (result) =>
+                  result.resourceId === resourceTemplateId ||
+                  result.id === resourceTemplateId ||
+                  result.templateId === resourceTemplateId
               )
 
               if (matchingResult && matchingResult.uri) {
@@ -88,19 +88,26 @@ export const loadResourceTemplateWithoutValidation =
               }
 
               // If no exact match found, log the issue and fall back
-              console.warn(`Template search for ${resourceTemplateId} returned ${searchResults.results.length} results but none matched`, searchResults.results)
+              console.warn(
+                `Template search for ${resourceTemplateId} returned ${searchResults.results.length} results but none matched`,
+                searchResults.results
+              )
             }
 
             // Fallback to legacy URI construction if search fails
-            const fallbackUri = `${Config.sinopiaApiBase}/resource/${resourceToName(
-              resourceTemplateId
-            )}`
-            console.warn(`Template search failed for ${resourceTemplateId}, using fallback:`, fallbackUri)
+            const fallbackUri = `${
+              Config.sinopiaApiBase
+            }/resource/${resourceToName(resourceTemplateId)}`
+            console.warn(
+              `Template search failed for ${resourceTemplateId}, using fallback:`,
+              fallbackUri
+            )
             return fallbackUri
           }
         )
 
-    const newResourceTemplatePromise = templateUriPromise.then((templateUri) => fetchResource(templateUri, {
+    const newResourceTemplatePromise = templateUriPromise.then((templateUri) =>
+      fetchResource(templateUri, {
         isTemplate: true,
       }).then(([dataset, response]) => {
         const user = selectUser(getState())
@@ -123,7 +130,8 @@ export const loadResourceTemplateWithoutValidation =
 
         dispatch(addTemplates(subjectTemplate))
         return subjectTemplate
-      }))
+      })
+    )
 
     if (resourceTemplatePromises)
       resourceTemplatePromises[resourceTemplateId] = newResourceTemplatePromise

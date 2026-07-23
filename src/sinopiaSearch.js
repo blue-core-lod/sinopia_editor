@@ -193,8 +193,7 @@ const hitsToResult = (payload) => {
     const mainTitle = titleObj?.mainTitle
     let label
     if (Array.isArray(mainTitle)) {
-      const first =
-        mainTitle.find((m) => typeof m === "string") ?? mainTitle[0]
+      const first = mainTitle.find((m) => typeof m === "string") ?? mainTitle[0]
       label = first?.["@value"] ?? first
     } else {
       label = mainTitle?.["@value"] ?? mainTitle

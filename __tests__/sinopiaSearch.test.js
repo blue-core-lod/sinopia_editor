@@ -88,7 +88,10 @@ describe("getSearchResults", () => {
       links: null,
       options: { noFacetResults: true },
     })
-    expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/search/?q=foo", { method: "GET" })
+    expect(global.fetch).toHaveBeenCalledWith(
+      "http://localhost:3000/search/?q=foo",
+      { method: "GET" }
+    )
   })
 
   it("performs a search with specified page and sort order and returns results", async () => {
@@ -103,7 +106,10 @@ describe("getSearchResults", () => {
       sortField: "label",
       sortOrder: "desc",
     })
-    expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/search/?q=foo", { method: "GET" })
+    expect(global.fetch).toHaveBeenCalledWith(
+      "http://localhost:3000/search/?q=foo",
+      { method: "GET" }
+    )
   })
 
   it("performs a search and handles error response", async () => {
@@ -192,7 +198,10 @@ describe("getSearchResults", () => {
             "@type": ["Text", "Monograph", "Work"],
             title: {
               "@type": "Title",
-              mainTitle: { "@value": "Encyclopedia of radical helping", "@language": "en" },
+              mainTitle: {
+                "@value": "Encyclopedia of radical helping",
+                "@language": "en",
+              },
             },
           },
           created_at: "2025-11-18T21:53:24.747972",
@@ -204,9 +213,7 @@ describe("getSearchResults", () => {
 
     global.fetch = jest
       .fn()
-      .mockImplementation(() =>
-        Promise.resolve({ json: () => jsonLdResult })
-      )
+      .mockImplementation(() => Promise.resolve({ json: () => jsonLdResult }))
 
     const results = await getSearchResults("an encyclopedia of radical helping")
     expect(typeof results.results[0].label).toBe("string")
@@ -238,9 +245,7 @@ describe("getSearchResults", () => {
 
     global.fetch = jest
       .fn()
-      .mockImplementation(() =>
-        Promise.resolve({ json: () => jsonLdResult })
-      )
+      .mockImplementation(() => Promise.resolve({ json: () => jsonLdResult }))
 
     const results = await getSearchResults("Hineh yamim")
     expect(typeof results.results[0].label).toBe("string")
@@ -260,7 +265,10 @@ describe("getSearchResults", () => {
                 "@type": "VariantTitle",
                 mainTitle: [
                   "Hŭk esŏ ch'ajŭn yŏngwŏn han sam",
-                  { "@value": "흙 에서 찾은 영원 한 삶", "@language": "ko-kore" },
+                  {
+                    "@value": "흙 에서 찾은 영원 한 삶",
+                    "@language": "ko-kore",
+                  },
                 ],
                 variantType: "portion",
               },
@@ -268,7 +276,10 @@ describe("getSearchResults", () => {
                 "@type": "Title",
                 mainTitle: [
                   "Palgul sokpo! hŭk esŏ ch'ajŭn yŏngwŏn han sam",
-                  { "@value": "발굴 속보! 흙 에서 찾은 영원 한 삶", "@language": "ko-kore" },
+                  {
+                    "@value": "발굴 속보! 흙 에서 찾은 영원 한 삶",
+                    "@language": "ko-kore",
+                  },
                 ],
               },
             ],
@@ -282,9 +293,7 @@ describe("getSearchResults", () => {
 
     global.fetch = jest
       .fn()
-      .mockImplementation(() =>
-        Promise.resolve({ json: () => jsonLdResult })
-      )
+      .mockImplementation(() => Promise.resolve({ json: () => jsonLdResult }))
 
     const results = await getSearchResults("Palgul sokpo")
     expect(typeof results.results[0].label).toBe("string")
@@ -309,7 +318,10 @@ describe("getSearchResultsWithFacets", () => {
       links: null,
       options: {},
     })
-    expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/search/?q=foo", { method: "GET" })
+    expect(global.fetch).toHaveBeenCalledWith(
+      "http://localhost:3000/search/?q=foo",
+      { method: "GET" }
+    )
   })
 
   it("performs a search with specified filters and returns results", async () => {
@@ -324,7 +336,10 @@ describe("getSearchResultsWithFacets", () => {
       groupFilter: ["cornell"],
       noFacetResults: true,
     })
-    expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/search/?q=foo", { method: "GET" })
+    expect(global.fetch).toHaveBeenCalledWith(
+      "http://localhost:3000/search/?q=foo",
+      { method: "GET" }
+    )
   })
 })
 
@@ -351,9 +366,7 @@ describe("getLookupResult", () => {
     it("performs a search and returns result", async () => {
       global.fetch = jest
         .fn()
-        .mockImplementation(() =>
-          Promise.resolve({ json: () => workResult })
-        )
+        .mockImplementation(() => Promise.resolve({ json: () => workResult }))
 
       const result = await getLookupResult("foo", lookupConfig)
       expect(result).toEqual({
@@ -449,7 +462,8 @@ const templateResult = {
       uri: "http://localhost:3000/profiles/29908869-339b-4cec-9ef6-4baa06cfb297",
       data: [
         {
-          "@id": "http://localhost:3000/profiles/29908869-339b-4cec-9ef6-4baa06cfb297",
+          "@id":
+            "http://localhost:3000/profiles/29908869-339b-4cec-9ef6-4baa06cfb297",
           "@type": ["http://sinopia.io/vocabulary/ResourceTemplate"],
           "http://sinopia.io/vocabulary/hasAuthor": [{ "@value": "LD4P" }],
           "http://sinopia.io/vocabulary/hasDate": [{ "@value": "2019-08-19" }],
@@ -464,8 +478,7 @@ const templateResult = {
           ],
           "http://sinopia.io/vocabulary/hasRemark": [
             {
-              "@value":
-                "based on LC template ld4p:RT:bf2:Cartographic:Item",
+              "@value": "based on LC template ld4p:RT:bf2:Cartographic:Item",
             },
           ],
         },
@@ -480,7 +493,8 @@ const expectedTemplateResult = {
   date: "2019-08-19",
   group: "blue core",
   id: "ld4p:RT:bf2:Cartographic:Item",
-  originalURI: "http://localhost:3000/profiles/29908869-339b-4cec-9ef6-4baa06cfb297",
+  originalURI:
+    "http://localhost:3000/profiles/29908869-339b-4cec-9ef6-4baa06cfb297",
   remark: "based on LC template ld4p:RT:bf2:Cartographic:Item",
   resourceLabel: "Cartographic Item (BIBFRAME)",
   resourceURI: "http://id.loc.gov/ontologies/bibframe/Item",
@@ -596,6 +610,8 @@ describe("getSearchResultsByUris", () => {
       links: null,
       options: undefined,
     })
-    expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/search/", { method: "GET" })
+    expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/search/", {
+      method: "GET",
+    })
   })
 })
