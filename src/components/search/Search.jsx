@@ -43,7 +43,13 @@ const Search = (props) => {
 
   const changeSearchPage = (linkOrOffset) => {
     if (typeof linkOrOffset === "number") {
-      fetchSearchResults(queryString, uri, searchOptions, linkOrOffset, keycloak)
+      fetchSearchResults(
+        queryString,
+        uri,
+        searchOptions,
+        linkOrOffset,
+        keycloak
+      )
     } else {
       fetchSearchResults(linkOrOffset, uri, searchOptions, null, keycloak)
     }

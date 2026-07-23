@@ -118,7 +118,13 @@ describe("saveNewResource", () => {
     const keycloak = { token: "test-token" }
 
     await store.dispatch(
-      saveNewResource("t9zVwg2zO", "stanford", ["cornell"], "testerror", keycloak)
+      saveNewResource(
+        "t9zVwg2zO",
+        "stanford",
+        ["cornell"],
+        "testerror",
+        keycloak
+      )
     )
 
     const actions = store.getActions()
