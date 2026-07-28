@@ -277,6 +277,30 @@ _:b4_c14n1 <http://www.w3.org/2000/01/rdf-schema#label> "Uber template1, propert
     )
   })
 
+  it("preserves full HTTPS URLs in nested resource property template", async () => {
+    const rdf = `<> <http://sinopia.io/vocabulary/hasClass> <http://id.loc.gov/ontologies/bibframe/Uber1> .
+<> <http://sinopia.io/vocabulary/hasPropertyTemplate> _:b1_c14n1 .
+<> <http://sinopia.io/vocabulary/hasResourceId> <resourceTemplate:testing:uber1> .
+<> <http://sinopia.io/vocabulary/hasResourceTemplate> "sinopia:template:resource" .
+<> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/vocabulary/ResourceTemplate> .
+<> <http://www.w3.org/2000/01/rdf-schema#label> "Uber template1"@en .
+<http://sinopia.io/vocabulary/propertyType/resource> <http://www.w3.org/2000/01/rdf-schema#label> "nested resource" .
+_:b1_c14n1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> _:b4_c14n1 .
+_:b1_c14n1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+_:b4_c14n0 <http://sinopia.io/vocabulary/hasResourceTemplateId> <https://dev.bcld.info/profiles/5f862f31-6f1a-469c-ba66-f3cea0bc6599> .
+_:b4_c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/vocabulary/ResourcePropertyTemplate> .
+_:b4_c14n1 <http://sinopia.io/vocabulary/hasPropertyType> <http://sinopia.io/vocabulary/propertyType/resource> .
+_:b4_c14n1 <http://sinopia.io/vocabulary/hasResourceAttributes> _:b4_c14n0 .
+_:b4_c14n1 <http://sinopia.io/vocabulary/hasPropertyUri> <http://id.loc.gov/ontologies/bibframe/uber/template1/property1> .
+_:b4_c14n1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/vocabulary/PropertyTemplate> .
+_:b4_c14n1 <http://www.w3.org/2000/01/rdf-schema#label> "Uber template1, property2"@en .`
+    const dataset = await datasetFromN3(rdf)
+    const subjectTemplate = new TemplatesBuilder(dataset, "").build()
+    expect(
+      subjectTemplate.propertyTemplates[0].valueSubjectTemplateKeys
+    ).toEqual(["https://dev.bcld.info/profiles/5f862f31-6f1a-469c-ba66-f3cea0bc6599"])
+  })
+
   it("builds lookup property template", async () => {
     const rdf = `<> <http://sinopia.io/vocabulary/hasClass> <http://id.loc.gov/ontologies/bibframe/Uber1> .
 <> <http://sinopia.io/vocabulary/hasPropertyTemplate> _:b1_c14n1 .
