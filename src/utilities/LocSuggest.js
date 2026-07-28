@@ -23,9 +23,7 @@ const suggest = (query, type, offset = 0) => {
       return resp.json()
     })
     .catch((err) => {
-      console.error(
-        `Error querying LOC Suggest Service: ${err.message || err}`
-      )
+      console.error(`Error querying LOC Suggest Service: ${err.message || err}`)
       throw err
     })
 }

@@ -657,6 +657,32 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ont
     expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
   })
 
+  it("builds a graph with a mads:componentList when subject has componentListUri", () => {
+      const subject = {
+        ...build.subject({
+          subjectTemplate: build.subjectTemplate({
+            id: "resourceTemplate:testing:uber1",
+            clazz: "http://id.loc.gov/ontologies/bibframe/Uber1",
+          }),
+          properties: [],
+        }),
+        componentListUri:
+          "http://id.loc.gov/authorities/subjects/sh85002058",
+      }
+
+      const canonical = new GraphBuilder(subject).graph.toCanonical()
+
+      expect(canonical).toContain(
+        "<> <http://www.loc.gov/mads/rdf/v1#componentList>"
+      )
+      expect(canonical).toContain(
+        "<http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <http://id.loc.gov/authorities/subjects/sh85002058>"
+      )
+      expect(canonical).toContain(
+        "<http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil>"
+      )
+    })
+
   it("builds a graph when multiple classes", () => {
     const resource = build.subject({
       subjectTemplate: build.subjectTemplate({
