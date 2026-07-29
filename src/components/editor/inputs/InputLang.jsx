@@ -17,10 +17,12 @@ import {
 import { selectNormValue } from "selectors/resources"
 import { parseLangTag, stringifyLangTag } from "utilities/Language"
 import { detectLanguage } from "sinopiaApi"
+import { useKeycloak } from "KeycloakContext"
 import _ from "lodash"
 
 const InputLang = () => {
   const dispatch = useDispatch()
+  const { keycloak } = useKeycloak()
   const valueKey = useSelector((state) => selectCurrentLangModalValue(state))
   const value = useSelector((state) => selectNormValue(state, valueKey))
   const langOptions = useSelector((state) => selectLanguages(state))
@@ -77,7 +79,7 @@ const InputLang = () => {
   useEffect(() => {
     if (_.isEmpty(textValue)) return
 
-    detectLanguage(textValue)
+    detectLanguage(textValue, keycloak)
       .then((resp) => {
         if (!_.isEmpty(resp) && resp[0].score >= 0.75) {
           // Strip optional region subtag
@@ -91,7 +93,7 @@ const InputLang = () => {
         // Not surfacing error to user.
         console.error("Error detecting language", err)
       })
-  }, [textValue])
+  }, [textValue, keycloak])
 
   const findOptions = (id, options) => {
     if (!id) return []
