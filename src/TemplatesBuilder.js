@@ -295,7 +295,7 @@ export default class TemplatesBuilder {
       propertyTemplate.valueSubjectTemplateKeys = this.valuesFor(
         attributeTerm,
         "http://sinopia.io/vocabulary/hasResourceTemplateId"
-      ).map((subjectTemplateKey) => resourceToName(subjectTemplateKey))
+      )
       propertyTemplate.key = `${
         propertyTemplate.key
       } > ${propertyTemplate.valueSubjectTemplateKeys.sort().join(", ")}`
