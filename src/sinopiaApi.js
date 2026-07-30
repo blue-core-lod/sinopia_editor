@@ -266,7 +266,7 @@ export const putUserHistory = (
   })
 }
 
-export const postTransfer = (resourceUri, keycloak) => {
+export const postTransfer = (body, keycloak) => {
   const url = `${Config.sinopiaApiBase}/export`
   const jwt = getJwt(keycloak)
 
@@ -276,7 +276,7 @@ export const postTransfer = (resourceUri, keycloak) => {
       Authorization: `Bearer ${jwt}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ instance_uri: resourceUri }),
+    body: JSON.stringify(body),
   }).then((resp) => checkResp(resp))
 }
 

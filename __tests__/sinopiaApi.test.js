@@ -492,7 +492,10 @@ describe("postTransfer", () => {
         ok: true,
       })
 
-      await postTransfer(resourceUri, { token: "Secret-Token" })
+      await postTransfer(
+        { instance_uri: resourceUri },
+        { token: "Secret-Token" }
+      )
 
       expect(global.fetch).toHaveBeenCalledWith(
         "http://localhost:3000/export",
@@ -503,6 +506,26 @@ describe("postTransfer", () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ instance_uri: resourceUri }),
+        }
+      )
+    })
+
+    it("posts an arbitrary body, e.g. local_id", async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+      })
+
+      await postTransfer({ local_id: "a123" }, { token: "Secret-Token" })
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        "http://localhost:3000/export",
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer Secret-Token",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ local_id: "a123" }),
         }
       )
     })

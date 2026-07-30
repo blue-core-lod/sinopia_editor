@@ -1,5 +1,5 @@
 import { renderApp, createStore, createHistory } from "testUtils"
-import { fireEvent, screen } from "@testing-library/react"
+import { fireEvent, screen, within } from "@testing-library/react"
 import { createState } from "stateUtils"
 import { featureSetup, resourceHeaderSelector } from "featureUtils"
 import * as sinopiaApi from "sinopiaApi"
@@ -25,7 +25,7 @@ jest.spyOn(Config, "transferConfig", "get").mockReturnValue({
 })
 
 describe("transfer saved bf:Instance when user belongs to a transfer group", () => {
-  it("allows transfer", async () => {
+  it("allows transfer by Bluecore URI", async () => {
     const state = createState()
     const store = createStore(state)
     renderApp(store)
@@ -44,12 +44,58 @@ describe("transfer saved bf:Instance when user belongs to a transfer group", () 
       selector: resourceHeaderSelector,
     })
 
-    const transferBtn = screen.getByText("Export to Catalog")
-    fireEvent.click(transferBtn)
-    await screen.findByText("Requesting")
+    fireEvent.click(screen.getByRole("button", { name: "Export to Catalog" }))
+
+    const modal = await screen.findByRole("dialog")
+    fireEvent.click(
+      within(modal).getByRole("button", { name: "Export to Catalog" })
+    )
     await screen.findByText(
       `Export of ${bfUri} requested. You will be notified by email once processed.`
     )
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
+  }, 15000)
+
+  it("allows overlay by local identifier", async () => {
+    const state = createState()
+    const store = createStore(state)
+    renderApp(store)
+
+    fireEvent.click(screen.getByText("Linked Data Editor", { selector: "a" }))
+
+    fireEvent.change(screen.getByLabelText("Search"), {
+      target: { value: bfUri },
+    })
+    fireEvent.click(screen.getByTestId("Submit search"))
+
+    await screen.findByText(bfUri)
+    fireEvent.click(screen.getByRole("button", { name: `Edit ${bfUri}` }))
+
+    await screen.findByText("The Practitioner's Guide to Graph Data", {
+      selector: resourceHeaderSelector,
+    })
+
+    fireEvent.click(screen.getByRole("button", { name: "Export to Catalog" }))
+
+    const modal = await screen.findByRole("dialog")
+    const overlayBtn = within(modal).getByRole("button", {
+      name: "Overlay by Identifier",
+    })
+    expect(overlayBtn).toBeDisabled()
+
+    fireEvent.change(
+      within(modal).getByLabelText(
+        "Overlay existing catalog record with the following local identifier (e.g. HRID)"
+      ),
+      { target: { value: "a123" } }
+    )
+    expect(overlayBtn).toBeEnabled()
+
+    fireEvent.click(overlayBtn)
+    await screen.findByText(
+      `Export of ${bfUri} using identifier a123 requested. You will be notified by email once processed.`
+    )
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
   }, 15000)
 })
 

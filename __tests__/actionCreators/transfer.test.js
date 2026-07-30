@@ -15,28 +15,74 @@ const resourceUri =
   "https://api.development.sinopia.io/resource/7b4c275d-b0c7-40a4-80b3-e95a0d9d987c"
 
 describe("transfer", () => {
-  describe("successful", () => {
-    it("dispatches ADD_SUCCESS with the resource URI", async () => {
-      sinopiaApi.postTransfer = jest.fn().mockResolvedValue()
-      const store = mockStore(createState())
-      await store.dispatch(transfer(resourceUri, undefined, "testerrorkey"))
+  describe("by resource URI", () => {
+    describe("successful", () => {
+      it("dispatches ADD_SUCCESS with the resource URI", async () => {
+        sinopiaApi.postTransfer = jest.fn().mockResolvedValue()
+        const store = mockStore(createState())
+        await store.dispatch(
+          transfer(resourceUri, null, undefined, "testerrorkey")
+        )
 
-      expect(sinopiaApi.postTransfer).toHaveBeenCalledWith(resourceUri, undefined)
-      expect(store.getActions()).toHaveAction("ADD_SUCCESS", {
-        successKey: "testerrorkey",
-        message: `Export of ${resourceUri} requested. You will be notified by email once processed.`,
+        expect(sinopiaApi.postTransfer).toHaveBeenCalledWith(
+          { instance_uri: resourceUri, local_id: null },
+          undefined
+        )
+        expect(store.getActions()).toHaveAction("ADD_SUCCESS", {
+          successKey: "testerrorkey",
+          message: `Export of ${resourceUri} requested. You will be notified by email once processed.`,
+        })
+      })
+    })
+    describe("failure", () => {
+      it("dispatches ADD_ERROR", async () => {
+        sinopiaApi.postTransfer = jest.fn().mockRejectedValue("Ooops!")
+        const store = mockStore(createState())
+        await store.dispatch(
+          transfer(resourceUri, null, undefined, "testerrorkey")
+        )
+
+        expect(store.getActions()).toHaveAction("ADD_ERROR", {
+          errorKey: "testerrorkey",
+          error: "Error requesting transfer: Ooops!",
+        })
       })
     })
   })
-  describe("failure", () => {
-    it("dispatches actions to remove user", async () => {
-      sinopiaApi.postTransfer = jest.fn().mockRejectedValue("Ooops!")
-      const store = mockStore(createState())
-      await store.dispatch(transfer(resourceUri, undefined, "testerrorkey"))
 
-      expect(store.getActions()).toHaveAction("ADD_ERROR", {
-        errorKey: "testerrorkey",
-        error: "Error requesting transfer: Ooops!",
+  describe("by resource URI and local identifier", () => {
+    const localId = "a123"
+
+    describe("successful", () => {
+      it("dispatches ADD_SUCCESS mentioning the identifier", async () => {
+        sinopiaApi.postTransfer = jest.fn().mockResolvedValue()
+        const store = mockStore(createState())
+        await store.dispatch(
+          transfer(resourceUri, localId, undefined, "testerrorkey")
+        )
+
+        expect(sinopiaApi.postTransfer).toHaveBeenCalledWith(
+          { instance_uri: resourceUri, local_id: localId },
+          undefined
+        )
+        expect(store.getActions()).toHaveAction("ADD_SUCCESS", {
+          successKey: "testerrorkey",
+          message: `Export of ${resourceUri} using identifier ${localId} requested. You will be notified by email once processed.`,
+        })
+      })
+    })
+    describe("failure", () => {
+      it("dispatches ADD_ERROR", async () => {
+        sinopiaApi.postTransfer = jest.fn().mockRejectedValue("Ooops!")
+        const store = mockStore(createState())
+        await store.dispatch(
+          transfer(resourceUri, localId, undefined, "testerrorkey")
+        )
+
+        expect(store.getActions()).toHaveAction("ADD_ERROR", {
+          errorKey: "testerrorkey",
+          error: "Error requesting transfer: Ooops!",
+        })
       })
     })
   })
