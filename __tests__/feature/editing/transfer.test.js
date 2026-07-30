@@ -85,7 +85,7 @@ describe("transfer saved bf:Instance when user belongs to a transfer group", () 
 
     fireEvent.change(
       within(modal).getByLabelText(
-        "Overlay existing catalog record with the following local identifier (e.g. HRID)"
+        "Overlay existing catalog record with the following HRID."
       ),
       { target: { value: "a123" } }
     )

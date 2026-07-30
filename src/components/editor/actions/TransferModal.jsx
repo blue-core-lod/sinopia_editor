@@ -45,8 +45,7 @@ const TransferModal = ({ modalName, label, resourceUri, errorKey }) => {
       </div>
       <div>
         <label htmlFor={`transferLocalId-${modalName}`}>
-          Overlay existing catalog record with the following local identifier
-          (e.g. HRID)
+          Overlay existing catalog record with the following HRID.
         </label>
         <div className="d-flex align-items-start">
           <input
