@@ -45,9 +45,12 @@ const templateFilenames = {
   "resourceTemplate:testing:literal": "testing_literal.json",
   "resourceTemplate:testing:uri": "testing_uri.json",
   "resourceTemplate:testing:suppressedUri": "testing_suppressed_uri.json",
+  "resourceTemplate:testing:suppressedUri2": "testing_suppressed_uri2.json",
   "resourceTemplate:testing:inputs": "testing_inputs.json",
   "resourceTemplate:testing:ordered": "testing_ordered.json",
   "resourceTemplate:testing:suppressible": "testing_suppressible.json",
+  "resourceTemplate:testing:suppressibleAmbiguous":
+    "testing_suppressible_ambiguous.json",
   "resourceTemplate:testing:multiplePropertyUris":
     "testing_multiple_property_uris.json",
   "resourceTemplate:testing:suppressLanguage": "testing_suppress_language.json",
@@ -59,6 +62,13 @@ const templateFilenames = {
   "resourceTemplate:testing:multipleClassInputs":
     "testing_multiple_class_inputs.json",
   "resourceTemplate:testing:lookup": "testing_lookups.json",
+  "resourceTemplate:testing:mergeDefaultsHost": "testing_merge_defaults_host.json",
+  "resourceTemplate:testing:mergeDefaultsMatch":
+    "testing_merge_defaults_match.json",
+  "resourceTemplate:testing:mergeDefaultsSibling":
+    "testing_merge_defaults_sibling.json",
+  "resourceTemplate:testing:requiredSingleDefaultHost":
+    "testing_required_single_default_host.json",
 }
 
 export const hasFixtureResource = (uri) => {
