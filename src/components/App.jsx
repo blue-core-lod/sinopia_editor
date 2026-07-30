@@ -92,23 +92,23 @@ const App = (props) => {
           history.push("/dashboard")
         }
       } else if (resourceParam) {
-        dispatch(loadResource(resourceParam, dashboardErrorKey, { keycloak })).then(
-          (result) => {
-            if (!result) {
-              history.push("/dashboard")
-              return
-            }
-            const [, resource] = result
-            if (canEdit(resource)) {
-              dispatch(dispatchResourceForEditor(result, resourceParam))
-              history.push("/editor")
-            } else {
-              dispatch(dispatchResourceForPreview(result))
-              dispatch(showModal("PreviewModal"))
-              history.push("/dashboard")
-            }
+        dispatch(
+          loadResource(resourceParam, dashboardErrorKey, { keycloak })
+        ).then((result) => {
+          if (!result) {
+            history.push("/dashboard")
+            return
           }
-        )
+          const [, resource] = result
+          if (canEdit(resource)) {
+            dispatch(dispatchResourceForEditor(result, resourceParam))
+            history.push("/editor")
+          } else {
+            dispatch(dispatchResourceForPreview(result))
+            dispatch(showModal("PreviewModal"))
+            history.push("/dashboard")
+          }
+        })
       } else if (editorExactMatch) {
         history.push("/dashboard")
       } else if (editorResourceMatch) {

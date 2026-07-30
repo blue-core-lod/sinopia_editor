@@ -3,6 +3,7 @@ import {
   fetchResource,
   postResource,
   putResource,
+  deleteResource,
   getGroups,
   postMarc,
   getMarcJob,
@@ -286,6 +287,32 @@ describe("putResource", () => {
         })
       ).rejects.toThrow("Blue Core API returned Cannot save resource")
     })
+  })
+})
+
+describe("deleteResource", () => {
+  const uri =
+    "https://api.development.sinopia.io/resource/7b4c275d-b0c7-40a4-80b3-e95a0d9d987c"
+  const keycloak = { token: "Secret-Token" }
+
+  it("sends a DELETE request to the resource URI", async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: true })
+    await deleteResource(uri, keycloak)
+    expect(global.fetch).toHaveBeenCalledWith(uri, {
+      method: "DELETE",
+      headers: { Authorization: "Bearer Secret-Token" },
+    })
+  })
+
+  it("errors if delete failed", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      json: jest.fn().mockRejectedValue("Parse error"),
+      statusText: "Not authorized",
+    })
+    await expect(deleteResource(uri, keycloak)).rejects.toThrow(
+      "Blue Core API returned Not authorized"
+    )
   })
 })
 

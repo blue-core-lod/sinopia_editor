@@ -5,6 +5,8 @@ import {
   loadResourceForEditor,
   loadResourceForPreview,
 } from "actionCreators/resources"
+import { deleteResource } from "sinopiaApi"
+import { addError } from "actions/errors"
 import { selectErrors } from "selectors/errors"
 import {
   selectCurrentResourceKey,
@@ -21,7 +23,7 @@ import { useKeycloak } from "../KeycloakContext"
 
 const useResource = (
   errorKey,
-  { resourceTemplateId = null, resourceURI = null }
+  { resourceTemplateId = null, resourceURI = null, onDelete = null }
 ) => {
   const dispatch = useDispatch()
   const history = useHistory()
@@ -85,6 +87,20 @@ const useResource = (
     }
   }
 
+  const handleDelete = (event) => {
+    if (event) event.preventDefault()
+    setStatus("loading delete")
+    deleteResource(resourceURI, keycloak)
+      .then(() => {
+        setStatus("ready")
+        if (onDelete) onDelete()
+      })
+      .catch((err) => {
+        setStatus("ready")
+        dispatch(addError(errorKey, err.toString()))
+      })
+  }
+
   const handleView = (event) => {
     if (event) event.preventDefault()
     if (resourceUriMap[resourceURI]) {
@@ -102,10 +118,12 @@ const useResource = (
   return {
     handleNew,
     handleCopy,
+    handleDelete,
     handleEdit,
     handleView,
     isLoadingNew: status === "loading new",
     isLoadingCopy: status === "loading copy",
+    isLoadingDelete: status === "loading delete",
     isLoadingEdit: status === "loading edit",
     isLoadingView: status === "loading view",
   }

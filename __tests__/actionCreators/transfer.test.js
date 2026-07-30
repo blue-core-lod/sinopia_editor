@@ -21,7 +21,10 @@ describe("transfer", () => {
       const store = mockStore(createState())
       await store.dispatch(transfer(resourceUri, undefined, "testerrorkey"))
 
-      expect(sinopiaApi.postTransfer).toHaveBeenCalledWith(resourceUri, undefined)
+      expect(sinopiaApi.postTransfer).toHaveBeenCalledWith(
+        resourceUri,
+        undefined
+      )
       expect(store.getActions()).toHaveAction("ADD_SUCCESS", {
         successKey: "testerrorkey",
         message: `Export of ${resourceUri} requested. You will be notified by email once processed.`,

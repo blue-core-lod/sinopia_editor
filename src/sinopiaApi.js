@@ -186,6 +186,16 @@ export const putResource = (
     )
   )
 
+export const deleteResource = (uri, keycloak) => {
+  const jwt = getJwt(keycloak)
+  return fetch(uri, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+  }).then((resp) => checkResp(resp))
+}
+
 export const postMarc = (resourceUri, keycloak) => {
   const url = resourceUri.replace("resource", "marc")
   const jwt = getJwt(keycloak)

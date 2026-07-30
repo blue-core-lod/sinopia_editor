@@ -103,7 +103,9 @@ describe("fetchSubjectDetails()", () => {
     expect(result.authoritativeLabel).toBe("Puppets--Political aspects")
     expect(result.componentList).toEqual({
       Description: {
-        first: { resource: "http://id.loc.gov/authorities/subjects/sh85105062" },
+        first: {
+          resource: "http://id.loc.gov/authorities/subjects/sh85105062",
+        },
       },
     })
   })
