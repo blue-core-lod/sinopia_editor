@@ -33,8 +33,13 @@ export const translate = (
   tDir = "r2s",
   capitalize = "no_change",
   options = {}
-) =>
-  fetch(`${Config.scriptShifterUrl}/trans`, {
+) => {
+  if (!text || !text.trim())
+    return Promise.reject(
+      new Error("Field is empty. Please enter a value to transliterate.")
+    )
+
+  return fetch(`${Config.scriptShifterUrl}/trans`, {
     method: "POST",
     headers: {
       accept: "*/*",
@@ -53,3 +58,4 @@ export const translate = (
       )
       throw err
     })
+}

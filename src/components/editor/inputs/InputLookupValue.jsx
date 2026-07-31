@@ -38,6 +38,7 @@ const InputLookupValue = ({
   // currentContent is what appears in the input. Query is sent to Lookup.
   const [query, setQuery] = useState("")
   const [showScriptShifter, setShowScriptShifter] = useState(false)
+  const [scriptShifterError, setScriptShifterError] = useState(null)
   const id = `inputlookup-${value.key}`
   const diacriticsId = `diacritics-${value.key}`
   const diacriticsBtnId = `diacritics-btn-${value.key}`
@@ -73,6 +74,7 @@ const InputLookupValue = ({
 
   const handleCloseScriptShifter = () => {
     setShowScriptShifter(false)
+    setScriptShifterError(null)
     inputRef.current.focus()
   }
 
@@ -226,6 +228,15 @@ const InputLookupValue = ({
           </div>
         </div>
       </div>
+      {scriptShifterError && (
+        <div className="row my-1">
+          <div className="col">
+            <div className="alert alert-danger" role="alert">
+              {scriptShifterError}
+            </div>
+          </div>
+        </div>
+      )}
       <div className="row">
         <DiacriticsSelection
           id={diacriticsId}
@@ -239,6 +250,7 @@ const InputLookupValue = ({
           text={currentContent}
           onTranslate={handleTranslate}
           close={handleCloseScriptShifter}
+          onError={setScriptShifterError}
         />
       </div>
       <ResourceList property={value.property} />

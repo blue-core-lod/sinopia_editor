@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import PropTypes from "prop-types"
 import { languages as fetchLanguages, translate } from "utilities/ScriptShifter"
 
-const ScriptShifterSelection = ({ id, show, text, onTranslate, close }) => {
+const ScriptShifterSelection = ({ id, show, text, onTranslate, close, onError }) => {
   const [langList, setLangList] = useState([])
   const [loading, setLoading] = useState(false)
   const [capitalize, setCapitalize] = useState(false)
@@ -32,7 +32,11 @@ const ScriptShifterSelection = ({ id, show, text, onTranslate, close }) => {
           close()
         }
       })
-      .catch((err) => setError(err.message))
+      .catch((err) => {
+        const msg = err.message
+        setError(msg)
+        if (onError) onError(msg)
+      })
       .finally(() => setTranslating(null))
   }
 
@@ -79,7 +83,6 @@ const ScriptShifterSelection = ({ id, show, text, onTranslate, close }) => {
               Capitalize first letter of transliteration
             </label>
           </div>
-          {error && <div className="alert alert-danger">{error}</div>}
           {loading ? (
             <div className="spinner-border" role="status">
               <span className="visually-hidden">Loading languages...</span>
@@ -147,6 +150,7 @@ ScriptShifterSelection.propTypes = {
   text: PropTypes.string.isRequired,
   onTranslate: PropTypes.func.isRequired,
   close: PropTypes.func.isRequired,
+  onError: PropTypes.func,
 }
 
 export default ScriptShifterSelection

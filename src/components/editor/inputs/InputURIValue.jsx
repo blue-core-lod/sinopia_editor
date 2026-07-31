@@ -36,6 +36,7 @@ const InputURIValue = ({
   const uriId = `inputuri-${value.key}`
   const labelId = `inputuri-label-${value.key}`
   const [showScriptShifter, setShowScriptShifter] = useState(false)
+  const [scriptShifterError, setScriptShifterError] = useState(null)
   const diacriticsId = `diacritics-${value.key}`
   const diacriticsBtnId = `diacritics-btn-${value.key}`
   const scriptShifterId = `script-shifter-${value.key}`
@@ -96,6 +97,7 @@ const InputURIValue = ({
 
   const handleCloseScriptShifter = () => {
     setShowScriptShifter(false)
+    setScriptShifterError(null)
     inputLabelRef.current.focus()
   }
 
@@ -247,6 +249,15 @@ const InputURIValue = ({
               {showLang && <LanguageButton value={value} />}
             </div>
           </div>
+          {scriptShifterError && (
+            <div className="row my-1">
+              <div className="col">
+                <div className="alert alert-danger" role="alert">
+                  {scriptShifterError}
+                </div>
+              </div>
+            </div>
+          )}
           <div className="row">
             <DiacriticsSelection
               id={diacriticsId}
@@ -260,6 +271,7 @@ const InputURIValue = ({
               text={currentLabelContent}
               onTranslate={handleTranslate}
               close={handleCloseScriptShifter}
+              onError={setScriptShifterError}
             />
           </div>
         </React.Fragment>
