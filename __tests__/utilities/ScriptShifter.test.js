@@ -128,5 +128,32 @@ describe("ScriptShifter", () => {
         "Network error"
       )
     })
+
+    it("rejects with a user-friendly message when text is empty", async () => {
+      global.fetch = jest.fn()
+
+      await expect(translate("", "cherokee")).rejects.toThrow(
+        "Field is empty. Please enter a value to transliterate."
+      )
+      expect(global.fetch).not.toHaveBeenCalled()
+    })
+
+    it("rejects with a user-friendly message when text is whitespace", async () => {
+      global.fetch = jest.fn()
+
+      await expect(translate("   ", "cherokee")).rejects.toThrow(
+        "Field is empty. Please enter a value to transliterate."
+      )
+      expect(global.fetch).not.toHaveBeenCalled()
+    })
+
+    it("rejects with a user-friendly message when text is null", async () => {
+      global.fetch = jest.fn()
+
+      await expect(translate(null, "cherokee")).rejects.toThrow(
+        "Field is empty. Please enter a value to transliterate."
+      )
+      expect(global.fetch).not.toHaveBeenCalled()
+    })
   })
 })

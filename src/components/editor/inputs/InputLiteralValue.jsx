@@ -33,6 +33,7 @@ const InputLiteralValue = ({
   const inputLiteralRef = useRef(null)
   const [focusHasBeenSet, setFocusHasBeenSet] = useState(false)
   const [showScriptShifter, setShowScriptShifter] = useState(false)
+  const [scriptShifterError, setScriptShifterError] = useState(null)
   const id = `inputliteral-${value.key}`
   const diacriticsId = `diacritics-${value.key}`
   const diacriticsBtnId = `diacritics-btn-${value.key}`
@@ -83,6 +84,7 @@ const InputLiteralValue = ({
 
   const handleCloseScriptShifter = () => {
     setShowScriptShifter(false)
+    setScriptShifterError(null)
     inputLiteralRef.current.focus()
   }
 
@@ -175,6 +177,15 @@ const InputLiteralValue = ({
           />
         </div>
       </div>
+      {scriptShifterError && (
+        <div className="row my-1">
+          <div className="col">
+            <div className="alert alert-danger" role="alert">
+              {scriptShifterError}
+            </div>
+          </div>
+        </div>
+      )}
       <div className="row">
         <DiacriticsSelection
           id={diacriticsId}
@@ -188,6 +199,7 @@ const InputLiteralValue = ({
           text={currentContent}
           onTranslate={handleTranslate}
           close={handleCloseScriptShifter}
+          onError={setScriptShifterError}
         />
       </div>
       {isLcshAuthLabel && (
