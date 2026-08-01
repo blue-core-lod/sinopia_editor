@@ -131,7 +131,6 @@ class Config {
       "https://id.loc.gov/authorities/subjects/"
     )
   }
-
 }
 
 export default Config

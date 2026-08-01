@@ -15,6 +15,7 @@ import useAlerts from "hooks/useAlerts"
 import { useHistory } from "react-router-dom"
 import { useKeycloak } from "../../KeycloakContext"
 import { getJwt } from "utilities/SinopiaApiHelper"
+import Config from "Config"
 import _ from "lodash"
 
 const prettyXml = (xml) => {
@@ -67,7 +68,7 @@ const LoadByRDFForm = () => {
 
     const reader = new FileReader()
     reader.onload = (e) => {
-      fetch("/api/marc2xml", {
+      fetch(`${Config.sinopiaApiBase}/api/marc2xml`, {
         method: "POST",
         headers: {
           "Content-Type": "application/marc",
@@ -82,7 +83,7 @@ const LoadByRDFForm = () => {
         })
         .then((marcXml) => {
           setMarcText(prettyXml(marcXml))
-          return fetch("/api/marc2bibframe", {
+          return fetch(`${Config.sinopiaApiBase}/api/marc2bibframe`, {
             method: "POST",
             headers: {
               "Content-Type": "application/xml",
@@ -140,7 +141,7 @@ const LoadByRDFForm = () => {
     dispatch(clearErrors(errorKey))
 
     if (isMarcBibframe) {
-      fetch("/api/works", {
+      fetch(`${Config.sinopiaApiBase}/api/works`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -154,7 +155,6 @@ const LoadByRDFForm = () => {
           return resp.json()
         })
         .then((json) => {
-          console.log("/api/works response:", json)
           history.push(`/editor/${json.uuid}`)
         })
         .catch((err) =>

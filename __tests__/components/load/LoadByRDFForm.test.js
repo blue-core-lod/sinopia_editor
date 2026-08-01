@@ -99,7 +99,7 @@ describe("LoadByRDFForm", () => {
       })
 
       // First call: marc2xml
-      expect(fetchMock.mock.calls[0][0]).toBe("/api/marc2xml")
+      expect(fetchMock.mock.calls[0][0]).toBe("http://localhost:3000/api/marc2xml")
       expect(fetchMock.mock.calls[0][1]).toMatchObject({
         method: "POST",
         headers: expect.objectContaining({
@@ -109,7 +109,7 @@ describe("LoadByRDFForm", () => {
       })
 
       // Second call: marc2bibframe
-      expect(fetchMock.mock.calls[1][0]).toBe("/api/marc2bibframe")
+      expect(fetchMock.mock.calls[1][0]).toBe("http://localhost:3000/api/marc2bibframe")
       expect(fetchMock.mock.calls[1][1]).toMatchObject({
         method: "POST",
         headers: expect.objectContaining({
@@ -236,7 +236,7 @@ describe("LoadByRDFForm", () => {
 
       await waitFor(() => {
         expect(global.fetch).toHaveBeenCalledWith(
-          "/api/works",
+          "http://localhost:3000/api/works",
           expect.objectContaining({
             method: "POST",
             headers: expect.objectContaining({
@@ -283,7 +283,7 @@ describe("LoadByRDFForm", () => {
 
       // /api/works should not be called
       expect(global.fetch).not.toHaveBeenCalledWith(
-        "/api/works",
+        "http://localhost:3000/api/works",
         expect.anything()
       )
     })
