@@ -1,4 +1,4 @@
-import { emptyValue } from "utilities/Utilities"
+import { emptyValue, isBlueCoreUri } from "utilities/Utilities"
 import {
   literalRequiredError,
   literalRegexValidationError,
@@ -120,10 +120,14 @@ export const updateResourceLabel = (state, value) => {
 export const updateBibframeRefs = (state, value) => {
   if (!value.uri) return state
   const newSubject = { ...state.subjects[value.rootSubjectKey] }
+  // The BIBFRAME ref buckets below are shown in the relationships display, which
+  // can only fetch and render Blue Core resources. External refs (e.g.
+  // bf:hasItem pointing at id.loc.gov) are omitted.
+  const isBlueCore = isBlueCoreUri(value.uri)
   switch (value.propertyUri) {
     case "http://id.loc.gov/ontologies/bibframe/adminMetadata":
       // References admin metadata
-      addToKeyArray(newSubject, "bfAdminMetadataRefs", value.uri)
+      if (isBlueCore) addToKeyArray(newSubject, "bfAdminMetadataRefs", value.uri)
       break
     case "http://sinopia.io/vocabulary/localAdminMetadataFor":
       // References Sinopia localadmin metadata
@@ -131,19 +135,19 @@ export const updateBibframeRefs = (state, value) => {
       break
     case "http://id.loc.gov/ontologies/bibframe/itemOf":
       // References instance
-      addToKeyArray(newSubject, "bfInstanceRefs", value.uri)
+      if (isBlueCore) addToKeyArray(newSubject, "bfInstanceRefs", value.uri)
       break
     case "http://id.loc.gov/ontologies/bibframe/hasItem":
       // References item
-      addToKeyArray(newSubject, "bfItemRefs", value.uri)
+      if (isBlueCore) addToKeyArray(newSubject, "bfItemRefs", value.uri)
       break
     case "http://id.loc.gov/ontologies/bibframe/instanceOf":
       // References work
-      addToKeyArray(newSubject, "bfWorkRefs", value.uri)
+      if (isBlueCore) addToKeyArray(newSubject, "bfWorkRefs", value.uri)
       break
     case "http://id.loc.gov/ontologies/bibframe/hasInstance":
       // References instance
-      addToKeyArray(newSubject, "bfInstanceRefs", value.uri)
+      if (isBlueCore) addToKeyArray(newSubject, "bfInstanceRefs", value.uri)
       break
     default:
     // Nothing
