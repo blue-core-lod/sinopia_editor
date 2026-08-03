@@ -14,15 +14,25 @@ const TransferModal = ({ modalName, label, resourceUri, errorKey }) => {
 
   const handleLocalIdChange = (event) => setLocalId(event.target.value)
 
+  const closeAndReset = () => {
+    dispatch(hideModal())
+    setLocalId("")
+  }
+
   const handleOverlayClick = (event) => {
     dispatch(transfer(resourceUri, localId.trim(), keycloak, errorKey))
-    dispatch(hideModal())
+    closeAndReset()
     event.preventDefault()
   }
 
   const handleExportClick = (event) => {
     dispatch(transfer(resourceUri, null, keycloak, errorKey))
-    dispatch(hideModal())
+    closeAndReset()
+    event.preventDefault()
+  }
+
+  const handleClose = (event) => {
+    closeAndReset()
     event.preventDefault()
   }
 
@@ -77,6 +87,7 @@ const TransferModal = ({ modalName, label, resourceUri, errorKey }) => {
       body={body}
       ariaLabel={`Export to ${label}`}
       className="transfer-modal"
+      handleClose={handleClose}
     />
   )
 }

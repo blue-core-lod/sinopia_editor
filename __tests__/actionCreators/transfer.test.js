@@ -25,7 +25,7 @@ describe("transfer", () => {
         )
 
         expect(sinopiaApi.postTransfer).toHaveBeenCalledWith(
-          { instance_uri: resourceUri, local_id: null },
+          { instance_uri: resourceUri },
           undefined
         )
         expect(store.getActions()).toHaveAction("ADD_SUCCESS", {
