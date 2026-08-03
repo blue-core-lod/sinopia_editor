@@ -68,7 +68,7 @@ const LoadByRDFForm = () => {
 
     const reader = new FileReader()
     reader.onload = (e) => {
-      fetch(`${Config.sinopiaApiBase}/api/marc2xml`, {
+      fetch(`${Config.sinopiaApiBase}/marc2xml`, {
         method: "POST",
         headers: {
           "Content-Type": "application/marc",
@@ -83,7 +83,7 @@ const LoadByRDFForm = () => {
         })
         .then((marcXml) => {
           setMarcText(prettyXml(marcXml))
-          return fetch(`${Config.sinopiaApiBase}/api/marc2bibframe`, {
+          return fetch(`${Config.sinopiaApiBase}/marc2bibframe`, {
             method: "POST",
             headers: {
               "Content-Type": "application/xml",
@@ -141,7 +141,7 @@ const LoadByRDFForm = () => {
     dispatch(clearErrors(errorKey))
 
     if (isMarcBibframe) {
-      fetch(`${Config.sinopiaApiBase}/api/works`, {
+      fetch(`${Config.sinopiaApiBase}/works`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
