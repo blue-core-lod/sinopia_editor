@@ -2,15 +2,16 @@ import { postTransfer } from "../sinopiaApi"
 import { addError, addSuccess } from "actions/errors"
 
 export const transfer =
-  (resourceUri, keycloak, errorKey) => (dispatch) => {
-    return postTransfer(resourceUri, keycloak)
+  (resourceUri, localId, keycloak, errorKey) => (dispatch) => {
+    const body = { instance_uri: resourceUri }
+    if (localId) body.local_id = localId
+
+    return postTransfer(body, keycloak)
       .then(() => {
-        dispatch(
-          addSuccess(
-            errorKey,
-            `Export of ${resourceUri} requested. You will be notified by email once processed.`
-          )
-        )
+        const message = localId
+          ? `Export of ${resourceUri} using identifier ${localId} requested. You will be notified by email once processed.`
+          : `Export of ${resourceUri} requested. You will be notified by email once processed.`
+        dispatch(addSuccess(errorKey, message))
       })
       .catch((err) => {
         dispatch(

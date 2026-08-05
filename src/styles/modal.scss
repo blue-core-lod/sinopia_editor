@@ -38,3 +38,18 @@
     width: 75vw;
   }
 }
+
+.transfer-modal {
+  .transfer-local-id-input {
+    max-width: 10rem;
+  }
+
+  .btn-transfer {
+    @include button-variant(
+      $bluecore-header,
+      $bluecore-header,
+      $hover-background: $orient,
+      $hover-border: $orient
+    );
+  }
+}
