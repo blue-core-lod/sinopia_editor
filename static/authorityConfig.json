@@ -746,7 +746,7 @@
     "nonldLookup": true
   },
   {
-    "label": "LOC Resource Compontents (QA) - direct",
+    "label": "LOC Resource Components (QA) - direct",
     "uri": "urn:ld4p:qa:loc:resourceComponents",
     "authority": "loc",
     "subauthority": "resourceComponents",
@@ -1803,6 +1803,11 @@
   {
     "label": "variant title type",
     "uri": "https://id.loc.gov/vocabulary/vartitletype",
+    "component": "list"
+  },
+  {
+    "label": "LOC Resource Components",
+    "uri": "https://id.loc.gov/vocabulary/resourceComponents",
     "component": "list"
   },
   {
