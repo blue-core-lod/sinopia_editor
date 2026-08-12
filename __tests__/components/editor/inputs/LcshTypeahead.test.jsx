@@ -2,11 +2,11 @@ import React from "react"
 import { render, screen, fireEvent, act } from "@testing-library/react"
 import LcshTypeahead from "components/editor/inputs/LcshTypeahead"
 
-jest.mock("utilities/LocSuggest")
-jest.mock("utilities/LocSubjectDetails")
-
 import suggest from "utilities/LocSuggest"
 import fetchSubjectDetails from "utilities/LocSubjectDetails"
+
+jest.mock("utilities/LocSuggest")
+jest.mock("utilities/LocSubjectDetails")
 
 const simpleHit = {
   aLabel: "Agricultural economics",
@@ -30,7 +30,9 @@ describe("<LcshTypeahead />", () => {
   beforeEach(() => {
     jest.useFakeTimers()
     suggest.mockResolvedValue({ hits: [] })
-    fetchSubjectDetails.mockResolvedValue({ authoritativeLabel: "Mocked label" })
+    fetchSubjectDetails.mockResolvedValue({
+      authoritativeLabel: "Mocked label",
+    })
   })
 
   afterEach(() => {
@@ -96,7 +98,9 @@ describe("<LcshTypeahead />", () => {
 
     expect(screen.getByText("Simple")).toBeInTheDocument()
     // suggestLabel appears in the result list button
-    expect(screen.getAllByText(simpleHit.suggestLabel).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(simpleHit.suggestLabel).length).toBeGreaterThan(
+      0
+    )
   })
 
   it("renders LCNAF and Complex groups when those hits exist", async () => {

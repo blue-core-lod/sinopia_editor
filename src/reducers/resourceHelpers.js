@@ -127,7 +127,8 @@ export const updateBibframeRefs = (state, value) => {
   switch (value.propertyUri) {
     case "http://id.loc.gov/ontologies/bibframe/adminMetadata":
       // References admin metadata
-      if (isBlueCore) addToKeyArray(newSubject, "bfAdminMetadataRefs", value.uri)
+      if (isBlueCore)
+        addToKeyArray(newSubject, "bfAdminMetadataRefs", value.uri)
       break
     case "http://sinopia.io/vocabulary/localAdminMetadataFor":
       // References Sinopia localadmin metadata

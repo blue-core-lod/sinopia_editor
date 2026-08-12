@@ -207,7 +207,6 @@ describe("searching and preview a resource", () => {
       jest
         .spyOn(sinopiaSearch, "getSearchResultsWithFacets")
         .mockResolvedValue(resourceSearchResults(uri))
-
     })
 
     it("renders a modal without edit controls but with MARC button and Export button", async () => {

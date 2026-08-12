@@ -11,7 +11,6 @@ jest.mock("KeycloakContext", () => ({
 featureSetup()
 
 describe("loading saved resource", () => {
-
   describe("when RDF", () => {
     it("opens the resource", async () => {
       const uri =

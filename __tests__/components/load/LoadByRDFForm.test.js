@@ -1,7 +1,11 @@
 import React from "react"
 import { fireEvent, screen, waitFor } from "@testing-library/react"
 import LoadByRDFForm from "components/load/LoadByRDFForm"
-import { renderComponent, createStore, createHistory } from "../../../__tests__/testUtilities/testUtils"
+import {
+  renderComponent,
+  createStore,
+  createHistory,
+} from "../../testUtilities/testUtils"
 import { createState } from "stateUtils"
 
 // Mock KeycloakContext with a token so getJwt works
@@ -37,7 +41,9 @@ describe("LoadByRDFForm", () => {
       expect(screen.getByText("Choose MARC file")).toBeInTheDocument()
       expect(screen.getByText("MARCXML output")).toBeInTheDocument()
       expect(
-        screen.getByPlaceholderText("Upload a .mrc file above to convert to MARCXML.")
+        screen.getByPlaceholderText(
+          "Upload a .mrc file above to convert to MARCXML."
+        )
       ).toBeInTheDocument()
     })
 
@@ -73,7 +79,8 @@ describe("LoadByRDFForm", () => {
         text: jest.fn().mockResolvedValue(rdfText),
       }
 
-      global.fetch = jest.fn()
+      global.fetch = jest
+        .fn()
         .mockResolvedValueOnce(marc2xmlResp)
         .mockResolvedValueOnce(marc2bibframeResp)
 
@@ -109,7 +116,9 @@ describe("LoadByRDFForm", () => {
       })
 
       // Second call: marc2bibframe
-      expect(fetchMock.mock.calls[1][0]).toBe("http://localhost:3000/marc2bibframe")
+      expect(fetchMock.mock.calls[1][0]).toBe(
+        "http://localhost:3000/marc2bibframe"
+      )
       expect(fetchMock.mock.calls[1][1]).toMatchObject({
         method: "POST",
         headers: expect.objectContaining({
@@ -198,7 +207,8 @@ describe("LoadByRDFForm", () => {
     const rdfText = "<rdf:RDF>bibframe rdf</rdf:RDF>"
 
     const setupMarcConversion = async () => {
-      global.fetch = jest.fn()
+      global.fetch = jest
+        .fn()
         .mockResolvedValueOnce({
           ok: true,
           text: jest.fn().mockResolvedValue(marcXml),
