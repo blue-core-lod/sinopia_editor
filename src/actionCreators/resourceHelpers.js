@@ -497,7 +497,13 @@ const newNestedResourceFromObject =
       ).then((suppressibleRtId) => {
         if (!suppressibleRtId) return null
         return dispatch(
-          recursiveResourceFromDataset(obj, null, suppressibleRtId, true, context)
+          recursiveResourceFromDataset(
+            obj,
+            null,
+            suppressibleRtId,
+            true,
+            context
+          )
         ).then((subject) => newValueSubject(property, propertyUri, subject))
       })
     })
@@ -714,12 +720,6 @@ const newValueCopy = (valueKey, property) => (dispatch, getState) => {
   newValue.key = nanoid()
   newValue.propertyKey = property.key
   newValue.valueSubject = null
-
-  if (value.valueSubject) {
-    return dispatch(newSubjectCopy(value.valueSubject.key, newValue)).then(
-      () => newValue
-    )
-  }
 
   return newValue
 }
