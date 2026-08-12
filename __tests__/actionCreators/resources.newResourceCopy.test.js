@@ -61,4 +61,31 @@ describe("newResourceCopy", () => {
       })
     })
   })
+
+  describe("copying a resource with a nested resource", () => {
+    const store = mockStore(
+      createState({ hasResourceWithNestedResource: true })
+    )
+
+    it("does not copy the nested valueSubject", async () => {
+      await store.dispatch(newResourceCopy("ljAblGiBW"))
+
+      const actions = store.getActions()
+      const addSubjectAction = actions.find(
+        (action) => action.type === "ADD_SUBJECT"
+      )
+
+      // The copied resource should have the property
+      const copiedResource = addSubjectAction.payload
+      expect(copiedResource.properties).toHaveLength(1)
+
+      // The property should have values
+      const property = copiedResource.properties[0]
+      expect(property.values).toHaveLength(1)
+
+      // The value should NOT have a copied valueSubject
+      const value = property.values[0]
+      expect(value.valueSubject).toBeNull()
+    })
+  })
 })
