@@ -1,6 +1,6 @@
 import React from "react"
 import { createStore, renderComponent } from "testUtils"
-import { screen, fireEvent } from "@testing-library/react"
+import { screen } from "@testing-library/react"
 import { createState } from "stateUtils"
 import NestedResourceActionButtons from "components/editor/property/NestedResourceActionButtons"
 
@@ -18,7 +18,7 @@ jest.mock("keycloak-js", () => {
     },
   }
 
-  return jest.fn().mockImplementation((config) => {
+  return jest.fn().mockImplementation(() => {
     return mockKeycloak
   })
 })
@@ -29,7 +29,7 @@ describe("<NestedResourceActionButtons />", () => {
     const store = createStore(state)
 
     // Value "VDOeQCnFA8" is a subject value in the nested resource fixture
-    const value = state.entities.values["VDOeQCnFA8"]
+    const value = state.entities.values.VDOeQCnFA8
 
     renderComponent(<NestedResourceActionButtons value={value} />, store)
 
