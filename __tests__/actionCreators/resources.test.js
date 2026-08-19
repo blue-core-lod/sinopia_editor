@@ -1,6 +1,7 @@
 import {
   expandProperty,
   addSiblingValueSubject,
+  resetValueSubject,
   saveNewResource,
   saveResource,
   contractProperty,
@@ -102,6 +103,42 @@ describe("addSiblingValueSubject", () => {
 
     const addValueAction = actions.find((action) => action.type === "ADD_VALUE")
     expect(safeAction(addValueAction)).toEqual(expectedAddSiblingAddValueAction)
+  })
+})
+
+describe("resetValueSubject", () => {
+  const store = mockStore(createState({ hasResourceWithNestedResource: true }))
+
+  it("dispatches ADD_VALUE then REMOVE_VALUE", async () => {
+    await store.dispatch(resetValueSubject("VDOeQCnFA8", "testerrorkey"))
+
+    const actions = store.getActions()
+
+    // Should add a new blank value
+    const addAction = actions.find((action) => action.type === "ADD_VALUE")
+    expect(addAction).toBeTruthy()
+
+    // The new value should use the old value's key as siblingValueKey for positioning
+    expect(addAction.payload.siblingValueKey).toBe("VDOeQCnFA8")
+
+    // The new value should have a blank valueSubject with the same template
+    const newValue = addAction.payload.value
+    expect(newValue.valueSubject).toBeTruthy()
+    expect(newValue.valueSubject.subjectTemplate.id).toBe(
+      "resourceTemplate:testing:uber2"
+    )
+
+    // Should remove the old value
+    const removeAction = actions.find(
+      (action) => action.type === "REMOVE_VALUE"
+    )
+    expect(removeAction).toBeTruthy()
+    expect(removeAction.payload).toBe("VDOeQCnFA8")
+
+    // ADD_VALUE must come before REMOVE_VALUE to preserve ordering
+    const addIndex = actions.indexOf(addAction)
+    const removeIndex = actions.indexOf(removeAction)
+    expect(addIndex).toBeLessThan(removeIndex)
   })
 })
 

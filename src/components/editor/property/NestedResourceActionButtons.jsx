@@ -8,13 +8,17 @@ import {
   faTrashAlt,
   faArrowUp,
   faArrowDown,
+  faEraser,
 } from "@fortawesome/free-solid-svg-icons"
 import { selectNormProperty, selectSiblingValues } from "selectors/resources"
 import {
   selectSubjectTemplateForSubject,
   selectPropertyTemplate,
 } from "selectors/templates"
-import { addSiblingValueSubject } from "actionCreators/resources"
+import {
+  addSiblingValueSubject,
+  resetValueSubject,
+} from "actionCreators/resources"
 import {
   removeValue as removeValueAction,
   setValueOrder,
@@ -71,6 +75,11 @@ const NestedResourceActionButtons = ({ value }) => {
     event.preventDefault()
   }
 
+  const resetValue = (event) => {
+    event.preventDefault()
+    dispatch(resetValueSubject(value.key, errorKey))
+  }
+
   return (
     <div className="btn-group pull-right" role="group">
       {showAddButton && (
@@ -83,6 +92,14 @@ const NestedResourceActionButtons = ({ value }) => {
           + Add another {subjectTemplate.label}
         </button>
       )}
+      <button
+        className="btn btn-sm btn-nested-resource"
+        aria-label={`Reset ${subjectTemplate.label}`}
+        data-testid={`Reset ${subjectTemplate.label}`}
+        onClick={resetValue}
+      >
+        <FontAwesomeIcon icon={faEraser} />
+      </button>
       {showRemoveButton && (
         <button
           className="btn btn-sm btn-remove-another btn-nested-resource"

@@ -6,6 +6,7 @@ import {
   clearPendingResourceTemplateSelection,
   addProperty as addPropertyAction,
   addValue as addValueAction,
+  removeValue as removeValueAction,
   updateLiteralValue,
   addSubject as addSubjectAction,
   showProperty,
@@ -509,6 +510,30 @@ export const addSiblingValueSubject =
           return dispatch(addValueAction(newValue, valueKey))
         }
       )
+    )
+  }
+
+/**
+ * A thunk that resets a nested resource value to a fresh blank subject of the same template.
+ */
+export const resetValueSubject =
+  (valueKey, errorKey) => (dispatch, getState) => {
+    const value = selectValue(getState(), valueKey)
+    const templateId = value.valueSubject.subjectTemplate.id
+    return dispatch(newSubject(null, templateId, {}, errorKey)).then(
+      (subject) =>
+        dispatch(newPropertiesFromTemplates(subject, false, errorKey)).then(
+          (properties) => {
+            subject.properties = properties
+            const newValue = newValueSubject(
+              value.property,
+              value.propertyUri,
+              subject
+            )
+            dispatch(addValueAction(newValue, valueKey))
+            dispatch(removeValueAction(valueKey))
+          }
+        )
     )
   }
 
