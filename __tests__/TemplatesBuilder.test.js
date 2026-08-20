@@ -367,4 +367,40 @@ _:b5_c14n2 <http://www.w3.org/2000/01/rdf-schema#label> "URI1"@en .`
       })
     )
   })
+
+  it("builds distinct keys for property templates sharing a propertyURI but differing in type", async () => {
+    const rdf = `<> <http://sinopia.io/vocabulary/hasClass> <http://id.loc.gov/ontologies/bibframe/Uber1> .
+<> <http://sinopia.io/vocabulary/hasPropertyTemplate> _:b1_c14n1 .
+<> <http://sinopia.io/vocabulary/hasPropertyTemplate> _:b1_c14n2 .
+<> <http://sinopia.io/vocabulary/hasResourceId> <resourceTemplate:testing:uber1> .
+<> <http://sinopia.io/vocabulary/hasResourceTemplate> "sinopia:template:resource" .
+<> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/vocabulary/ResourceTemplate> .
+<> <http://www.w3.org/2000/01/rdf-schema#label> "Uber template1"@en .
+<http://sinopia.io/vocabulary/propertyType/literal> <http://www.w3.org/2000/01/rdf-schema#label> "literal" .
+<http://sinopia.io/vocabulary/propertyType/uri> <http://www.w3.org/2000/01/rdf-schema#label> "uri" .
+_:b1_c14n1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> _:b2_c14n0 .
+_:b1_c14n1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:b1_c14n2 .
+_:b1_c14n2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> _:b3_c14n0 .
+_:b1_c14n2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+_:b2_c14n0 <http://sinopia.io/vocabulary/hasPropertyType> <http://sinopia.io/vocabulary/propertyType/literal> .
+_:b2_c14n0 <http://sinopia.io/vocabulary/hasPropertyUri> <http://id.loc.gov/ontologies/bibframe/uber/template1/property1> .
+_:b2_c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/vocabulary/PropertyTemplate> .
+_:b2_c14n0 <http://www.w3.org/2000/01/rdf-schema#label> "Uber template1, property1 (literal)"@en .
+_:b3_c14n0 <http://sinopia.io/vocabulary/hasPropertyType> <http://sinopia.io/vocabulary/propertyType/uri> .
+_:b3_c14n0 <http://sinopia.io/vocabulary/hasPropertyUri> <http://id.loc.gov/ontologies/bibframe/uber/template1/property1> .
+_:b3_c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/vocabulary/PropertyTemplate> .
+_:b3_c14n0 <http://www.w3.org/2000/01/rdf-schema#label> "Uber template1, property1 (uri)"@en .`
+    const dataset = await datasetFromN3(rdf)
+    const subjectTemplate = new TemplatesBuilder(dataset, "").build()
+
+    expect(subjectTemplate.propertyTemplates).toHaveLength(2)
+    const [literalTemplate, uriTemplate] = subjectTemplate.propertyTemplates
+    expect(literalTemplate.type).toBe("literal")
+    expect(uriTemplate.type).toBe("uri")
+    expect(literalTemplate.key).not.toEqual(uriTemplate.key)
+    expect(subjectTemplate.propertyTemplateKeys).toEqual([
+      literalTemplate.key,
+      uriTemplate.key,
+    ])
+  })
 })
