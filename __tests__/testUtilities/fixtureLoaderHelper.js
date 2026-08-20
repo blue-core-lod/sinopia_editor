@@ -62,7 +62,8 @@ const templateFilenames = {
   "resourceTemplate:testing:multipleClassInputs":
     "testing_multiple_class_inputs.json",
   "resourceTemplate:testing:lookup": "testing_lookups.json",
-  "resourceTemplate:testing:mergeDefaultsHost": "testing_merge_defaults_host.json",
+  "resourceTemplate:testing:mergeDefaultsHost":
+    "testing_merge_defaults_host.json",
   "resourceTemplate:testing:mergeDefaultsMatch":
     "testing_merge_defaults_match.json",
   "resourceTemplate:testing:mergeDefaultsSibling":

@@ -15,6 +15,12 @@ import { clearErrors, addError } from "actions/errors"
 import { fetchResource } from "sinopiaApi"
 import { findRootResourceTemplateId } from "utilities/Utilities"
 
+// Work-Instance relationship property URIs to exclude when copying resources
+const skipPropertyUris = [
+  "http://id.loc.gov/ontologies/bibframe/hasInstance",
+  "http://id.loc.gov/ontologies/bibframe/instanceOf",
+]
+
 /**
  * Helper methods that should only be used in 'actionCreators/resources'
  */
@@ -112,6 +118,13 @@ export const addResourceFromDataset =
       if (asNewResource) {
         newResource.group = null
         newResource.editGroups = []
+        // Strip Work-Instance relationship properties from copy
+        newResource.properties = newResource.properties.filter(
+          (property) =>
+            !Object.keys(property.propertyTemplate?.uris || {}).some((uri) =>
+              skipPropertyUris.includes(uri)
+            )
+        )
       }
 
       dispatch(addSubjectAction(newResource))
@@ -497,7 +510,13 @@ const newNestedResourceFromObject =
       ).then((suppressibleRtId) => {
         if (!suppressibleRtId) return null
         return dispatch(
-          recursiveResourceFromDataset(obj, null, suppressibleRtId, true, context)
+          recursiveResourceFromDataset(
+            obj,
+            null,
+            suppressibleRtId,
+            true,
+            context
+          )
         ).then((subject) => newValueSubject(property, propertyUri, subject))
       })
     })
@@ -673,6 +692,13 @@ export const newSubjectCopy = (subjectKey, value) => (dispatch, getState) => {
 
 const newPropertyCopy = (propertyKey, subject) => (dispatch, getState) => {
   const property = selectProperty(getState(), propertyKey)
+
+  // Skip Work-Instance relationship properties
+  const templateUris = Object.keys(property.propertyTemplate?.uris || {})
+  if (templateUris.some((uri) => skipPropertyUris.includes(uri))) {
+    return Promise.resolve(null)
+  }
+
   const newProperty = _.pick(property, [
     "propertyTemplate",
     "propertyUri",
@@ -714,12 +740,6 @@ const newValueCopy = (valueKey, property) => (dispatch, getState) => {
   newValue.key = nanoid()
   newValue.propertyKey = property.key
   newValue.valueSubject = null
-
-  if (value.valueSubject) {
-    return dispatch(newSubjectCopy(value.valueSubject.key, newValue)).then(
-      () => newValue
-    )
-  }
 
   return newValue
 }

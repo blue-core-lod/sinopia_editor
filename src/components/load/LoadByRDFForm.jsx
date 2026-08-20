@@ -37,7 +37,9 @@ const prettyXml = (xml) => {
     if (children.length === 0) return `${indent}<${tag}${attrs}/>`
     if (children.length === 1 && !children[0].includes("\n"))
       return `${indent}<${tag}${attrs}>${children[0].trim()}</${tag}>`
-    return `${indent}<${tag}${attrs}>\n${children.join("\n")}\n${indent}</${tag}>`
+    return `${indent}<${tag}${attrs}>\n${children.join(
+      "\n"
+    )}\n${indent}</${tag}>`
   }
   const root = doc.documentElement
   return `<?xml version="1.0" encoding="UTF-8"?>\n${serialize(root, 0)}`
@@ -103,10 +105,7 @@ const LoadByRDFForm = () => {
         })
         .catch((err) =>
           dispatch(
-            addError(
-              errorKey,
-              `Error converting MARC: ${err.message || err}`
-            )
+            addError(errorKey, `Error converting MARC: ${err.message || err}`)
           )
         )
         .finally(() => setIsConvertingMarc(false))
@@ -158,7 +157,9 @@ const LoadByRDFForm = () => {
           history.push(`/editor/${json.uuid}`)
         })
         .catch((err) =>
-          dispatch(addError(errorKey, `Error creating work: ${err.message || err}`))
+          dispatch(
+            addError(errorKey, `Error creating work: ${err.message || err}`)
+          )
         )
       return
     }

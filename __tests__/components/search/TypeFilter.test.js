@@ -26,7 +26,9 @@ jest.mock("keycloak-js", () => {
 })
 
 jest.mock("KeycloakContext", () => ({
-  useKeycloak: jest.fn().mockReturnValue({ keycloak: { token: "Secret-Token" } }),
+  useKeycloak: jest
+    .fn()
+    .mockReturnValue({ keycloak: { token: "Secret-Token" } }),
 }))
 
 /* eslint-disable testing-library/no-node-access */
@@ -114,17 +116,21 @@ describe("<TypeFilter />", () => {
       expect(document.querySelector(".show")).not.toBeInTheDocument()
     )
 
-    expect(mockGetSearchResults).toHaveBeenCalledWith("twain", {
-      resultsPerPage: 10,
-      startOfRange: 0,
-      sortField: undefined,
-      sortOrder: undefined,
-      typeFilter: [
-        "http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle",
-        "http://id.loc.gov/ontologies/bibframe/Barcode",
-        "http://id.loc.gov/ontologies/bibframe/Chronology",
-      ],
-    }, { token: "Secret-Token" })
+    expect(mockGetSearchResults).toHaveBeenCalledWith(
+      "twain",
+      {
+        resultsPerPage: 10,
+        startOfRange: 0,
+        sortField: undefined,
+        sortOrder: undefined,
+        typeFilter: [
+          "http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle",
+          "http://id.loc.gov/ontologies/bibframe/Barcode",
+          "http://id.loc.gov/ontologies/bibframe/Chronology",
+        ],
+      },
+      { token: "Secret-Token" }
+    )
   })
 
   it("allows selecting / deselecting all", async () => {
@@ -179,13 +185,17 @@ describe("<TypeFilter />", () => {
     fireEvent.click(screen.getByText("Filter by class"))
     fireEvent.click(screen.getByText("Clear filter"))
 
-    expect(mockGetSearchResults).toHaveBeenLastCalledWith("twain", {
-      resultsPerPage: 10,
-      startOfRange: 0,
-      sortField: undefined,
-      sortOrder: undefined,
-      typeFilter: null,
-    }, { token: "Secret-Token" })
+    expect(mockGetSearchResults).toHaveBeenLastCalledWith(
+      "twain",
+      {
+        resultsPerPage: 10,
+        startOfRange: 0,
+        sortField: undefined,
+        sortOrder: undefined,
+        typeFilter: null,
+      },
+      { token: "Secret-Token" }
+    )
   })
 
   it("allows reselecting cleared filters before using them", async () => {

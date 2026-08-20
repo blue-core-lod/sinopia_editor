@@ -432,12 +432,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     it("does not apply the unmatched sibling template's default value", async () => {
       const dataset = await datasetFromN3(mergeDefaultsN3)
       const result = await store.dispatch(
-        newResourceFromDataset(
-          dataset,
-          mergeDefaultsUri,
-          null,
-          "testerrorkey"
-        )
+        newResourceFromDataset(dataset, mergeDefaultsUri, null, "testerrorkey")
       )
       expect(result).toBe(true)
 
@@ -527,7 +522,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       // The core reference is preserved either way -- this only documents
       // the known asymmetry with a genuinely Sinopia-authored round-trip.
       expect(actualRdf).not.toMatch(
-        '<http://foo/bar> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'
+        "<http://foo/bar> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"
       )
     })
   })

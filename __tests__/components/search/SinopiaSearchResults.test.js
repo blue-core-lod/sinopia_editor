@@ -17,7 +17,9 @@ describe("<SinopiaSearchResults />", () => {
       expect(
         screen.queryByTestId("sinopia-search-results")
       ).not.toBeInTheDocument()
-      expect(screen.queryByText("Class", { selector: "th" })).not.toBeInTheDocument()
+      expect(
+        screen.queryByText("Class", { selector: "th" })
+      ).not.toBeInTheDocument()
     })
   })
 

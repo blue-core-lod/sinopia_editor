@@ -2,7 +2,14 @@ import React, { useState, useEffect } from "react"
 import PropTypes from "prop-types"
 import { languages as fetchLanguages, translate } from "utilities/ScriptShifter"
 
-const ScriptShifterSelection = ({ id, show, text, onTranslate, close, onError }) => {
+const ScriptShifterSelection = ({
+  id,
+  show,
+  text,
+  onTranslate,
+  close,
+  onError,
+}) => {
   const [langList, setLangList] = useState([])
   const [loading, setLoading] = useState(false)
   const [capitalize, setCapitalize] = useState(false)
@@ -25,7 +32,12 @@ const ScriptShifterSelection = ({ id, show, text, onTranslate, close, onError })
 
   const handleTranslate = (lang, tDir) => {
     setTranslating(`${lang.id}-${tDir}`)
-    translate(text, lang.id, tDir, capitalize ? "capitalize_first" : "no_change")
+    translate(
+      text,
+      lang.id,
+      tDir,
+      capitalize ? "capitalize_first" : "no_change"
+    )
       .then((result) => {
         if (result?.output) {
           onTranslate(result.output, lang.marc_code)

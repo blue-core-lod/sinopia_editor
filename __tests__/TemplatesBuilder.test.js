@@ -298,7 +298,9 @@ _:b4_c14n1 <http://www.w3.org/2000/01/rdf-schema#label> "Uber template1, propert
     const subjectTemplate = new TemplatesBuilder(dataset, "").build()
     expect(
       subjectTemplate.propertyTemplates[0].valueSubjectTemplateKeys
-    ).toEqual(["https://dev.bcld.info/profiles/5f862f31-6f1a-469c-ba66-f3cea0bc6599"])
+    ).toEqual([
+      "https://dev.bcld.info/profiles/5f862f31-6f1a-469c-ba66-f3cea0bc6599",
+    ])
   })
 
   it("builds lookup property template", async () => {

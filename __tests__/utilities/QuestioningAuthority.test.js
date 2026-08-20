@@ -170,8 +170,7 @@ describe("getTerm", () => {
     expect(term).toBe("n3")
 
     expect(global.fetch).toHaveBeenCalledTimes(1)
-    const url =
-      "/api/qa/authorities/show/discogs/master/132553?format=n3"
+    const url = "/api/qa/authorities/show/discogs/master/132553?format=n3"
     expect(global.fetch).toHaveBeenCalledWith(url)
   })
 })

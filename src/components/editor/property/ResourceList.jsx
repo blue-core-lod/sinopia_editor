@@ -42,9 +42,7 @@ const ResourceList = (props) => {
     let isMounted = true
     const handleChange = (resourceTemplateId, event) => {
       event.preventDefault()
-      dispatch(
-        newResource(resourceTemplateId, errorKey, false, keycloak)
-      ).then(
+      dispatch(newResource(resourceTemplateId, errorKey, false, keycloak)).then(
         (resourceKey) => {
           if (resourceKey && mainTitleValue) {
             dispatch(addMainTitle(resourceKey, mainTitleValue))

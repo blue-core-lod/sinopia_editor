@@ -167,9 +167,9 @@ describe("Utilities", () => {
     })
 
     it("is false for an external URI", () => {
-      expect(
-        isBlueCoreUri("http://id.loc.gov/resources/items/14300125")
-      ).toBe(false)
+      expect(isBlueCoreUri("http://id.loc.gov/resources/items/14300125")).toBe(
+        false
+      )
     })
 
     it("is false for a non-URI value", () => {

@@ -5,6 +5,9 @@ import configureMockStore from "redux-mock-store"
 import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 
+import InputLiteralValue from "components/editor/inputs/InputLiteralValue"
+import LcshTypeahead from "components/editor/inputs/LcshTypeahead"
+
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
 }))
@@ -14,9 +17,6 @@ jest.mock("components/editor/inputs/LcshTypeahead", () => ({
   __esModule: true,
   default: jest.fn(),
 }))
-
-import InputLiteralValue from "components/editor/inputs/InputLiteralValue"
-import LcshTypeahead from "components/editor/inputs/LcshTypeahead"
 
 const mockStore = configureMockStore([thunk])
 
