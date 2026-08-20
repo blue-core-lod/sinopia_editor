@@ -15,7 +15,7 @@ describe("selectSubjectAndPropertyTemplates()", () => {
     )
     expect(subjectTemplate).toBeSubjectTemplate("ld4p:RT:bf2:Title:AbbrTitle")
     expect(subjectTemplate.propertyTemplates).toBePropertyTemplates([
-      "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle",
+      "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal",
     ])
   })
 })

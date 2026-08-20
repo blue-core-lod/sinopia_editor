@@ -59,6 +59,9 @@ export default class StateResourceBuilder {
   }) {
     assertProps({ subjectTemplateKey, label, uris, type, component })
     let key = `${subjectTemplateKey} > ${Object.keys(uris).join(", ")}`
+    if (type === "literal") key = `${key} > literal`
+    else if (!_.isEmpty(authorities)) key = `${key} > lookup`
+    else if (type === "uri") key = `${key} > uri`
     if (!_.isEmpty(valueSubjectTemplateKeys))
       key = `${key} > ${valueSubjectTemplateKeys.join(", ")}`
     return {

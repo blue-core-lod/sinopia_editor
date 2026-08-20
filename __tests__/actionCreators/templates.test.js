@@ -24,7 +24,7 @@ describe("loadResourceTemplate()", () => {
       expect(subjectTemplate).toBeSubjectTemplate("ld4p:RT:bf2:Title:AbbrTitle")
       expect(subjectTemplate.propertyTemplates).toHaveLength(1)
       expect(subjectTemplate.propertyTemplates[0]).toBePropertyTemplate(
-        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle"
+        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal"
       )
 
       expect(store.getActions()).toEqual([
@@ -46,7 +46,7 @@ describe("loadResourceTemplate()", () => {
       expect(subjectTemplate).toBeSubjectTemplate("ld4p:RT:bf2:Title:AbbrTitle")
       expect(subjectTemplate.propertyTemplates).toHaveLength(1)
       expect(subjectTemplate.propertyTemplates[0]).toBePropertyTemplate(
-        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle"
+        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal"
       )
 
       expect(store.getActions()).toHaveLength(0)

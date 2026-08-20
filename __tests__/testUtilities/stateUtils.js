@@ -682,7 +682,7 @@ const buildResourceWithNestedResource = (state, options) => {
       remark:
         "Template for testing purposes with single repeatable literal with a link to Stanford at https://www.stanford.edu",
       propertyTemplateKeys: [
-        "resourceTemplate:testing:uber2 > http://id.loc.gov/ontologies/bibframe/uber/template2/property1",
+        "resourceTemplate:testing:uber2 > http://id.loc.gov/ontologies/bibframe/uber/template2/property1 > literal",
       ],
     }),
   }
@@ -702,9 +702,9 @@ const buildResourceWithNestedResource = (state, options) => {
         component: "InputURI",
         valueSubjectTemplateKeys: ["resourceTemplate:testing:uber2"],
       }),
-    "resourceTemplate:testing:uber2 > http://id.loc.gov/ontologies/bibframe/uber/template2/property1":
+    "resourceTemplate:testing:uber2 > http://id.loc.gov/ontologies/bibframe/uber/template2/property1 > literal":
       build.propertyTemplate({
-        key: "resourceTemplate:testing:uber2 > http://id.loc.gov/ontologies/bibframe/uber/template2/property1",
+        key: "resourceTemplate:testing:uber2 > http://id.loc.gov/ontologies/bibframe/uber/template2/property1 > literal",
         subjectTemplateKey: "resourceTemplate:testing:uber2",
         label: "Uber template2, property1",
         uris: {
@@ -757,7 +757,7 @@ const buildResourceWithNestedResource = (state, options) => {
       rootSubjectKey: "ljAblGiBW",
       rootPropertyKey: "v1o90QO1Qx",
       propertyTemplateKey:
-        "resourceTemplate:testing:uber2 > http://id.loc.gov/ontologies/bibframe/uber/template2/property1",
+        "resourceTemplate:testing:uber2 > http://id.loc.gov/ontologies/bibframe/uber/template2/property1 > literal",
       valueKeys: ["pRJ0lO_mT-"],
       descUriOrLiteralValueKeys: ["pRJ0lO_mT-"],
       descWithErrorPropertyKeys: options.hasError ? ["7caLbfwwle"] : [],
