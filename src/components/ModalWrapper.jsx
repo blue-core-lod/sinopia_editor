@@ -36,6 +36,7 @@ const ModalWrapper = ({
     <DialogOverlay
       initialFocusRef={initialInputRef}
       className={wrapperClasses.join(" ")}
+      onDismiss={handleClose || close}
     >
       <DialogContent aria-label={ariaLabel} {...props}>
         <div className="card">
