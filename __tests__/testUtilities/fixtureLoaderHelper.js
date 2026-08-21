@@ -51,6 +51,12 @@ const templateFilenames = {
   "resourceTemplate:testing:suppressible": "testing_suppressible.json",
   "resourceTemplate:testing:suppressibleAmbiguous":
     "testing_suppressible_ambiguous.json",
+  "resourceTemplate:testing:richUri": "testing_rich_uri.json",
+  "resourceTemplate:testing:richUri2": "testing_rich_uri2.json",
+  "resourceTemplate:testing:ambiguousClassNonSuppressible":
+    "testing_ambiguous_class_non_suppressible.json",
+  "resourceTemplate:testing:ambiguousClassMultipleNonSuppressible":
+    "testing_ambiguous_class_multiple_non_suppressible.json",
   "resourceTemplate:testing:multiplePropertyUris":
     "testing_multiple_property_uris.json",
   "resourceTemplate:testing:suppressLanguage": "testing_suppress_language.json",

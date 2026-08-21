@@ -559,6 +559,95 @@ describe("validateTemplates()", () => {
     })
   })
 
+  describe("template with value template refs sharing a class, one suppressible and one not", () => {
+    // resourceTemplate:testing:suppressedUri (suppressible, a bare uri +
+    // label) and resourceTemplate:testing:richUri (not suppressible, a
+    // label and a source property) both declare http://sinopia.io/testing/Uri
+    // as their class. Unlike two non-suppressible (or two suppressible)
+    // candidates sharing a class, this is resolvable at load time: a
+    // suppressible template only ever catches values with no local type, so
+    // a value asserting that type unambiguously resolves to the
+    // non-suppressible candidate. This should not be a validation error.
+    const subjectTemplate = build.subjectTemplate({
+      id: "resourceTemplate:testing:ambiguousClassNonSuppressible",
+      clazz: "http://sinopia.io/testing/AmbiguousClassNonSuppressible",
+      label: "Ambiguous class, non-suppressible sibling",
+      propertyTemplates: [
+        build.propertyTemplate({
+          subjectTemplateKey:
+            "resourceTemplate:testing:ambiguousClassNonSuppressible",
+          label: "Property1",
+          uris: {
+            "http://sinopia.io/testing/AmbiguousClassNonSuppressible/property1":
+              "Property1",
+          },
+          type: "resource",
+          component: "NestedResource",
+          valueSubjectTemplateKeys: [
+            "resourceTemplate:testing:suppressedUri",
+            "resourceTemplate:testing:richUri",
+          ],
+        }),
+      ],
+    })
+
+    it("returns no errors", async () => {
+      const store = mockStore(createState())
+
+      expect(
+        await store.dispatch(
+          validateTemplates(subjectTemplate, {}, "testerrorkey")
+        )
+      ).toBe(true)
+      expect(store.getActions()).not.toHaveAction("ADD_ERROR")
+    })
+  })
+
+  describe("template with value template refs sharing a class, neither suppressible", () => {
+    // resourceTemplate:testing:richUri and :richUri2 both declare
+    // http://sinopia.io/testing/Uri as their class and neither is
+    // suppressible, so there's no way to disambiguate a value asserting
+    // that type -- this must remain a genuine ambiguity error.
+    const subjectTemplate = build.subjectTemplate({
+      id: "resourceTemplate:testing:ambiguousClassMultipleNonSuppressible",
+      clazz: "http://sinopia.io/testing/AmbiguousClassMultipleNonSuppressible",
+      label: "Ambiguous class, multiple non-suppressible siblings",
+      propertyTemplates: [
+        build.propertyTemplate({
+          subjectTemplateKey:
+            "resourceTemplate:testing:ambiguousClassMultipleNonSuppressible",
+          label: "Property1",
+          uris: {
+            "http://sinopia.io/testing/AmbiguousClassMultipleNonSuppressible/property1":
+              "Property1",
+          },
+          type: "resource",
+          component: "NestedResource",
+          valueSubjectTemplateKeys: [
+            "resourceTemplate:testing:richUri",
+            "resourceTemplate:testing:richUri2",
+          ],
+        }),
+      ],
+    })
+
+    it("returns error", async () => {
+      const store = mockStore(createState())
+
+      expect(
+        await store.dispatch(
+          validateTemplates(subjectTemplate, {}, "testerrorkey")
+        )
+      ).toBe(false)
+      const payload = {
+        errorKey: "testerrorkey",
+        error:
+          "The following resource templates references for http://sinopia.io/testing/AmbiguousClassMultipleNonSuppressible/property1 have the same class (http://sinopia.io/testing/Uri), but must be unique: resourceTemplate:testing:richUri, resourceTemplate:testing:richUri2",
+      }
+      expect(store.getActions()).toHaveAction("ADD_ERROR", payload)
+    })
+  })
+
   describe("a valid suppressible template", () => {
     const subjectTemplate = build.subjectTemplate({
       uri: "http://localhost:3000/resource/pcc:bf2:Agent:Person",
