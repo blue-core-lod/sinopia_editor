@@ -159,6 +159,7 @@ export default class TemplatesBuilder {
   newLiteralPropertyTemplate(propertyTerm) {
     const propertyTemplate = this.newBasePropertyTemplate(propertyTerm)
     propertyTemplate.type = "literal"
+    propertyTemplate.key = `${propertyTemplate.key} > literal`
     const attributeTerm = this.objectFor(
       propertyTerm,
       "http://sinopia.io/vocabulary/hasLiteralAttributes"
@@ -201,6 +202,7 @@ export default class TemplatesBuilder {
   newUriPropertyTemplate(propertyTerm) {
     const propertyTemplate = this.newBasePropertyTemplate(propertyTerm)
     propertyTemplate.type = "uri"
+    propertyTemplate.key = `${propertyTemplate.key} > uri`
     propertyTemplate.component = "InputURI"
     const attributeTerm = this.objectFor(
       propertyTerm,
@@ -307,6 +309,7 @@ export default class TemplatesBuilder {
   newLookupPropertyTemplate(propertyTerm) {
     const propertyTemplate = this.newBasePropertyTemplate(propertyTerm)
     propertyTemplate.type = "uri"
+    propertyTemplate.key = `${propertyTemplate.key} > lookup`
     const attributeTerm = this.objectFor(
       propertyTerm,
       "http://sinopia.io/vocabulary/hasLookupAttributes"
