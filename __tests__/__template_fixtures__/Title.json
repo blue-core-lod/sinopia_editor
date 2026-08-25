@@ -2,14 +2,14 @@
   {
     "@id": "_:b10",
     "@type": [
-      "http://sinopia.io/vocabulary/PropertyTemplate"
+      "http://www.w3.org/ns/shacl#PropertyShape"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Note on title"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyUri": [
+    "http://www.w3.org/ns/shacl#path": [
       {
         "@id": "http://id.loc.gov/ontologies/bibframe/note"
       }
@@ -19,19 +19,15 @@
         "@id": "http://access.rdatoolkit.org/2.17.2.html"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyAttribute": [
-      {
-        "@id": "http://sinopia.io/vocabulary/propertyAttribute/repeatable"
-      }
-    ],
-    "http://sinopia.io/vocabulary/hasPropertyType": [
-      {
-        "@id": "http://sinopia.io/vocabulary/propertyType/resource"
-      }
-    ],
     "http://sinopia.io/vocabulary/hasResourceAttributes": [
       {
         "@id": "_:b11"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#order": [
+      {
+        "@value": "4",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },
@@ -40,7 +36,7 @@
     "@type": [
       "http://sinopia.io/vocabulary/ResourcePropertyTemplate"
     ],
-    "http://sinopia.io/vocabulary/hasResourceTemplateId": [
+    "http://www.w3.org/ns/shacl#node": [
       {
         "@id": "resourceTemplate:bf2:Title:Note"
       }
@@ -49,14 +45,14 @@
   {
     "@id": "_:b3",
     "@type": [
-      "http://sinopia.io/vocabulary/PropertyTemplate"
+      "http://www.w3.org/ns/shacl#PropertyShape"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Title Proper (RDA 2.3.2) (BIBFRAME: Main title)"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyUri": [
+    "http://www.w3.org/ns/shacl#path": [
       {
         "@id": "http://id.loc.gov/ontologies/bibframe/mainTitle"
       }
@@ -66,28 +62,29 @@
         "@id": "http://access.rdatoolkit.org/rdachp2_rda2-3376.html"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyAttribute": [
+    "http://www.w3.org/ns/shacl#nodeKind": [
       {
-        "@id": "http://sinopia.io/vocabulary/propertyAttribute/repeatable"
+        "@id": "http://www.w3.org/ns/shacl#Literal"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyType": [
+    "http://www.w3.org/ns/shacl#order": [
       {
-        "@id": "http://sinopia.io/vocabulary/propertyType/literal"
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },
   {
     "@id": "_:b5",
     "@type": [
-      "http://sinopia.io/vocabulary/PropertyTemplate"
+      "http://www.w3.org/ns/shacl#PropertyShape"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Other Title Information (RDA 2.3.4) (BIBFRAME: Subtitle)"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyUri": [
+    "http://www.w3.org/ns/shacl#path": [
       {
         "@id": "http://id.loc.gov/ontologies/bibframe/subtitle"
       }
@@ -97,66 +94,69 @@
         "@id": "http://access.rdatoolkit.org/rdachp2_rda2-3782.html"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyAttribute": [
+    "http://www.w3.org/ns/shacl#nodeKind": [
       {
-        "@id": "http://sinopia.io/vocabulary/propertyAttribute/repeatable"
+        "@id": "http://www.w3.org/ns/shacl#Literal"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyType": [
+    "http://www.w3.org/ns/shacl#order": [
       {
-        "@id": "http://sinopia.io/vocabulary/propertyType/literal"
+        "@value": "1",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },
   {
     "@id": "_:b7",
     "@type": [
-      "http://sinopia.io/vocabulary/PropertyTemplate"
+      "http://www.w3.org/ns/shacl#PropertyShape"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Part number"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyUri": [
+    "http://www.w3.org/ns/shacl#path": [
       {
         "@id": "http://id.loc.gov/ontologies/bibframe/partNumber"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyAttribute": [
+    "http://www.w3.org/ns/shacl#nodeKind": [
       {
-        "@id": "http://sinopia.io/vocabulary/propertyAttribute/repeatable"
+        "@id": "http://www.w3.org/ns/shacl#Literal"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyType": [
+    "http://www.w3.org/ns/shacl#order": [
       {
-        "@id": "http://sinopia.io/vocabulary/propertyType/literal"
+        "@value": "2",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },
   {
     "@id": "_:b9",
     "@type": [
-      "http://sinopia.io/vocabulary/PropertyTemplate"
+      "http://www.w3.org/ns/shacl#PropertyShape"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Part name"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyUri": [
+    "http://www.w3.org/ns/shacl#path": [
       {
         "@id": "http://id.loc.gov/ontologies/bibframe/partName"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyAttribute": [
+    "http://www.w3.org/ns/shacl#nodeKind": [
       {
-        "@id": "http://sinopia.io/vocabulary/propertyAttribute/repeatable"
+        "@id": "http://www.w3.org/ns/shacl#Literal"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyType": [
+    "http://www.w3.org/ns/shacl#order": [
       {
-        "@id": "http://sinopia.io/vocabulary/propertyType/literal"
+        "@value": "3",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },
@@ -168,47 +168,43 @@
       }
     ],
     "@type": [
-      "http://sinopia.io/vocabulary/ResourceTemplate"
+      "http://www.w3.org/ns/shacl#NodeShape"
     ],
     "http://sinopia.io/vocabulary/hasResourceId": [
       {
         "@value": "resourceTemplate:bf2:Title"
       }
     ],
-    "http://sinopia.io/vocabulary/hasClass": [
+    "http://www.w3.org/ns/shacl#targetClass": [
       {
         "@id": "http://id.loc.gov/ontologies/bibframe/Title"
       }
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Instance Title"
       }
     ],
-    "http://sinopia.io/vocabulary/hasRemark": [
+    "http://www.w3.org/ns/shacl#description": [
       {
         "@value": "Title information relating to a resource: work title, preferred title, instance title, transcribed title, translated title, variant form of title, etc."
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyTemplate": [
+    "http://www.w3.org/ns/shacl#property": [
       {
-        "@list": [
-          {
-            "@id": "_:b3"
-          },
-          {
-            "@id": "_:b5"
-          },
-          {
-            "@id": "_:b7"
-          },
-          {
-            "@id": "_:b9"
-          },
-          {
-            "@id": "_:b10"
-          }
-        ]
+        "@id": "_:b3"
+      },
+      {
+        "@id": "_:b5"
+      },
+      {
+        "@id": "_:b7"
+      },
+      {
+        "@id": "_:b9"
+      },
+      {
+        "@id": "_:b10"
       }
     ]
   }
