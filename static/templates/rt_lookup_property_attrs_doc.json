@@ -1,9 +1,7 @@
 [
   {
     "@id": "_:b3",
-    "@type": [
-      "http://www.w3.org/ns/shacl#PropertyShape"
-    ],
+    "@type": ["http://www.w3.org/ns/shacl#PropertyShape"],
     "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Authorities"
@@ -44,9 +42,7 @@
   },
   {
     "@id": "_:b4",
-    "@type": [
-      "http://sinopia.io/vocabulary/LookupPropertyTemplate"
-    ],
+    "@type": ["http://sinopia.io/vocabulary/LookupPropertyTemplate"],
     "http://sinopia.io/vocabulary/hasAuthority": [
       {
         "@id": "file:/authorityConfig.json"
@@ -55,9 +51,7 @@
   },
   {
     "@id": "_:b5",
-    "@type": [
-      "http://www.w3.org/ns/shacl#PropertyShape"
-    ],
+    "@type": ["http://www.w3.org/ns/shacl#PropertyShape"],
     "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Defaults"
@@ -92,9 +86,7 @@
         "@value": "sinopia:template:resource"
       }
     ],
-    "@type": [
-      "http://www.w3.org/ns/shacl#NodeShape"
-    ],
+    "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
     "http://sinopia.io/vocabulary/hasResourceId": [
       {
         "@value": "sinopia:template:property:lookup"

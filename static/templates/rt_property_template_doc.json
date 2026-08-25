@@ -1,9 +1,7 @@
 [
   {
     "@id": "_:b11",
-    "@type": [
-      "http://www.w3.org/ns/shacl#PropertyShape"
-    ],
+    "@type": ["http://www.w3.org/ns/shacl#PropertyShape"],
     "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Property attributes"
@@ -38,9 +36,7 @@
   },
   {
     "@id": "_:b12",
-    "@type": [
-      "http://sinopia.io/vocabulary/LookupPropertyTemplate"
-    ],
+    "@type": ["http://sinopia.io/vocabulary/LookupPropertyTemplate"],
     "http://sinopia.io/vocabulary/hasAuthority": [
       {
         "@id": "file:/propertyAttribute.json"
@@ -49,9 +45,7 @@
   },
   {
     "@id": "_:b14",
-    "@type": [
-      "http://www.w3.org/ns/shacl#PropertyShape"
-    ],
+    "@type": ["http://www.w3.org/ns/shacl#PropertyShape"],
     "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Property type"
@@ -98,9 +92,7 @@
   },
   {
     "@id": "_:b15",
-    "@type": [
-      "http://sinopia.io/vocabulary/LookupPropertyTemplate"
-    ],
+    "@type": ["http://sinopia.io/vocabulary/LookupPropertyTemplate"],
     "http://sinopia.io/vocabulary/hasAuthority": [
       {
         "@id": "file:/propertyType.json"
@@ -109,9 +101,7 @@
   },
   {
     "@id": "_:b17",
-    "@type": [
-      "http://www.w3.org/ns/shacl#PropertyShape"
-    ],
+    "@type": ["http://www.w3.org/ns/shacl#PropertyShape"],
     "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Literal attributes (if a literal)"
@@ -147,9 +137,7 @@
   },
   {
     "@id": "_:b18",
-    "@type": [
-      "http://sinopia.io/vocabulary/ResourcePropertyTemplate"
-    ],
+    "@type": ["http://sinopia.io/vocabulary/ResourcePropertyTemplate"],
     "http://www.w3.org/ns/shacl#node": [
       {
         "@id": "sinopia:template:property:literal"
@@ -158,9 +146,7 @@
   },
   {
     "@id": "_:b20",
-    "@type": [
-      "http://www.w3.org/ns/shacl#PropertyShape"
-    ],
+    "@type": ["http://www.w3.org/ns/shacl#PropertyShape"],
     "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "URI attributes (if a URI)"
@@ -196,9 +182,7 @@
   },
   {
     "@id": "_:b21",
-    "@type": [
-      "http://sinopia.io/vocabulary/ResourcePropertyTemplate"
-    ],
+    "@type": ["http://sinopia.io/vocabulary/ResourcePropertyTemplate"],
     "http://www.w3.org/ns/shacl#node": [
       {
         "@id": "sinopia:template:property:uri"
@@ -207,9 +191,7 @@
   },
   {
     "@id": "_:b23",
-    "@type": [
-      "http://www.w3.org/ns/shacl#PropertyShape"
-    ],
+    "@type": ["http://www.w3.org/ns/shacl#PropertyShape"],
     "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Lookup attributes (if a lookup)"
@@ -245,9 +227,7 @@
   },
   {
     "@id": "_:b24",
-    "@type": [
-      "http://sinopia.io/vocabulary/ResourcePropertyTemplate"
-    ],
+    "@type": ["http://sinopia.io/vocabulary/ResourcePropertyTemplate"],
     "http://www.w3.org/ns/shacl#node": [
       {
         "@id": "sinopia:template:property:lookup"
@@ -256,9 +236,7 @@
   },
   {
     "@id": "_:b25",
-    "@type": [
-      "http://www.w3.org/ns/shacl#PropertyShape"
-    ],
+    "@type": ["http://www.w3.org/ns/shacl#PropertyShape"],
     "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Nested resource attributes (if a resource)"
@@ -294,9 +272,7 @@
   },
   {
     "@id": "_:b26",
-    "@type": [
-      "http://sinopia.io/vocabulary/ResourcePropertyTemplate"
-    ],
+    "@type": ["http://sinopia.io/vocabulary/ResourcePropertyTemplate"],
     "http://www.w3.org/ns/shacl#node": [
       {
         "@id": "sinopia:template:property:resource"
@@ -305,9 +281,7 @@
   },
   {
     "@id": "_:b3",
-    "@type": [
-      "http://www.w3.org/ns/shacl#PropertyShape"
-    ],
+    "@type": ["http://www.w3.org/ns/shacl#PropertyShape"],
     "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Property"
@@ -343,9 +317,7 @@
   },
   {
     "@id": "_:b5",
-    "@type": [
-      "http://www.w3.org/ns/shacl#PropertyShape"
-    ],
+    "@type": ["http://www.w3.org/ns/shacl#PropertyShape"],
     "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Label"
@@ -387,9 +359,7 @@
   },
   {
     "@id": "_:b7",
-    "@type": [
-      "http://www.w3.org/ns/shacl#PropertyShape"
-    ],
+    "@type": ["http://www.w3.org/ns/shacl#PropertyShape"],
     "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Remark"
@@ -425,9 +395,7 @@
   },
   {
     "@id": "_:b9",
-    "@type": [
-      "http://www.w3.org/ns/shacl#PropertyShape"
-    ],
+    "@type": ["http://www.w3.org/ns/shacl#PropertyShape"],
     "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Remark URL"
@@ -468,9 +436,7 @@
         "@value": "sinopia:template:resource"
       }
     ],
-    "@type": [
-      "http://www.w3.org/ns/shacl#NodeShape"
-    ],
+    "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
     "http://sinopia.io/vocabulary/hasResourceId": [
       {
         "@value": "sinopia:template:property"
