@@ -1,11 +1,22 @@
 import express from "express"
 import request from "supertest"
+import Package from "../package.json"
 import { healthPayload, registerHealthRoute } from "../src/Health"
 import webpackConfig from "../webpack.config"
 
+const expectedPayload = { status: "ok", version: Package.version }
+
 describe("healthPayload", () => {
   it("reports ok", () => {
-    expect(healthPayload()).toEqual({ status: "ok" })
+    expect(healthPayload().status).toBe("ok")
+  })
+
+  it("reports the package version", () => {
+    expect(healthPayload().version).toBe(Package.version)
+  })
+
+  it("reports a version that looks like a release", () => {
+    expect(healthPayload().version).toMatch(/^\d+\.\d+\.\d+/)
   })
 })
 
@@ -19,7 +30,7 @@ describe("registerHealthRoute", () => {
 
     expect(response.status).toBe(200)
     expect(response.type).toBe("application/json")
-    expect(response.body).toEqual({ status: "ok" })
+    expect(response.body).toEqual(expectedPayload)
   })
 })
 
@@ -55,6 +66,6 @@ describe("dev server health middleware", () => {
 
     expect(response.status).toBe(200)
     expect(response.type).toBe("application/json")
-    expect(response.body).toEqual({ status: "ok" })
+    expect(response.body).toEqual(expectedPayload)
   })
 })
