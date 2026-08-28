@@ -4,6 +4,7 @@
 const path = require("path")
 const webpack = require("webpack")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
+const { healthHandler } = require("./src/Health")
 
 module.exports = {
   entry: "./src/index.js",
@@ -105,6 +106,16 @@ module.exports = {
     historyApiFallback: true,
     hot: true,
     port: 8888,
+    // Unshifted so /health answers with JSON before historyApiFallback can
+    // serve index.html for it.
+    setupMiddlewares: (middlewares) => {
+      middlewares.unshift({
+        name: "health-check",
+        path: "/health",
+        middleware: healthHandler,
+      })
+      return middlewares
+    },
     proxy: {
       "/api/search": "http://localhost:8000",
       "/api/qa": {
