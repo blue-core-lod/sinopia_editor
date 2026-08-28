@@ -573,6 +573,100 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     })
   })
 
+  describe("loading a resource with a value matching both a suppressible and a non-suppressible candidate", () => {
+    // resourceTemplate:testing:suppressedUri (suppressible, one uri property)
+    // and resourceTemplate:testing:richUri (not suppressible, a label and a
+    // source property) both declare http://sinopia.io/testing/Uri as their
+    // class. The value below asserts that type locally and has real data for
+    // richUri's properties, so it should resolve to richUri rather than
+    // throwing on the ambiguous class match.
+    const richUri =
+      "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3e"
+    const n3 = `<${richUri}> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:ambiguousClassNonSuppressible" .
+    <${richUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/AmbiguousClassNonSuppressible> .
+    <${richUri}> <http://sinopia.io/testing/AmbiguousClassNonSuppressible/property1> _:b7 .
+    _:b7 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Uri> .
+    _:b7 <http://sinopia.io/testing/RichUri/label> "A rich value"@en .
+    _:b7 <http://sinopia.io/testing/RichUri/source> <http://foo/scheme> .
+    `
+
+    const store = mockStore(createState())
+
+    it("resolves to the non-suppressible candidate and consumes its properties", async () => {
+      const dataset = await datasetFromN3(n3)
+      const result = await store.dispatch(
+        newResourceFromDataset(dataset, richUri, null, "testerrorkey")
+      )
+      expect(result).toBe(true)
+
+      const actions = store.getActions()
+      const addSubjectAction = actions.find(
+        (action) => action.type === "ADD_SUBJECT"
+      )
+      expect(addSubjectAction).not.toBeNull()
+
+      const property = addSubjectAction.payload.properties[0]
+      const valueSubject = property.values[0].valueSubject
+      expect(valueSubject.subjectTemplate.id).toBe(
+        "resourceTemplate:testing:richUri"
+      )
+      expect(valueSubject.properties[0].values[0].literal).toBe(
+        "A rich value"
+      )
+      expect(valueSubject.properties[1].values[0].uri).toBe(
+        "http://foo/scheme"
+      )
+
+      // Both properties were consumed from the real data, so nothing is left unused.
+      expect(actions).toHaveAction("SET_UNUSED_RDF", {
+        resourceKey: "abc123",
+        rdf: null,
+      })
+
+      const actualRdf = new GraphBuilder(
+        addSubjectAction.payload
+      ).graph.toCanonical()
+      const expectedGraph = await datasetFromN3(n3)
+      const expectedRdf = expectedGraph.toCanonical()
+      expect(actualRdf).toMatch(expectedRdf)
+    })
+  })
+
+  describe("loading a resource with a value matching two non-suppressible candidates", () => {
+    // resourceTemplate:testing:richUri and :richUri2 are both NOT
+    // suppressible and both declare http://sinopia.io/testing/Uri as their
+    // class. Preferring non-suppressible candidates only resolves the
+    // suppressible-vs-non-suppressible case; with two non-suppressible
+    // matches there's still no way to know which one the value represents.
+    // This is caught by template validation before matching is even
+    // attempted -- the host template itself fails to load.
+    const ambiguousUri =
+      "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3a"
+    const n3 = `<${ambiguousUri}> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:ambiguousClassMultipleNonSuppressible" .
+    <${ambiguousUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/AmbiguousClassMultipleNonSuppressible> .
+    <${ambiguousUri}> <http://sinopia.io/testing/AmbiguousClassMultipleNonSuppressible/property1> _:b8 .
+    _:b8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Uri> .
+    _:b8 <http://sinopia.io/testing/RichUri/label> "A rich value"@en .
+    `
+
+    const store = mockStore(createState())
+
+    it("dispatches an error rather than guessing", async () => {
+      const dataset = await datasetFromN3(n3)
+      const result = await store.dispatch(
+        newResourceFromDataset(dataset, ambiguousUri, null, "testerrorkey")
+      )
+      expect(result).toBe(false)
+
+      const actions = store.getActions()
+      expect(actions).toHaveAction("ADD_ERROR", {
+        errorKey: "testerrorkey",
+        error:
+          "The following resource templates references for http://sinopia.io/testing/AmbiguousClassMultipleNonSuppressible/property1 have the same class (http://sinopia.io/testing/Uri), but must be unique: resourceTemplate:testing:richUri, resourceTemplate:testing:richUri2",
+      })
+    })
+  })
+
   describe("loading a resource with a required nested resource property that has no data at all", () => {
     // resourceTemplate:testing:mergeDefaultsSibling has a configured literal
     // default (see the merge-defaults describe block above), but here it's
