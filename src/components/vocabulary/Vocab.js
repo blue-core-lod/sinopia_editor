@@ -8,6 +8,72 @@ import ContextAlert from "components/alerts/ContextAlert"
 import _ from "lodash"
 
 const vocabulary = {
+  // === SHACL predicates (new) ===
+  "sh:NodeShape": {
+    description:
+      "SHACL class for a resource template (replaces sinopia:ResourceTemplate)",
+    url: "http://www.w3.org/ns/shacl#NodeShape",
+  },
+  "sh:PropertyShape": {
+    description:
+      "SHACL class for a property template (replaces sinopia:PropertyTemplate)",
+    url: "http://www.w3.org/ns/shacl#PropertyShape",
+  },
+  "sh:targetClass": {
+    description: "The RDF class for a resource",
+    url: "http://www.w3.org/ns/shacl#targetClass",
+  },
+  "sh:property": {
+    description: "Property template used by the resource template",
+    url: "http://www.w3.org/ns/shacl#property",
+  },
+  "sh:order": {
+    description:
+      "Numeric ordering of property templates within a resource template",
+    url: "http://www.w3.org/ns/shacl#order",
+  },
+  "sh:path": {
+    description: "URI of the RDF property being described",
+    url: "http://www.w3.org/ns/shacl#path",
+  },
+  "sh:name": {
+    description: "Human-readable label for a template or property",
+    url: "http://www.w3.org/ns/shacl#name",
+  },
+  "sh:description": {
+    description:
+      "Comment or guiding statement intended to be presented as supplementary information in user display",
+    url: "http://www.w3.org/ns/shacl#description",
+  },
+  "sh:nodeKind": {
+    description: "Specifies the type of node (sh:Literal, sh:IRI)",
+    url: "http://www.w3.org/ns/shacl#nodeKind",
+  },
+  "sh:node": {
+    description: "Reference to a nested resource template (NodeShape)",
+    url: "http://www.w3.org/ns/shacl#node",
+  },
+  "sh:minCount": {
+    description: "Minimum number of values required (1 = required)",
+    url: "http://www.w3.org/ns/shacl#minCount",
+  },
+  "sh:maxCount": {
+    description: "Maximum number of values allowed (absence = repeatable)",
+    url: "http://www.w3.org/ns/shacl#maxCount",
+  },
+  "sh:defaultValue": {
+    description: "Default value(s) specific to a property",
+    url: "http://www.w3.org/ns/shacl#defaultValue",
+  },
+  "sh:pattern": {
+    description: "Regular Expression to validate a literal",
+    url: "http://www.w3.org/ns/shacl#pattern",
+  },
+  "sh:datatype": {
+    description: "Data Type to validate the literal, e.g. integer or dateTime",
+    url: "http://www.w3.org/ns/shacl#datatype",
+  },
+  // === Sinopia extensions (kept) ===
   "bf/nonfiling": {
     description:
       "Number of character positions associated with a definite or indefinite article (e.g., Le, An) at the beginning of a title that are disregarded in sorting and filing processes.",
@@ -21,10 +87,6 @@ const vocabulary = {
     description: "An authority associated with a lookup",
     url: "http://sinopia.io/vocabulary/hasAuthority",
   },
-  hasClass: {
-    description: "The RDF class for a resource",
-    url: "http://sinopia.io/vocabulary/hasClass",
-  },
   hasOptionalClass: {
     description: "Optional RDF classes for a resource",
     url: "http://sinopia.io/vocabulary/hasOptionalClass",
@@ -32,10 +94,6 @@ const vocabulary = {
   hasDate: {
     description: "Date associated with the template",
     url: "http://sinopia.io/vocabulary/hasDate",
-  },
-  hasDefault: {
-    description: "Default value(s) specific to a property",
-    url: "http://sinopia.io/vocabulary/hasDefault",
   },
   hasLiteralAttributes: {
     description: "Attributes for a literal",
@@ -48,27 +106,6 @@ const vocabulary = {
   hasLookupAttributes: {
     description: "Attributes for a lookup",
     url: "http://sinopia.io/vocabulary/hasLookupAttributes",
-  },
-  hasPropertyAttribute: {
-    description: "Attributes specific to a property (e.g., repeatable)",
-    url: "http://sinopia.io/vocabulary/hasPropertyAttribute",
-  },
-  hasPropertyTemplate: {
-    description: "Property template used by the resource template",
-    url: "http://sinopia.io/vocabulary/hasPropertyTemplate",
-  },
-  hasPropertyType: {
-    description: "Specifies the type of property",
-    url: "http://sinopia.io/vocabulary/hasPropertyType",
-  },
-  hasPropertyUri: {
-    description: "URI of the RDF property being described",
-    url: "http://sinopia.io/vocabulary/hasPropertyUri",
-  },
-  hasRemark: {
-    description:
-      "Comment or guiding statement intended to be presented as supplementary information in user display",
-    url: "http://sinopia.io/vocabulary/hasRemark",
   },
   hasRemarkUrl: {
     description: "The property's remark as a URL",
@@ -87,13 +124,8 @@ const vocabulary = {
       "The template used in creating, editing, or updating a resource",
     url: "http://sinopia.io/vocabulary/hasResourceTemplate",
   },
-  hasResourceTemplateId: {
-    description:
-      "The resource's Template ID, e.g., ld4p:RT:bf2:Title:AbbrTitle",
-    url: "http://sinopia.io/vocabulary/hasResourceTemplateId",
-  },
   hasUri: {
-    description: "URI",
+    description: "URI (legacy)",
     url: "http://sinopia.io/vocabulary/hasUri",
   },
   hasUriAttributes: {
@@ -103,22 +135,6 @@ const vocabulary = {
   hasUriAttribute: {
     description: "Attributes specific to a URI (e.g., label suppressible)",
     url: "http://sinopia.io/vocabulary/hasUriAttributes",
-  },
-  hasValidationDataType: {
-    description: "Data Type to validate the literal, e.g. integer or dateTime",
-    url: "http://sinopia.io/vocabulary/hasValidationDataType",
-  },
-  hasValidationRegex: {
-    description: "Regular Expression to validate a literal",
-    url: "http://sinopia.io/vocabulary/hasValidationRegex",
-  },
-  LookupPropertyTemplate: {
-    description: "Class for a lookup property template",
-    url: "http://sinopia.io/vocabulary/LookupPropertyTemplate",
-  },
-  PropertyTemplate: {
-    description: "Class for a property template",
-    url: "http://sinopia.io/vocabulary/PropertyTemplate",
   },
   "literalPropertyAttribute/userIdDefault": {
     description: "Default to the current user's ID",
@@ -136,42 +152,22 @@ const vocabulary = {
     description: "Values are ordered",
     url: "http://sinopia.io/vocabulary/propertyAttribute/ordered",
   },
-  "propertyAttribute/repeatable": {
-    description: "Multiple values are allowed for the property",
-    url: "http://sinopia.io/vocabulary/propertyAttribute/repeatable",
-  },
-  "propertyAttribute/required": {
-    description: "Property value is required",
-    url: "http://sinopia.io/vocabulary/propertyAttribute/required",
-  },
   "propertyAttribute/suppressLanguage": {
     description: "Language selection is suppressed",
     url: "http://sinopia.io/vocabulary/propertyAttribute/languageSuppressed",
-  },
-  "propertyType/literal": {
-    description: "Literal property value",
-    url: "http://sinopia.io/vocabulary/propertyType/literal",
-  },
-  "propertyType/resource": {
-    description: "Resource property value",
-    url: "http://sinopia.io/vocabulary/propertyType/resource",
-  },
-  "propertyType/uri": {
-    description: "URI property value",
-    url: "http://sinopia.io/vocabulary/propertyType/uri",
   },
   "resourceAttribute/suppressible": {
     description:
       "whether resource is suppressible (must have only one property which is a lookup or URI)",
     url: "http://sinopia.io/vocabulary/resourceAttribute/suppressible",
   },
+  LookupPropertyTemplate: {
+    description: "Class for a lookup property template",
+    url: "http://sinopia.io/vocabulary/LookupPropertyTemplate",
+  },
   ResourcePropertyTemplate: {
     description: "Class for a resource property template",
     url: "http://sinopia.io/vocabulary/ResourcePropertyTemplate",
-  },
-  ResourceTemplate: {
-    description: "Class for a resource template ('template' or 'resource')",
-    url: "http://sinopia.io/vocabulary/ResourceTemplate",
   },
   Uri: {
     description: "Class for a URI template",
@@ -184,7 +180,7 @@ const vocabulary = {
 }
 
 const displayProperty = (params) => {
-  const header = <h2>Sinopia Vocabulary</h2>
+  const header = <h2>Template Vocabulary</h2>
   const key = params.sub ? `${params.element}/${params.sub}` : params.element
   const element = vocabulary[key]
   if (_.isEmpty(element))
@@ -213,8 +209,9 @@ const AllProperties = () => (
   <div>
     <h1>Vocabulary</h1>
     <p>
-      Sinopia uses a number of properties and classes for adding and editing RDF
-      resources.
+      Templates use SHACL (Shapes Constraint Language) predicates for standard
+      template structure, supplemented by Sinopia extension predicates for
+      domain-specific features.
     </p>
     {Object.keys(vocabulary).map((key) => {
       const element = vocabulary[key]
