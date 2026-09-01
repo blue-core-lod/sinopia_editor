@@ -599,3 +599,37 @@ describe("getSearchResultsByUris", () => {
     expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/search/", { method: "GET" })
   })
 })
+
+describe("template search nested filtering", () => {
+  const mockFetch = () => {
+    global.fetch = jest
+      .fn()
+      .mockImplementation(() => Promise.resolve({ json: () => templateResult }))
+    return global.fetch
+  }
+
+  it("does not ask to exclude nested templates unless told to", async () => {
+    const fetchMock = mockFetch()
+    await getTemplateSearchResults("Cartographic:Item")
+
+    expect(fetchMock.mock.calls[0][0]).not.toContain("nested=exclude")
+  })
+
+  it("asks to exclude nested templates when the option is set", async () => {
+    const fetchMock = mockFetch()
+    await getTemplateSearchResults("Cartographic:Item", {
+      excludeNested: true,
+    })
+
+    expect(fetchMock.mock.calls[0][0]).toContain("nested=exclude")
+  })
+
+  it("never excludes nested templates when resolving them by id", async () => {
+    // This path is how the editor loads a nested template. Excluding them here
+    // would leave a nested resource unable to render.
+    const fetchMock = mockFetch()
+    await getTemplateSearchResultsByIds(["Cartographic:Item"])
+
+    expect(fetchMock.mock.calls[0][0]).not.toContain("nested=exclude")
+  })
+})

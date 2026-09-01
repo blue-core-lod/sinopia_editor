@@ -276,6 +276,9 @@ const getTemplateSearchParams = (query, options) => {
   const offset = options?.startOfRange || 0
   params.append("limit", limit)
   params.append("offset", offset)
+  if (options?.excludeNested) {
+    params.append("nested", "exclude")
+  }
   return params
 }
 
