@@ -49,6 +49,15 @@ app.use(
 // answer this with the SPA's index.html.
 registerHealthRoute(app)
 
+app.get('/env-config.js', (req, res) => {
+  res.type('application/javascript');
+  res.send(`window._env_ = ${JSON.stringify({
+    KEYCLOAK_URL: process.env.KEYCLOAK_URL,
+    SINOPIA_URI: process.env.SINOPIA_URI,
+    SINOPIA_API_BASE_URL: process.env.SINOPIA_API_BASE_URL
+  })};`);
+});
+
 app.get("/", (req, res) => {
   res.sendFile(`${__dirname}/dist/index.html`)
 })
