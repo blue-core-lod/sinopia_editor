@@ -2,6 +2,7 @@
 import Config from "Config"
 
 const OLD_ENV = process.env
+const OLD_WINDOW_ENV = window._env_
 
 describe("Config", () => {
   describe("static default values", () => {
@@ -48,13 +49,16 @@ describe("Config", () => {
     beforeAll(() => {
       process.env = {
         USE_FIXTURES: "true",
-        SINOPIA_URI: "https://dev.bcld.info/sinopia",
         SINOPIA_ENV: "TEST",
         SINOPIA_GROUP: "foobar",
-        KEYCLOAK_URL: "https://bcld.info/keycloak",
         KEYCLOAK_CLIENTID: "bluecore_workflows",
         MAX_RECORDS_FOR_QA_LOOKUPS: 15,
         INDEX_URL: "http://elasticsearch.aws.example.com",
+      }
+      window._env_ = {
+        SINOPIA_URI: "https://dev.bcld.info/sinopia",
+        SINOPIA_API_BASE_URL: "http://api.example.com:3000",
+        KEYCLOAK_URL: "https://bcld.info/keycloak",
       }
     })
 
@@ -84,6 +88,7 @@ describe("Config", () => {
 
     afterAll(() => {
       process.env = OLD_ENV
+      window._env_ = OLD_WINDOW_ENV
     })
   })
 })
