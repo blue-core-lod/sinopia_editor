@@ -15,8 +15,8 @@ import {
   detectLanguage,
 } from "sinopiaApi"
 import { selectFullSubject } from "selectors/resources"
-import { selectUser } from "selectors/authenticate"
 import { createState } from "stateUtils"
+import useAuthenticateStore from "stores/authenticateStore"
 
 import Config from "Config"
 
@@ -171,7 +171,7 @@ describe("postResource", () => {
     const state = createState({ hasResourceWithLiteral: true })
     return {
       resource: selectFullSubject(state, "t9zVwg2zO"),
-      currentUser: selectUser(state),
+      currentUser: useAuthenticateStore.getState().user,
     }
   }
 
@@ -257,7 +257,7 @@ describe("putResource", () => {
   describe("when changed resource is sent to the api", () => {
     const state = createState({ hasResourceWithLiteral: true })
     const resource = selectFullSubject(state, "t9zVwg2zO")
-    const currentUser = selectUser(state)
+    const currentUser = useAuthenticateStore.getState().user
 
     it("saves the resource", async () => {
       global.fetch = jest.fn().mockResolvedValue({ ok: true })

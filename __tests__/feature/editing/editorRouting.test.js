@@ -2,6 +2,7 @@ import { renderApp, createHistory, createStore } from "testUtils"
 import { screen, waitFor } from "@testing-library/react"
 import { featureSetup, resourceHeaderSelector } from "featureUtils"
 import { createState } from "stateUtils"
+import useAuthenticateStore from "stores/authenticateStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -40,9 +41,12 @@ describe("routing in editor", () => {
 
   describe("/editor/:templateId when user does not have create permissions", () => {
     const history = createHistory(["/editor/resourceTemplate:testing:uber1"])
-    const state = createState()
-    state.authenticate.user.groups = []
-    const store = createStore(state)
+    let store
+    beforeEach(() => {
+      const state = createState()
+      useAuthenticateStore.setState({ user: { username: "Foo McBar", groups: [] } })
+      store = createStore(state)
+    })
 
     it("redirects to dashboard", async () => {
       renderApp(store, history)
@@ -91,9 +95,12 @@ describe("routing in editor", () => {
     const history = createHistory([
       "/editor/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
     ])
-    const state = createState()
-    state.authenticate.user.groups = []
-    const store = createStore(state)
+    let store
+    beforeEach(() => {
+      const state = createState()
+      useAuthenticateStore.setState({ user: { username: "Foo McBar", groups: [] } })
+      store = createStore(state)
+    })
 
     it("opens existing resource in preview", async () => {
       renderApp(store, history)
