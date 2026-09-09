@@ -20,6 +20,7 @@ import expectedExpandPropertyAddValueAction from "../__action_fixtures__/expandP
 import expectedExpandPropertyAddPropertyAction from "../__action_fixtures__/expandProperty-ADD_PROPERTY"
 import expectedAddSiblingAddValueAction from "../__action_fixtures__/addSiblingValueSubject-ADD_VALUE"
 import useAuthenticateStore from "stores/authenticateStore"
+import useHistoryStore from "stores/historyStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -41,6 +42,7 @@ beforeEach(() => {
 
 afterEach(() => {
   useAuthenticateStore.setState({ user: undefined })
+  useHistoryStore.setState({ templates: [], searches: [], resources: [] })
 })
 
 afterAll(() => {
@@ -177,12 +179,16 @@ describe("saveNewResource", () => {
     expect(actions).toHaveAction("CLEAR_ERRORS")
     expect(actions).toHaveAction("SET_BASE_URL")
     expect(actions).toHaveAction("SAVE_RESOURCE_FINISHED")
-    expect(actions).toHaveAction("ADD_RESOURCE_HISTORY", {
-      resourceUri: uri,
-      modified: "2020-08-20T11:34:40.887Z",
-      group: "stanford",
-      type: "http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle",
-    })
+    expect(useHistoryStore.getState().resources).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          uri,
+          modified: "2020-08-20T11:34:40.887Z",
+          group: "stanford",
+          type: ["http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle"],
+        }),
+      ])
+    )
     expect(actions).toHaveAction("SET_RESOURCE_GROUP", {
       resourceKey: "t9zVwg2zO",
       group: "stanford",
@@ -240,12 +246,16 @@ describe("saveResource", () => {
 
     expect(actions).toHaveAction("CLEAR_ERRORS")
     expect(actions).toHaveAction("SAVE_RESOURCE_FINISHED")
-    expect(actions).toHaveAction("ADD_RESOURCE_HISTORY", {
-      resourceUri: "https://api.sinopia.io/resource/0894a8b3",
-      type: "http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle",
-      group: "stanford",
-      modified: "2020-08-20T11:34:40.887Z",
-    })
+    expect(useHistoryStore.getState().resources).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          uri: "https://api.sinopia.io/resource/0894a8b3",
+          type: ["http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle"],
+          group: "stanford",
+          modified: "2020-08-20T11:34:40.887Z",
+        }),
+      ])
+    )
     expect(actions).toHaveAction("SET_RESOURCE_GROUP", {
       resourceKey: "t9zVwg2zO",
       group: "stanford",

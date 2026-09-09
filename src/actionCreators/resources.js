@@ -1,4 +1,4 @@
-import { addTemplateHistory } from "actions/history"
+import useHistoryStore from "stores/historyStore"
 import { clearErrors, addError } from "actions/errors"
 import { showModal } from "actions/modals"
 import {
@@ -264,7 +264,7 @@ export const newResource =
         )
         if (setCurrent) dispatch(setCurrentResource(resource.key))
         dispatch(setUnusedRDF(resource.key, null))
-        dispatch(addTemplateHistory(resource.subjectTemplate))
+        useHistoryStore.getState().addTemplateHistory(resource.subjectTemplate)
         dispatch(addUserTemplateHistory(resourceTemplateId, keycloak))
         // This will mark the resource has unchanged.
         dispatch(loadResourceFinished(resource.key))

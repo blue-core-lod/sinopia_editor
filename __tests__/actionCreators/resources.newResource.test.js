@@ -8,6 +8,7 @@ import { createState } from "stateUtils"
 import { nanoid } from "nanoid"
 import { safeAction } from "actionUtils"
 import expectedAction from "../__action_fixtures__/newResource-ADD_SUBJECT"
+import useHistoryStore from "stores/historyStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -27,6 +28,10 @@ beforeEach(() => {
 afterAll(() => {
   jest.useRealTimers()
   restoreConsole()
+})
+
+afterEach(() => {
+  useHistoryStore.setState({ templates: [], searches: [], resources: [] })
 })
 
 // This forces Sinopia server to use fixtures
@@ -65,7 +70,11 @@ describe("newResource", () => {
       })
       expect(actions).toHaveAction("SET_CURRENT_EDIT_RESOURCE", "abc123")
       expect(actions).toHaveAction("LOAD_RESOURCE_FINISHED", "abc123")
-      expect(actions).toHaveAction("ADD_TEMPLATE_HISTORY")
+      expect(useHistoryStore.getState().templates).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: resourceTemplateId }),
+        ])
+      )
       expect(actions).toHaveAction("SET_CURRENT_COMPONENT", {
         rootSubjectKey: "abc123",
         rootPropertyKey: "abc123",

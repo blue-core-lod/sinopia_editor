@@ -10,6 +10,7 @@ import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import * as sinopiaSearch from "sinopiaSearch"
 import useAuthenticateStore from "stores/authenticateStore"
+import useHistoryStore from "stores/historyStore"
 
 let mockKeycloak
 
@@ -40,6 +41,7 @@ beforeEach(() => {
 
 afterEach(() => {
   useAuthenticateStore.setState({ user: undefined })
+  useHistoryStore.setState({ templates: [], searches: [], resources: [] })
 })
 
 describe("loadUserData()", () => {
@@ -82,18 +84,25 @@ describe("loadUserData()", () => {
     await store.dispatch(loadUserData("ekostova"))
     const actions = store.getActions()
 
-    expect(actions).toHaveAction("ADD_TEMPLATE_HISTORY_BY_RESULT", {
-      id: "template1",
-    })
-    expect(actions).toHaveAction("ADD_RESOURCE_HISTORY_BY_RESULT", {
-      uri: "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
-    })
-    expect(actions).toHaveAction("ADD_SEARCH_HISTORY", {
-      authorityUri: "urn:ld4p:sinopia",
-      authorityLabel: "Sinopia resources",
-      query: "dracula",
-      keycloak: undefined,
-    })
+    expect(useHistoryStore.getState().templates).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: "template1" })])
+    )
+    expect(useHistoryStore.getState().resources).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          uri: "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
+        }),
+      ])
+    )
+    expect(useHistoryStore.getState().searches).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          authorityUri: "urn:ld4p:sinopia",
+          authorityLabel: "Sinopia resources",
+          query: "dracula",
+        }),
+      ])
+    )
 
     expect(sinopiaApi.fetchUser).toHaveBeenCalledWith("ekostova")
     expect(sinopiaSearch.getTemplateSearchResultsByIds).toHaveBeenCalledWith([

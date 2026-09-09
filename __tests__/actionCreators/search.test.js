@@ -11,10 +11,15 @@ import { createState } from "stateUtils"
 import * as sinopiaApi from "sinopiaApi"
 import * as QuestioningAuthority from "utilities/QuestioningAuthority"
 import rdf from "rdf-ext"
+import useHistoryStore from "stores/historyStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
 }))
+
+afterEach(() => {
+  useHistoryStore.setState({ templates: [], searches: [], resources: [] })
+})
 
 const mockStore = configureMockStore([thunk])
 
@@ -65,7 +70,7 @@ describe("fetchSinopiaSearchResults", () => {
 
     const actions = store.getActions()
 
-    expect(actions).toHaveLength(4)
+    expect(actions).toHaveLength(3)
     expect(actions).toHaveAction("CLEAR_ERRORS")
     expect(actions).toHaveAction("SET_SEARCH_RESULTS", {
       searchType: "resource",
@@ -83,12 +88,15 @@ describe("fetchSinopiaSearchResults", () => {
       },
       links: undefined,
     })
-    expect(actions).toHaveAction("ADD_SEARCH_HISTORY", {
-      authorityUri: "urn:ld4p:sinopia",
-      authorityLabel: "Sinopia resources",
-      query: "*",
-      keycloak,
-    })
+    expect(useHistoryStore.getState().searches).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          authorityUri: "urn:ld4p:sinopia",
+          authorityLabel: "Sinopia resources",
+          query: "*",
+        }),
+      ])
+    )
     expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
       "Foo McBar",
       "search",
@@ -179,7 +187,7 @@ describe("fetchQASearchResults", () => {
 
       const actions = store.getActions()
 
-      expect(actions).toHaveLength(3)
+      expect(actions).toHaveLength(2)
       expect(actions).toHaveAction("CLEAR_ERRORS")
       expect(actions).toHaveAction("SET_SEARCH_RESULTS", {
         searchType: "resource",
@@ -192,12 +200,15 @@ describe("fetchQASearchResults", () => {
         facetResults: {},
         links: undefined,
       })
-      expect(actions).toHaveAction("ADD_SEARCH_HISTORY", {
-        authorityUri: uri,
-        authorityLabel: "OCLCFAST Topic (QA) - direct",
-        query,
-        keycloak: undefined,
-      })
+      expect(useHistoryStore.getState().searches).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            authorityUri: uri,
+            authorityLabel: "OCLCFAST Topic (QA) - direct",
+            query,
+          }),
+        ])
+      )
     })
   })
 

@@ -3,7 +3,7 @@
 import React from "react"
 import { useSelector } from "react-redux"
 import ResourceTemplateSearchResult from "./ResourceTemplateSearchResult"
-import { selectHistoricalTemplates } from "selectors/history"
+import useHistoryStore from "stores/historyStore"
 import { selectSearchResults } from "selectors/search"
 import ExpandingResourceTemplates from "./ExpandingResourceTemplates"
 import _ from "lodash"
@@ -15,9 +15,7 @@ const SinopiaResourceTemplates = () => {
   const searchResults = useSelector((state) =>
     selectSearchResults(state, "template")
   )
-  const historicalTemplates = useSelector((state) =>
-    selectHistoricalTemplates(state)
-  )
+  const historicalTemplates = useHistoryStore((state) => state.templates)
 
   return (
     <section id="resource-templates">
