@@ -50,11 +50,6 @@ export const initialState = {
     values: {},
     versions: {}, // {<resourceKey>: [versions...]}
   },
-  history: {
-    templates: [],
-    searches: [],
-    resources: [],
-  },
   search: {
     // Search model:
     // {
