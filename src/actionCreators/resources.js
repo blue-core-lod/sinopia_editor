@@ -38,7 +38,7 @@ import {
   selectMainTitleProperty,
 } from "selectors/resources"
 import { newLiteralValue, newValueSubject } from "utilities/valueFactory"
-import { selectUser } from "selectors/authenticate"
+import useAuthenticateStore from "stores/authenticateStore"
 import { selectUnusedRDF } from "selectors/modals"
 import {
   addTemplateHistory as addUserTemplateHistory,
@@ -362,7 +362,7 @@ export const saveNewResource =
   (dispatch, getState) => {
     const state = getState()
     const resource = selectFullSubject(state, resourceKey)
-    const currentUser = selectUser(state)
+    const currentUser = useAuthenticateStore.getState().user
     const unusedRDF = selectUnusedRDF(state, resourceKey)
 
     dispatch(clearErrors(errorKey))
@@ -398,7 +398,7 @@ export const saveResource =
   (dispatch, getState) => {
     const state = getState()
     const resource = selectFullSubject(state, resourceKey)
-    const currentUser = selectUser(state)
+    const currentUser = useAuthenticateStore.getState().user
     const unusedRDF = selectUnusedRDF(state, resourceKey)
 
     dispatch(clearErrors(errorKey))

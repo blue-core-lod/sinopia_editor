@@ -7,7 +7,7 @@ import { selectSubjectAndPropertyTemplates } from "selectors/templates"
 import TemplatesBuilder from "TemplatesBuilder"
 import { fetchResource } from "sinopiaApi"
 import { resourceToName } from "../utilities/Utilities"
-import { selectUser } from "selectors/authenticate"
+import useAuthenticateStore from "stores/authenticateStore"
 import { getTemplateSearchResultsByIds } from "sinopiaSearch"
 
 /**
@@ -110,7 +110,7 @@ export const loadResourceTemplateWithoutValidation =
       fetchResource(templateUri, {
         isTemplate: true,
       }).then(([dataset, response]) => {
-        const user = selectUser(getState())
+        const user = useAuthenticateStore.getState().user
         const subjectTemplate = new TemplatesBuilder(
           dataset,
           templateUri,

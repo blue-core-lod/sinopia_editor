@@ -1,5 +1,5 @@
 import { fetchUser, putUserHistory } from "sinopiaApi"
-import { selectUser } from "selectors/authenticate"
+import useAuthenticateStore from "stores/authenticateStore"
 import {
   loadTemplateHistory,
   loadSearchHistory,
@@ -25,8 +25,8 @@ export const loadUserData = (userId, keycloak) => (dispatch) =>
     })
     .catch((err) => console.error(err))
 
-const addHistory = (historyType, payload, keycloak) => (dispatch, getState) => {
-  const user = selectUser(getState())
+const addHistory = (historyType, payload, keycloak) => (dispatch) => {
+  const user = useAuthenticateStore.getState().user
   if (!user || !keycloak) return
   return putUserHistory(
     user.username,
