@@ -2,7 +2,7 @@ import React, { useMemo } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import PropTypes from "prop-types"
 import { selectNormSubject } from "selectors/resources"
-import { selectGroups } from "selectors/authenticate"
+import useAuthenticateStore from "stores/authenticateStore"
 import Config from "Config"
 import TransferModal from "./TransferModal"
 import { showModal } from "actions/modals"
@@ -14,7 +14,7 @@ const TransferButtons = ({ resourceKey }) => {
   const dispatch = useDispatch()
   const errorKey = useAlerts()
   const resource = useSelector((state) => selectNormSubject(state, resourceKey))
-  const userGroups = useSelector((state) => selectGroups(state))
+  const userGroups = useAuthenticateStore((state) => state.user?.groups)
 
   const transferTargets = useMemo(() => {
     const newTargets = []

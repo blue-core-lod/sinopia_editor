@@ -4,13 +4,12 @@ import React from "react"
 import PropTypes from "prop-types"
 import { NavLink, useLocation } from "react-router-dom"
 import Config from "Config"
-import { connect } from "react-redux"
-import { selectUser } from "selectors/authenticate"
+import { useSelector, useDispatch } from "react-redux"
 import { signOut } from "actionCreators/authenticate"
-import { bindActionCreators } from "redux"
 import { selectCurrentResourceKey } from "selectors/resources"
 import { useKeycloak } from "../KeycloakContext"
 import usePermissions from "hooks/usePermissions"
+import useAuthenticateStore from "stores/authenticateStore"
 import HeaderSearch from "./search/HeaderSearch"
 
 const bcLogo = require("../styles/bluecore-small.png")
@@ -18,12 +17,15 @@ const bcLogo = require("../styles/bluecore-small.png")
 const Header = (props) => {
   const { canCreate } = usePermissions()
   const location = useLocation()
+  const dispatch = useDispatch()
   const isActionsActive =
     location.pathname === "/exports" ||
     location.pathname === "/load" ||
     location.pathname.startsWith("/metrics/")
 
   const { keycloak } = useKeycloak()
+  const currentUser = useAuthenticateStore((state) => state.user)
+  const hasResource = useSelector((state) => !!selectCurrentResourceKey(state))
 
   return (
     <React.Fragment>
@@ -43,15 +45,15 @@ const Header = (props) => {
           </div>
           <div className="col-6">
             <ul className="nav pull-right">
-              {props.currentUser && (
+              {currentUser && (
                 <li className="nav-item">
                   <span className="nav-link editor-header-user">
-                    {props.currentUser.username}
+                    {currentUser.username}
                   </span>
                 </li>
               )}
               <div className="nav-link">•</div>
-              {props.currentUser && (
+              {currentUser && (
                 <li className="nav-item">
                   <a
                     href="#"
@@ -63,12 +65,12 @@ const Header = (props) => {
                 </li>
               )}
               <div className="nav-link">•</div>
-              {props.currentUser && (
+              {currentUser && (
                 <li className="nav-item">
                   <a
                     href="#"
                     className="nav-link editor-header-logout"
-                    onClick={() => props.signOut(keycloak)}
+                    onClick={() => dispatch(signOut(keycloak))}
                   >
                     Logout
                   </a>
@@ -80,13 +82,12 @@ const Header = (props) => {
       </div>
       <nav className="navbar navbar-expand-lg editor-navtabs">
         <ul className="navbar-nav">
-          {/* Navlinks enable highlighting the appropriate tab based on route, active style is defined in css */}
           <li className="nav-item">
             <NavLink className="nav-link" to="/dashboard">
               Dashboard
             </NavLink>
           </li>
-          {props.hasResource && canCreate && (
+          {hasResource && canCreate && (
             <li className="nav-item">
               <NavLink className="nav-link" to="/editor">
                 Editor
@@ -152,17 +153,6 @@ const Header = (props) => {
 
 Header.propTypes = {
   triggerEditorMenu: PropTypes.func,
-  hasResource: PropTypes.bool,
-  currentUser: PropTypes.object,
-  signOut: PropTypes.func,
 }
 
-const mapStateToProps = (state) => ({
-  currentUser: selectUser(state),
-  hasResource: !!selectCurrentResourceKey(state),
-})
-
-const mapDispatchToProps = (dispatch) =>
-  bindActionCreators({ signOut }, dispatch)
-
-export default connect(mapStateToProps, mapDispatchToProps)(Header)
+export default Header

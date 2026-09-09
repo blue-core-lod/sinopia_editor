@@ -1,21 +1,16 @@
 // Copyright 2021 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector } from "react-redux"
-import {
-  hasUser as hasUserSelector,
-  selectGroups,
-} from "selectors/authenticate"
+import useAuthenticateStore from "stores/authenticateStore"
 
 const UserNotifications = () => {
-  const hasUser = useSelector((state) => hasUserSelector(state))
-  const userGroups = useSelector((state) => selectGroups(state))
+  const user = useAuthenticateStore((state) => state.user)
+  const userGroups = user?.groups
 
-  if (!hasUser) return null // nothing to show if not logged in
-  if (userGroups.length) return null // nothing to show if the user is logged in but is in at least one group
+  if (!user) return null
+  if (userGroups.length) return null
 
   if (!userGroups.length) {
-    // show a message if the user is not in any groups
     return (
       <div className="alert alert-warning">
         <strong>Note:</strong> Before you can create new resources or edit
