@@ -483,16 +483,29 @@ const newNestedResourceFromObject =
         context.usedDataset.addAll(typeQuads)
 
         // One resource template
-        const suppress = obj.termType === "NamedNode"
+        const childRtId = compactChildRtIds[0]
         return dispatch(
-          recursiveResourceFromDataset(
-            obj,
-            null,
-            compactChildRtIds[0],
-            suppress,
-            context
+          loadResourceTemplate(
+            childRtId,
+            context.resourceTemplatePromises,
+            context.errorKey
           )
-        ).then((subject) => newValueSubject(property, propertyUri, subject))
+        ).then((subjectTemplate) => {
+          // Suppression only makes sense when the matched template is
+          // itself suppressible (a single URI/lookup property) -- a
+          // NamedNode matching a template with more properties describes
+          // itself via its own real triples, not a single substituted
+          // value. When not suppressing, preserve the object's own URI as
+          // the new subject's identity so it round-trips as itself rather
+          // than a fresh blank node.
+          const suppress =
+            obj.termType === "NamedNode" && !!subjectTemplate?.suppressible
+          const uri =
+            !suppress && obj.termType === "NamedNode" ? obj.value : null
+          return dispatch(
+            recursiveResourceFromDataset(obj, uri, childRtId, suppress, context)
+          ).then((subject) => newValueSubject(property, propertyUri, subject))
+        })
       }
 
       // No local rdf:type triple matched a candidate template -- e.g. the

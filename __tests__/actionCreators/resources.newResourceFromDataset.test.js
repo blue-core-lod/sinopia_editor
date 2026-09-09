@@ -194,6 +194,64 @@ describe("newResourceFromDataset", () => {
     })
   })
 
+  describe("loading a resource with a NamedNode value that has more than one property", () => {
+    // resourceTemplate:testing:namedNodeMultiProp is NOT suppressible and has
+    // two properties. The value below is a real NamedNode (not a blank
+    // node) asserting that type locally -- this used to force suppress
+    // mode purely because the value was a NamedNode, which corrupted both
+    // properties into copies of the node's own URI and discarded its real
+    // identity on save.
+    const namedNodeUri = "http://foo/named-multi-prop"
+    const n3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:namedNodeMultiPropHost" .
+    <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/NamedNodeMultiPropHost> .
+    <> <http://sinopia.io/testing/NamedNodeMultiPropHost/property1> <${namedNodeUri}> .
+    <${namedNodeUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/NamedNodeMultiProp> .
+    <${namedNodeUri}> <http://sinopia.io/testing/NamedNodeMultiProp/property1> "Value one"@en .
+    <${namedNodeUri}> <http://sinopia.io/testing/NamedNodeMultiProp/property2> "Value two"@en .
+    `
+
+    const store = mockStore(createState())
+
+    it("does not force suppression and preserves the value's real identity", async () => {
+      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const result = await store.dispatch(
+        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      )
+      expect(result).toBe(true)
+
+      const actions = store.getActions()
+      const addSubjectAction = actions.find(
+        (action) => action.type === "ADD_SUBJECT"
+      )
+      expect(addSubjectAction).not.toBeNull()
+
+      const property = addSubjectAction.payload.properties[0]
+      const valueSubject = property.values[0].valueSubject
+
+      // The value's own URI is preserved, not discarded.
+      expect(valueSubject.uri).toBe(namedNodeUri)
+
+      // Both properties were populated from their real triples, not both
+      // substituted with the node's own URI.
+      expect(valueSubject.properties[0].values[0].literal).toBe("Value one")
+      expect(valueSubject.properties[1].values[0].literal).toBe("Value two")
+
+      // Nothing left unused.
+      expect(actions).toHaveAction("SET_UNUSED_RDF", {
+        resourceKey: "abc123",
+        rdf: null,
+      })
+
+      // Round-trips as the same NamedNode, not a fresh blank node.
+      const actualRdf = new GraphBuilder(
+        addSubjectAction.payload
+      ).graph.toCanonical()
+      const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const expectedRdf = expectedGraph.toCanonical()
+      expect(actualRdf).toMatch(expectedRdf)
+    })
+  })
+
   describe("loading a legacy resource (<> as root)", () => {
     // Legacy resources have <> as the root resource rather than <[uri]>.
     const store = mockStore(createState())

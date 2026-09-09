@@ -70,6 +70,10 @@ const templateFilenames = {
     "testing_merge_defaults_sibling.json",
   "resourceTemplate:testing:requiredSingleDefaultHost":
     "testing_required_single_default_host.json",
+  "resourceTemplate:testing:namedNodeMultiProp":
+    "testing_named_node_multi_prop.json",
+  "resourceTemplate:testing:namedNodeMultiPropHost":
+    "testing_named_node_multi_prop_host.json",
 }
 
 export const hasFixtureResource = (uri) => {

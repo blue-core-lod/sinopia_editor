@@ -1,0 +1,127 @@
+[
+  {
+    "@id": "_:b31",
+    "@type": [
+      "http://sinopia.io/vocabulary/PropertyTemplate"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Property1",
+        "@language": "en"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasPropertyUri": [
+      {
+        "@id": "http://sinopia.io/testing/NamedNodeMultiProp/property1"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasPropertyType": [
+      {
+        "@id": "http://sinopia.io/vocabulary/propertyType/literal"
+      }
+    ]
+  },
+  {
+    "@id": "_:b32",
+    "@type": [
+      "http://sinopia.io/vocabulary/PropertyTemplate"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Property2",
+        "@language": "en"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasPropertyUri": [
+      {
+        "@id": "http://sinopia.io/testing/NamedNodeMultiProp/property2"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasPropertyType": [
+      {
+        "@id": "http://sinopia.io/vocabulary/propertyType/literal"
+      }
+    ]
+  },
+  {
+    "@id": "http://localhost:3000/resource/resourceTemplate:testing:namedNodeMultiProp",
+    "http://sinopia.io/vocabulary/hasResourceTemplate": [
+      {
+        "@value": "sinopia:template:resource"
+      }
+    ],
+    "@type": [
+      "http://sinopia.io/vocabulary/ResourceTemplate"
+    ],
+    "http://sinopia.io/vocabulary/hasResourceId": [
+      {
+        "@value": "resourceTemplate:testing:namedNodeMultiProp",
+        "@language": "en"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasClass": [
+      {
+        "@id": "http://sinopia.io/testing/NamedNodeMultiProp"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "NamedNode with multiple properties",
+        "@language": "en"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasRemark": [
+      {
+        "@value": "A non-suppressible template matched against a NamedNode value that carries more than one local property -- used to test that suppression is not incorrectly forced just because the value is a NamedNode.",
+        "@language": "en"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasPropertyTemplate": [
+      {
+        "@list": [
+          {
+            "@id": "_:b31"
+          },
+          {
+            "@id": "_:b32"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "@id": "http://sinopia.io/testing/NamedNodeMultiProp",
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "NamedNodeMultiProp",
+        "@language": "en"
+      }
+    ]
+  },
+  {
+    "@id": "http://sinopia.io/testing/NamedNodeMultiProp/property1",
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Property1",
+        "@language": "en"
+      }
+    ]
+  },
+  {
+    "@id": "http://sinopia.io/testing/NamedNodeMultiProp/property2",
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Property2",
+        "@language": "en"
+      }
+    ]
+  },
+  {
+    "@id": "http://sinopia.io/vocabulary/propertyType/literal",
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "literal"
+      }
+    ]
+  }
+]
