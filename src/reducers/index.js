@@ -1,7 +1,6 @@
 // Copyright 2018, 2019 Stanford University see LICENSE for license
 
 import { combineReducers } from "redux"
-import { setUser, removeUser } from "./authenticate"
 import { setLanguage, languagesReceived, setDefaultLang } from "./languages"
 import { groupsReceived } from "./groups"
 import {
@@ -102,11 +101,6 @@ export const clearPendingResourceTemplateSelection = (state) => ({
   pendingResourceTemplateSelection: null,
 })
 
-const authHandlers = {
-  SET_USER: setUser,
-  REMOVE_USER: removeUser,
-}
-
 const editorHandlers = {
   ADD_ERROR: addError,
   ADD_SUCCESS: addSuccess,
@@ -191,7 +185,6 @@ export const createReducer =
   }
 
 const appReducer = combineReducers({
-  authenticate: createReducer(authHandlers),
   editor: createReducer(editorHandlers),
   entities: createReducer(entityHandlers),
   history: createReducer(historyHandlers),

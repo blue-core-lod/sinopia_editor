@@ -6,9 +6,6 @@ import reducer from "./reducers/index"
 import { sinopiaSearchUri } from "utilities/authorityConfig"
 
 export const initialState = {
-  authenticate: {
-    user: undefined,
-  },
   editor: {
     // The state of the editor
     copyToNewMessage: {
