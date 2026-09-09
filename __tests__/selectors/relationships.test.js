@@ -5,6 +5,11 @@ import {
   hasSearchRelationships,
   selectSearchRelationships,
 } from "selectors/relationships"
+import useSearchStore from "stores/searchStore"
+
+afterEach(() => {
+  useSearchStore.setState({ resource: null, template: null })
+})
 
 describe("selectRelationships()", () => {
   it("merges relationships from resource and API (inferred)", () => {
@@ -64,42 +69,46 @@ describe("hasRelationships()", () => {
   })
 })
 
-const searchState = createState()
-searchState.search.resource = {
-  relationshipResults: {
-    "http://localhost:3000/resource/252b24cb-0b5f-4df6-88d2-cb9efdf3f376": {
-      bfInstanceRefs: [
-        "http://localhost:3000/resource/922b24cb-0b5f-4df6-88d2-cb9efdf3f373",
-      ],
-    },
-    "http://localhost:3000/resource/032b24cb-0b5f-4df6-88d2-cb9efdf3f374": {
-      bfInstanceRefs: [],
-    },
-  },
-}
-
 describe("hasSearchRelationships()", () => {
   it("returns true when relationships", () => {
+    useSearchStore.setState({
+      resource: {
+        relationshipResults: {
+          "http://localhost:3000/resource/252b24cb-0b5f-4df6-88d2-cb9efdf3f376":
+            {
+              bfInstanceRefs: [
+                "http://localhost:3000/resource/922b24cb-0b5f-4df6-88d2-cb9efdf3f373",
+              ],
+            },
+        },
+      },
+    })
     expect(
       hasSearchRelationships(
-        searchState,
         "http://localhost:3000/resource/252b24cb-0b5f-4df6-88d2-cb9efdf3f376"
       )
     ).toBe(true)
   })
 
   it("returns false when no relationships", () => {
-    const state = createState({ hasTemplateWithLiteral: true })
+    useSearchStore.setState({
+      resource: {
+        relationshipResults: {
+          "http://localhost:3000/resource/032b24cb-0b5f-4df6-88d2-cb9efdf3f374":
+            {
+              bfInstanceRefs: [],
+            },
+        },
+      },
+    })
 
     expect(
       hasSearchRelationships(
-        state,
         "http://localhost:3000/resource/032b24cb-0b5f-4df6-88d2-cb9efdf3f374"
       )
     ).toBe(false)
     expect(
       hasSearchRelationships(
-        state,
         "http://localhost:3000/resource/xxxb24cb-0b5f-4df6-88d2-cb9efdf3f374"
       )
     ).toBe(false)
@@ -108,9 +117,20 @@ describe("hasSearchRelationships()", () => {
 
 describe("selectSearchRelationships()", () => {
   it("returns relationships", () => {
+    useSearchStore.setState({
+      resource: {
+        relationshipResults: {
+          "http://localhost:3000/resource/252b24cb-0b5f-4df6-88d2-cb9efdf3f376":
+            {
+              bfInstanceRefs: [
+                "http://localhost:3000/resource/922b24cb-0b5f-4df6-88d2-cb9efdf3f373",
+              ],
+            },
+        },
+      },
+    })
     expect(
       selectSearchRelationships(
-        searchState,
         "http://localhost:3000/resource/252b24cb-0b5f-4df6-88d2-cb9efdf3f376"
       )
     ).toStrictEqual({

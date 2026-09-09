@@ -2,11 +2,10 @@
 
 import React, { useState, useEffect } from "react"
 import PropTypes from "prop-types"
-import { useSelector } from "react-redux"
 import SearchRow from "./SearchRow"
 import useSearch from "hooks/useSearch"
 import { useHistory } from "react-router-dom"
-import { selectSearchQuery } from "selectors/search"
+import useSearchStore from "stores/searchStore"
 
 /**
  * This is the list view of searches
@@ -14,7 +13,7 @@ import { selectSearchQuery } from "selectors/search"
 const SearchList = (props) => {
   const { fetchNewSearchResults } = useSearch()
   const [navigateSearch, setNavigateSearch] = useState(false)
-  const query = useSelector((state) => selectSearchQuery(state, "resource"))
+  const query = useSearchStore((state) => state.resource?.query)
   const history = useHistory()
 
   // Need to wait until results before navigating

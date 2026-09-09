@@ -26,8 +26,7 @@ const useSearchStore = create((set, get) => ({
         query,
         options: {
           resultsPerPage:
-            options?.resultsPerPage ||
-            defaultSearchResultsPerPage(searchType),
+            options?.resultsPerPage || defaultSearchResultsPerPage(searchType),
           startOfRange: options?.startOfRange || 0,
           sortField: options?.sortField,
           sortOrder: options?.sortOrder,

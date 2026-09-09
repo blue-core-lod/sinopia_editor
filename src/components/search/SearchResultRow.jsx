@@ -1,7 +1,6 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useState } from "react"
-import { useSelector } from "react-redux"
 import PropTypes from "prop-types"
 import LongDate from "components/LongDate"
 import ViewButton from "../buttons/ViewButton"
@@ -9,10 +8,11 @@ import EditButton from "../buttons/EditButton"
 import CopyButton from "../buttons/CopyButton"
 import useResource from "hooks/useResource"
 import useAlerts from "hooks/useAlerts"
-import { hasSearchRelationships } from "selectors/relationships"
+import useSearchStore from "stores/searchStore"
 import RelationshipResults from "./RelationshipResults"
 import { resourceToName } from "utilities/Utilities"
 import ResourceTitle from "components/editor/ResourceTitle"
+import _ from "lodash"
 
 /**
  * Generates HTML row of all search results
@@ -32,8 +32,12 @@ const SearchResultRow = ({
     isLoadingEdit,
     isLoadingCopy,
   } = useResource(errorKey, { resourceURI: row.uri })
+  const relationships = useSearchStore(
+    (state) => state.resource?.relationshipResults?.[row.uri]
+  )
   const hasRelationships =
-    useSelector((state) => hasSearchRelationships(state, row.uri)) &&
+    !_.isEmpty(relationships) &&
+    Object.values(relationships).some((refs) => !_.isEmpty(refs)) &&
     withRelationships
 
   const [showRelationships, setShowRelationships] = useState(false)

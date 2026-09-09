@@ -12,6 +12,7 @@ import * as sinopiaApi from "sinopiaApi"
 import * as QuestioningAuthority from "utilities/QuestioningAuthority"
 import rdf from "rdf-ext"
 import useHistoryStore from "stores/historyStore"
+import useSearchStore from "stores/searchStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -19,6 +20,7 @@ jest.mock("KeycloakContext", () => ({
 
 afterEach(() => {
   useHistoryStore.setState({ templates: [], searches: [], resources: [] })
+  useSearchStore.setState({ resource: null, template: null })
 })
 
 const mockStore = configureMockStore([thunk])
@@ -70,23 +72,21 @@ describe("fetchSinopiaSearchResults", () => {
 
     const actions = store.getActions()
 
-    expect(actions).toHaveLength(3)
+    expect(actions).toHaveLength(1)
     expect(actions).toHaveAction("CLEAR_ERRORS")
-    expect(actions).toHaveAction("SET_SEARCH_RESULTS", {
-      searchType: "resource",
+    expect(useSearchStore.getState().resource).toMatchObject({
       error: undefined,
       uri: "urn:ld4p:sinopia",
       query: "*",
       results: mockSearchResults.results,
       totalResults: mockSearchResults.totalHits,
       facetResults: mockFacetResults,
-      options: {
+      options: expect.objectContaining({
         sortField: "label",
         sortOrder: "desc",
         startOfRange: 5,
         resultsPerPage: 10,
-      },
-      links: undefined,
+      }),
     })
     expect(useHistoryStore.getState().searches).toEqual(
       expect.arrayContaining([
@@ -187,18 +187,16 @@ describe("fetchQASearchResults", () => {
 
       const actions = store.getActions()
 
-      expect(actions).toHaveLength(2)
+      expect(actions).toHaveLength(1)
       expect(actions).toHaveAction("CLEAR_ERRORS")
-      expect(actions).toHaveAction("SET_SEARCH_RESULTS", {
-        searchType: "resource",
+      expect(useSearchStore.getState().resource).toMatchObject({
         uri,
         query,
         results: mockSearchResults,
         totalResults: 15,
-        options: {},
+        options: expect.objectContaining({}),
         error: undefined,
         facetResults: {},
-        links: undefined,
       })
       expect(useHistoryStore.getState().searches).toEqual(
         expect.arrayContaining([
@@ -228,18 +226,16 @@ describe("fetchQASearchResults", () => {
 
       const actions = store.getActions()
 
-      expect(actions).toHaveLength(3)
+      expect(actions).toHaveLength(2)
       expect(actions).toHaveAction("CLEAR_ERRORS")
-      expect(actions).toHaveAction("SET_SEARCH_RESULTS", {
-        searchType: "resource",
+      expect(useSearchStore.getState().resource).toMatchObject({
         uri,
         query,
         results: [],
         totalResults: 0,
-        options: {},
+        options: expect.objectContaining({}),
         facetResults: {},
         error: "Ooops...",
-        links: undefined,
       })
       expect(actions).toHaveAction("ADD_ERROR", {
         errorKey: "testerrorkey",
@@ -280,19 +276,17 @@ describe("fetchTemplateGuessSearchResults", () => {
 
       const actions = store.getActions()
 
-      expect(actions).toHaveLength(1)
-      expect(actions).toHaveAction("SET_SEARCH_RESULTS", {
-        searchType: "templateguess",
+      expect(actions).toHaveLength(0)
+      expect(useSearchStore.getState().templateguess).toMatchObject({
         error: undefined,
         uri: null,
         query,
         results: mockSearchResults.results,
         totalResults: mockSearchResults.totalHits,
         facetResults: {},
-        options: {
+        options: expect.objectContaining({
           startOfRange: 0,
-        },
-        links: undefined,
+        }),
       })
     })
   })
@@ -318,19 +312,17 @@ describe("fetchTemplateGuessSearchResults", () => {
 
       const actions = store.getActions()
 
-      expect(actions).toHaveLength(2)
-      expect(actions).toHaveAction("SET_SEARCH_RESULTS", {
-        searchType: "templateguess",
+      expect(actions).toHaveLength(1)
+      expect(useSearchStore.getState().templateguess).toMatchObject({
         error: "Ooops",
         uri: null,
         query,
         results: [],
         totalResults: 0,
         facetResults: {},
-        options: {
+        options: expect.objectContaining({
           startOfRange: 0,
-        },
-        links: undefined,
+        }),
       })
       expect(actions).toHaveAction("ADD_ERROR", {
         errorKey: "testerrorkey",

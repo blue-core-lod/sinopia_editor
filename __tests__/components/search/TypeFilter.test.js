@@ -1,10 +1,14 @@
 import React from "react"
 import TypeFilter from "components/search/TypeFilter"
 import { fireEvent, waitFor, screen } from "@testing-library/react"
-import { createStore, renderComponent } from "testUtils"
-import { createState } from "stateUtils"
+import { renderComponent } from "testUtils"
 import * as server from "sinopiaSearch"
 import * as sinopiaApi from "sinopiaApi"
+import useSearchStore from "stores/searchStore"
+
+afterEach(() => {
+  useSearchStore.setState({ resource: null, template: null })
+})
 
 let mockKeycloak
 
@@ -56,13 +60,23 @@ describe("<TypeFilter />", () => {
 
   jest.spyOn(sinopiaApi, "putUserHistory").mockResolvedValue()
 
-  const createInitialState = () => {
-    const state = createState()
-    state.search.resource = {
-      facetResults,
-      query: "twain",
-    }
-    return state
+  const seedStore = () => {
+    useSearchStore.setState({
+      resource: {
+        facetResults,
+        query: "twain",
+        options: {
+          startOfRange: 0,
+          resultsPerPage: 10,
+          sortField: undefined,
+          sortOrder: undefined,
+        },
+        results: [],
+        totalResults: 0,
+        uri: null,
+        relationshipResults: {},
+      },
+    })
   }
 
   it("does not render when no facet results", () => {
@@ -78,8 +92,8 @@ describe("<TypeFilter />", () => {
       undefined,
     ])
 
-    const store = createStore(createInitialState())
-    renderComponent(<TypeFilter />, store)
+    seedStore()
+    renderComponent(<TypeFilter />)
 
     screen.getByText("Filter by class")
     screen.getByText("http://id.loc.gov/ontologies/bibframe/Title (5)")
@@ -96,8 +110,8 @@ describe("<TypeFilter />", () => {
       undefined,
     ])
 
-    const store = createStore(createInitialState())
-    renderComponent(<TypeFilter />, store)
+    seedStore()
+    renderComponent(<TypeFilter />)
 
     expect(document.querySelector(".show")).not.toBeInTheDocument()
     fireEvent.click(screen.getByText("Filter by class"))
@@ -140,8 +154,8 @@ describe("<TypeFilter />", () => {
       undefined,
     ])
 
-    const store = createStore(createInitialState())
-    renderComponent(<TypeFilter />, store)
+    seedStore()
+    renderComponent(<TypeFilter />)
 
     fireEvent.click(screen.getByText("Filter by class"))
     // Deselect all
@@ -164,8 +178,8 @@ describe("<TypeFilter />", () => {
       facetResults,
     ])
 
-    const store = createStore(createInitialState())
-    renderComponent(<TypeFilter />, store)
+    seedStore()
+    renderComponent(<TypeFilter />)
 
     fireEvent.click(screen.getByText("Filter by class"))
     fireEvent.click(
@@ -205,8 +219,8 @@ describe("<TypeFilter />", () => {
       facetResults,
     ])
 
-    const store = createStore(createInitialState())
-    renderComponent(<TypeFilter />, store)
+    seedStore()
+    renderComponent(<TypeFilter />)
 
     fireEvent.click(screen.getByText("Filter by class"))
     // all checked

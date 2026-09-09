@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import { useDispatch } from "react-redux"
 import PropTypes from "prop-types"
-import { selectSearchRelationships } from "selectors/relationships"
+import useSearchStore from "stores/searchStore"
 import { fetchResource } from "sinopiaApi"
 import rdf from "rdf-ext"
 import { labelFromDataset } from "utilities/Bibframe"
@@ -28,8 +28,8 @@ const rowFromDataset = (uri, dataset, response) => ({
 const RelationshipResults = ({ uri }) => {
   const dispatch = useDispatch()
   const errorKey = useAlerts()
-  const relationships = useSelector((state) =>
-    selectSearchRelationships(state, uri)
+  const relationships = useSearchStore(
+    (state) => state.resource?.relationshipResults?.[uri]
   )
   const { canEdit, canCreate } = usePermissions()
 
