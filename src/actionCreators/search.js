@@ -10,7 +10,7 @@ import {
   sinopiaSearchUri,
 } from "utilities/authorityConfig"
 import { addSearchHistory as addApiSearchHistory } from "actionCreators/user"
-import { addSearchHistory } from "actions/history"
+import useHistoryStore from "stores/historyStore"
 import { clearErrors, addError } from "actions/errors"
 import { isBfWorkInstanceItem } from "utilities/Bibframe"
 import { loadSearchRelationships } from "./relationships"
@@ -42,14 +42,12 @@ export const fetchSinopiaSearchResults =
     dispatch(clearErrors(errorKey))
     return getSearchResultsWithFacets(query, options, keycloak).then(
       ([response, facetResponse]) => {
-        dispatch(
-          addSearchHistory(
-            sinopiaSearchUri,
-            "Sinopia resources",
-            query,
-            keycloak
-          )
-        )
+        useHistoryStore.getState().addSearchHistory({
+          authorityUri: sinopiaSearchUri,
+          authorityLabel: "Sinopia resources",
+          query,
+          keycloak,
+        })
         dispatch(addApiSearchHistory(sinopiaSearchUri, query, keycloak))
         // Use extracted options from response if available, otherwise use passed options
         const finalOptions = response.options || options
@@ -120,7 +118,11 @@ export const fetchQASearchResults =
         )
         return false
       }
-      dispatch(addSearchHistory(uri, authorityConfig.label, query))
+      useHistoryStore.getState().addSearchHistory({
+        authorityUri: uri,
+        authorityLabel: authorityConfig.label,
+        query,
+      })
       dispatch(addApiSearchHistory(uri, query))
       dispatch(
         setSearchResults(

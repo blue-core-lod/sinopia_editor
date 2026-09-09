@@ -53,13 +53,6 @@ import { showModal, hideModal, showLangModal, showMarcModal } from "./modals"
 import { showCopyNewMessage } from "./messages"
 import { exportsReceived } from "./exports"
 import { addTemplates } from "./templates"
-import {
-  addTemplateHistory,
-  addTemplateHistoryByResult,
-  addSearchHistory,
-  addResourceHistory,
-  addResourceHistoryByResult,
-} from "./history"
 import { clearSearchResults, setSearchResults, setHeaderSearch } from "./search"
 import { lookupOptionsRetrieved } from "./lookups"
 import _ from "lodash"
@@ -163,14 +156,6 @@ const entityHandlers = {
   UPDATE_VALUE: updateValue,
 }
 
-const historyHandlers = {
-  ADD_RESOURCE_HISTORY: addResourceHistory,
-  ADD_RESOURCE_HISTORY_BY_RESULT: addResourceHistoryByResult,
-  ADD_SEARCH_HISTORY: addSearchHistory,
-  ADD_TEMPLATE_HISTORY: addTemplateHistory,
-  ADD_TEMPLATE_HISTORY_BY_RESULT: addTemplateHistoryByResult,
-}
-
 const searchHandlers = {
   CLEAR_SEARCH_RESULTS: clearSearchResults,
   SET_SEARCH_RELATIONSHIPS: setSearchRelationships,
@@ -187,7 +172,6 @@ export const createReducer =
 const appReducer = combineReducers({
   editor: createReducer(editorHandlers),
   entities: createReducer(entityHandlers),
-  history: createReducer(historyHandlers),
   search: createReducer(searchHandlers),
 })
 

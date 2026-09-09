@@ -2,12 +2,8 @@
 
 import React from "react"
 import PropTypes from "prop-types"
-import { useSelector, useDispatch } from "react-redux"
-import {
-  selectHistoricalTemplates,
-  selectHistoricalSearches,
-  selectHistoricalResources,
-} from "selectors/history"
+import { useDispatch } from "react-redux"
+import useHistoryStore from "stores/historyStore"
 import Header from "../Header"
 import ResourceList from "./ResourceList"
 import ResourceTemplateSearchResult from "../templates/ResourceTemplateSearchResult"
@@ -25,15 +21,9 @@ import { useHistory } from "react-router-dom"
 const Dashboard = (props) => {
   const dispatch = useDispatch()
   const history = useHistory()
-  const historicalTemplates = useSelector((state) =>
-    selectHistoricalTemplates(state)
-  )
-  const historicalSearches = useSelector((state) =>
-    selectHistoricalSearches(state)
-  )
-  const historicalResources = useSelector((state) =>
-    selectHistoricalResources(state)
-  )
+  const historicalTemplates = useHistoryStore((state) => state.templates)
+  const historicalSearches = useHistoryStore((state) => state.searches)
+  const historicalResources = useHistoryStore((state) => state.resources)
 
   const chooseResourceTemplate = (resourceTemplateId) => {
     dispatch(completeResourceLoadingWithTemplate(resourceTemplateId)).then(

@@ -15,6 +15,7 @@ import * as relationshipActionCreators from "actionCreators/relationships"
 import expectedAction from "../__action_fixtures__/loadResource-ADD_SUBJECT"
 import expectedMultiplePropertyUrisAction from "../__action_fixtures__/loadResource-ADD_SUBJECT-multiple-property-uris"
 import { safeAction, cloneAddResourceActionAsNewResource } from "actionUtils"
+import useHistoryStore from "stores/historyStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -34,6 +35,10 @@ beforeEach(() => {
 afterAll(() => {
   jest.useRealTimers()
   restoreConsole()
+})
+
+afterEach(() => {
+  useHistoryStore.setState({ templates: [], searches: [], resources: [] })
 })
 
 // This forces Sinopia server to use fixtures
@@ -74,12 +79,16 @@ describe("loadResource", () => {
       expect(actions).toHaveAction("SET_UNUSED_RDF")
       expect(actions).toHaveAction("SET_CURRENT_EDIT_RESOURCE")
       expect(actions).toHaveAction("LOAD_RESOURCE_FINISHED")
-      expect(actions).toHaveAction("ADD_RESOURCE_HISTORY", {
-        resourceUri: uri,
-        type: "http://sinopia.io/testing/Inputs",
-        group: "stanford",
-        modified: "2020-08-20T11:34:40.887Z",
-      })
+      expect(useHistoryStore.getState().resources).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            uri,
+            type: ["http://sinopia.io/testing/Inputs"],
+            group: "stanford",
+            modified: "2020-08-20T11:34:40.887Z",
+          }),
+        ])
+      )
 
       expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
         "Foo McBar",
