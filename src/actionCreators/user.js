@@ -25,7 +25,7 @@ export const loadUserData = (userId, keycloak) => (dispatch) =>
     })
     .catch((err) => console.error(err))
 
-const addHistory = (historyType, payload, keycloak) => (dispatch) => {
+const addHistory = (historyType, payload, keycloak) => () => {
   const user = useAuthenticateStore.getState().user
   if (!user || !keycloak) return
   return putUserHistory(
