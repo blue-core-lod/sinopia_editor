@@ -1149,59 +1149,10 @@ const buildResourceWithTwoNestedResources = (state, options) => {
   }
 }
 
-const buildSearchResults = (state, options) => {
-  if (!options.hasSearchResults) return
-
-  state.search.resource = {
-    uri: "urn:ld4p:sinopia",
-    results: [
-      {
-        uri: "http://localhost:3000/resource/4ea0b514-0475-48c6-a076-7ed30ab4d6f4",
-        label: "Foo1",
-        modified: "2021-10-12T21:29:51.950Z",
-        type: ["http://foo/bar"],
-        group: "stanford",
-        editGroups: [],
-      },
-      {
-        uri: "http://localhost:3000/resource/e1eb5c8f-8382-4abc-980c-bcdb305c1e22",
-        label: "Foo2",
-        modified: "2021-10-12T21:30:11.558Z",
-        type: ["http://foo/bar"],
-        group: "other",
-        editGroups: [],
-      },
-    ],
-    totalResults: 6,
-    facetResults: {
-      types: [
-        {
-          key: "http://foo/bar",
-          doc_count: 5,
-        },
-        {
-          key: "http://id.loc.gov/ontologies/bibframe/Work",
-          doc_count: 1,
-        },
-      ],
-      groups: [
-        {
-          key: "other",
-          doc_count: 5,
-        },
-        {
-          key: "stanford",
-          doc_count: 1,
-        },
-      ],
-    },
-    query: "*",
-    options: {
-      resultsPerPage: 10,
-      startOfRange: 0,
-    },
-  }
-}
+// Search state is now in Zustand (useSearchStore), not Redux.
+// Use useSearchStore.setState(...) directly in tests that need search results.
+// eslint-disable-next-line no-unused-vars
+const buildSearchResults = (_state, _options) => {}
 
 const buildCurrentDiff = (state, options) => {
   if (!options.hasCurrentDiff) return
