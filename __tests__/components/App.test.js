@@ -35,9 +35,7 @@ describe("<App />", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockUseKeycloak.mockReturnValue({
-      keycloak: {
-        authenticated: false,
-      },
+      keycloak: {},
     })
   })
 

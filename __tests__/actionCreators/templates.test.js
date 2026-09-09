@@ -3,6 +3,7 @@ import Config from "Config"
 import configureMockStore from "redux-mock-store"
 import thunk from "redux-thunk"
 import { createState } from "stateUtils"
+import useAuthenticateStore from "stores/authenticateStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -12,6 +13,16 @@ jest.mock("KeycloakContext", () => ({
 jest.spyOn(Config, "useResourceTemplateFixtures", "get").mockReturnValue(true)
 
 const mockStore = configureMockStore([thunk])
+
+beforeEach(() => {
+  useAuthenticateStore.setState({
+    user: { username: "Foo McBar", groups: ["stanford", "pcc"] },
+  })
+})
+
+afterEach(() => {
+  useAuthenticateStore.setState({ user: undefined })
+})
 
 describe("loadResourceTemplate()", () => {
   describe("a valid template", () => {

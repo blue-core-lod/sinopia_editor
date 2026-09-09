@@ -9,6 +9,7 @@ import configureMockStore from "redux-mock-store"
 import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import * as sinopiaSearch from "sinopiaSearch"
+import useAuthenticateStore from "stores/authenticateStore"
 
 let mockKeycloak
 
@@ -30,6 +31,16 @@ jest.mock("keycloak-js", () => {
 })
 
 const mockStore = configureMockStore([thunk])
+
+beforeEach(() => {
+  useAuthenticateStore.setState({
+    user: { username: "Foo McBar", groups: ["stanford", "pcc"] },
+  })
+})
+
+afterEach(() => {
+  useAuthenticateStore.setState({ user: undefined })
+})
 
 describe("loadUserData()", () => {
   it("fetches from Sinopia API and dispatches", async () => {

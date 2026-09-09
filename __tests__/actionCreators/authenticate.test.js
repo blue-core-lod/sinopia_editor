@@ -3,16 +3,22 @@ import { authenticate, signIn, signOut } from "actionCreators/authenticate"
 import configureMockStore from "redux-mock-store"
 import thunk from "redux-thunk"
 import * as sinopiaApi from "sinopiaApi"
+import useAuthenticateStore from "stores/authenticateStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
 }))
 
+// Still need mock Redux store for non-auth dispatches (clearErrors, loadUserData)
 const mockStore = configureMockStore([thunk])
 
 const userData = {
   data: { history: { template: [], resource: [], search: [] } },
 }
+
+afterEach(() => {
+  useAuthenticateStore.setState({ user: undefined })
+})
 
 describe("authenticate", () => {
   beforeEach(() => {
@@ -21,18 +27,21 @@ describe("authenticate", () => {
 
   describe("user already in state", () => {
     it("does not authenticate", async () => {
+      useAuthenticateStore.setState({ user: { username: "havram" } })
       const mockKeycloak = {}
-      const store = mockStore({
-        authenticate: { user: { username: "havram" } },
-      })
+      const store = mockStore({})
       await store.dispatch(authenticate(mockKeycloak))
       expect(store.getActions()).toEqual([])
+      // User unchanged
+      expect(useAuthenticateStore.getState().user).toEqual({
+        username: "havram",
+      })
     })
   })
 
   describe("successful", () => {
     sinopiaApi.fetchUser = jest.fn().mockResolvedValue(userData)
-    it("dispatches actions to add user", async () => {
+    it("sets user in Zustand store", async () => {
       const mockKeycloak = {
         authenticated: true,
         isTokenExpired: jest.fn(),
@@ -43,10 +52,10 @@ describe("authenticate", () => {
         },
       }
 
-      const store = mockStore({ authenticate: { user: undefined } })
+      const store = mockStore({})
       await store.dispatch(authenticate(mockKeycloak))
 
-      expect(store.getActions()).toHaveAction("SET_USER", {
+      expect(useAuthenticateStore.getState().user).toEqual({
         username: "havram",
         groups: ["blue core"],
       })
@@ -54,11 +63,14 @@ describe("authenticate", () => {
     })
   })
   describe("failure", () => {
-    it("dispatches actions to remove user", async () => {
+    it("removes user from Zustand store", async () => {
+      useAuthenticateStore.setState({
+        user: { username: "stale", groups: [] },
+      })
       const mockKeycloak = { authenticated: false }
-      const store = mockStore({ authenticate: { user: undefined } })
+      const store = mockStore({})
       await store.dispatch(authenticate(mockKeycloak))
-      expect(store.getActions()).toHaveAction("REMOVE_USER")
+      expect(useAuthenticateStore.getState().user).toBeUndefined()
     })
   })
 })
@@ -70,23 +82,24 @@ describe("signIn", () => {
 
   describe("successful", () => {
     sinopiaApi.fetchUser = jest.fn().mockResolvedValue(userData)
-    it("dispatches actions to add user", async () => {
-      let store = mockStore()
+    it("dispatches clearErrors and calls keycloak login", async () => {
+      const store = mockStore({})
       const mockKeycloak = {
         login: jest.fn(() => Promise.resolve(true)),
         isTokenExpired: jest.fn(),
         updateToken: jest.fn(),
       }
       await store.dispatch(signIn(mockKeycloak, "testerrorkey"))
-      // After successful signIn, redirected to Sinopia home-page
+      expect(store.getActions()).toHaveAction("CLEAR_ERRORS", "testerrorkey")
+
+      // Simulate redirect back — keycloak now authenticated
       mockKeycloak.authenticated = true
       mockKeycloak.tokenParsed = {
         preferred_username: "havram",
       }
-      store = mockStore({ authenticate: { user: undefined } })
       await store.dispatch(authenticate(mockKeycloak))
 
-      expect(store.getActions()).toHaveAction("SET_USER", {
+      expect(useAuthenticateStore.getState().user).toEqual({
         username: "havram",
         groups: ["blue core"],
       })
@@ -94,34 +107,35 @@ describe("signIn", () => {
     })
   })
   describe("failure", () => {
-    it("dispatches actions to remove user", async () => {
-      let store = mockStore()
+    it("dispatches clearErrors then removes user on failed auth", async () => {
+      const store = mockStore({})
       const mockKeycloak = {
         login: jest.fn(() => Promise.resolve(false)),
       }
       await store.dispatch(signIn(mockKeycloak, "testerrorkey"))
       expect(store.getActions()).toHaveAction("CLEAR_ERRORS", "testerrorkey")
 
-      // SignIn failures happen in Keycloak so can't test failures
-      // directly, simulates user refreshing Sinopia
-      store = mockStore({ authenticate: { user: undefined } })
+      // Simulate user refreshing Sinopia — not authenticated
       await store.dispatch(authenticate(mockKeycloak))
-
-      expect(store.getActions()).toHaveAction("REMOVE_USER")
+      expect(useAuthenticateStore.getState().user).toBeUndefined()
     })
   })
 })
 
 describe("signOut", () => {
   describe("successful", () => {
-    it("dispatches actions to remove user", async () => {
-      const store = mockStore()
+    it("removes user from Zustand store and calls keycloak logout", async () => {
+      useAuthenticateStore.setState({
+        user: { username: "havram", groups: ["blue core"] },
+      })
+      const store = mockStore({})
       const mockKeycloak = {
         logout: jest.fn(() => Promise.resolve(true)),
       }
       await store.dispatch(signOut(mockKeycloak))
 
-      expect(store.getActions()).toHaveAction("REMOVE_USER")
+      expect(useAuthenticateStore.getState().user).toBeUndefined()
+      expect(mockKeycloak.logout).toHaveBeenCalled()
     })
   })
 })

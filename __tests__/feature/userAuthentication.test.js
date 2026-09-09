@@ -8,11 +8,11 @@ import {
 import { createState } from "stateUtils"
 import { createStore, renderApp } from "testUtils"
 import * as sinopiaApi from "sinopiaApi"
+import useAuthenticateStore from "stores/authenticateStore"
 
 jest.mock("../../src/KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({
     keycloak: {
-      authenticated: false,
       logout: jest.fn(),
     },
   }),
@@ -25,7 +25,7 @@ jest.spyOn(sinopiaApi, "fetchUser").mockResolvedValue({
 describe("user authentication", () => {
   it("allows a logged in user to log out and allows a new one to login", async () => {
     const state = createState()
-    state.authenticate.user.groups = []
+    useAuthenticateStore.setState({ user: { username: "Foo McBar", groups: [] } })
     const store = createStore(state)
 
     renderApp(store)

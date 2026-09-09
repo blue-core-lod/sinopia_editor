@@ -2,6 +2,7 @@
 import { initialState } from "store"
 import StateResourceBuilder from "./stateResourceBuilderUtils"
 import _ from "lodash"
+import useAuthenticateStore from "stores/authenticateStore"
 
 const build = new StateResourceBuilder()
 
@@ -53,21 +54,22 @@ const buildExports = (state, options) => {
 }
 
 const buildAuthenticate = (state, options) => {
-  state.authenticate = { authenticationState: {} }
-
-  if (options.notAuthenticated) return
+  if (options.notAuthenticated) {
+    useAuthenticateStore.setState({ user: undefined })
+    return
+  }
 
   let groups = ["stanford", "pcc"]
   if (options.noGroups) groups = []
   if (options.otherGroups) groups = ["loc"]
   if (options.editGroups) groups = ["cornell"]
 
-  state.authenticate = {
+  useAuthenticateStore.setState({
     user: {
       username: "Foo McBar",
       groups,
     },
-  }
+  })
 }
 
 const buildLanguages = (state, options) => {

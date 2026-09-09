@@ -1,9 +1,8 @@
-import { useSelector } from "react-redux"
-import { selectGroups } from "selectors/authenticate"
+import useAuthenticateStore from "stores/authenticateStore"
 import _ from "lodash"
 
 const usePermissions = () => {
-  const userGroups = useSelector((state) => selectGroups(state)) || []
+  const userGroups = useAuthenticateStore((state) => state.user?.groups) || []
 
   const canEdit = (resource) =>
     userGroups.includes(resource?.group) ||

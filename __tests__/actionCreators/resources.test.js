@@ -19,6 +19,7 @@ import { safeAction } from "actionUtils"
 import expectedExpandPropertyAddValueAction from "../__action_fixtures__/expandProperty-ADD_VALUE"
 import expectedExpandPropertyAddPropertyAction from "../__action_fixtures__/expandProperty-ADD_PROPERTY"
 import expectedAddSiblingAddValueAction from "../__action_fixtures__/addSiblingValueSubject-ADD_VALUE"
+import useAuthenticateStore from "stores/authenticateStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -33,6 +34,13 @@ beforeEach(() => {
   nanoid.mockImplementation(() => "abc123")
   // Capture and not display console output
   restoreConsole = mockConsole(["error", "debug"])
+  useAuthenticateStore.setState({
+    user: { username: "Foo McBar", groups: ["stanford", "pcc"] },
+  })
+})
+
+afterEach(() => {
+  useAuthenticateStore.setState({ user: undefined })
 })
 
 afterAll(() => {

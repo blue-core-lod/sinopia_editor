@@ -11,7 +11,7 @@ import {
   selectCurrentResourceKey,
   selectNormSubject,
 } from "selectors/resources"
-import { selectGroups } from "selectors/authenticate"
+import useAuthenticateStore from "stores/authenticateStore"
 import { selectGroupMap } from "selectors/groups"
 import usePermissions from "hooks/usePermissions"
 import useAlerts from "hooks/useAlerts"
@@ -22,7 +22,7 @@ const GroupChoiceModal = () => {
   const errorKey = useAlerts()
   const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
   const resource = useSelector((state) => selectNormSubject(state, resourceKey))
-  const userGroupIds = useSelector((state) => selectGroups(state))
+  const userGroupIds = useAuthenticateStore((state) => state.user?.groups)
   const groupMap = useSelector((state) => selectGroupMap(state))
   const [ownerGroupId, setOwnerGroupId] = useState(
     resource.group || userGroupIds[0]

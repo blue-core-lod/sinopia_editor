@@ -28,7 +28,7 @@ import { fetchLanguages } from "actionCreators/languages"
 import { fetchExports } from "actionCreators/exports"
 import Exports from "./exports/Exports"
 import { authenticate } from "actionCreators/authenticate"
-import { hasUser as hasUserSelector } from "selectors/authenticate"
+import useAuthenticateStore from "stores/authenticateStore"
 import { isModalOpen as isModalOpenSelector } from "selectors/modals"
 import {
   newResource as newResourceCreator,
@@ -56,7 +56,7 @@ const App = (props) => {
   const { canCreate, canEdit } = usePermissions()
   const [isFirstMountWithUser, setFirstMountWithUser] = useState(true)
   const { keycloak } = useKeycloak()
-  const hasUser = useSelector((state) => hasUserSelector(state))
+  const hasUser = useAuthenticateStore((state) => !!state.user)
   const isModalOpen = useSelector((state) => isModalOpenSelector(state))
 
   useEffect(() => {
