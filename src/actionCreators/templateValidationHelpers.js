@@ -109,48 +109,90 @@ const validatePropertyTemplate = (template) => {
 
 const validateRepeatedPropertyTemplates =
   (propertyTemplates, resourceTemplatePromises) => (dispatch) => {
-    const dupes = new Set()
-    const found = {}
+    // Collected first and classified once everything has resolved, rather
+    // than flagged as each promise resolves -- the same (uri, class) pair
+    // can legitimately appear twice (see below), and Promise resolution
+    // order is not guaranteed, so the exactly-one-non-suppressible check
+    // needs every occurrence in hand before deciding.
+    const plainUris = []
+    const nestedEntries = []
+
     return Promise.all(
       propertyTemplates.map((propertyTemplate) => {
-        if (!_.isEmpty(propertyTemplate.uris)) {
-          return Promise.all(
-            Object.keys(propertyTemplate.uris).map((uri) => {
-              if (_.isEmpty(propertyTemplate.valueSubjectTemplateKeys)) {
-                pushFoundOrDupe(uri, found, dupes)
-                return Promise.resolve()
-              }
-              return Promise.all(
-                propertyTemplate.valueSubjectTemplateKeys.map(
-                  (subjectTemplateKey) =>
-                    dispatch(
-                      loadResourceTemplateWithoutValidation(
-                        subjectTemplateKey,
-                        resourceTemplatePromises
-                      )
+        if (_.isEmpty(propertyTemplate.uris)) return Promise.resolve()
+
+        return Promise.all(
+          Object.keys(propertyTemplate.uris).map((uri) => {
+            if (_.isEmpty(propertyTemplate.valueSubjectTemplateKeys)) {
+              plainUris.push(uri)
+              return Promise.resolve()
+            }
+            return Promise.all(
+              propertyTemplate.valueSubjectTemplateKeys.map(
+                (subjectTemplateKey) =>
+                  dispatch(
+                    loadResourceTemplateWithoutValidation(
+                      subjectTemplateKey,
+                      resourceTemplatePromises
                     )
-                      .then((resourceTemplate) => {
-                        Object.keys(resourceTemplate.classes).forEach(
-                          (clazz) => {
-                            pushFoundOrDupeNestedResource(
-                              uri,
-                              clazz,
-                              found,
-                              dupes
-                            )
-                          }
-                        )
-                        return Promise.resolve()
-                      })
-                      // Some templates may not exist. This is not validated here.
-                      .catch(() => {})
-                )
+                  )
+                    .then((resourceTemplate) => {
+                      Object.keys(resourceTemplate.classes).forEach(
+                        (clazz) => {
+                          nestedEntries.push({
+                            uri,
+                            clazz,
+                            suppressible: resourceTemplate.suppressible,
+                          })
+                        }
+                      )
+                    })
+                    // Some templates may not exist. This is not validated here.
+                    .catch(() => {})
               )
-            })
-          )
-        }
+            )
+          })
+        )
       })
     ).then(() => {
+      const dupes = new Set()
+
+      // A plain (non-nested) property URI should never repeat.
+      const plainUriCounts = {}
+      plainUris.forEach((uri) => {
+        plainUriCounts[uri] = (plainUriCounts[uri] || 0) + 1
+      })
+      Object.keys(plainUriCounts).forEach((uri) => {
+        if (plainUriCounts[uri] > 1) dupes.add(uri)
+      })
+
+      // A nested resource property URI may repeat across different classes,
+      // and may repeat for the SAME class only when exactly one of the
+      // sharing candidates is non-suppressible -- a suppressible template
+      // exists only to catch values with no local type at all, so pairing
+      // it with one non-suppressible candidate for the same class is
+      // resolved unambiguously at load time, not a real conflict.
+      const byUriAndClass = {}
+      nestedEntries.forEach(({ uri, clazz, suppressible }) => {
+        const key = `${uri} ${clazz}`
+        if (!byUriAndClass[key]) byUriAndClass[key] = { uri, suppressible: [] }
+        byUriAndClass[key].suppressible.push(suppressible)
+      })
+      Object.values(byUriAndClass).forEach(({ uri, suppressible }) => {
+        const nonSuppressibleCount = suppressible.filter(
+          (isSuppressible) => !isSuppressible
+        ).length
+        if (suppressible.length > 1 && nonSuppressibleCount !== 1)
+          dupes.add(uri)
+      })
+
+      // A plain property URI must never coincide with a nested resource
+      // property URI, regardless of class.
+      const nestedUris = new Set(nestedEntries.map((entry) => entry.uri))
+      plainUris.forEach((uri) => {
+        if (nestedUris.has(uri)) dupes.add(uri)
+      })
+
       if (_.isEmpty(dupes)) return []
 
       return [
@@ -162,38 +204,6 @@ const validateRepeatedPropertyTemplates =
       ]
     })
   }
-
-const pushFoundOrDupe = (uri, found, dupes) => {
-  // Other properties should not have same URI as any other property (including nested).
-  if (found[uri]) {
-    dupes.add(uri)
-  } else {
-    // For others, just set to true to indicate that the property has been found.
-    found[uri] = true
-  }
-}
-
-const pushFoundOrDupeNestedResource = (uri, clazz, found, dupes) => {
-  // Nested resource properties have clazz; other properties do not.
-  // Nested resource properties should not have the same URI and class as any other nested resource property.
-  if (found[uri]) {
-    // If a nested property and there are already classes for this URI, then check this class.
-    if (Array.isArray(found[uri])) {
-      // If this class found, then a dupe. Otherwise, add to list of classes for this URI.
-      if (found[uri].includes(clazz)) {
-        dupes.add(uri)
-      } else {
-        found[uri].add(clazz)
-      }
-    } else {
-      // There is already a property, so a dupe.
-      dupes.add(uri)
-    }
-  } else {
-    // For nested properties, keep track of classes.
-    found[uri] = [clazz]
-  }
-}
 
 const validateAllRefResourceTemplatesExist =
   (propertyTemplates, resourceTemplatePromises) => (dispatch) =>
@@ -270,6 +280,7 @@ const validateUniqueResourceURIs =
             subjectTemplate.class,
             Object.keys(subjectTemplate.classes),
             subjectTemplate.id,
+            subjectTemplate.suppressible,
           ])
           .catch(() => {
             /* nothing */
@@ -277,26 +288,35 @@ const validateUniqueResourceURIs =
       )
     ).then((results) => {
       // No other nested template can have (required) class or optional class that is the same as this (required) class.
-      // Nested templates can have same optional classes.
-      const classToResourceTemplateIds = {}
+      // Nested templates can have same optional classes. The one exception:
+      // a suppressible template exists only to catch values with no local
+      // type at all, so if exactly one non-suppressible candidate shares a
+      // class with one or more suppressible candidates, loading resolves
+      // that unambiguously to the non-suppressible one -- not an error.
+      const classToCandidates = {}
       const classes = []
       _.compact(results).forEach((result) => {
-        const [clazz, allClasses, resourceTemplateId] = result
+        const [clazz, allClasses, resourceTemplateId, suppressible] = result
         classes.push(clazz)
         allClasses.forEach((allClazz) => {
-          if (!classToResourceTemplateIds[allClazz])
-            classToResourceTemplateIds[allClazz] = []
-          classToResourceTemplateIds[allClazz].push(resourceTemplateId)
+          if (!classToCandidates[allClazz]) classToCandidates[allClazz] = []
+          classToCandidates[allClazz].push({ resourceTemplateId, suppressible })
         })
       })
 
       const multipleClasses = new Set()
       classes.forEach((clazz) => {
-        if (classToResourceTemplateIds[clazz].length > 1)
+        const candidates = classToCandidates[clazz]
+        const nonSuppressibleCount = candidates.filter(
+          (candidate) => !candidate.suppressible
+        ).length
+        if (candidates.length > 1 && nonSuppressibleCount !== 1)
           multipleClasses.add(clazz)
       })
       return Array.from(multipleClasses).map((clazz) => {
-        const classIdsStr = classToResourceTemplateIds[clazz].join(", ")
+        const classIdsStr = classToCandidates[clazz]
+          .map((candidate) => candidate.resourceTemplateId)
+          .join(", ")
         return `The following resource templates references for ${_.first(
           Object.keys(propertyTemplate.uris)
         )} have the same class (${clazz}), but must be unique: ${classIdsStr}`
