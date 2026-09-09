@@ -1,3 +1,1 @@
-const selectHeaderSearch = (state) => state.editor.currentHeaderSearch
-
-export default selectHeaderSearch
+export const selectHeaderSearch = (state) => state.editor.currentHeaderSearch

@@ -9,7 +9,7 @@ import searchConfig from "../../../static/searchConfig.json"
 import { sinopiaSearchUri } from "utilities/authorityConfig"
 import useSearch from "hooks/useSearch"
 import { useKeycloak } from "../../KeycloakContext"
-import selectHeaderSearch from "selectors/editor"
+import { selectHeaderSearch } from "selectors/editor"
 import { setHeaderSearch } from "actions/index"
 import useAlerts from "hooks/useAlerts"
 
