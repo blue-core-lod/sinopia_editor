@@ -755,4 +755,103 @@ describe("validateTemplates()", () => {
       expect(store.getActions()).toHaveAction("ADD_ERROR", payload)
     })
   })
+  describe("two property templates sharing a property URI, one nested template suppressible", () => {
+    // The suppressible exemption applies only WITHIN a single property
+    // template. Across two property templates the same triples are matched
+    // twice at load time and the value is duplicated into both fields, so
+    // sharing a class here is still a conflict.
+    const subjectTemplate = build.subjectTemplate({
+      id: "resourceTemplate:testing:dupeProperties",
+      clazz: "http://sinopia.io/testing/DupeProperties",
+      label: "Nested resource with duplicate properties",
+      propertyTemplates: [
+        build.propertyTemplate({
+          subjectTemplateKey: "resourceTemplate:testing:dupeProperties",
+          label: "Dupe property1",
+          uris: {
+            "http://sinopia.io/testing/DupeProperties/property1": "Property1",
+          },
+          type: "resource",
+          component: "NestedResource",
+          valueSubjectTemplateKeys: ["resourceTemplate:testing:richUri"],
+        }),
+        build.propertyTemplate({
+          subjectTemplateKey: "resourceTemplate:testing:dupeProperties",
+          label: "Dupe property2",
+          uris: {
+            "http://sinopia.io/testing/DupeProperties/property1": "Property1",
+          },
+          type: "resource",
+          component: "NestedResource",
+          valueSubjectTemplateKeys: ["resourceTemplate:testing:suppressedUri"],
+        }),
+      ],
+    })
+
+    it("returns error", async () => {
+      const store = mockStore(createState())
+
+      expect(
+        await store.dispatch(
+          validateTemplates(subjectTemplate, {}, "testerrorkey")
+        )
+      ).toBe(false)
+      const payload = {
+        errorKey: "testerrorkey",
+        error:
+          "A property template may not use the same property URI as another property template (http://sinopia.io/testing/DupeProperties/property1) unless both propery templates are of type nested resource and the nested resources are of different classes.",
+      }
+      expect(store.getActions()).toHaveAction("ADD_ERROR", payload)
+    })
+  })
+
+  describe("two property templates sharing a property URI, nested templates sharing only an optional class", () => {
+    // resourceTemplate:bf2:Title:Note:OptionalClass is bf:TitleNote with
+    // optional bf:Note; resourceTemplate:testing:sharedOptionalClass is
+    // testing/SharedOptionalClass with optional bf:Note. Neither required
+    // class appears among the other's classes, so this is allowed --
+    // nested templates may share optional classes.
+    const subjectTemplate = build.subjectTemplate({
+      id: "resourceTemplate:testing:dupeProperties",
+      clazz: "http://sinopia.io/testing/DupeProperties",
+      label: "Nested resource with duplicate properties",
+      propertyTemplates: [
+        build.propertyTemplate({
+          subjectTemplateKey: "resourceTemplate:testing:dupeProperties",
+          label: "Dupe property1",
+          uris: {
+            "http://sinopia.io/testing/DupeProperties/property1": "Property1",
+          },
+          type: "resource",
+          component: "NestedResource",
+          valueSubjectTemplateKeys: [
+            "resourceTemplate:bf2:Title:Note:OptionalClass",
+          ],
+        }),
+        build.propertyTemplate({
+          subjectTemplateKey: "resourceTemplate:testing:dupeProperties",
+          label: "Dupe property2",
+          uris: {
+            "http://sinopia.io/testing/DupeProperties/property1": "Property1",
+          },
+          type: "resource",
+          component: "NestedResource",
+          valueSubjectTemplateKeys: [
+            "resourceTemplate:testing:sharedOptionalClass",
+          ],
+        }),
+      ],
+    })
+
+    it("returns no errors", async () => {
+      const store = mockStore(createState())
+
+      expect(
+        await store.dispatch(
+          validateTemplates(subjectTemplate, {}, "testerrorkey")
+        )
+      ).toBe(true)
+      expect(store.getActions()).not.toHaveAction("ADD_ERROR")
+    })
+  })
 })

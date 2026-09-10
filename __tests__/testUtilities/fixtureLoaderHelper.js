@@ -78,6 +78,8 @@ const templateFilenames = {
     "testing_required_single_default_host.json",
   "resourceTemplate:testing:namedNodeMultiProp":
     "testing_named_node_multi_prop.json",
+  "resourceTemplate:testing:sharedOptionalClass":
+    "testing_shared_optional_class.json",
   "resourceTemplate:testing:namedNodeMultiPropHost":
     "testing_named_node_multi_prop_host.json",
 }

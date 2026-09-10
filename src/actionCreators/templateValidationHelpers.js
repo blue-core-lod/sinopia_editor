@@ -110,15 +110,15 @@ const validatePropertyTemplate = (template) => {
 const validateRepeatedPropertyTemplates =
   (propertyTemplates, resourceTemplatePromises) => (dispatch) => {
     // Collected first and classified once everything has resolved, rather
-    // than flagged as each promise resolves -- the same (uri, class) pair
-    // can legitimately appear twice (see below), and Promise resolution
-    // order is not guaranteed, so the exactly-one-non-suppressible check
-    // needs every occurrence in hand before deciding.
+    // than flagged as each promise resolves -- deciding whether a (uri,
+    // class) pair is a conflict depends on how many *other* property
+    // templates contribute to it, and Promise resolution order is not
+    // guaranteed, so every occurrence has to be in hand before deciding.
     const plainUris = []
     const nestedEntries = []
 
     return Promise.all(
-      propertyTemplates.map((propertyTemplate) => {
+      propertyTemplates.map((propertyTemplate, propertyTemplateIndex) => {
         if (_.isEmpty(propertyTemplate.uris)) return Promise.resolve()
 
         return Promise.all(
@@ -137,15 +137,12 @@ const validateRepeatedPropertyTemplates =
                     )
                   )
                     .then((resourceTemplate) => {
-                      Object.keys(resourceTemplate.classes).forEach(
-                        (clazz) => {
-                          nestedEntries.push({
-                            uri,
-                            clazz,
-                            suppressible: resourceTemplate.suppressible,
-                          })
-                        }
-                      )
+                      nestedEntries.push({
+                        propertyTemplateIndex,
+                        uri,
+                        requiredClass: resourceTemplate.class,
+                        allClasses: Object.keys(resourceTemplate.classes),
+                      })
                     })
                     // Some templates may not exist. This is not validated here.
                     .catch(() => {})
@@ -166,23 +163,30 @@ const validateRepeatedPropertyTemplates =
         if (plainUriCounts[uri] > 1) dupes.add(uri)
       })
 
-      // A nested resource property URI may repeat across different classes,
-      // and may repeat for the SAME class only when exactly one of the
-      // sharing candidates is non-suppressible -- a suppressible template
-      // exists only to catch values with no local type at all, so pairing
-      // it with one non-suppressible candidate for the same class is
-      // resolved unambiguously at load time, not a real conflict.
-      const byUriAndClass = {}
-      nestedEntries.forEach(({ uri, clazz, suppressible }) => {
-        const key = `${uri} ${clazz}`
-        if (!byUriAndClass[key]) byUriAndClass[key] = { uri, suppressible: [] }
-        byUriAndClass[key].suppressible.push(suppressible)
+      // This check is only about collisions BETWEEN property templates.
+      // Several nested templates offered by a SINGLE property template are
+      // validated by validateUniqueResourceURIs, which knows the suppressible
+      // exemption (one suppressible plus one non-suppressible sharing a class
+      // resolves unambiguously at load time). That exemption must not be
+      // applied here: two property templates sharing a property URI each
+      // match the same triples independently at load time and would duplicate
+      // the value into both fields, whether or not either is suppressible.
+      //
+      // Two property templates may share a property URI only when their
+      // nested resources are of different classes -- a required class must
+      // not appear among any other nested template's classes, required or
+      // optional. Sharing only an optional class is allowed.
+      const propertyTemplatesByUriAndClass = {}
+      nestedEntries.forEach(({ propertyTemplateIndex, uri, allClasses }) => {
+        allClasses.forEach((clazz) => {
+          const key = `${uri} ${clazz}`
+          if (!propertyTemplatesByUriAndClass[key])
+            propertyTemplatesByUriAndClass[key] = new Set()
+          propertyTemplatesByUriAndClass[key].add(propertyTemplateIndex)
+        })
       })
-      Object.values(byUriAndClass).forEach(({ uri, suppressible }) => {
-        const nonSuppressibleCount = suppressible.filter(
-          (isSuppressible) => !isSuppressible
-        ).length
-        if (suppressible.length > 1 && nonSuppressibleCount !== 1)
+      nestedEntries.forEach(({ uri, requiredClass }) => {
+        if (propertyTemplatesByUriAndClass[`${uri} ${requiredClass}`].size > 1)
           dupes.add(uri)
       })
 

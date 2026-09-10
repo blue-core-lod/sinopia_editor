@@ -668,12 +668,8 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       expect(valueSubject.subjectTemplate.id).toBe(
         "resourceTemplate:testing:richUri"
       )
-      expect(valueSubject.properties[0].values[0].literal).toBe(
-        "A rich value"
-      )
-      expect(valueSubject.properties[1].values[0].uri).toBe(
-        "http://foo/scheme"
-      )
+      expect(valueSubject.properties[0].values[0].literal).toBe("A rich value")
+      expect(valueSubject.properties[1].values[0].uri).toBe("http://foo/scheme")
 
       // Both properties were consumed from the real data, so nothing is left unused.
       expect(actions).toHaveAction("SET_UNUSED_RDF", {

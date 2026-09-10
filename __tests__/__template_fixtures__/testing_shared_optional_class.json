@@ -1,0 +1,68 @@
+[
+  {
+    "@id": "_:b90",
+    "@type": [
+      "http://sinopia.io/vocabulary/PropertyTemplate"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Note Text"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasPropertyUri": [
+      {
+        "@id": "http://www.w3.org/2000/01/rdf-schema#label"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasPropertyType": [
+      {
+        "@id": "http://sinopia.io/vocabulary/propertyType/literal"
+      }
+    ]
+  },
+  {
+    "@id": "http://localhost:3000/resource/resourceTemplate:testing:sharedOptionalClass",
+    "http://sinopia.io/vocabulary/hasResourceTemplate": [
+      {
+        "@value": "sinopia:template:resource"
+      }
+    ],
+    "@type": [
+      "http://sinopia.io/vocabulary/ResourceTemplate"
+    ],
+    "http://sinopia.io/vocabulary/hasResourceId": [
+      {
+        "@value": "resourceTemplate:testing:sharedOptionalClass"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasClass": [
+      {
+        "@id": "http://sinopia.io/testing/SharedOptionalClass"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasOptionalClass": [
+      {
+        "@id": "http://id.loc.gov/ontologies/bibframe/Note"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Shares only an optional class with bf2:Title:Note:OptionalClass"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasRemark": [
+      {
+        "@value": "Required class is unique; its only shared class (bf:Note) is optional on both sides -- used to test that sharing an optional class alone is not a conflict."
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasPropertyTemplate": [
+      {
+        "@list": [
+          {
+            "@id": "_:b90"
+          }
+        ]
+      }
+    ]
+  }
+]
