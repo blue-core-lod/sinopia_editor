@@ -85,7 +85,9 @@ describe("InputLiteralValue handleLcshSelect", () => {
   })
 
   it("dispatches updateLiteralValue with the selected label", () => {
-    const spy = jest.spyOn(useEntitiesStore.getState(), "updateValue")
+    const spy = jest
+      .spyOn(useEntitiesStore.getState(), "updateValue")
+      .mockImplementation(() => {})
     const store = mockStore(makeState())
     renderComponent(store)
 
@@ -104,10 +106,12 @@ describe("InputLiteralValue handleLcshSelect", () => {
   })
 
   it("dispatches setSubjectComponentList when uri and subjectKey are present", () => {
-    const spy = jest.spyOn(
-      useEntitiesStore.getState(),
-      "setSubjectComponentList"
-    )
+    jest
+      .spyOn(useEntitiesStore.getState(), "updateValue")
+      .mockImplementation(() => {})
+    const spy = jest
+      .spyOn(useEntitiesStore.getState(), "setSubjectComponentList")
+      .mockImplementation(() => {})
     const store = mockStore(makeState())
     renderComponent(store)
 
@@ -117,13 +121,16 @@ describe("InputLiteralValue handleLcshSelect", () => {
 
     expect(spy).toHaveBeenCalledWith(SUBJECT_KEY, SUBJECT_URI)
     spy.mockRestore()
+    useEntitiesStore.getState().updateValue.mockRestore?.()
   })
 
   it("does not dispatch setSubjectComponentList when uri is absent", () => {
-    const spy = jest.spyOn(
-      useEntitiesStore.getState(),
-      "setSubjectComponentList"
-    )
+    jest
+      .spyOn(useEntitiesStore.getState(), "updateValue")
+      .mockImplementation(() => {})
+    const spy = jest
+      .spyOn(useEntitiesStore.getState(), "setSubjectComponentList")
+      .mockImplementation(() => {})
     const store = mockStore(makeState())
     renderComponent(store)
 
@@ -133,13 +140,16 @@ describe("InputLiteralValue handleLcshSelect", () => {
 
     expect(spy).not.toHaveBeenCalled()
     spy.mockRestore()
+    useEntitiesStore.getState().updateValue.mockRestore?.()
   })
 
   it("does not dispatch setSubjectComponentList when subjectKey is absent", () => {
-    const spy = jest.spyOn(
-      useEntitiesStore.getState(),
-      "setSubjectComponentList"
-    )
+    jest
+      .spyOn(useEntitiesStore.getState(), "updateValue")
+      .mockImplementation(() => {})
+    const spy = jest
+      .spyOn(useEntitiesStore.getState(), "setSubjectComponentList")
+      .mockImplementation(() => {})
     const store = mockStore(makeState({ subjectKey: null }))
     renderComponent(store)
 
@@ -149,6 +159,7 @@ describe("InputLiteralValue handleLcshSelect", () => {
 
     expect(spy).not.toHaveBeenCalled()
     spy.mockRestore()
+    useEntitiesStore.getState().updateValue.mockRestore?.()
   })
 
   it("renders LcshTypeahead when propertyUri is the MADS authoritative label URI", () => {

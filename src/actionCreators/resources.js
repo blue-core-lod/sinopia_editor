@@ -14,6 +14,7 @@ import {
 import { putResource, postResource, fetchResource } from "sinopiaApi"
 import {
   selectProperty,
+  selectNormProperty,
   selectValue,
   selectFullSubject,
   selectMainTitleProperty,
@@ -478,9 +479,27 @@ export const expandProperty = (propertyKey, errorKey) => (dispatch) => {
  * Note that this is NOT showing/hiding a property.
  */
 export const contractProperty = (propertyKey) => () => {
-  const property = selectProperty(useEntitiesStore.getState(), propertyKey)
-  property.values = null
-  useEntitiesStore.getState().addProperty(property)
+  const property = selectNormProperty(useEntitiesStore.getState(), propertyKey)
+  if (!property) return
+
+  // Remove existing values
+  const oldValueKeys = property.valueKeys || []
+  oldValueKeys.forEach((valueKey) => {
+    useEntitiesStore.getState().removeValue(valueKey)
+  })
+
+  // Hide property (the removeValue calls above already removed valueKeys entries;
+  // set valueKeys to null to indicate contracted state)
+  useEntitiesStore.setState((prev) => ({
+    properties: {
+      ...prev.properties,
+      [propertyKey]: {
+        ...prev.properties[propertyKey],
+        valueKeys: null,
+        show: false,
+      },
+    },
+  }))
 }
 
 /**

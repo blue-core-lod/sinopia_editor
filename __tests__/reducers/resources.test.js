@@ -75,7 +75,7 @@ describe("addProperty()", () => {
           key: "vmq88891",
           subject: { key: "t9zVwg2zO" },
           propertyTemplate: {
-            key: "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle",
+            key: "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal",
           },
           values: [],
           show: true,
@@ -89,7 +89,7 @@ describe("addProperty()", () => {
           subjectKey: "t9zVwg2zO",
           rootSubjectKey: "t9zVwg2zO",
           propertyTemplateKey:
-            "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle",
+            "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal",
           valueKeys: ["abc123"],
           show: false,
           rootPropertyKey: "vmq88891",
@@ -116,7 +116,7 @@ describe("addProperty()", () => {
     it("updates state", () => {
       const oldState = createState({ hasResourceWithLiteral: true })
       oldState.entities.propertyTemplates[
-        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle"
+        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal"
       ].languageSuppressed = true
 
       const action = {
@@ -125,7 +125,7 @@ describe("addProperty()", () => {
           key: "vmq88891",
           subject: { key: "t9zVwg2zO" },
           propertyTemplate: {
-            key: "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle",
+            key: "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal",
           },
           values: [],
           show: true,
@@ -159,7 +159,7 @@ describe("addProperty()", () => {
           key: "JQEtq-vmq8",
           subject: { key: "t9zVwg2zO" },
           propertyTemplate: {
-            key: "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle",
+            key: "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal",
           },
           values: [
             {
@@ -182,7 +182,7 @@ describe("addProperty()", () => {
         subjectKey: "t9zVwg2zO",
         rootSubjectKey: "t9zVwg2zO",
         propertyTemplateKey:
-          "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle",
+          "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal",
         valueKeys: ["RxGx7WMh4"],
         show: true,
         showNav: true,
@@ -392,7 +392,7 @@ describe("addSubject()", () => {
               key: "KQEtq-vmq9",
               subject: { key: "t9zVwg2zO" },
               propertyTemplate: {
-                key: "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle",
+                key: "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal",
               },
               valueKeys: [],
               show: true,
@@ -509,7 +509,7 @@ describe("addValue()", () => {
           rootSubjectKey: "t9zVwg2zO",
           rootPropertyKey: "JQEtq-vmq8",
           propertyTemplateKey:
-            "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle",
+            "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal",
           valueKeys: [],
           show: true,
           descUriOrLiteralValueKeys: [],
@@ -1090,7 +1090,7 @@ describe("removeValue()", () => {
         hasError: true,
       })
       oldState.entities.propertyTemplates[
-        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle"
+        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal"
       ].required = false
       const action = {
         type: "REMOVE_VALUE",
@@ -1365,7 +1365,7 @@ describe("updateValue()", () => {
     it("updates state", () => {
       const oldState = createState({ hasResourceWithLiteral: true })
       oldState.entities.propertyTemplates[
-        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle"
+        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal"
       ].required = true
 
       const action = {

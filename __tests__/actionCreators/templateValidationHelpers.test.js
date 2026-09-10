@@ -5,6 +5,7 @@ import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import ResourceBuilder from "resourceBuilderUtils"
 import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -12,6 +13,15 @@ jest.mock("KeycloakContext", () => ({
 
 afterEach(() => {
   useEditorStore.setState({ errors: {}, successes: {} })
+  useEntitiesStore.setState({
+    subjects: {},
+    properties: {},
+    values: {},
+    subjectTemplates: {},
+    propertyTemplates: {},
+    versions: {},
+    relationships: {},
+  })
 })
 
 // This forces Sinopia server to use fixtures
@@ -89,7 +99,10 @@ describe("validateTemplates()", () => {
           validateTemplates(subjectTemplate, {}, "testerrorkey")
         )
       ).toBe(true)
-      expect(store.getActions()).toHaveAction("ADD_TEMPLATES")
+      // Templates were added to Zustand entities store during validation
+      expect(
+        Object.keys(useEntitiesStore.getState().subjectTemplates).length
+      ).toBeGreaterThan(0)
       expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
         0
       )

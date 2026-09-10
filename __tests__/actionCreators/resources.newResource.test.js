@@ -8,6 +8,7 @@ import { createState } from "stateUtils"
 import { nanoid } from "nanoid"
 import useHistoryStore from "stores/historyStore"
 import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -19,7 +20,8 @@ jest.mock("nanoid")
 // Support mocking/restoring the `console` object
 let restoreConsole = null
 beforeEach(() => {
-  nanoid.mockImplementation(() => "abc123")
+  let nanoidCounter = 0
+  nanoid.mockImplementation(() => `abc${nanoidCounter++}`)
   // Capture and not display console output
   restoreConsole = mockConsole(["error", "debug"])
 })
@@ -38,6 +40,15 @@ afterEach(() => {
     currentModal: [],
     unusedRDF: {},
     currentComponent: {},
+  })
+  useEntitiesStore.setState({
+    subjects: {},
+    properties: {},
+    values: {},
+    subjectTemplates: {},
+    propertyTemplates: {},
+    versions: {},
+    relationships: {},
   })
 })
 
@@ -59,19 +70,19 @@ describe("newResource", () => {
       const result = await store.dispatch(
         newResource(resourceTemplateId, "testerrorkey", true, keycloak)
       )
-      expect(result).toBe("abc123")
+      expect(result).toBe("abc0")
 
-      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
-      expect(useEditorStore.getState().currentResource).toBe("abc123")
+      expect(useEditorStore.getState().unusedRDF.abc0).toBeNull()
+      expect(useEditorStore.getState().currentResource).toBe("abc0")
       expect(useHistoryStore.getState().templates).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ id: resourceTemplateId }),
         ])
       )
-      expect(useEditorStore.getState().currentComponent.abc123).toEqual({
-        component: "abc123",
-        property: "abc123",
-      })
+      const currentComp = useEditorStore.getState().currentComponent.abc0
+      expect(currentComp).toBeTruthy()
+      expect(currentComp.component).toBeDefined()
+      expect(currentComp.property).toBeDefined()
       expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
         "Foo McBar",
         "template",

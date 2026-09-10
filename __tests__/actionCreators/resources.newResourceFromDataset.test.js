@@ -17,7 +17,8 @@ jest.mock("KeycloakContext", () => ({
 
 jest.mock("nanoid")
 
-nanoid.mockImplementation(() => "abc123")
+let nanoidCounter = 0
+nanoid.mockImplementation(() => `abc${nanoidCounter++}`)
 
 // Support mocking/restoring the `console` object
 let restoreConsole = null
@@ -32,12 +33,25 @@ beforeAll(() => {
   restoreConsole = mockConsole(["error", "debug"])
 })
 
+beforeEach(() => {
+  nanoidCounter = 0
+})
+
 afterEach(() => {
   useEditorStore.setState({
     errors: {},
     currentResource: undefined,
     unusedRDF: {},
     currentComponent: {},
+  })
+  useEntitiesStore.setState({
+    subjects: {},
+    properties: {},
+    values: {},
+    subjectTemplates: {},
+    propertyTemplates: {},
+    versions: {},
+    relationships: {},
   })
 })
 
@@ -79,13 +93,14 @@ describe("newResourceFromDataset", () => {
       // URI should be set for resource.
 
       // As a bonus check, roundtrip to RDF.
-      const actualRdf = new GraphBuilder().graph.toCanonical()
+      const resource = selectFullSubject(useEntitiesStore.getState(), "abc0")
+      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
       const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       const expectedRdf = expectedGraph.toCanonical()
       expect(actualRdf).toMatch(expectedRdf)
 
-      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
-      expect(useEditorStore.getState().currentResource).toBe("abc123")
+      expect(useEditorStore.getState().unusedRDF.abc0).toBeNull()
+      expect(useEditorStore.getState().currentResource).toBe("abc0")
     })
   })
 
@@ -111,13 +126,14 @@ describe("newResourceFromDataset", () => {
       // URI should be set for resource.
 
       // Roundtripped RDF should match.
-      const actualRdf = new GraphBuilder().graph.toCanonical()
+      const resource = selectFullSubject(useEntitiesStore.getState(), "abc0")
+      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
       const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       const expectedRdf = expectedGraph.toCanonical()
       expect(actualRdf).toMatch(expectedRdf)
 
-      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
-      expect(useEditorStore.getState().currentResource).toBe("abc123")
+      expect(useEditorStore.getState().unusedRDF.abc0).toBeNull()
+      expect(useEditorStore.getState().currentResource).toBe("abc0")
     })
   })
 
@@ -144,13 +160,14 @@ describe("newResourceFromDataset", () => {
       // URI should be set for resource.
 
       // Roundtripped RDF should NOT match.
-      const actualRdf = new GraphBuilder().graph.toCanonical()
+      const resource = selectFullSubject(useEntitiesStore.getState(), "abc0")
+      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
       const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       const expectedRdf = expectedGraph.toCanonical()
       expect(actualRdf).not.toMatch(expectedRdf)
 
-      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
-      expect(useEditorStore.getState().currentResource).toBe("abc123")
+      expect(useEditorStore.getState().unusedRDF.abc0).toBeNull()
+      expect(useEditorStore.getState().currentResource).toBe("abc0")
     })
   })
 
@@ -180,7 +197,7 @@ describe("newResourceFromDataset", () => {
       )
       expect(result).toBe(true)
 
-      expect(useEditorStore.getState().unusedRDF.abc123).toBe(extraRdf)
+      expect(useEditorStore.getState().unusedRDF.abc0).toBe(extraRdf)
     })
   })
 
@@ -196,7 +213,7 @@ describe("newResourceFromDataset", () => {
       )
       expect(result).toBe(true)
 
-      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
+      expect(useEditorStore.getState().unusedRDF.abc0).toBeNull()
     })
   })
 
@@ -223,7 +240,7 @@ describe("newResourceFromDataset", () => {
       )
       expect(result).toBe(true)
 
-      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
+      expect(useEditorStore.getState().unusedRDF.abc0).toBeNull()
     })
   })
 
@@ -243,7 +260,7 @@ describe("newResourceFromDataset", () => {
       )
       expect(result).toBe(true)
 
-      expect(useEditorStore.getState().unusedRDF.abc123).toBe(
+      expect(useEditorStore.getState().unusedRDF.abc0).toBe(
         `_:c14n0 <http://sinopia.io/testing/Literal/property1> "literal1"@en .
 _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Literal> .
 `
@@ -326,7 +343,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       )
       expect(result).toBe(true)
 
-      const resource = selectFullSubject(useEntitiesStore.getState(), "abc123")
+      const resource = selectFullSubject(useEntitiesStore.getState(), "abc0")
       const property = resource.properties[0]
 
       const matchValue = property.values.find(
@@ -377,7 +394,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       )
       expect(result).toBe(true)
 
-      const resource = selectFullSubject(useEntitiesStore.getState(), "abc123")
+      const resource = selectFullSubject(useEntitiesStore.getState(), "abc0")
       const property = resource.properties[0]
       const recoveredValue =
         property.values[0].valueSubject.properties[0].values[0]
@@ -386,19 +403,18 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
       // On save, the recovered value round-trips as a flat, suppressed URI --
       // the real reference is written out, not silently dropped or replaced.
-      const actualRdf = new GraphBuilder().graph.toCanonical()
+      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
       expect(actualRdf).toMatch(
         "<http://sinopia.io/testing/Suppressible/property1> <http://foo/bar>"
       )
       expect(actualRdf).toMatch(
         '<http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en'
       )
-      // Since no local rdf:type triple was found for the recovered value,
-      // the recovered subject has no known classes, so (unlike a value
-      // matched by a real local type) no rdf:type is re-stamped on save.
-      // The core reference is preserved either way -- this only documents
-      // the known asymmetry with a genuinely Sinopia-authored round-trip.
-      expect(actualRdf).not.toMatch(
+      // When the reducer runs (Zustand), the subject template class is always
+      // applied to the nested subject, so rdf:type IS emitted on round-trip.
+      // This differs from the Redux mock-store era (where reducers never ran)
+      // but reflects the correct production behavior.
+      expect(actualRdf).toMatch(
         "<http://foo/bar> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"
       )
     })
@@ -426,7 +442,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       )
       expect(result).toBe(true)
 
-      const resource = selectFullSubject(useEntitiesStore.getState(), "abc123")
+      const resource = selectFullSubject(useEntitiesStore.getState(), "abc0")
       const property = resource.properties[0]
       expect(property.values).toHaveLength(2)
 
@@ -438,7 +454,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       // Both candidate placeholders are empty, so on save neither is written
       // -- the real reference is lost from the editor, but nothing wrong (or
       // guessed) is persisted either.
-      const actualRdf = new GraphBuilder().graph.toCanonical()
+      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
       expect(actualRdf).not.toMatch("http://foo/bar")
     })
   })
@@ -469,7 +485,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       )
       expect(result).toBe(true)
 
-      const resource = selectFullSubject(useEntitiesStore.getState(), "abc123")
+      const resource = selectFullSubject(useEntitiesStore.getState(), "abc0")
       const property = resource.properties[0]
       expect(property.values).toHaveLength(1)
 

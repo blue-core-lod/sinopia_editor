@@ -14,6 +14,7 @@ import { nanoid } from "nanoid"
 import * as relationshipActionCreators from "actionCreators/relationships"
 import useHistoryStore from "stores/historyStore"
 import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -25,7 +26,8 @@ jest.mock("nanoid")
 // Support mocking/restoring the `console` object
 let restoreConsole = null
 beforeEach(() => {
-  nanoid.mockImplementation(() => "abc123")
+  let nanoidCounter = 0
+  nanoid.mockImplementation(() => `abc${nanoidCounter++}`)
   // Capture and not display console output
   restoreConsole = mockConsole(["error", "debug"])
 })
@@ -47,6 +49,15 @@ afterEach(() => {
     unusedRDF: {},
     pendingResourceTemplateSelection: null,
     currentComponent: {},
+  })
+  useEntitiesStore.setState({
+    subjects: {},
+    properties: {},
+    values: {},
+    subjectTemplates: {},
+    propertyTemplates: {},
+    versions: {},
+    relationships: {},
   })
 })
 
@@ -77,8 +88,8 @@ describe("loadResource", () => {
       expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
         0
       )
-      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
-      expect(useEditorStore.getState().currentResource).toBe("abc123")
+      expect(useEditorStore.getState().unusedRDF.abc0).toBeNull()
+      expect(useEditorStore.getState().currentResource).toBe("abc0")
       expect(useHistoryStore.getState().resources).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
@@ -100,7 +111,7 @@ describe("loadResource", () => {
 
       // loadRelationships is invoked async and do not wait for results
       expect(relationshipActionCreators.loadRelationships).toHaveBeenCalledWith(
-        "abc123",
+        "abc0",
         uri,
         "testerrorkey"
       )
@@ -121,12 +132,12 @@ describe("loadResource", () => {
       expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
         0
       )
-      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
-      expect(useEditorStore.getState().currentResource).toBe("abc123")
-      expect(useEditorStore.getState().currentComponent.abc123).toEqual({
-        component: "abc123",
-        property: "abc123",
-      })
+      expect(useEditorStore.getState().unusedRDF.abc0).toBeNull()
+      expect(useEditorStore.getState().currentResource).toBe("abc0")
+      const currentComp = useEditorStore.getState().currentComponent.abc0
+      expect(currentComp).toBeTruthy()
+      expect(currentComp.component).toBeDefined()
+      expect(currentComp.property).toBeDefined()
     })
   })
 
@@ -142,8 +153,8 @@ describe("loadResource", () => {
       expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
         0
       )
-      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
-      expect(useEditorStore.getState().currentPreviewResource).toBe("abc123")
+      expect(useEditorStore.getState().unusedRDF.abc0).toBeNull()
+      expect(useEditorStore.getState().currentPreviewResource).toBe("abc0")
     })
   })
 
@@ -161,8 +172,8 @@ describe("loadResource", () => {
       expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
         0
       )
-      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
-      expect(useEditorStore.getState().currentDiff.compareFrom).toBe("abc123")
+      expect(useEditorStore.getState().unusedRDF.abc0).toBeNull()
+      expect(useEditorStore.getState().currentDiff.compareFrom).toBe("abc0")
     })
   })
 

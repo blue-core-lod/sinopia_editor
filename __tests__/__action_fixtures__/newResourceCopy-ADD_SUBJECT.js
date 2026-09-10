@@ -15,7 +15,7 @@ const expectedAction = {
       author: "LD4P",
       date: "2019-08-19",
       propertyTemplateKeys: [
-        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle",
+        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal",
       ],
     }),
     properties: [
