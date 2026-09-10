@@ -30,7 +30,7 @@ describe("<PropertyLabelInfo />", () => {
     const store = createStore(state)
     const propertyTemplate =
       state.entities.propertyTemplates[
-        "resourceTemplate:testing:uber1 > http://id.loc.gov/ontologies/bibframe/uber/template1/property1"
+        "resourceTemplate:testing:uber1 > http://id.loc.gov/ontologies/bibframe/uber/template1/property1 > resourceTemplate:testing:uber2"
       ]
     renderComponent(
       <PropertyLabelInfo propertyTemplate={propertyTemplate} />,
@@ -80,7 +80,7 @@ describe("<PropertyLabelInfo />", () => {
     const store = createStore(state)
     const propertyTemplate =
       state.entities.propertyTemplates[
-        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle"
+        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal"
       ]
 
     renderComponent(

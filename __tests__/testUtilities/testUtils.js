@@ -1,11 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { Provider } from "react-redux"
 import { render } from "@testing-library/react"
-import { createStore as createReduxStore, applyMiddleware } from "redux"
-import thunk from "redux-thunk"
-import appReducer from "reducers/index"
 import { Router } from "react-router-dom"
 import { createMemoryHistory } from "history"
 import _ from "lodash"
@@ -23,26 +19,27 @@ export const renderComponent = (
   history,
   { errorKey = null } = {}
 ) => {
+  // Seed Zustand stores with default state if not already done
+  if (!store) createState()
   setupModal()
   return {
     ...render(
       <Router history={history || createHistory()}>
-        <Provider store={store || createStore()}>
-          <AlertsContextProvider value={errorKey || "testErrorKey"}>
-            {component}
-          </AlertsContextProvider>
-        </Provider>
+        <AlertsContextProvider value={errorKey || "testErrorKey"}>
+          {component}
+        </AlertsContextProvider>
       </Router>
     ),
   }
 }
 
 export const createStore = (initialState) => {
-  return createReduxStore(
-    appReducer,
-    initialState || createState(),
-    applyMiddleware(thunk)
-  )
+  // Legacy compatibility — just create the Zustand state
+  if (initialState) {
+    // If passed initial state, seed Zustand stores
+    return initialState
+  }
+  return createState()
 }
 
 export const createHistory = (initialEntries) => {

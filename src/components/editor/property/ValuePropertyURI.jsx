@@ -1,16 +1,19 @@
 import React from "react"
 import PropTypes from "prop-types"
-import { setValuePropertyURI } from "actions/resources"
+import useEntitiesStore from "stores/entitiesStore"
 import PropertyURI from "./PropertyURI"
 
 const ValuePropertyURI = ({ propertyTemplate, value, readOnly = false }) => {
   if (propertyTemplate.ordered) return null
 
+  const changePropertyUri = (key, uri) =>
+    useEntitiesStore.getState().setValuePropertyURI(key, uri)
+
   return (
     <PropertyURI
       propertyTemplate={propertyTemplate}
       obj={value}
-      changePropertyUri={setValuePropertyURI}
+      changePropertyUri={changePropertyUri}
       readOnly={readOnly}
     />
   )

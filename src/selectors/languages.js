@@ -9,32 +9,31 @@ export const selectLanguageLabel = (state, tag) => {
 
   const [langSubtag, scriptSubtag, transliterationSubtag] = parseLangTag(tag)
   const labels = [
-    state.entities.languages[langSubtag] || `Unknown language (${langSubtag})`,
+    state.languages[langSubtag] || `Unknown language (${langSubtag})`,
   ]
   if (scriptSubtag)
     labels.push(
-      state.entities.scripts[scriptSubtag] || `Unknown script (${scriptSubtag})`
+      state.scripts[scriptSubtag] || `Unknown script (${scriptSubtag})`
     )
   if (transliterationSubtag)
     labels.push(
-      state.entities.transliterations[transliterationSubtag] ||
+      state.transliterations[transliterationSubtag] ||
         `Unknown transliteration (${transliterationSubtag})`
     )
   return labels.join(" - ")
 }
 
 export const hasLanguages = (state) => {
-  state.entities.languages.length > 0
+  state.languages.length > 0
 }
 
-export const selectLanguages = (state) => state.entities.languageLookup
+export const selectLanguages = (state) => state.languageLookup
 
-export const selectLanguageLabels = (state) => state.entities.languages
+export const selectLanguageLabels = (state) => state.languages
 
-export const selectScripts = (state) => state.entities.scriptLookup
+export const selectScripts = (state) => state.scriptLookup
 
-export const selectTransliterations = (state) =>
-  state.entities.transliterationLookup
+export const selectTransliterations = (state) => state.transliterationLookup
 
 export const selectDefaultLang = (state, resourceKey) =>
   selectNormSubject(state, resourceKey)?.defaultLang

@@ -7,7 +7,7 @@ import _ from "lodash"
 import { findAuthorityConfig } from "utilities/authorityConfig"
 import useHistoryStore from "stores/historyStore"
 
-export const loadTemplateHistory = (templateIds) => () => {
+export const loadTemplateHistory = (templateIds) => {
   if (_.isEmpty(templateIds)) return
   getTemplateSearchResultsByIds(templateIds)
     .then((response) => {
@@ -27,7 +27,7 @@ export const loadTemplateHistory = (templateIds) => () => {
     .catch((err) => console.error(err))
 }
 
-export const loadSearchHistory = (searches) => () => {
+export const loadSearchHistory = (searches) => {
   if (_.isEmpty(searches)) return
   searches.reverse().forEach((search) => {
     const authorityConfig = findAuthorityConfig(search.authorityUri)
@@ -41,7 +41,7 @@ export const loadSearchHistory = (searches) => () => {
   })
 }
 
-export const loadResourceHistory = (resourceUris) => () => {
+export const loadResourceHistory = (resourceUris) => {
   if (_.isEmpty(resourceUris)) return
   getSearchResultsByUris(resourceUris)
     .then((response) => {
@@ -61,26 +61,25 @@ export const loadResourceHistory = (resourceUris) => () => {
     .catch((err) => console.error(err))
 }
 
-export const addResourceHistory =
-  (resourceUri, type, group, modified) => () => {
-    getSearchResultsByUris([resourceUri])
-      .then((response) => {
-        if (response.error) {
-          console.error(response.error)
-          return
-        }
-        if (response.results.length !== 1) {
-          useHistoryStore.getState().addResourceHistory({
-            resourceUri,
-            type,
-            group,
-            modified: modified || new Date().toISOString(),
-          })
-        } else {
-          useHistoryStore
-            .getState()
-            .addResourceHistoryByResult(response.results[0])
-        }
-      })
-      .catch((err) => console.error(err))
-  }
+export const addResourceHistory = (resourceUri, type, group, modified) => {
+  getSearchResultsByUris([resourceUri])
+    .then((response) => {
+      if (response.error) {
+        console.error(response.error)
+        return
+      }
+      if (response.results.length !== 1) {
+        useHistoryStore.getState().addResourceHistory({
+          resourceUri,
+          type,
+          group,
+          modified: modified || new Date().toISOString(),
+        })
+      } else {
+        useHistoryStore
+          .getState()
+          .addResourceHistoryByResult(response.results[0])
+      }
+    })
+    .catch((err) => console.error(err))
+}

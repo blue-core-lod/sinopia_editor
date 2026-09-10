@@ -1,7 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useMemo } from "react"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import { selectGroupMap } from "selectors/groups"
 import _ from "lodash"
@@ -9,7 +9,7 @@ import _ from "lodash"
 export const defaultGroup = null
 
 const GroupFilter = ({ params, setParams }) => {
-  const groupMap = useSelector((state) => selectGroupMap(state))
+  const groupMap = useEntitiesStore((state) => selectGroupMap(state))
 
   const groupOptions = useMemo(
     () =>

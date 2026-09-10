@@ -1,6 +1,5 @@
 import Config from "Config"
 import { createState } from "stateUtils"
-import { createReducer } from "reducers/index"
 import { addValue, updateValue } from "reducers/resources"
 
 // This forces Sinopia server to use fixtures
@@ -10,6 +9,13 @@ const reducers = {
   ADD_VALUE: addValue,
   UPDATE_VALUE: updateValue,
 }
+
+const createReducer =
+  (handlers) =>
+  (state = {}, action) => {
+    const fn = handlers[action.type]
+    return fn ? fn(state, action) : state
+  }
 
 const reducer = createReducer(reducers)
 

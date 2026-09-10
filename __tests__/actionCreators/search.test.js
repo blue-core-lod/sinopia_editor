@@ -5,8 +5,6 @@ import {
   fetchTemplateGuessSearchResults,
 } from "actionCreators/search"
 import * as server from "sinopiaSearch"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import * as sinopiaApi from "sinopiaApi"
 import * as QuestioningAuthority from "utilities/QuestioningAuthority"
@@ -24,8 +22,6 @@ afterEach(() => {
   useSearchStore.setState({ resource: null, template: null })
   useEditorStore.setState({ errors: {}, successes: {} })
 })
-
-const mockStore = configureMockStore([thunk])
 
 describe("fetchSinopiaSearchResults", () => {
   const query = "*"
@@ -57,24 +53,19 @@ describe("fetchSinopiaSearchResults", () => {
       .mockResolvedValue([mockSearchResults, mockFacetResults])
     sinopiaApi.putUserHistory = jest.fn().mockResolvedValue()
     const keycloak = { token: "test-token" }
-    const store = mockStore(createState())
-    await store.dispatch(
-      fetchSinopiaSearchResults(
-        query,
-        {
-          startOfRange: 5,
-          resultsPerPage: 10,
-          sortField: "label",
-          sortOrder: "desc",
-        },
-        "testerrorkey",
-        keycloak
-      )
+    createState()
+    await fetchSinopiaSearchResults(
+      query,
+      {
+        startOfRange: 5,
+        resultsPerPage: 10,
+        sortField: "label",
+        sortOrder: "desc",
+      },
+      "testerrorkey",
+      keycloak
     )
 
-    const actions = store.getActions()
-
-    expect(actions).toHaveLength(0)
     expect(useEditorStore.getState().errors.testerrorkey).toEqual([])
     expect(useSearchStore.getState().resource).toMatchObject({
       error: undefined,
@@ -184,12 +175,9 @@ describe("fetchQASearchResults", () => {
     })
 
     it("dispatches action", async () => {
-      const store = mockStore(createState())
-      await store.dispatch(fetchQASearchResults(query, uri, "testerrorkey"))
+      createState()
+      await fetchQASearchResults(query, uri, "testerrorkey")
 
-      const actions = store.getActions()
-
-      expect(actions).toHaveLength(0)
       expect(useEditorStore.getState().errors.testerrorkey).toEqual([])
       expect(useSearchStore.getState().resource).toMatchObject({
         uri,
@@ -223,12 +211,9 @@ describe("fetchQASearchResults", () => {
     })
 
     it("dispatches action when error", async () => {
-      const store = mockStore(createState())
-      await store.dispatch(fetchQASearchResults(query, uri, "testerrorkey"))
+      createState()
+      await fetchQASearchResults(query, uri, "testerrorkey")
 
-      const actions = store.getActions()
-
-      expect(actions).toHaveLength(0)
       expect(useSearchStore.getState().resource).toMatchObject({
         uri,
         query,
@@ -267,16 +252,11 @@ describe("fetchTemplateGuessSearchResults", () => {
       server.getTemplateSearchResults = jest
         .fn()
         .mockResolvedValue(mockSearchResults)
-      const store = mockStore(createState())
-      await store.dispatch(
-        fetchTemplateGuessSearchResults(query, "testerrorkey", {
-          startOfRange: 0,
-        })
-      )
+      createState()
+      await fetchTemplateGuessSearchResults(query, "testerrorkey", {
+        startOfRange: 0,
+      })
 
-      const actions = store.getActions()
-
-      expect(actions).toHaveLength(0)
       expect(useSearchStore.getState().templateguess).toMatchObject({
         error: undefined,
         uri: null,
@@ -303,16 +283,11 @@ describe("fetchTemplateGuessSearchResults", () => {
       server.getTemplateSearchResults = jest
         .fn()
         .mockResolvedValue(mockSearchResults)
-      const store = mockStore(createState())
-      await store.dispatch(
-        fetchTemplateGuessSearchResults(query, "testerrorkey", {
-          startOfRange: 0,
-        })
-      )
+      createState()
+      await fetchTemplateGuessSearchResults(query, "testerrorkey", {
+        startOfRange: 0,
+      })
 
-      const actions = store.getActions()
-
-      expect(actions).toHaveLength(0)
       expect(useSearchStore.getState().templateguess).toMatchObject({
         error: "Ooops",
         uri: null,

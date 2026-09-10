@@ -1,11 +1,10 @@
 import React from "react"
-import { useDispatch, useSelector } from "react-redux"
 import PropTypes from "prop-types"
 import InputLiteralValue from "./InputLiteralValue"
 import InputURIValue from "./InputURIValue"
 import InputLookupValue from "./InputLookupValue"
 import InputListValue from "./InputListValue"
-import { addValue as addValueAction } from "actions/resources"
+import useEntitiesStore from "stores/entitiesStore"
 import {
   newBlankLiteralValue,
   newBlankUriValue,
@@ -20,11 +19,10 @@ const InputLiteralOrURI = ({
   propertyTemplate,
   displayValidations,
 }) => {
-  const dispatch = useDispatch()
-  const fullProperty = useSelector((state) =>
+  const fullProperty = useEntitiesStore((state) =>
     selectProperty(state, property.key)
   )
-  const defaultLang = useSelector((state) =>
+  const defaultLang = useEntitiesStore((state) =>
     selectDefaultLang(state, property.rootSubjectKey)
   )
 
@@ -74,7 +72,7 @@ const InputLiteralOrURI = ({
           propertyTemplate.defaultUri
         )
     }
-    dispatch(addValueAction(newValue))
+    useEntitiesStore.getState().addValue(newValue)
     event.preventDefault()
   }
 

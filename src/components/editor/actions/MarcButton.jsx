@@ -1,7 +1,8 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useState, useRef, useEffect } from "react"
-import { useSelector, shallowEqual } from "react-redux"
+import { shallow } from "zustand/shallow"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import { postMarc, getMarcJob, getMarc } from "sinopiaApi"
 import { selectPickSubject } from "selectors/resources"
@@ -14,14 +15,14 @@ const MarcButton = ({ resourceKey }) => {
   const errorKey = useAlerts()
   const marcs = useRef({})
   const isMounted = useRef(false)
-  const resource = useSelector(
+  const resource = useEntitiesStore(
     (state) =>
       selectPickSubject(state, resourceKey, [
         "uri",
         "subjectTemplateKey",
         "classes",
       ]),
-    shallowEqual
+    shallow
   )
 
   const [isRequesting, setRequesting] = useState(false)

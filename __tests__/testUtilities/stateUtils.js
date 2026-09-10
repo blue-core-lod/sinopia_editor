@@ -1,9 +1,9 @@
-// Copyright 2019 Stanford University see LICENSE for licenseimport React from 'react'
-import { initialState } from "store"
+// Copyright 2019 Stanford University see LICENSE for license
 import StateResourceBuilder from "./stateResourceBuilderUtils"
 import _ from "lodash"
 import useAuthenticateStore from "stores/authenticateStore"
 import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 
 const build = new StateResourceBuilder()
 
@@ -24,6 +24,27 @@ const editorInitialState = {
   marc: null,
   pendingResourceTemplateSelection: null,
   currentHeaderSearch: { query: null, uri: "urn:ld4p:sinopia" },
+}
+
+const initialState = {
+  entities: {
+    languageLookup: [],
+    languages: {},
+    scriptLookup: [],
+    scripts: {},
+    transliterations: {},
+    transliterationLookup: [],
+    groupMap: {},
+    lookups: {},
+    exports: [],
+    properties: {},
+    propertyTemplates: {},
+    relationships: {},
+    subjects: {},
+    subjectTemplates: {},
+    values: {},
+    versions: {},
+  },
 }
 
 export const createState = (options = {}) => {
@@ -49,6 +70,9 @@ export const createState = (options = {}) => {
   buildLookups(state, options)
   buildSearchResults(state, options)
   buildCurrentDiff(state, options)
+
+  // Seed the Zustand entities store with the built entities state
+  useEntitiesStore.setState(state.entities)
 
   return state
 }
@@ -214,6 +238,9 @@ const buildResourceWithLiteral = (state, options) => {
     resources: ["t9zVwg2zO"],
     ...(options.readOnlyResource ? { currentResourceIsReadOnly: true } : {}),
   })
+  const abbrTitlePtKey =
+    "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal"
+
   state.entities.subjectTemplates = {
     "ld4p:RT:bf2:Title:AbbrTitle": build.subjectTemplate({
       id: "ld4p:RT:bf2:Title:AbbrTitle",
@@ -221,9 +248,7 @@ const buildResourceWithLiteral = (state, options) => {
       label: "Abbreviated Title",
       author: "LD4P",
       date: "2019-08-19",
-      propertyTemplateKeys: [
-        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle",
-      ],
+      propertyTemplateKeys: [abbrTitlePtKey],
     }),
   }
 
@@ -238,22 +263,21 @@ const buildResourceWithLiteral = (state, options) => {
     validationDataType = "http://id.loc.gov/datatypes/edtf"
 
   state.entities.propertyTemplates = {
-    "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle":
-      build.propertyTemplate({
-        subjectTemplateKey: "ld4p:RT:bf2:Title:AbbrTitle",
-        label: "Abbreviated Title",
-        uris: {
-          "http://id.loc.gov/ontologies/bibframe/mainTitle": "Main title",
-        },
-        required: !!options.hasError,
-        defaults: options.hasDefaultLiterals
-          ? [{ literal: "Default literal1", lang: null }]
-          : [],
-        type: "literal",
-        validationRegex: options.hasRegexVinskyValidation ? "^Vinsky$" : null,
-        validationDataType,
-        component: "InputLiteral",
-      }),
+    [abbrTitlePtKey]: build.propertyTemplate({
+      subjectTemplateKey: "ld4p:RT:bf2:Title:AbbrTitle",
+      label: "Abbreviated Title",
+      uris: {
+        "http://id.loc.gov/ontologies/bibframe/mainTitle": "Main title",
+      },
+      required: !!options.hasError,
+      defaults: options.hasDefaultLiterals
+        ? [{ literal: "Default literal1", lang: null }]
+        : [],
+      type: "literal",
+      validationRegex: options.hasRegexVinskyValidation ? "^Vinsky$" : null,
+      validationDataType,
+      component: "InputLiteral",
+    }),
   }
 
   state.entities.subjects = {
@@ -272,8 +296,7 @@ const buildResourceWithLiteral = (state, options) => {
     "JQEtq-vmq8": build.property({
       key: "JQEtq-vmq8",
       subjectKey: "t9zVwg2zO",
-      propertyTemplateKey:
-        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle",
+      propertyTemplateKey: abbrTitlePtKey,
       valueKeys: ["CxGx7WMh2"],
       descUriOrLiteralValueKeys: ["CxGx7WMh2"],
       descWithErrorPropertyKeys: options.hasError ? ["JQEtq-vmq8"] : [],
@@ -308,7 +331,7 @@ const buildTwoLiteralResources = (state, options) => {
       author: "LD4P",
       date: "2019-08-19",
       propertyTemplateKeys: [
-        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle",
+        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal",
       ],
     }),
     "ld4p:RT:bf2:Note": build.subjectTemplate({
@@ -323,7 +346,7 @@ const buildTwoLiteralResources = (state, options) => {
     }),
   }
   state.entities.propertyTemplates = {
-    "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle":
+    "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal":
       build.propertyTemplate({
         subjectTemplateKey: "ld4p:RT:bf2:Title:AbbrTitle",
         label: "Abbreviated Title",
@@ -370,7 +393,7 @@ const buildTwoLiteralResources = (state, options) => {
       subjectKey: "t9zVwg2zO",
       rootSubjectKey: "t9zVwg2zO",
       propertyTemplateKey:
-        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle",
+        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal",
       valueKeys: ["CxGx7WMh2"],
       descUriOrLiteralValueKeys: ["CxGx7WMh2"],
       labels: ["Abbreviated Title", "Abbreviated Title"],
@@ -653,14 +676,14 @@ const buildResourceWithContractedLiteral = (state, options) => {
       author: "LD4P",
       date: "2019-08-19",
       propertyTemplateKeys: [
-        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle",
+        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal",
       ],
     }),
   }
   state.entities.propertyTemplates = {
-    "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle":
+    "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal":
       build.propertyTemplate({
-        key: "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle",
+        key: "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal",
         subjectTemplateKey: "ld4p:RT:bf2:Title:AbbrTitle",
         label: "Abbreviated Title",
         uris: {
@@ -687,7 +710,7 @@ const buildResourceWithContractedLiteral = (state, options) => {
       subjectKey: "t9zVwg2zO",
       rootPropertyKey: "JQEtq-vmq8",
       propertyTemplateKey:
-        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle",
+        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal",
       show: true,
       labels: ["Abbreviated Title", "Abbreviated Title"],
     }),
@@ -702,15 +725,18 @@ const buildResourceWithNestedResource = (state, options) => {
     currentResource: "ljAblGiBW",
     resources: ["ljAblGiBW"],
   })
+  const uber1PtKey =
+    "resourceTemplate:testing:uber1 > http://id.loc.gov/ontologies/bibframe/uber/template1/property1 > resourceTemplate:testing:uber2"
+  const uber2PtKey =
+    "resourceTemplate:testing:uber2 > http://id.loc.gov/ontologies/bibframe/uber/template2/property1 > literal"
+
   state.entities.subjectTemplates = {
     "resourceTemplate:testing:uber1": build.subjectTemplate({
       id: "resourceTemplate:testing:uber1",
       clazz: "http://id.loc.gov/ontologies/bibframe/Uber1",
       label: "Uber template1",
       remark: "Template for testing purposes.",
-      propertyTemplateKeys: [
-        "resourceTemplate:testing:uber1 > http://id.loc.gov/ontologies/bibframe/uber/template1/property1",
-      ],
+      propertyTemplateKeys: [uber1PtKey],
     }),
     "resourceTemplate:testing:uber2": build.subjectTemplate({
       id: "resourceTemplate:testing:uber2",
@@ -718,41 +744,35 @@ const buildResourceWithNestedResource = (state, options) => {
       label: "Uber template2",
       remark:
         "Template for testing purposes with single repeatable literal with a link to Stanford at https://www.stanford.edu",
-      propertyTemplateKeys: [
-        "resourceTemplate:testing:uber2 > http://id.loc.gov/ontologies/bibframe/uber/template2/property1 > literal",
-      ],
+      propertyTemplateKeys: [uber2PtKey],
     }),
   }
   state.entities.propertyTemplates = {
-    "resourceTemplate:testing:uber1 > http://id.loc.gov/ontologies/bibframe/uber/template1/property1":
-      build.propertyTemplate({
-        key: "resourceTemplate:testing:uber1 > http://id.loc.gov/ontologies/bibframe/uber/template1/property1",
-        subjectTemplateKey: "resourceTemplate:testing:uber1",
-        label: "Uber template1, property1",
-        uris: {
-          "http://id.loc.gov/ontologies/bibframe/uber/template1/property1":
-            "Property1",
-        },
-        repeatable: true,
-        remark: "Nested, repeatable resource template.",
-        type: "resource",
-        component: "InputURI",
-        valueSubjectTemplateKeys: ["resourceTemplate:testing:uber2"],
-      }),
-    "resourceTemplate:testing:uber2 > http://id.loc.gov/ontologies/bibframe/uber/template2/property1 > literal":
-      build.propertyTemplate({
-        key: "resourceTemplate:testing:uber2 > http://id.loc.gov/ontologies/bibframe/uber/template2/property1 > literal",
-        subjectTemplateKey: "resourceTemplate:testing:uber2",
-        label: "Uber template2, property1",
-        uris: {
-          "http://id.loc.gov/ontologies/bibframe/uber/template2/property1":
-            "Property1",
-        },
-        repeatable: true,
-        remark: "A repeatable literal",
-        type: "literal",
-        component: "InputLiteral",
-      }),
+    [uber1PtKey]: build.propertyTemplate({
+      subjectTemplateKey: "resourceTemplate:testing:uber1",
+      label: "Uber template1, property1",
+      uris: {
+        "http://id.loc.gov/ontologies/bibframe/uber/template1/property1":
+          "Property1",
+      },
+      repeatable: true,
+      remark: "Nested, repeatable resource template.",
+      type: "resource",
+      component: "InputURI",
+      valueSubjectTemplateKeys: ["resourceTemplate:testing:uber2"],
+    }),
+    [uber2PtKey]: build.propertyTemplate({
+      subjectTemplateKey: "resourceTemplate:testing:uber2",
+      label: "Uber template2, property1",
+      uris: {
+        "http://id.loc.gov/ontologies/bibframe/uber/template2/property1":
+          "Property1",
+      },
+      repeatable: true,
+      remark: "A repeatable literal",
+      type: "literal",
+      component: "InputLiteral",
+    }),
   }
   state.entities.subjects = {
     ljAblGiBW: build.resource({
@@ -781,8 +801,7 @@ const buildResourceWithNestedResource = (state, options) => {
     v1o90QO1Qx: build.property({
       key: "v1o90QO1Qx",
       subjectKey: "ljAblGiBW",
-      propertyTemplateKey:
-        "resourceTemplate:testing:uber1 > http://id.loc.gov/ontologies/bibframe/uber/template1/property1",
+      propertyTemplateKey: uber1PtKey,
       valueKeys: ["VDOeQCnFA8"],
       descUriOrLiteralValueKeys: ["pRJ0lO_mT-"],
       descWithErrorPropertyKeys: options.hasError ? ["7caLbfwwle"] : [],
@@ -793,8 +812,7 @@ const buildResourceWithNestedResource = (state, options) => {
       subjectKey: "XPb8jaPWo",
       rootSubjectKey: "ljAblGiBW",
       rootPropertyKey: "v1o90QO1Qx",
-      propertyTemplateKey:
-        "resourceTemplate:testing:uber2 > http://id.loc.gov/ontologies/bibframe/uber/template2/property1 > literal",
+      propertyTemplateKey: uber2PtKey,
       valueKeys: ["pRJ0lO_mT-"],
       descUriOrLiteralValueKeys: ["pRJ0lO_mT-"],
       descWithErrorPropertyKeys: options.hasError ? ["7caLbfwwle"] : [],

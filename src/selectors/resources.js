@@ -69,11 +69,11 @@ export const selectValue = (state, key) => {
   return newValue
 }
 
-export const selectNormSubject = (state, key) => state.entities.subjects[key]
+export const selectNormSubject = (state, key) => state.subjects[key]
 
-export const selectNormProperty = (state, key) => state.entities.properties[key]
+export const selectNormProperty = (state, key) => state.properties[key]
 
-export const selectNormValue = (state, key) => state.entities.values[key]
+export const selectNormValue = (state, key) => state.values[key]
 
 export const selectFullSubject = (state, key) => {
   const subject = selectNormSubject(state, key)
@@ -127,7 +127,7 @@ const selectFullValue = (state, key, property) => {
 export const resourceHasChangesSinceLastSave = (state, resourceKey) => {
   const thisResourceKey =
     resourceKey || useEditorStore.getState().currentResource
-  return state.entities.subjects[thisResourceKey].changed
+  return state.subjects[thisResourceKey].changed
 }
 
 export const selectResourceUriMap = (state) => {
@@ -149,7 +149,7 @@ export const selectResourceGroup = (state, resourceKey) =>
   _.pick(selectNormSubject(state, resourceKey), ["group", "editGroups"])
 
 export const selectUri = (state, resourceKey) =>
-  state.entities.subjects[resourceKey]?.uri
+  state.subjects[resourceKey]?.uri
 
 export const selectResourceId = (state, resourceKey) => {
   const uri = selectUri(state, resourceKey)
@@ -181,10 +181,10 @@ export const selectResourceLabel = (state, subjectKey) =>
 // Only select certain properties from a subject.
 // Note that this will return a unique object every time.
 export const selectPickSubject = (state, key, props) =>
-  _.pick(state.entities.subjects[key], props)
+  _.pick(state.subjects[key], props)
 
 export const selectVersions = (state, resourceKey) =>
-  state.entities.versions[resourceKey]
+  state.versions[resourceKey]
 
 export const selectMainTitleProperty = (state, key) => {
   // Selects main title for a resource like:

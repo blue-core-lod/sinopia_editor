@@ -1,11 +1,17 @@
 import { setRelationships, clearRelationships } from "reducers/relationships"
 import { createState } from "stateUtils"
-import { createReducer } from "reducers/index"
 
 const reducers = {
   SET_RELATIONSHIPS: setRelationships,
   CLEAR_RELATIONSHIPS: clearRelationships,
 }
+
+const createReducer =
+  (handlers) =>
+  (state = {}, action) => {
+    const fn = handlers[action.type]
+    return fn ? fn(state, action) : state
+  }
 
 const reducer = createReducer(reducers)
 

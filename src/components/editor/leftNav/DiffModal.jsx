@@ -1,7 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import useEditorStore from "stores/editorStore"
 import { selectFullSubject } from "selectors/resources"
 import ModalWrapper from "components/ModalWrapper"
@@ -16,10 +16,10 @@ const DiffModal = () => {
   const show = useEditorStore(
     (state) => (_.last(state.currentModal) || null) === "DiffModal"
   )
-  const compareFromResource = useSelector((state) =>
+  const compareFromResource = useEntitiesStore((state) =>
     selectFullSubject(state, compareFrom)
   )
-  const compareToResource = useSelector((state) =>
+  const compareToResource = useEntitiesStore((state) =>
     selectFullSubject(state, compareTo)
   )
 

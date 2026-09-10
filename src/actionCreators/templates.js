@@ -2,7 +2,7 @@
 import useEditorStore from "stores/editorStore"
 import { validateTemplates } from "./templateValidationHelpers"
 import Config from "Config"
-import { addTemplates } from "actions/templates"
+import useEntitiesStore from "stores/entitiesStore"
 import { selectSubjectAndPropertyTemplates } from "selectors/templates"
 import TemplatesBuilder from "TemplatesBuilder"
 import { fetchResource } from "sinopiaApi"
@@ -11,129 +11,133 @@ import useAuthenticateStore from "stores/authenticateStore"
 import { getTemplateSearchResultsByIds } from "sinopiaSearch"
 
 /**
- * A thunk that gets a resource template from state or the server.
+ * A function that gets a resource template from state or the server.
  * @return [Object] subject template
  */
-export const loadResourceTemplate =
-  (resourceTemplateId, resourceTemplatePromises, errorKey) => (dispatch) =>
-    dispatch(
-      loadResourceTemplateWithoutValidation(
-        resourceTemplateId,
-        resourceTemplatePromises
-      )
+export const loadResourceTemplate = (
+  resourceTemplateId,
+  resourceTemplatePromises,
+  errorKey
+) =>
+  loadResourceTemplateWithoutValidation(
+    resourceTemplateId,
+    resourceTemplatePromises
+  )
+    .then((subjectTemplate) =>
+      validateTemplates(
+        subjectTemplate,
+        resourceTemplatePromises,
+        errorKey
+      ).then((isValid) => (isValid ? subjectTemplate : null))
     )
-      .then((subjectTemplate) =>
-        dispatch(
-          validateTemplates(subjectTemplate, resourceTemplatePromises, errorKey)
-        ).then((isValid) => (isValid ? subjectTemplate : null))
-      )
-      .catch((err) => {
-        useEditorStore
-          .getState()
-          .addError(
-            errorKey,
-            `Error retrieving ${resourceTemplateId}: ${err.message || err}`
-          )
-        return null
-      })
+    .catch((err) => {
+      useEditorStore
+        .getState()
+        .addError(
+          errorKey,
+          `Error retrieving ${resourceTemplateId}: ${err.message || err}`
+        )
+      return null
+    })
 
 /**
- * A thunk that gets a resource template from state or the server and transforms to
+ * A function that gets a resource template from state or the server and transforms to
  * subject template and property template models and adds to state.
  * Validation is not performed. This means that invalid templates can be stored in state.
  * @return [Object] subject template
  * @throws when error occurs retrieving the resource template.
  */
-export const loadResourceTemplateWithoutValidation =
-  (resourceTemplateId, resourceTemplatePromises) => (dispatch, getState) => {
-    // Try to get it from resourceTemplatePromises.
-    // Using this cache since in some cases, adding to state to too slow.
-    const resourceTemplatePromise =
-      resourceTemplatePromises?.[resourceTemplateId]
-    if (resourceTemplatePromise) {
-      return resourceTemplatePromise
-    }
-    // Try to get it from state.
-    const subjectTemplate = selectSubjectAndPropertyTemplates(
-      getState(),
-      resourceTemplateId
-    )
-    if (subjectTemplate) {
-      return Promise.resolve(subjectTemplate)
-    }
+export const loadResourceTemplateWithoutValidation = (
+  resourceTemplateId,
+  resourceTemplatePromises
+) => {
+  // Try to get it from resourceTemplatePromises.
+  // Using this cache since in some cases, adding to state to too slow.
+  const resourceTemplatePromise = resourceTemplatePromises?.[resourceTemplateId]
+  if (resourceTemplatePromise) {
+    return resourceTemplatePromise
+  }
+  // Try to get it from state.
+  const subjectTemplate = selectSubjectAndPropertyTemplates(
+    useEntitiesStore.getState(),
+    resourceTemplateId
+  )
+  if (subjectTemplate) {
+    return Promise.resolve(subjectTemplate)
+  }
 
-    // If resourceTemplateId is not a full URI, search for it to get the URI
-    const isFullUri =
-      resourceTemplateId.startsWith("http://") ||
-      resourceTemplateId.startsWith("https://")
+  // If resourceTemplateId is not a full URI, search for it to get the URI
+  const isFullUri =
+    resourceTemplateId.startsWith("http://") ||
+    resourceTemplateId.startsWith("https://")
 
-    const templateUriPromise = isFullUri
-      ? Promise.resolve(resourceTemplateId)
-      : getTemplateSearchResultsByIds([resourceTemplateId]).then(
-          (searchResults) => {
-            if (searchResults.results && searchResults.results.length > 0) {
-              // Filter results to find the one matching the requested template ID
-              // This is necessary because Blue Core search returns multiple results
-              // Try multiple possible field names for the template ID
-              const matchingResult = searchResults.results.find(
-                (result) =>
-                  result.resourceId === resourceTemplateId ||
-                  result.id === resourceTemplateId ||
-                  result.templateId === resourceTemplateId
-              )
+  const templateUriPromise = isFullUri
+    ? Promise.resolve(resourceTemplateId)
+    : getTemplateSearchResultsByIds([resourceTemplateId]).then(
+        (searchResults) => {
+          if (searchResults.results && searchResults.results.length > 0) {
+            // Filter results to find the one matching the requested template ID
+            // This is necessary because Blue Core search returns multiple results
+            // Try multiple possible field names for the template ID
+            const matchingResult = searchResults.results.find(
+              (result) =>
+                result.resourceId === resourceTemplateId ||
+                result.id === resourceTemplateId ||
+                result.templateId === resourceTemplateId
+            )
 
-              if (matchingResult && matchingResult.uri) {
-                const uri = matchingResult.uri
-                return uri
-              }
-
-              // If no exact match found, log the issue and fall back
-              console.warn(
-                `Template search for ${resourceTemplateId} returned ${searchResults.results.length} results but none matched`,
-                searchResults.results
-              )
+            if (matchingResult && matchingResult.uri) {
+              const uri = matchingResult.uri
+              return uri
             }
 
-            // Fallback to legacy URI construction if search fails
-            const fallbackUri = `${
-              Config.sinopiaApiBase
-            }/resource/${resourceToName(resourceTemplateId)}`
+            // If no exact match found, log the issue and fall back
             console.warn(
-              `Template search failed for ${resourceTemplateId}, using fallback:`,
-              fallbackUri
+              `Template search for ${resourceTemplateId} returned ${searchResults.results.length} results but none matched`,
+              searchResults.results
             )
-            return fallbackUri
           }
-        )
 
-    const newResourceTemplatePromise = templateUriPromise.then((templateUri) =>
-      fetchResource(templateUri, {
-        isTemplate: true,
-      }).then(([dataset, response]) => {
-        const user = useAuthenticateStore.getState().user
-        const subjectTemplate = new TemplatesBuilder(
-          dataset,
-          templateUri,
-          user.username,
-          response.group,
-          response.editGroups
-        ).build()
-        // Validate that the loaded template matches the requested ID
-        // Only check when we used search (not a full URI), to work around Blue Core search
-        if (!isFullUri && subjectTemplate.id !== resourceTemplateId) {
-          const error = new Error(
-            `Search returned wrong template: requested ${resourceTemplateId} but got ${subjectTemplate.id} from ${templateUri}. This indicates the Blue Core API search index is misconfigured.`
+          // Fallback to legacy URI construction if search fails
+          const fallbackUri = `${
+            Config.sinopiaApiBase
+          }/resource/${resourceToName(resourceTemplateId)}`
+          console.warn(
+            `Template search failed for ${resourceTemplateId}, using fallback:`,
+            fallbackUri
           )
-          console.error(error.message)
-          throw error
+          return fallbackUri
         }
+      )
 
-        dispatch(addTemplates(subjectTemplate))
-        return subjectTemplate
-      })
-    )
+  const newResourceTemplatePromise = templateUriPromise.then((templateUri) =>
+    fetchResource(templateUri, {
+      isTemplate: true,
+    }).then(([dataset, response]) => {
+      const user = useAuthenticateStore.getState().user
+      const subjectTemplate = new TemplatesBuilder(
+        dataset,
+        templateUri,
+        user.username,
+        response.group,
+        response.editGroups
+      ).build()
+      // Validate that the loaded template matches the requested ID
+      // Only check when we used search (not a full URI), to work around Blue Core search
+      if (!isFullUri && subjectTemplate.id !== resourceTemplateId) {
+        const error = new Error(
+          `Search returned wrong template: requested ${resourceTemplateId} but got ${subjectTemplate.id} from ${templateUri}. This indicates the Blue Core API search index is misconfigured.`
+        )
+        console.error(error.message)
+        throw error
+      }
 
-    if (resourceTemplatePromises)
-      resourceTemplatePromises[resourceTemplateId] = newResourceTemplatePromise
-    return newResourceTemplatePromise
-  }
+      useEntitiesStore.getState().addTemplates(subjectTemplate)
+      return subjectTemplate
+    })
+  )
+
+  if (resourceTemplatePromises)
+    resourceTemplatePromises[resourceTemplateId] = newResourceTemplatePromise
+  return newResourceTemplatePromise
+}

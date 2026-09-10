@@ -7,43 +7,40 @@ import { loadResourceTemplateWithoutValidation } from "./templates"
  */
 
 /**
- * A thunk that validates a subject template model.
+ * A function that validates a subject template model.
  * Note that this may involve loading additional subject templates.
  * @return [Array<String>] errors
  */
-export const validateTemplates =
-  (subjectTemplate, resourceTemplatePromises, errorKey) => (dispatch) =>
-    Promise.all([
-      Promise.resolve(validateSubjectTemplate(subjectTemplate)),
-      Promise.resolve(validateSuppressible(subjectTemplate)),
-      Promise.resolve(
-        validatePropertyTemplates(subjectTemplate.propertyTemplates)
-      ),
-      dispatch(
-        validateAllRefResourceTemplatesExist(
-          subjectTemplate.propertyTemplates,
-          resourceTemplatePromises
-        )
-      ),
-      dispatch(
-        validateRepeatedPropertyTemplates(
-          subjectTemplate.propertyTemplates,
-          resourceTemplatePromises
-        )
-      ),
-      dispatch(
-        validateAllUniqueResourceURIs(
-          subjectTemplate.propertyTemplates,
-          resourceTemplatePromises
-        )
-      ),
-    ]).then((errors) => {
-      const flatErrors = errors.flat()
-      flatErrors.forEach((error) =>
-        useEditorStore.getState().addError(errorKey, error)
-      )
-      return _.isEmpty(flatErrors)
-    })
+export const validateTemplates = (
+  subjectTemplate,
+  resourceTemplatePromises,
+  errorKey
+) =>
+  Promise.all([
+    Promise.resolve(validateSubjectTemplate(subjectTemplate)),
+    Promise.resolve(validateSuppressible(subjectTemplate)),
+    Promise.resolve(
+      validatePropertyTemplates(subjectTemplate.propertyTemplates)
+    ),
+    validateAllRefResourceTemplatesExist(
+      subjectTemplate.propertyTemplates,
+      resourceTemplatePromises
+    ),
+    validateRepeatedPropertyTemplates(
+      subjectTemplate.propertyTemplates,
+      resourceTemplatePromises
+    ),
+    validateAllUniqueResourceURIs(
+      subjectTemplate.propertyTemplates,
+      resourceTemplatePromises
+    ),
+  ]).then((errors) => {
+    const flatErrors = errors.flat()
+    flatErrors.forEach((error) =>
+      useEditorStore.getState().addError(errorKey, error)
+    )
+    return _.isEmpty(flatErrors)
+  })
 
 const validateSubjectTemplate = (template) => {
   const errors = []
@@ -109,61 +106,54 @@ const validatePropertyTemplate = (template) => {
   return errors
 }
 
-const validateRepeatedPropertyTemplates =
-  (propertyTemplates, resourceTemplatePromises) => (dispatch) => {
-    const dupes = new Set()
-    const found = {}
-    return Promise.all(
-      propertyTemplates.map((propertyTemplate) => {
-        if (!_.isEmpty(propertyTemplate.uris)) {
-          return Promise.all(
-            Object.keys(propertyTemplate.uris).map((uri) => {
-              if (_.isEmpty(propertyTemplate.valueSubjectTemplateKeys)) {
-                pushFoundOrDupe(uri, found, dupes)
-                return Promise.resolve()
-              }
-              return Promise.all(
-                propertyTemplate.valueSubjectTemplateKeys.map(
-                  (subjectTemplateKey) =>
-                    dispatch(
-                      loadResourceTemplateWithoutValidation(
-                        subjectTemplateKey,
-                        resourceTemplatePromises
-                      )
-                    )
-                      .then((resourceTemplate) => {
-                        Object.keys(resourceTemplate.classes).forEach(
-                          (clazz) => {
-                            pushFoundOrDupeNestedResource(
-                              uri,
-                              clazz,
-                              found,
-                              dupes
-                            )
-                          }
-                        )
-                        return Promise.resolve()
+const validateRepeatedPropertyTemplates = (
+  propertyTemplates,
+  resourceTemplatePromises
+) => {
+  const dupes = new Set()
+  const found = {}
+  return Promise.all(
+    propertyTemplates.map((propertyTemplate) => {
+      if (!_.isEmpty(propertyTemplate.uris)) {
+        return Promise.all(
+          Object.keys(propertyTemplate.uris).map((uri) => {
+            if (_.isEmpty(propertyTemplate.valueSubjectTemplateKeys)) {
+              pushFoundOrDupe(uri, found, dupes)
+              return Promise.resolve()
+            }
+            return Promise.all(
+              propertyTemplate.valueSubjectTemplateKeys.map(
+                (subjectTemplateKey) =>
+                  loadResourceTemplateWithoutValidation(
+                    subjectTemplateKey,
+                    resourceTemplatePromises
+                  )
+                    .then((resourceTemplate) => {
+                      Object.keys(resourceTemplate.classes).forEach((clazz) => {
+                        pushFoundOrDupeNestedResource(uri, clazz, found, dupes)
                       })
-                      // Some templates may not exist. This is not validated here.
-                      .catch(() => {})
-                )
+                      return Promise.resolve()
+                    })
+                    // Some templates may not exist. This is not validated here.
+                    .catch(() => {})
               )
-            })
-          )
-        }
-      })
-    ).then(() => {
-      if (_.isEmpty(dupes)) return []
-
-      return [
-        `A property template may not use the same property URI as another property template (${Array.from(
-          dupes
-        ).join(
-          ", "
-        )}) unless both propery templates are of type nested resource and the nested resources are of different classes.`,
-      ]
+            )
+          })
+        )
+      }
     })
-  }
+  ).then(() => {
+    if (_.isEmpty(dupes)) return []
+
+    return [
+      `A property template may not use the same property URI as another property template (${Array.from(
+        dupes
+      ).join(
+        ", "
+      )}) unless both propery templates are of type nested resource and the nested resources are of different classes.`,
+    ]
+  })
+}
 
 const pushFoundOrDupe = (uri, found, dupes) => {
   // Other properties should not have same URI as any other property (including nested).
@@ -197,113 +187,111 @@ const pushFoundOrDupeNestedResource = (uri, clazz, found, dupes) => {
   }
 }
 
-const validateAllRefResourceTemplatesExist =
-  (propertyTemplates, resourceTemplatePromises) => (dispatch) =>
-    Promise.all(
-      propertyTemplates.map((template) =>
-        dispatch(
-          validateRefResourceTemplatesExist(template, resourceTemplatePromises)
-        )
-      )
-    ).then((missingResourceTemplateIds) => {
-      // If misssing, then write errors for uniq
-      const uniqMissingResourceTemplateIds = _.uniq(
-        missingResourceTemplateIds.flat()
-      )
-      if (_.isEmpty(uniqMissingResourceTemplateIds)) return []
-      return [
-        `The following referenced resource templates are not available in Sinopia: ${uniqMissingResourceTemplateIds.join(
-          ", "
-        )}`,
-      ]
-    })
+const validateAllRefResourceTemplatesExist = (
+  propertyTemplates,
+  resourceTemplatePromises
+) =>
+  Promise.all(
+    propertyTemplates.map((template) =>
+      validateRefResourceTemplatesExist(template, resourceTemplatePromises)
+    )
+  ).then((missingResourceTemplateIds) => {
+    // If misssing, then write errors for uniq
+    const uniqMissingResourceTemplateIds = _.uniq(
+      missingResourceTemplateIds.flat()
+    )
+    if (_.isEmpty(uniqMissingResourceTemplateIds)) return []
+    return [
+      `The following referenced resource templates are not available in Sinopia: ${uniqMissingResourceTemplateIds.join(
+        ", "
+      )}`,
+    ]
+  })
 
 /**
  * Validates that all value template refs exist.
  */
-const validateRefResourceTemplatesExist =
-  (propertyTemplate, resourceTemplatePromises) => (dispatch) => {
-    if (_.isEmpty(propertyTemplate.valueSubjectTemplateKeys))
-      return Promise.resolve([])
+const validateRefResourceTemplatesExist = (
+  propertyTemplate,
+  resourceTemplatePromises
+) => {
+  if (_.isEmpty(propertyTemplate.valueSubjectTemplateKeys))
+    return Promise.resolve([])
 
-    return Promise.all(
-      propertyTemplate.valueSubjectTemplateKeys.map((resourceTemplateId) =>
-        dispatch(
-          loadResourceTemplateWithoutValidation(
-            resourceTemplateId,
-            resourceTemplatePromises
-          )
-        )
-          .then(() => null)
-          .catch(() => resourceTemplateId)
+  return Promise.all(
+    propertyTemplate.valueSubjectTemplateKeys.map((resourceTemplateId) =>
+      loadResourceTemplateWithoutValidation(
+        resourceTemplateId,
+        resourceTemplatePromises
       )
-    ).then((missingResourceTemplateIds) =>
-      _.compact(missingResourceTemplateIds)
+        .then(() => null)
+        .catch(() => resourceTemplateId)
     )
-  }
+  ).then((missingResourceTemplateIds) => _.compact(missingResourceTemplateIds))
+}
 
-const validateAllUniqueResourceURIs =
-  (propertyTemplates, resourceTemplatePromises) => (dispatch) =>
-    Promise.all(
-      propertyTemplates.map((propertyTemplate) =>
-        dispatch(
-          validateUniqueResourceURIs(propertyTemplate, resourceTemplatePromises)
-        )
-      )
-    ).then((errors) => errors.flat())
+const validateAllUniqueResourceURIs = (
+  propertyTemplates,
+  resourceTemplatePromises
+) =>
+  Promise.all(
+    propertyTemplates.map((propertyTemplate) =>
+      validateUniqueResourceURIs(propertyTemplate, resourceTemplatePromises)
+    )
+  ).then((errors) => errors.flat())
 
 /**
  * Validates that all value template refs have unique resource URIs.
  */
-const validateUniqueResourceURIs =
-  (propertyTemplate, resourceTemplatePromises) => (dispatch) => {
-    if (_.isEmpty(propertyTemplate.valueSubjectTemplateKeys))
-      return Promise.resolve([])
+const validateUniqueResourceURIs = (
+  propertyTemplate,
+  resourceTemplatePromises
+) => {
+  if (_.isEmpty(propertyTemplate.valueSubjectTemplateKeys))
+    return Promise.resolve([])
 
-    return Promise.all(
-      propertyTemplate.valueSubjectTemplateKeys.map((resourceTemplateId) =>
-        dispatch(
-          loadResourceTemplateWithoutValidation(
-            resourceTemplateId,
-            resourceTemplatePromises
-          )
-        )
-          .then((subjectTemplate) => [
-            subjectTemplate.class,
-            Object.keys(subjectTemplate.classes),
-            subjectTemplate.id,
-          ])
-          .catch(() => {
-            /* nothing */
-          })
+  return Promise.all(
+    propertyTemplate.valueSubjectTemplateKeys.map((resourceTemplateId) =>
+      loadResourceTemplateWithoutValidation(
+        resourceTemplateId,
+        resourceTemplatePromises
       )
-    ).then((results) => {
-      // No other nested template can have (required) class or optional class that is the same as this (required) class.
-      // Nested templates can have same optional classes.
-      const classToResourceTemplateIds = {}
-      const classes = []
-      _.compact(results).forEach((result) => {
-        const [clazz, allClasses, resourceTemplateId] = result
-        classes.push(clazz)
-        allClasses.forEach((allClazz) => {
-          if (!classToResourceTemplateIds[allClazz])
-            classToResourceTemplateIds[allClazz] = []
-          classToResourceTemplateIds[allClazz].push(resourceTemplateId)
+        .then((subjectTemplate) => [
+          subjectTemplate.class,
+          Object.keys(subjectTemplate.classes),
+          subjectTemplate.id,
+        ])
+        .catch(() => {
+          /* nothing */
         })
-      })
-
-      const multipleClasses = new Set()
-      classes.forEach((clazz) => {
-        if (classToResourceTemplateIds[clazz].length > 1)
-          multipleClasses.add(clazz)
-      })
-      return Array.from(multipleClasses).map((clazz) => {
-        const classIdsStr = classToResourceTemplateIds[clazz].join(", ")
-        return `The following resource templates references for ${_.first(
-          Object.keys(propertyTemplate.uris)
-        )} have the same class (${clazz}), but must be unique: ${classIdsStr}`
+    )
+  ).then((results) => {
+    // No other nested template can have (required) class or optional class that is the same as this (required) class.
+    // Nested templates can have same optional classes.
+    const classToResourceTemplateIds = {}
+    const classes = []
+    _.compact(results).forEach((result) => {
+      const [clazz, allClasses, resourceTemplateId] = result
+      classes.push(clazz)
+      allClasses.forEach((allClazz) => {
+        if (!classToResourceTemplateIds[allClazz])
+          classToResourceTemplateIds[allClazz] = []
+        classToResourceTemplateIds[allClazz].push(resourceTemplateId)
       })
     })
-  }
+
+    const multipleClasses = new Set()
+    classes.forEach((clazz) => {
+      if (classToResourceTemplateIds[clazz].length > 1)
+        multipleClasses.add(clazz)
+    })
+    return Array.from(multipleClasses).map((clazz) => {
+      const classIdsStr = classToResourceTemplateIds[clazz].join(", ")
+      return `The following resource templates references for ${_.first(
+        Object.keys(propertyTemplate.uris)
+      )} have the same class (${clazz}), but must be unique: ${classIdsStr}`
+    })
+  })
+}
 
 export const noop = () => {}

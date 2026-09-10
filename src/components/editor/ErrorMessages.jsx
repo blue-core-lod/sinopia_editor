@@ -1,7 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import { selectValidationErrors } from "selectors/errors"
 import AlertWrapper from "components/alerts/AlertWrapper"
@@ -10,7 +10,7 @@ import _ from "lodash"
 const ErrorMessages = ({ resourceKey }) => {
   // To determine if errors have changed, check length first and then isEqual.
   // Most changes in errors will change the length, but not all.
-  const errors = useSelector(
+  const errors = useEntitiesStore(
     (state) => selectValidationErrors(state, resourceKey),
     (obj1, obj2) => obj1?.length === obj2?.length && _.isEqual(obj1, obj2)
   )

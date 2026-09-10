@@ -1,14 +1,7 @@
-import { useDispatch } from "react-redux"
-import {
-  showNavProperty,
-  hideNavProperty,
-  showNavSubject,
-  hideNavSubject,
-} from "actions/resources"
+import useEntitiesStore from "stores/entitiesStore"
 
 const useLeftNav = (navObj) => {
   // navObj can be a subject or property.
-  const dispatch = useDispatch()
   const isExpanded = navObj.showNav
 
   const handleToggleClick = (event) => {
@@ -16,14 +9,14 @@ const useLeftNav = (navObj) => {
 
     if (navObj.subjectTemplateKey) {
       if (isExpanded) {
-        dispatch(hideNavSubject(navObj.key))
+        useEntitiesStore.getState().hideNavSubject(navObj.key)
       } else {
-        dispatch(showNavSubject(navObj.key))
+        useEntitiesStore.getState().showNavSubject(navObj.key)
       }
     } else if (isExpanded) {
-      dispatch(hideNavProperty(navObj.key))
+      useEntitiesStore.getState().hideNavProperty(navObj.key)
     } else {
-      dispatch(showNavProperty(navObj.key))
+      useEntitiesStore.getState().showNavProperty(navObj.key)
     }
   }
 

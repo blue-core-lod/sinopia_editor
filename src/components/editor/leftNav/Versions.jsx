@@ -1,7 +1,6 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useState, useEffect } from "react"
-import { useDispatch, useSelector } from "react-redux"
 import PropTypes from "prop-types"
 import { fetchResourceVersions } from "sinopiaApi"
 import TimeAgo from "javascript-time-ago"
@@ -10,8 +9,8 @@ import {
   loadResourceForDiff,
   loadResourceForPreview,
 } from "actionCreators/resources"
-import { setVersions } from "actions/resources"
 import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 import VersionPreviewModal from "../preview/VersionPreviewModal"
 import DiffModal from "./DiffModal"
 import { selectVersions } from "selectors/resources"
@@ -20,9 +19,10 @@ import useAlerts from "hooks/useAlerts"
 import _ from "lodash"
 
 const Versions = ({ resource }) => {
-  const dispatch = useDispatch()
   const errorKey = useAlerts()
-  const versions = useSelector((state) => selectVersions(state, resource.key))
+  const versions = useEntitiesStore((state) =>
+    selectVersions(state, resource.key)
+  )
 
   const [compareFrom, setCompareFrom] = useState()
   const [compareTo, setCompareTo] = useState("current")
@@ -34,21 +34,23 @@ const Versions = ({ resource }) => {
   const handleView = (event, timestamp) => {
     event.preventDefault()
     setLoadingView(timestamp)
-    dispatch(
-      loadResourceForPreview(resource.uri, errorKey, { version: timestamp })
-    ).then((result) => {
-      setLoadingView(false)
-      if (result) useEditorStore.getState().showModal("VersionPreviewModal")
-    })
+    loadResourceForPreview(resource.uri, errorKey, { version: timestamp }).then(
+      (result) => {
+        setLoadingView(false)
+        if (result) useEditorStore.getState().showModal("VersionPreviewModal")
+      }
+    )
   }
 
   useEffect(() => {
     if (!_.isEmpty(versions)) return
     fetchResourceVersions(resource.uri).then((newVersions) => {
-      dispatch(setVersions(resource.key, newVersions.reverse()))
+      useEntitiesStore
+        .getState()
+        .setVersions(resource.key, newVersions.reverse())
       setCompareFrom(_.first(newVersions).timestamp)
     })
-  }, [resource.uri, resource.key, versions, dispatch])
+  }, [resource.uri, resource.key, versions])
 
   if (!versions) {
     return <React.Fragment>Loading ...</React.Fragment>
@@ -72,14 +74,9 @@ const Versions = ({ resource }) => {
       useEditorStore.getState().setCurrentDiffResources(resource.key, undefined)
     } else {
       loadPromises.push(
-        dispatch(
-          loadResourceForDiff(
-            resource.uri,
-            errorKey,
-            "compareFromResourceKey",
-            { version: compareFrom }
-          )
-        )
+        loadResourceForDiff(resource.uri, errorKey, "compareFromResourceKey", {
+          version: compareFrom,
+        })
       )
     }
 
@@ -87,11 +84,9 @@ const Versions = ({ resource }) => {
       useEditorStore.getState().setCurrentDiffResources(undefined, resource.key)
     } else {
       loadPromises.push(
-        dispatch(
-          loadResourceForDiff(resource.uri, errorKey, "compareToResourceKey", {
-            version: compareTo,
-          })
-        )
+        loadResourceForDiff(resource.uri, errorKey, "compareToResourceKey", {
+          version: compareTo,
+        })
       )
     }
 

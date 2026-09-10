@@ -1,5 +1,4 @@
 import React, { useState } from "react"
-import { useDispatch } from "react-redux"
 import useAuthenticateStore from "stores/authenticateStore"
 import { signIn } from "actionCreators/authenticate"
 import { useKeycloak } from "../../KeycloakContext"
@@ -8,7 +7,6 @@ import _ from "lodash"
 import { signInErrorKey } from "utilities/errorKeyFactory"
 
 const LoginPanel = () => {
-  const dispatch = useDispatch()
   const hasUser = useAuthenticateStore((state) => !!state.user)
 
   const [username, setUsername] = useState("")
@@ -24,7 +22,7 @@ const LoginPanel = () => {
       "resource"
     )
     const redirectUri = resourceParam ? window.location.href : undefined
-    dispatch(signIn(keycloak, signInErrorKey, redirectUri))
+    signIn(keycloak, signInErrorKey, redirectUri)
   }
 
   if (hasUser) return null

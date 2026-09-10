@@ -32,13 +32,13 @@ const refsFromDataset = (dataset) => {
  * Relationships for resources in the editor are already tracked on the subject
  * via updateBibframeRefs as values are loaded. No separate API call is needed.
  */
-export const loadRelationships = () => () => Promise.resolve(true)
+export const loadRelationships = () => Promise.resolve(true)
 
 /**
- * A thunk that loads relationships for a search result by fetching the resource
+ * A function that loads relationships for a search result by fetching the resource
  * and extracting BIBFRAME ref predicates from its dataset.
  */
-export const loadSearchRelationships = (uri) => () =>
+export const loadSearchRelationships = (uri) =>
   fetchResource(uri)
     .then(([dataset]) => {
       useSearchStore

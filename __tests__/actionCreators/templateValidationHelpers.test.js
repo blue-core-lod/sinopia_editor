@@ -1,10 +1,9 @@
 import { validateTemplates } from "actionCreators/templateValidationHelpers"
 import Config from "Config"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import ResourceBuilder from "resourceBuilderUtils"
 import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -12,13 +11,21 @@ jest.mock("KeycloakContext", () => ({
 
 afterEach(() => {
   useEditorStore.setState({ errors: {}, successes: {} })
+  useEntitiesStore.setState({
+    subjects: {},
+    properties: {},
+    values: {},
+    subjectTemplates: {},
+    propertyTemplates: {},
+    versions: {},
+    relationships: {},
+  })
 })
 
 // This forces Sinopia server to use fixtures
 jest.spyOn(Config, "useResourceTemplateFixtures", "get").mockReturnValue(true)
 
 const build = new ResourceBuilder()
-const mockStore = configureMockStore([thunk])
 
 describe("validateTemplates()", () => {
   describe("a valid template", () => {
@@ -82,14 +89,15 @@ describe("validateTemplates()", () => {
     })
 
     it("returns no errors", async () => {
-      const store = mockStore(createState())
+      createState()
 
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        true
+      )
+      // Templates were added to Zustand entities store during validation
       expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(true)
-      expect(store.getActions()).toHaveAction("ADD_TEMPLATES")
+        Object.keys(useEntitiesStore.getState().subjectTemplates).length
+      ).toBeGreaterThan(0)
       expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
         0
       )
@@ -110,13 +118,11 @@ describe("validateTemplates()", () => {
     }
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload1 = {
         errorKey: "testerrorkey",
         error: "Resource template id is missing from resource template.",
@@ -160,13 +166,11 @@ describe("validateTemplates()", () => {
     subjectTemplate.propertyTemplates[0].uris = undefined
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload = {
         errorKey: "testerrorkey",
         error: "Property template URI is required.",
@@ -199,13 +203,11 @@ describe("validateTemplates()", () => {
     subjectTemplate.propertyTemplates[0].type = null
     subjectTemplate.propertyTemplates[0].component = null
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload1 = {
         errorKey: "testerrorkey",
         error:
@@ -254,13 +256,11 @@ describe("validateTemplates()", () => {
     })
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload = {
         errorKey: "testerrorkey",
         error:
@@ -307,13 +307,11 @@ describe("validateTemplates()", () => {
     })
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload = {
         errorKey: "testerrorkey",
         error:
@@ -355,13 +353,11 @@ describe("validateTemplates()", () => {
     })
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload = {
         errorKey: "testerrorkey",
         error:
@@ -403,13 +399,11 @@ describe("validateTemplates()", () => {
     })
 
     it("does not return returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(true)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        true
+      )
     })
   })
 
@@ -445,13 +439,11 @@ describe("validateTemplates()", () => {
     })
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
     })
   })
 
@@ -484,13 +476,11 @@ describe("validateTemplates()", () => {
     })
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
     })
   })
 
@@ -527,13 +517,11 @@ describe("validateTemplates()", () => {
     })
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload = {
         errorKey: "testerrorkey",
         error:
@@ -572,13 +560,11 @@ describe("validateTemplates()", () => {
     })
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload = {
         errorKey: "testerrorkey",
         error:
@@ -621,13 +607,11 @@ describe("validateTemplates()", () => {
     })
 
     it("returns no errors", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(true)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        true
+      )
       expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
         0
       )
@@ -646,13 +630,11 @@ describe("validateTemplates()", () => {
     })
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload = {
         errorKey: "testerrorkey",
         error:
@@ -686,13 +668,11 @@ describe("validateTemplates()", () => {
     })
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload = {
         errorKey: "testerrorkey",
         error:

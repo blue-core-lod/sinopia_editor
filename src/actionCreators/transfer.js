@@ -1,7 +1,7 @@
 import { postTransfer } from "../sinopiaApi"
 import useEditorStore from "stores/editorStore"
 
-export const transfer = (resourceUri, localId, keycloak, errorKey) => () => {
+export const transfer = (resourceUri, localId, keycloak, errorKey) => {
   const body = { instance_uri: resourceUri }
   if (localId) body.local_id = localId
 

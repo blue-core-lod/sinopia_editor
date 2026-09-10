@@ -1,6 +1,5 @@
 /* eslint max-params: ["error", 5] */
 import { useState, useEffect } from "react"
-import { useDispatch } from "react-redux"
 import { newResourceFromDataset } from "actionCreators/resources"
 import useEditorStore from "stores/editorStore"
 import { useHistory } from "react-router-dom"
@@ -15,7 +14,6 @@ import { useHistory } from "react-router-dom"
  * @return {[Object, rdf.Dataset, string]} resource state, unused RDF, error
  */
 const useRdfResource = (dataset, baseURI, resourceTemplateId, errorKey) => {
-  const dispatch = useDispatch()
   const history = useHistory()
   const hasResource = useEditorStore((state) => !!state.currentResource)
 
@@ -27,18 +25,16 @@ const useRdfResource = (dataset, baseURI, resourceTemplateId, errorKey) => {
       return
     }
     useEditorStore.getState().clearErrors(errorKey)
-    dispatch(
-      newResourceFromDataset(
-        dataset,
-        baseURI,
-        resourceTemplateId,
-        errorKey,
-        true
-      )
+    newResourceFromDataset(
+      dataset,
+      baseURI,
+      resourceTemplateId,
+      errorKey,
+      true
     ).then((result) => {
       setNavigateEditor(result)
     })
-  }, [dataset, baseURI, resourceTemplateId, dispatch, errorKey])
+  }, [dataset, baseURI, resourceTemplateId, errorKey])
 
   useEffect(() => {
     // Forces a wait until the root resource has been set in state

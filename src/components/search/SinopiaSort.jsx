@@ -1,6 +1,5 @@
 // Copyright 2019 Stanford University see LICENSE for license
 import React from "react"
-import { useDispatch } from "react-redux"
 import { fetchSinopiaSearchResults } from "actionCreators/search"
 import useSearchStore from "stores/searchStore"
 import { defaultSearchResultsPerPage } from "utilities/Search"
@@ -22,20 +21,17 @@ const SinopiaSort = () => {
   const curSortField = searchOptions.sortField
   const curSortOrder = searchOptions.sortOrder
 
-  const dispatch = useDispatch()
   const handleSort = (sortField, sortOrder) =>
-    dispatch(
-      fetchSinopiaSearchResults(
-        query,
-        {
-          ...searchOptions,
-          startOfRange: 0,
-          sortField,
-          sortOrder,
-        },
-        errorKey,
-        keycloak
-      )
+    fetchSinopiaSearchResults(
+      query,
+      {
+        ...searchOptions,
+        startOfRange: 0,
+        sortField,
+        sortOrder,
+      },
+      errorKey,
+      keycloak
     )
 
   const getClasses = (sortField, sortOrder) =>

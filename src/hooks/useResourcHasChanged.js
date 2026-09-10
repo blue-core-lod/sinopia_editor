@@ -1,11 +1,8 @@
 import { useRef, useEffect } from "react"
-import { useDispatch } from "react-redux"
-import { setResourceChanged } from "actions/resources"
+import useEntitiesStore from "stores/entitiesStore"
 
 const useResourceHasChanged = (value) => {
-  const dispatch = useDispatch()
-
-  // This indicates whether on a SET_RESOURCE_CHANGED has been dispatched.
+  // This indicates whether setResourceChanged has been called.
   // Using a ref for this because don't want to trigger rerender when changes.
   const hasDispatchedChanged = useRef(false)
 
@@ -15,7 +12,7 @@ const useResourceHasChanged = (value) => {
 
   const handleKeyDown = () => {
     if (!hasDispatchedChanged.current) {
-      dispatch(setResourceChanged(value.rootSubjectKey))
+      useEntitiesStore.getState().setResourceChanged(value.rootSubjectKey)
       hasDispatchedChanged.current = true
     }
   }

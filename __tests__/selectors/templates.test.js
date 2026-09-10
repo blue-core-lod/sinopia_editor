@@ -1,16 +1,21 @@
 import { createState } from "stateUtils"
+import useEntitiesStore from "stores/entitiesStore"
 import { selectSubjectAndPropertyTemplates } from "selectors/templates"
+
+const entitiesState = () => useEntitiesStore.getState()
 
 describe("selectSubjectAndPropertyTemplates()", () => {
   it("returns null when no subject", () => {
-    const state = createState()
-    expect(selectSubjectAndPropertyTemplates(state, "abc123")).toEqual(null)
+    createState()
+    expect(
+      selectSubjectAndPropertyTemplates(entitiesState(), "abc123")
+    ).toEqual(null)
   })
 
   it("returns templates", () => {
-    const state = createState({ hasResourceWithLiteral: true })
+    createState({ hasResourceWithLiteral: true })
     const subjectTemplate = selectSubjectAndPropertyTemplates(
-      state,
+      entitiesState(),
       "ld4p:RT:bf2:Title:AbbrTitle"
     )
     expect(subjectTemplate).toBeSubjectTemplate("ld4p:RT:bf2:Title:AbbrTitle")

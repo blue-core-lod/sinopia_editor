@@ -1,7 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useEffect, useState } from "react"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import PanelResource from "./property/PanelResource"
 import CopyToNewMessage from "./CopyToNewMessage"
 import ResourceURIMessage from "./ResourceURIMessage"
@@ -23,7 +23,9 @@ import TopButton from "./actions/TopButton"
  */
 const ResourceComponent = () => {
   const resourceKey = useEditorStore((state) => state.currentResource)
-  const resource = useSelector((state) => selectNormSubject(state, resourceKey))
+  const resource = useEntitiesStore((state) =>
+    selectNormSubject(state, resourceKey)
+  )
   const [isHeaderInViewport, setHeaderInViewport] = useState(true)
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useState, useRef } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import {
   saveNewResource,
   saveResource as saveResourceAction,
@@ -18,9 +18,11 @@ import { useKeycloak } from "KeycloakContext"
 const GroupChoiceModal = () => {
   const errorKey = useAlerts()
   const resourceKey = useEditorStore((state) => state.currentResource)
-  const resource = useSelector((state) => selectNormSubject(state, resourceKey))
+  const resource = useEntitiesStore((state) =>
+    selectNormSubject(state, resourceKey)
+  )
   const userGroupIds = useAuthenticateStore((state) => state.user?.groups)
-  const groupMap = useSelector((state) => selectGroupMap(state))
+  const groupMap = useEntitiesStore((state) => selectGroupMap(state))
   const [ownerGroupId, setOwnerGroupId] = useState(
     resource.group || userGroupIds[0]
   )
@@ -29,7 +31,6 @@ const GroupChoiceModal = () => {
   const ownerGroupLabel = groupMap[ownerGroupId]
   const { canChangeGroups } = usePermissions()
   const canChange = canChangeGroups(resource) || !resource.uri
-  const dispatch = useDispatch()
   const { keycloak } = useKeycloak()
 
   const ownerGroupOptions = userGroupIds.map((groupId) => (
@@ -45,13 +46,9 @@ const GroupChoiceModal = () => {
 
   const saveAndClose = (event) => {
     if (resource.uri) {
-      dispatch(
-        saveResourceAction(resourceKey, ownerGroupId, [], errorKey, keycloak)
-      )
+      saveResourceAction(resourceKey, ownerGroupId, [], errorKey, keycloak)
     } else {
-      dispatch(
-        saveNewResource(resourceKey, ownerGroupId, [], errorKey, keycloak)
-      )
+      saveNewResource(resourceKey, ownerGroupId, [], errorKey, keycloak)
     }
     useEditorStore.getState().hideModal()
     event.preventDefault()

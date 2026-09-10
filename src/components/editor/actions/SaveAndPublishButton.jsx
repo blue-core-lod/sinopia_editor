@@ -1,7 +1,8 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector, useDispatch, shallowEqual } from "react-redux"
+import { shallow } from "zustand/shallow"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import { saveResource as saveResourceAction } from "actionCreators/resources"
 import {
@@ -15,21 +16,20 @@ import { useKeycloak } from "../../../KeycloakContext"
 import useAlerts from "hooks/useAlerts"
 
 const SaveAndPublishButton = (props) => {
-  const dispatch = useDispatch()
   const errorKey = useAlerts()
   const { keycloak } = useKeycloak()
 
   const resourceKey = useEditorStore((state) => state.currentResource)
-  // selectPickSubject and shallowEqual prevents rerender from unrelated changed.
-  const resource = useSelector(
+  // selectPickSubject and shallow prevents rerender from unrelated changed.
+  const resource = useEntitiesStore(
     (state) =>
       selectPickSubject(state, resourceKey, ["group", "editGroups", "uri"]),
-    shallowEqual
+    shallow
   )
-  const resourceHasChanged = useSelector((state) =>
+  const resourceHasChanged = useEntitiesStore((state) =>
     resourceHasChangesSinceLastSave(state)
   )
-  const hasValidationErrors = useSelector((state) =>
+  const hasValidationErrors = useEntitiesStore((state) =>
     hasValidationErrorsSelector(state, resourceKey)
   )
   const validationErrorsAreShowing = useEditorStore(
@@ -53,14 +53,12 @@ const SaveAndPublishButton = (props) => {
     event.preventDefault()
     if (formIsValid()) {
       if (isSaved) {
-        dispatch(
-          saveResourceAction(
-            resourceKey,
-            resource.group,
-            resource.editGroups,
-            errorKey,
-            keycloak
-          )
+        saveResourceAction(
+          resourceKey,
+          resource.group,
+          resource.editGroups,
+          errorKey,
+          keycloak
         )
       } else {
         // Show group chooser

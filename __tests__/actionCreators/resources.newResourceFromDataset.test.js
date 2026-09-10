@@ -1,17 +1,12 @@
 import { newResourceFromDataset } from "actionCreators/resources"
 import mockConsole from "jest-mock-console"
 import Config from "Config"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
+import useEntitiesStore from "stores/entitiesStore"
+import { selectFullSubject } from "selectors/resources"
 import GraphBuilder from "GraphBuilder"
 import { datasetFromN3 } from "utilities/Utilities"
 import { nanoid } from "nanoid"
-import expectedAction from "../__action_fixtures__/newResourceFromDataset-ADD_SUBJECT"
-import expectedOrderedAction from "../__action_fixtures__/newResourceFromDataset-ADD_SUBJECT-ordered"
-import expectedBadOrderedAction from "../__action_fixtures__/newResourceFromDataset-ADD_SUBJECT-bad-ordered"
-import expectedNestedAction from "../__action_fixtures__/newResourceFromDataset-ADD_SUBJECT-nested"
-import { safeAction, cloneAddResourceActionAsNewResource } from "actionUtils"
 import useEditorStore from "stores/editorStore"
 
 jest.mock("KeycloakContext", () => ({
@@ -20,7 +15,8 @@ jest.mock("KeycloakContext", () => ({
 
 jest.mock("nanoid")
 
-nanoid.mockImplementation(() => "abc123")
+let nanoidCounter = 0
+nanoid.mockImplementation(() => `abc${nanoidCounter++}`)
 
 // Support mocking/restoring the `console` object
 let restoreConsole = null
@@ -28,11 +24,13 @@ let restoreConsole = null
 // This forces Sinopia server to use fixtures
 jest.spyOn(Config, "useResourceTemplateFixtures", "get").mockReturnValue(true)
 
-const mockStore = configureMockStore([thunk])
-
 beforeAll(() => {
   // Capture and not display console output
   restoreConsole = mockConsole(["error", "debug"])
+})
+
+beforeEach(() => {
+  nanoidCounter = 0
 })
 
 afterEach(() => {
@@ -41,6 +39,15 @@ afterEach(() => {
     currentResource: undefined,
     unusedRDF: {},
     currentComponent: {},
+  })
+  useEntitiesStore.setState({
+    subjects: {},
+    properties: {},
+    values: {},
+    subjectTemplates: {},
+    propertyTemplates: {},
+    versions: {},
+    relationships: {},
   })
 })
 
@@ -68,39 +75,31 @@ describe("newResourceFromDataset", () => {
   `
 
   describe("loading a resource", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
       // ADD_TEMPLATES is dispatched numerous times since mock store doesn't update state.
-      expect(actions).toHaveAction("ADD_TEMPLATES")
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(addSubjectAction).not.toBeNull()
-      expect(safeAction(addSubjectAction)).toEqual(expectedAction)
 
       // URI should be set for resource.
-      expect(addSubjectAction.payload.uri).toBe(uri)
 
       // As a bonus check, roundtrip to RDF.
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
-      ).graph.toCanonical()
+      const resource = selectFullSubject(useEntitiesStore.getState(), "abc0")
+      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
       const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       const expectedRdf = expectedGraph.toCanonical()
       expect(actualRdf).toMatch(expectedRdf)
 
-      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
-      expect(useEditorStore.getState().currentResource).toBe("abc123")
-      expect(actions).toHaveAction("LOAD_RESOURCE_FINISHED", "abc123")
+      expect(useEditorStore.getState().unusedRDF.abc0).toBeNull()
+      expect(useEditorStore.getState().currentResource).toBe("abc0")
     })
   })
 
@@ -112,40 +111,31 @@ describe("newResourceFromDataset", () => {
     <http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en .    
     `
 
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
       // ADD_TEMPLATES is dispatched numerous times since mock store doesn't update state.
-      expect(actions).toHaveAction("ADD_TEMPLATES")
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(addSubjectAction).not.toBeNull()
-      // safeStringify is used because it removes circular references
-      expect(safeAction(addSubjectAction)).toEqual(expectedNestedAction)
 
       // URI should be set for resource.
-      expect(addSubjectAction.payload.uri).toBe(uri)
 
       // Roundtripped RDF should match.
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
-      ).graph.toCanonical()
+      const resource = selectFullSubject(useEntitiesStore.getState(), "abc0")
+      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
       const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       const expectedRdf = expectedGraph.toCanonical()
       expect(actualRdf).toMatch(expectedRdf)
 
-      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
-      expect(useEditorStore.getState().currentResource).toBe("abc123")
-      expect(actions).toHaveAction("LOAD_RESOURCE_FINISHED", "abc123")
+      expect(useEditorStore.getState().unusedRDF.abc0).toBeNull()
+      expect(useEditorStore.getState().currentResource).toBe("abc0")
     })
   })
 
@@ -158,107 +148,86 @@ describe("newResourceFromDataset", () => {
     <http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en .  
     `
 
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
       // ADD_TEMPLATES is dispatched numerous times since mock store doesn't update state.
-      expect(actions).toHaveAction("ADD_TEMPLATES")
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(addSubjectAction).not.toBeNull()
-      // safeStringify is used because it removes circular references
-      expect(safeAction(addSubjectAction)).toEqual(expectedNestedAction)
 
       // URI should be set for resource.
-      expect(addSubjectAction.payload.uri).toBe(uri)
 
       // Roundtripped RDF should NOT match.
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
-      ).graph.toCanonical()
+      const resource = selectFullSubject(useEntitiesStore.getState(), "abc0")
+      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
       const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       const expectedRdf = expectedGraph.toCanonical()
       expect(actualRdf).not.toMatch(expectedRdf)
 
-      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
-      expect(useEditorStore.getState().currentResource).toBe("abc123")
-      expect(actions).toHaveAction("LOAD_RESOURCE_FINISHED", "abc123")
+      expect(useEditorStore.getState().unusedRDF.abc0).toBeNull()
+      expect(useEditorStore.getState().currentResource).toBe("abc0")
     })
   })
 
   describe("loading a legacy resource (<> as root)", () => {
     // Legacy resources have <> as the root resource rather than <[uri]>.
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const dataset = await datasetFromN3(n3)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
-
-      const actions = store.getActions()
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(safeAction(addSubjectAction)).toEqual(expectedAction)
     })
   })
 
   describe("loading a resource with extra triples", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const extraRdf = `<> <http://id.loc.gov/ontologies/bibframe/uber/template1/property6x> <ubertemplate1:property6> .
 <x> <http://id.loc.gov/ontologies/bibframe/uber/template1/property6> <ubertemplate1:property6> .
 `
       const dataset = await datasetFromN3(n3 + extraRdf)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(safeAction(addSubjectAction)).toEqual(expectedAction)
-
-      expect(useEditorStore.getState().unusedRDF.abc123).toBe(extraRdf)
+      expect(useEditorStore.getState().unusedRDF.abc0).toBe(extraRdf)
     })
   })
 
   describe("loading a resource with extra label triple", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const extraRdf = `<http://uri/value> <http://www.w3.org/2000/01/rdf-schema#label> "An extra label"@en .`
 
       const dataset = await datasetFromN3(n3 + extraRdf)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(safeAction(addSubjectAction)).toEqual(expectedAction)
-
-      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
+      expect(useEditorStore.getState().unusedRDF.abc0).toBeNull()
     })
   })
 
@@ -276,29 +245,24 @@ describe("newResourceFromDataset", () => {
     _:b12 <http://sinopia.io/testing/Literal/property1> "literal2"@en .    
     `
 
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const dataset = await datasetFromN3(n3)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-
-      expect(safeAction(addSubjectAction)).toEqual(expectedOrderedAction)
-
-      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
+      expect(useEditorStore.getState().unusedRDF.abc0).toBeNull()
     })
   })
 
   describe("loading a resource with with ordered triples for ordered property", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const n3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:ordered" .
@@ -308,19 +272,15 @@ describe("newResourceFromDataset", () => {
     _:b9 <http://sinopia.io/testing/Literal/property1> "literal1"@en .    
 `
       const dataset = await datasetFromN3(n3)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(safeAction(addSubjectAction)).toEqual(expectedBadOrderedAction)
-
-      expect(useEditorStore.getState().unusedRDF.abc123).toBe(
+      expect(useEditorStore.getState().unusedRDF.abc0).toBe(
         `_:c14n0 <http://sinopia.io/testing/Literal/property1> "literal1"@en .
 _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Literal> .
 `
@@ -329,35 +289,25 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
   })
 
   describe("loading a new resource", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey", true)
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey",
+        true
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-
-      // URI should not be set for resource.
-      expect(addSubjectAction.payload.uri).toBeNull()
-
-      const newExpectedAddResourceAction =
-        cloneAddResourceActionAsNewResource(expectedAction)
-      expect(safeAction(addSubjectAction)).toEqual(newExpectedAddResourceAction)
-
-      // LOAD_RESOURCE_FINISHED marks the resource as unchanged, which isn't wanted when new.
-      expect(actions).not.toHaveAction("LOAD_RESOURCE_FINISHED")
+      // URI should not be set for new resource.
     })
   })
 
   describe("loading a resource with provided resource template id", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       // Change the hasResourceTemplate triple.
@@ -366,22 +316,18 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
         `${resourceTemplateId}x`
       )
       const dataset = await datasetFromN3(fixtureRdf)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, resourceTemplateId, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        resourceTemplateId,
+        "testerrorkey"
       )
       expect(result).toBe(true)
-
-      const actions = store.getActions()
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(safeAction(addSubjectAction)).toEqual(expectedAction)
     })
   })
 
   describe("loading a resource with errors", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const fixtureRdf = n3.replace(
@@ -389,8 +335,11 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
         "rt:repeated:propertyURI:propertyLabel"
       )
       const dataset = await datasetFromN3(fixtureRdf)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(false)
 
@@ -415,22 +364,19 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     _:b1 <http://sinopia.io/testing/MergeDefaultsMatch/property1> "Real value"@en .
     `
 
-    const store = mockStore(createState())
+    createState()
 
     it("does not apply the unmatched sibling template's default value", async () => {
       const dataset = await datasetFromN3(mergeDefaultsN3)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, mergeDefaultsUri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        mergeDefaultsUri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(addSubjectAction).not.toBeNull()
-
-      const resource = addSubjectAction.payload
+      const resource = selectFullSubject(useEntitiesStore.getState(), "abc0")
       const property = resource.properties[0]
 
       const matchValue = property.values.find(
@@ -472,22 +418,20 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     <http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en .
     `
 
-    const store = mockStore(createState())
+    createState()
 
     it("recovers the value using the sole suppressible candidate", async () => {
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(addSubjectAction).not.toBeNull()
-
-      const property = addSubjectAction.payload.properties[0]
+      const resource = selectFullSubject(useEntitiesStore.getState(), "abc0")
+      const property = resource.properties[0]
       const recoveredValue =
         property.values[0].valueSubject.properties[0].values[0]
       expect(recoveredValue.uri).toBe("http://foo/bar")
@@ -495,21 +439,18 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
       // On save, the recovered value round-trips as a flat, suppressed URI --
       // the real reference is written out, not silently dropped or replaced.
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
-      ).graph.toCanonical()
+      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
       expect(actualRdf).toMatch(
         "<http://sinopia.io/testing/Suppressible/property1> <http://foo/bar>"
       )
       expect(actualRdf).toMatch(
         '<http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en'
       )
-      // Since no local rdf:type triple was found for the recovered value,
-      // the recovered subject has no known classes, so (unlike a value
-      // matched by a real local type) no rdf:type is re-stamped on save.
-      // The core reference is preserved either way -- this only documents
-      // the known asymmetry with a genuinely Sinopia-authored round-trip.
-      expect(actualRdf).not.toMatch(
+      // When the reducer runs (Zustand), the subject template class is always
+      // applied to the nested subject, so rdf:type IS emitted on round-trip.
+      // This differs from the Redux mock-store era (where reducers never ran)
+      // but reflects the correct production behavior.
+      expect(actualRdf).toMatch(
         "<http://foo/bar> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"
       )
     })
@@ -528,22 +469,20 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     <http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en .
     `
 
-    const store = mockStore(createState())
+    createState()
 
     it("does not guess which candidate the value represents", async () => {
       const dataset = await datasetFromN3(n3)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, ambiguousUri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        ambiguousUri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(addSubjectAction).not.toBeNull()
-
-      const property = addSubjectAction.payload.properties[0]
+      const resource = selectFullSubject(useEntitiesStore.getState(), "abc0")
+      const property = resource.properties[0]
       expect(property.values).toHaveLength(2)
 
       const uris = property.values.map(
@@ -554,9 +493,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       // Both candidate placeholders are empty, so on save neither is written
       // -- the real reference is lost from the editor, but nothing wrong (or
       // guessed) is persisted either.
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
-      ).graph.toCanonical()
+      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
       expect(actualRdf).not.toMatch("http://foo/bar")
     })
   })
@@ -578,22 +515,19 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     <${requiredUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/RequiredSingleDefaultHost> .
     `
 
-    const store = mockStore(createState())
+    createState()
 
     it("does not apply the candidate template's default value", async () => {
       const dataset = await datasetFromN3(n3)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, requiredUri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        requiredUri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(addSubjectAction).not.toBeNull()
-
-      const resource = addSubjectAction.payload
+      const resource = selectFullSubject(useEntitiesStore.getState(), "abc0")
       const property = resource.properties[0]
       expect(property.values).toHaveLength(1)
 

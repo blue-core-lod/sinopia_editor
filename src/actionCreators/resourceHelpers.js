@@ -4,7 +4,7 @@ import rdf from "rdf-ext"
 import { nanoid } from "nanoid"
 import _ from "lodash"
 import { loadResourceTemplate } from "actionCreators/templates"
-import { addSubject as addSubjectAction } from "actions/resources"
+import useEntitiesStore from "stores/entitiesStore"
 import { selectProperty, selectSubject, selectValue } from "selectors/resources"
 import {
   newLiteralValue,
@@ -26,152 +26,146 @@ const skipPropertyUris = [
  */
 
 /**
- * A thunk that loads an existing resource from Sinopia API and adds to state.
+ * A function that loads an existing resource from Sinopia API and adds to state.
  * @return {[resource, unusedDataset]} if successful
  */
-export const loadResource =
-  (uri, errorKey, { asNewResource = false, version = null } = {}) =>
-  (dispatch) => {
-    useEditorStore.getState().clearErrors(errorKey)
-    return fetchResource(uri, { version })
-      .then(([dataset, response]) => {
-        if (!dataset) return false
-        const resourceTemplateId = resourceTemplateIdFromDataset(uri, dataset)
-        return dispatch(
-          addResourceFromDataset(
-            dataset,
-            uri,
-            resourceTemplateId,
-            errorKey,
-            asNewResource,
-            _.pick(response, ["group", "editGroups"])
-          )
-        )
-          .then(([resource, usedDataset]) => {
-            const unusedDataset = dataset.difference(usedDataset)
+export const loadResource = (
+  uri,
+  errorKey,
+  { asNewResource = false, version = null } = {}
+) => {
+  useEditorStore.getState().clearErrors(errorKey)
+  return fetchResource(uri, { version })
+    .then(([dataset, response]) => {
+      if (!dataset) return false
+      const resourceTemplateId = resourceTemplateIdFromDataset(uri, dataset)
+      return addResourceFromDataset(
+        dataset,
+        uri,
+        resourceTemplateId,
+        errorKey,
+        asNewResource,
+        _.pick(response, ["group", "editGroups"])
+      )
+        .then(([resource, usedDataset]) => {
+          const unusedDataset = dataset.difference(usedDataset)
+          useEditorStore
+            .getState()
+            .setUnusedRDF(
+              resource.key,
+              unusedDataset.size > 0 ? unusedDataset.toCanonical() : null
+            )
+          return [response, resource, unusedDataset]
+        })
+        .catch((err) => {
+          // ResourceTemplateErrors have already been dispatched.
+          if (err.name !== "ResourceTemplateError") {
+            console.error(err)
             useEditorStore
               .getState()
-              .setUnusedRDF(
-                resource.key,
-                unusedDataset.size > 0 ? unusedDataset.toCanonical() : null
+              .addError(
+                errorKey,
+                `Error retrieving ${uri}: ${err.message || err}`
               )
-            return [response, resource, unusedDataset]
-          })
-          .catch((err) => {
-            // ResourceTemplateErrors have already been dispatched.
-            if (err.name !== "ResourceTemplateError") {
-              console.error(err)
-              useEditorStore
-                .getState()
-                .addError(
-                  errorKey,
-                  `Error retrieving ${uri}: ${err.message || err}`
-                )
-            }
-            return false
-          })
-      })
-      .catch((err) => {
-        console.error(err)
-        useEditorStore
-          .getState()
-          .addError(errorKey, `Error retrieving ${uri}: ${err.message || err}`)
-        return false
-      })
-  }
-
-export const addResourceFromDataset =
-  (
-    dataset,
-    uri,
-    resourceTemplateId,
-    errorKey,
-    asNewResource,
-    otherResourceAttrs = {}
-  ) =>
-  (dispatch) => {
-    const subjectTerm = rdf.namedNode(chooseURI(dataset, uri))
-    const newUri = asNewResource ? null : uri
-    const context = {
-      usedDataset: rdf.dataset(),
-      dataset,
-      errorKey,
-      resourceTemplatePromises: {},
-    }
-    context.usedDataset.addAll(
-      context.dataset.match(
-        subjectTerm,
-        rdf.namedNode("http://sinopia.io/vocabulary/hasResourceTemplate")
-      )
-    )
-    return dispatch(
-      recursiveResourceFromDataset(
-        subjectTerm,
-        newUri,
-        resourceTemplateId,
-        false,
-        context
-      )
-    ).then((resource) => {
-      // Do not copy group or editGroups (passed in via otherResourceAttrs) if resource is new (i.e., copied)
-      const newResource = _.merge(resource, otherResourceAttrs)
-      if (asNewResource) {
-        newResource.group = null
-        newResource.editGroups = []
-        // Strip Work-Instance relationship properties from copy
-        newResource.properties = newResource.properties.filter(
-          (property) =>
-            !Object.keys(property.propertyTemplate?.uris || {}).some((uri) =>
-              skipPropertyUris.includes(uri)
-            )
-        )
-      }
-
-      dispatch(addSubjectAction(newResource))
-      return [newResource, context.usedDataset]
+          }
+          return false
+        })
     })
+    .catch((err) => {
+      console.error(err)
+      useEditorStore
+        .getState()
+        .addError(errorKey, `Error retrieving ${uri}: ${err.message || err}`)
+      return false
+    })
+}
+
+export const addResourceFromDataset = (
+  dataset,
+  uri,
+  resourceTemplateId,
+  errorKey,
+  asNewResource,
+  otherResourceAttrs = {}
+) => {
+  const subjectTerm = rdf.namedNode(chooseURI(dataset, uri))
+  const newUri = asNewResource ? null : uri
+  const context = {
+    usedDataset: rdf.dataset(),
+    dataset,
+    errorKey,
+    resourceTemplatePromises: {},
   }
+  context.usedDataset.addAll(
+    context.dataset.match(
+      subjectTerm,
+      rdf.namedNode("http://sinopia.io/vocabulary/hasResourceTemplate")
+    )
+  )
+  return recursiveResourceFromDataset(
+    subjectTerm,
+    newUri,
+    resourceTemplateId,
+    false,
+    context
+  ).then((resource) => {
+    // Do not copy group or editGroups (passed in via otherResourceAttrs) if resource is new (i.e., copied)
+    const newResource = _.merge(resource, otherResourceAttrs)
+    if (asNewResource) {
+      newResource.group = null
+      newResource.editGroups = []
+      // Strip Work-Instance relationship properties from copy
+      newResource.properties = newResource.properties.filter(
+        (property) =>
+          !Object.keys(property.propertyTemplate?.uris || {}).some((uri) =>
+            skipPropertyUris.includes(uri)
+          )
+      )
+    }
+
+    useEntitiesStore.getState().addSubject(newResource)
+    return [newResource, context.usedDataset]
+  })
+}
 
 // The provided URI or <>.
 export const chooseURI = (dataset, uri) =>
   dataset.match(rdf.namedNode(uri)).size > 0 ? uri : ""
 
-export const addEmptyResource = (resourceTemplateId, errorKey) => (dispatch) =>
-  dispatch(newSubject(null, resourceTemplateId, {}, errorKey)).then((subject) =>
-    dispatch(newPropertiesFromTemplates(subject, false, errorKey)).then(
-      (properties) => {
-        const promises = properties.map((property) =>
-          dispatch(expandProperty(property, errorKey))
-        )
-        return Promise.all(promises)
-          .then((expandedProperties) => {
-            subject.properties = expandedProperties
-            return dispatch(addSubjectAction(subject))
-          })
-          .then(() => subject)
-      }
-    )
+export const addEmptyResource = (resourceTemplateId, errorKey) =>
+  newSubject(null, resourceTemplateId, {}, errorKey).then((subject) =>
+    newPropertiesFromTemplates(subject, false, errorKey).then((properties) => {
+      const promises = properties.map((property) =>
+        expandProperty(property, errorKey)
+      )
+      return Promise.all(promises)
+        .then((expandedProperties) => {
+          subject.properties = expandedProperties
+          useEntitiesStore.getState().addSubject(subject)
+          return subject
+        })
+        .then(() => subject)
+    })
   )
 
-const expandProperty = (property, errorKey) => (dispatch) => {
+const expandProperty = (property, errorKey) => {
   if (property.propertyTemplate.type === "resource") {
     property.values = []
     const promises = property.propertyTemplate.valueSubjectTemplateKeys.map(
       (resourceTemplateId) =>
-        dispatch(newSubject(null, resourceTemplateId, {}, errorKey)).then(
-          (subject) =>
-            dispatch(newPropertiesFromTemplates(subject, false, errorKey)).then(
-              (properties) => {
-                subject.properties = properties
-                const newValue = newValueSubject(
-                  property,
-                  property.propertyTemplate.defaultUri,
-                  subject
-                )
-                property.values.push(newValue)
-                property.show = true
-              }
-            )
+        newSubject(null, resourceTemplateId, {}, errorKey).then((subject) =>
+          newPropertiesFromTemplates(subject, false, errorKey).then(
+            (properties) => {
+              subject.properties = properties
+              const newValue = newValueSubject(
+                property,
+                property.propertyTemplate.defaultUri,
+                subject
+              )
+              property.values.push(newValue)
+              property.show = true
+            }
+          )
         )
     )
     return Promise.all(promises).then(() => property)
@@ -181,184 +175,180 @@ const expandProperty = (property, errorKey) => (dispatch) => {
   return property
 }
 
-export const recursiveResourceFromDataset =
-  (subjectTerm, uri, resourceTemplateId, suppress, context) => (dispatch) =>
-    dispatch(
-      newSubjectFromDataset(subjectTerm, uri, resourceTemplateId, context)
-    ).then((subject) =>
-      dispatch(
-        newPropertiesFromTemplates(subject, true, context.errorKey)
-      ).then((properties) =>
-        Promise.all(
-          properties.map((property) =>
-            dispatch(
+export const recursiveResourceFromDataset = (
+  subjectTerm,
+  uri,
+  resourceTemplateId,
+  suppress,
+  context
+) =>
+  newSubjectFromDataset(subjectTerm, uri, resourceTemplateId, context).then(
+    (subject) =>
+      newPropertiesFromTemplates(subject, true, context.errorKey).then(
+        (properties) =>
+          Promise.all(
+            properties.map((property) =>
               newValuesFromDatasetByProperty(
                 subjectTerm,
                 property,
                 suppress,
                 context
-              )
-            ).then((values) => {
-              const compactValues = _.compact(_.flatten(values))
-              if (!_.isEmpty(compactValues)) {
-                property.values = compactValues
-                // If ordered, set property uri
-                if (property.propertyTemplate.ordered)
-                  property.propertyUri = _.first(compactValues).propertyUri
-              }
+              ).then((values) => {
+                const compactValues = _.compact(_.flatten(values))
+                if (!_.isEmpty(compactValues)) {
+                  property.values = compactValues
+                  // If ordered, set property uri
+                  if (property.propertyTemplate.ordered)
+                    property.propertyUri = _.first(compactValues).propertyUri
+                }
 
-              return compactValues
-            })
-          )
-        ).then(() => {
-          subject.properties = properties
-          return subject
-        })
+                return compactValues
+              })
+            )
+          ).then(() => {
+            subject.properties = properties
+            return subject
+          })
       )
-    )
+  )
 
-const newSubjectFromDataset =
-  (subjectTerm, uri, resourceTemplateId, context) => (dispatch) =>
-    dispatch(
-      newSubject(
-        uri,
-        resourceTemplateId,
-        context.resourceTemplatePromises,
-        context.errorKey
+const newSubjectFromDataset = (subjectTerm, uri, resourceTemplateId, context) =>
+  newSubject(
+    uri,
+    resourceTemplateId,
+    context.resourceTemplatePromises,
+    context.errorKey
+  ).then((subject) => {
+    // Add classes
+    const typeQuads = context.dataset
+      .match(
+        subjectTerm,
+        rdf.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
       )
-    ).then((subject) => {
-      // Add classes
-      const typeQuads = context.dataset
-        .match(
-          subjectTerm,
-          rdf.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
-        )
-        .toArray()
-      context.usedDataset.addAll(typeQuads)
-      subject.classes = typeQuads.map((quad) => quad.object.value)
-      return subject
-    })
+      .toArray()
+    context.usedDataset.addAll(typeQuads)
+    subject.classes = typeQuads.map((quad) => quad.object.value)
+    return subject
+  })
 
-export const newSubject =
-  (uri, resourceTemplateId, resourceTemplatePromises, errorKey) =>
-  (dispatch) => {
-    const key = nanoid()
-    return dispatch(
-      loadResourceTemplate(
-        resourceTemplateId,
-        resourceTemplatePromises,
-        errorKey
-      )
-    ).then((subjectTemplate) => {
-      // This handles if there was an error fetching resource template
-      if (!subjectTemplate) {
-        const err = new Error(`Unable to load ${resourceTemplateId}`)
-        err.name = "ResourceTemplateError"
-        console.error(err.toString())
-        throw err
-      }
-
-      return {
-        key,
-        uri: _.isEmpty(uri) ? null : uri,
-        subjectTemplate,
-        properties: [],
-      }
-    })
-  }
-
-export const newPropertiesFromTemplates =
-  (subject, noDefaults, errorKey) => (dispatch) =>
-    Promise.all(
-      subject.subjectTemplate.propertyTemplates.map((propertyTemplate) =>
-        dispatch(newProperty(subject, propertyTemplate, noDefaults, errorKey))
-      )
-    )
-
-const newValuesFromDatasetByProperty =
-  (subjectTerm, property, suppress, context) => (dispatch) =>
-    Promise.all(
-      Object.keys(property.propertyTemplate.uris).flatMap((propertyUri) =>
-        dispatch(
-          newValuesFromDatasetByPropertyUri(
-            subjectTerm,
-            property,
-            propertyUri,
-            suppress,
-            context
-          )
-        )
-      )
-    )
-
-const newValuesFromDatasetByPropertyUri =
-  (subjectTerm, property, propertyUri, suppress, context) => (dispatch) => {
-    // Get the objects for the values. How depends on whether property is ordered or suppressed.
-    let objects = null
-    if (suppress) {
-      objects = [subjectTerm]
-    } else if (property.propertyTemplate.ordered) {
-      objects = orderedObjects(subjectTerm, propertyUri, context)
-    } else {
-      objects = unorderedObjects(subjectTerm, propertyUri, context)
+export const newSubject = (
+  uri,
+  resourceTemplateId,
+  resourceTemplatePromises,
+  errorKey
+) => {
+  const key = nanoid()
+  return loadResourceTemplate(
+    resourceTemplateId,
+    resourceTemplatePromises,
+    errorKey
+  ).then((subjectTemplate) => {
+    // This handles if there was an error fetching resource template
+    if (!subjectTemplate) {
+      const err = new Error(`Unable to load ${resourceTemplateId}`)
+      err.name = "ResourceTemplateError"
+      console.error(err.toString())
+      throw err
     }
 
-    if (property.propertyTemplate.type === "resource") {
-      // Get the values based on the template and the dataset then merge.
-      const objPromises = _.compact(
-        objects.map((obj) =>
-          dispatch(
-            newNestedResourceFromObject(obj, property, propertyUri, context)
-          )
-        )
-      )
-      return Promise.all(objPromises).then((valuesFromObjs) => {
-        if (_.isEmpty(valuesFromObjs)) return []
-        const templatePromises = templatePromisesFor(
-          property,
-          context.errorKey,
-          dispatch
-        )
-        return Promise.all(templatePromises).then((valuesFromTemplates) =>
-          mergeValues(valuesFromTemplates, valuesFromObjs)
-        )
-      })
+    return {
+      key,
+      uri: _.isEmpty(uri) ? null : uri,
+      subjectTemplate,
+      properties: [],
     }
-    return Promise.all(
-      objects.map((obj) => {
-        if (obj.termType === "NamedNode") {
-          // URI
-          return Promise.resolve(
-            newUriFromObject(obj, property, propertyUri, context)
-          )
-        }
-        // Literal
-        return Promise.resolve(newLiteralFromObject(obj, property, propertyUri))
-      })
+  })
+}
+
+export const newPropertiesFromTemplates = (subject, noDefaults, errorKey) =>
+  Promise.all(
+    subject.subjectTemplate.propertyTemplates.map((propertyTemplate) =>
+      newProperty(subject, propertyTemplate, noDefaults, errorKey)
     )
+  )
+
+const newValuesFromDatasetByProperty = (
+  subjectTerm,
+  property,
+  suppress,
+  context
+) =>
+  Promise.all(
+    Object.keys(property.propertyTemplate.uris).flatMap((propertyUri) =>
+      newValuesFromDatasetByPropertyUri(
+        subjectTerm,
+        property,
+        propertyUri,
+        suppress,
+        context
+      )
+    )
+  )
+
+const newValuesFromDatasetByPropertyUri = (
+  subjectTerm,
+  property,
+  propertyUri,
+  suppress,
+  context
+) => {
+  // Get the objects for the values. How depends on whether property is ordered or suppressed.
+  let objects = null
+  if (suppress) {
+    objects = [subjectTerm]
+  } else if (property.propertyTemplate.ordered) {
+    objects = orderedObjects(subjectTerm, propertyUri, context)
+  } else {
+    objects = unorderedObjects(subjectTerm, propertyUri, context)
   }
+
+  if (property.propertyTemplate.type === "resource") {
+    // Get the values based on the template and the dataset then merge.
+    const objPromises = _.compact(
+      objects.map((obj) =>
+        newNestedResourceFromObject(obj, property, propertyUri, context)
+      )
+    )
+    return Promise.all(objPromises).then((valuesFromObjs) => {
+      if (_.isEmpty(valuesFromObjs)) return []
+      const templatePromises = templatePromisesFor(property, context.errorKey)
+      return Promise.all(templatePromises).then((valuesFromTemplates) =>
+        mergeValues(valuesFromTemplates, valuesFromObjs)
+      )
+    })
+  }
+  return Promise.all(
+    objects.map((obj) => {
+      if (obj.termType === "NamedNode") {
+        // URI
+        return Promise.resolve(
+          newUriFromObject(obj, property, propertyUri, context)
+        )
+      }
+      // Literal
+      return Promise.resolve(newLiteralFromObject(obj, property, propertyUri))
+    })
+  )
+}
 
 // Promises that return values based on template
-const templatePromisesFor = (property, errorKey, dispatch) =>
+const templatePromisesFor = (property, errorKey) =>
   property.propertyTemplate.valueSubjectTemplateKeys.map((resourceTemplateId) =>
-    dispatch(newSubject(null, resourceTemplateId, {}, errorKey)).then(
-      (subject) =>
-        // noDefaults is true: these subjects are placeholders for every
-        // valueSubjectTemplateKeys entry, used by mergeValues to find the one
-        // matching the dataset. Populating them with template defaults would let
-        // those defaults leak into merged values as extra siblings, or entirely
-        // replace real data whenever the dataset value isn't recognized (e.g., an
-        // external authority URI with no local rdf:type triple to match against).
-        dispatch(newPropertiesFromTemplates(subject, true, errorKey)).then(
-          (properties) => {
-            subject.properties = properties
-            return newValueSubject(
-              property,
-              property.propertyTemplate.defaultUri,
-              subject
-            )
-          }
+    newSubject(null, resourceTemplateId, {}, errorKey).then((subject) =>
+      // noDefaults is true: these subjects are placeholders for every
+      // valueSubjectTemplateKeys entry, used by mergeValues to find the one
+      // matching the dataset. Populating them with template defaults would let
+      // those defaults leak into merged values as extra siblings, or entirely
+      // replace real data whenever the dataset value isn't recognized (e.g., an
+      // external authority URI with no local rdf:type triple to match against).
+      newPropertiesFromTemplates(subject, true, errorKey).then((properties) => {
+        subject.properties = properties
+        return newValueSubject(
+          property,
+          property.propertyTemplate.defaultUri,
+          subject
         )
+      })
     )
   )
 
@@ -448,125 +438,118 @@ const unorderedObjects = (subjectTerm, propertyUri, context) => {
   return quads.map((quad) => quad.object)
 }
 
-const newNestedResourceFromObject =
-  (obj, property, propertyUri, context) => (dispatch) => {
-    // Only build this embedded resource if can find the resource template.
-    // Multiple types may be provided.
-    const typeQuads = context.dataset
-      .match(
-        obj,
-        rdf.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
-      )
-      .toArray()
+const newNestedResourceFromObject = (obj, property, propertyUri, context) => {
+  // Only build this embedded resource if can find the resource template.
+  // Multiple types may be provided.
+  const typeQuads = context.dataset
+    .match(
+      obj,
+      rdf.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
+    )
+    .toArray()
 
-    // Among the valueTemplateRefs, find all of the resource templates that match a type.
-    // Ideally, only want 1 but need to handle other cases.
-    return Promise.all(
-      typeQuads.map((typeQuad) =>
-        dispatch(
-          selectResourceTemplateId(
-            property.propertyTemplate,
-            typeQuad.object.value,
-            context
-          )
-        )
-      )
-    ).then((childRtIds) => {
-      const compactChildRtIds = _.compact(_.flatten(childRtIds))
-
-      // Don't know which to pick, so error.
-      if (compactChildRtIds.length > 1) {
-        throw `More than one resource template matches: ${compactChildRtIds}`
-      }
-
-      if (!_.isEmpty(compactChildRtIds)) {
-        context.usedDataset.addAll(typeQuads)
-
-        // One resource template
-        const suppress = obj.termType === "NamedNode"
-        return dispatch(
-          recursiveResourceFromDataset(
-            obj,
-            null,
-            compactChildRtIds[0],
-            suppress,
-            context
-          )
-        ).then((subject) => newValueSubject(property, propertyUri, subject))
-      }
-
-      // No local rdf:type triple matched a candidate template -- e.g. the
-      // object is a bare reference to an external, shared vocabulary term or
-      // resource, which has no reason to restate its own type locally. If the
-      // object is a plain URI and exactly one candidate template is marked
-      // suppressible (i.e., designed to round-trip as a flat URI with no
-      // local type assertion), use that template directly rather than
-      // discarding real data.
-      if (obj.termType !== "NamedNode") {
-        return null
-      }
-      return dispatch(
-        selectSuppressibleResourceTemplateId(property.propertyTemplate, context)
-      ).then((suppressibleRtId) => {
-        if (!suppressibleRtId) return null
-        return dispatch(
-          recursiveResourceFromDataset(
-            obj,
-            null,
-            suppressibleRtId,
-            true,
-            context
-          )
-        ).then((subject) => newValueSubject(property, propertyUri, subject))
-      })
-    })
-  }
-
-const selectResourceTemplateId =
-  (propertyTemplate, resourceURI, { resourceTemplatePromises, errorKey }) =>
-  (dispatch) =>
-    Promise.all(
-      // The keys are resource template ids. They may or may not be in state
-      propertyTemplate.valueSubjectTemplateKeys.map((resourceTemplateId) =>
-        dispatch(
-          loadResourceTemplate(
-            resourceTemplateId,
-            resourceTemplatePromises,
-            errorKey
-          )
-        ).then((subjectTemplate) => {
-          // Check if resourceURI matches either the required class or any optional class
-          if (!subjectTemplate) return undefined
-          const allClasses = Object.keys(subjectTemplate.classes || {})
-          const matches = allClasses.includes(resourceURI)
-          return matches ? resourceTemplateId : undefined
-        })
+  // Among the valueTemplateRefs, find all of the resource templates that match a type.
+  // Ideally, only want 1 but need to handle other cases.
+  return Promise.all(
+    typeQuads.map((typeQuad) =>
+      selectResourceTemplateId(
+        property.propertyTemplate,
+        typeQuad.object.value,
+        context
       )
     )
+  ).then((childRtIds) => {
+    const compactChildRtIds = _.compact(_.flatten(childRtIds))
+
+    // Don't know which to pick, so error.
+    if (compactChildRtIds.length > 1) {
+      throw `More than one resource template matches: ${compactChildRtIds}`
+    }
+
+    if (!_.isEmpty(compactChildRtIds)) {
+      context.usedDataset.addAll(typeQuads)
+
+      // One resource template
+      const suppress = obj.termType === "NamedNode"
+      return recursiveResourceFromDataset(
+        obj,
+        null,
+        compactChildRtIds[0],
+        suppress,
+        context
+      ).then((subject) => newValueSubject(property, propertyUri, subject))
+    }
+
+    // No local rdf:type triple matched a candidate template -- e.g. the
+    // object is a bare reference to an external, shared vocabulary term or
+    // resource, which has no reason to restate its own type locally. If the
+    // object is a plain URI and exactly one candidate template is marked
+    // suppressible (i.e., designed to round-trip as a flat URI with no
+    // local type assertion), use that template directly rather than
+    // discarding real data.
+    if (obj.termType !== "NamedNode") {
+      return null
+    }
+    return selectSuppressibleResourceTemplateId(
+      property.propertyTemplate,
+      context
+    ).then((suppressibleRtId) => {
+      if (!suppressibleRtId) return null
+      return recursiveResourceFromDataset(
+        obj,
+        null,
+        suppressibleRtId,
+        true,
+        context
+      ).then((subject) => newValueSubject(property, propertyUri, subject))
+    })
+  })
+}
+
+const selectResourceTemplateId = (
+  propertyTemplate,
+  resourceURI,
+  { resourceTemplatePromises, errorKey }
+) =>
+  Promise.all(
+    // The keys are resource template ids. They may or may not be in state
+    propertyTemplate.valueSubjectTemplateKeys.map((resourceTemplateId) =>
+      loadResourceTemplate(
+        resourceTemplateId,
+        resourceTemplatePromises,
+        errorKey
+      ).then((subjectTemplate) => {
+        // Check if resourceURI matches either the required class or any optional class
+        if (!subjectTemplate) return undefined
+        const allClasses = Object.keys(subjectTemplate.classes || {})
+        const matches = allClasses.includes(resourceURI)
+        return matches ? resourceTemplateId : undefined
+      })
+    )
+  )
 
 // Used only when no candidate template's class matched a local rdf:type
 // triple on the object. Safe to use only when exactly one candidate is
 // suppressible -- with more than one, there's no way to know which the value
 // represents, so the caller should decline (return undefined) rather than guess.
-const selectSuppressibleResourceTemplateId =
-  (propertyTemplate, { resourceTemplatePromises, errorKey }) =>
-  (dispatch) =>
-    Promise.all(
-      propertyTemplate.valueSubjectTemplateKeys.map((resourceTemplateId) =>
-        dispatch(
-          loadResourceTemplate(
-            resourceTemplateId,
-            resourceTemplatePromises,
-            errorKey
-          )
-        ).then((subjectTemplate) =>
-          subjectTemplate?.suppressible ? resourceTemplateId : undefined
-        )
+const selectSuppressibleResourceTemplateId = (
+  propertyTemplate,
+  { resourceTemplatePromises, errorKey }
+) =>
+  Promise.all(
+    propertyTemplate.valueSubjectTemplateKeys.map((resourceTemplateId) =>
+      loadResourceTemplate(
+        resourceTemplateId,
+        resourceTemplatePromises,
+        errorKey
+      ).then((subjectTemplate) =>
+        subjectTemplate?.suppressible ? resourceTemplateId : undefined
       )
-    ).then((resourceTemplateIds) => {
-      const compactIds = _.compact(resourceTemplateIds)
-      return compactIds.length === 1 ? compactIds[0] : undefined
-    })
+    )
+  ).then((resourceTemplateIds) => {
+    const compactIds = _.compact(resourceTemplateIds)
+    return compactIds.length === 1 ? compactIds[0] : undefined
+  })
 
 const newLiteralFromObject = (obj, property, propertyUri) =>
   newLiteralValue(property, propertyUri, obj.value, obj.language)
@@ -592,39 +575,38 @@ const newUriFromObject = (obj, property, propertyUri, context) => {
   return newUriValue(property, propertyUri, uri, label, lang)
 }
 
-const newProperty =
-  (subject, propertyTemplate, noDefaults, errorKey) => (dispatch) => {
-    const key = nanoid()
-    const property = {
-      key,
-      subject,
-      propertyTemplate,
-      values: null,
-      show: false,
-      propertyUri: null,
-    }
-    if (!noDefaults && !_.isEmpty(property.propertyTemplate.defaults)) {
-      property.values = defaultValuesFor(property)
-      if (!_.isEmpty(property.values)) property.show = true
-    }
+const newProperty = (subject, propertyTemplate, noDefaults, errorKey) => {
+  const key = nanoid()
+  const property = {
+    key,
+    subject,
+    propertyTemplate,
+    values: null,
+    show: false,
+    propertyUri: null,
+  }
+  if (!noDefaults && !_.isEmpty(property.propertyTemplate.defaults)) {
+    property.values = defaultValuesFor(property)
+    if (!_.isEmpty(property.values)) property.show = true
+  }
 
-    // If ordered, then set property uri
-    if (propertyTemplate.ordered)
-      property.propertyUri = propertyTemplate.defaultUri
+  // If ordered, then set property uri
+  if (propertyTemplate.ordered)
+    property.propertyUri = propertyTemplate.defaultUri
 
-    // If required and we do not already have some default values, then expand the property.
-    if (propertyTemplate.required && !property.values) {
-      property.show = true
-      return dispatch(
-        valuesForExpandedProperty(property, noDefaults, errorKey)
-      ).then((values) => {
+  // If required and we do not already have some default values, then expand the property.
+  if (propertyTemplate.required && !property.values) {
+    property.show = true
+    return valuesForExpandedProperty(property, noDefaults, errorKey).then(
+      (values) => {
         property.values = values
         return property
-      })
-    }
-
-    return property
+      }
+    )
   }
+
+  return property
+}
 
 export function defaultValuesFor(property) {
   return property.propertyTemplate.defaults.map((defaultValue) => {
@@ -646,33 +628,31 @@ export function defaultValuesFor(property) {
   })
 }
 
-const valuesForExpandedProperty =
-  (property, noDefaults, errorKey) => (dispatch) => {
-    if (property.propertyTemplate.type === "resource") {
-      return Promise.all(
-        property.propertyTemplate.valueSubjectTemplateKeys.map(
-          (resourceTemplateId) =>
-            dispatch(newSubject(null, resourceTemplateId, {}, errorKey)).then(
-              (subject) =>
-                dispatch(
-                  newPropertiesFromTemplates(subject, noDefaults, errorKey)
-                ).then((properties) => {
-                  subject.properties = properties
-                  return newValueSubject(
-                    property,
-                    property.propertyTemplate.defaultUri,
-                    subject
-                  )
-                })
+const valuesForExpandedProperty = (property, noDefaults, errorKey) => {
+  if (property.propertyTemplate.type === "resource") {
+    return Promise.all(
+      property.propertyTemplate.valueSubjectTemplateKeys.map(
+        (resourceTemplateId) =>
+          newSubject(null, resourceTemplateId, {}, errorKey).then((subject) =>
+            newPropertiesFromTemplates(subject, noDefaults, errorKey).then(
+              (properties) => {
+                subject.properties = properties
+                return newValueSubject(
+                  property,
+                  property.propertyTemplate.defaultUri,
+                  subject
+                )
+              }
             )
-        )
+          )
       )
-    }
-    return Promise.resolve([])
+    )
   }
+  return Promise.resolve([])
+}
 
-export const newSubjectCopy = (subjectKey, value) => (dispatch, getState) => {
-  const subject = selectSubject(getState(), subjectKey)
+export const newSubjectCopy = (subjectKey, value) => {
+  const subject = selectSubject(useEntitiesStore.getState(), subjectKey)
   const newSubject = _.pick(subject, ["subjectTemplate", "classes"])
 
   // Add to value
@@ -685,13 +665,13 @@ export const newSubjectCopy = (subjectKey, value) => (dispatch, getState) => {
   // Add properties
   return Promise.all(
     subject.properties.map((property) =>
-      dispatch(newPropertyCopy(property.key, newSubject))
+      newPropertyCopy(property.key, newSubject)
     )
   ).then(() => newSubject)
 }
 
-const newPropertyCopy = (propertyKey, subject) => (dispatch, getState) => {
-  const property = selectProperty(getState(), propertyKey)
+const newPropertyCopy = (propertyKey, subject) => {
+  const property = selectProperty(useEntitiesStore.getState(), propertyKey)
 
   // Skip Work-Instance relationship properties
   const templateUris = Object.keys(property.propertyTemplate?.uris || {})
@@ -715,16 +695,14 @@ const newPropertyCopy = (propertyKey, subject) => (dispatch, getState) => {
   // Add values
   if (property.values) {
     return Promise.all(
-      property.values.map((value) =>
-        dispatch(newValueCopy(value.key, newProperty))
-      )
+      property.values.map((value) => newValueCopy(value.key, newProperty))
     ).then(() => newProperty)
   }
   return newProperty
 }
 
-const newValueCopy = (valueKey, property) => (dispatch, getState) => {
-  const value = selectValue(getState(), valueKey)
+const newValueCopy = (valueKey, property) => {
+  const value = selectValue(useEntitiesStore.getState(), valueKey)
   const newValue = _.pick(value, [
     "literal",
     "lang",

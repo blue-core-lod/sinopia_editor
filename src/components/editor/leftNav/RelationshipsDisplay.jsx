@@ -1,7 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useState, useEffect } from "react"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import PreviewModal from "../preview/PreviewModal"
 import { selectRelationships } from "selectors/relationships"
@@ -35,7 +35,10 @@ const RelationshipsDisplay = ({ resourceKey, displayActions = true }) => {
   // Note that when loading a new resource the inferred refs may arrive asynchronously, which means the refs
   // may change during the lifecycle of the component.
   const { bfAdminMetadataRefs, bfItemRefs, bfInstanceRefs, bfWorkRefs } =
-    useSelector((state) => selectRelationships(state, resourceKey), _.isEqual)
+    useEntitiesStore(
+      (state) => selectRelationships(state, resourceKey),
+      _.isEqual
+    )
 
   useEffect(() => () => setMounted(false), [])
 

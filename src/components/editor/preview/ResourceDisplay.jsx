@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react"
 import PropTypes from "prop-types"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import RDFDisplay from "./RDFDisplay"
 import { selectFullSubject } from "selectors/resources"
 import { hasRelationships as hasRelationshipsSelector } from "selectors/relationships"
@@ -17,8 +17,10 @@ const ResourceDisplay = ({
   displayRelationships = true,
 }) => {
   const errorKey = useAlerts()
-  const resource = useSelector((state) => selectFullSubject(state, resourceKey))
-  const hasRelationships = useSelector((state) =>
+  const resource = useEntitiesStore((state) =>
+    selectFullSubject(state, resourceKey)
+  )
+  const hasRelationships = useEntitiesStore((state) =>
     hasRelationshipsSelector(state, resourceKey)
   )
   const dataset = useMemo(() => new GraphBuilder(resource).graph, [resource])

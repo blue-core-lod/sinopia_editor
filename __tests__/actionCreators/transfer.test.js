@@ -1,6 +1,4 @@
 // Copyright 2019 Stanford University see LICENSE for license
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import * as sinopiaApi from "sinopiaApi"
 import { createState } from "stateUtils"
 import { transfer } from "actionCreators/transfer"
@@ -14,8 +12,6 @@ afterEach(() => {
   useEditorStore.setState({ errors: {}, successes: {} })
 })
 
-const mockStore = configureMockStore([thunk])
-
 const resourceUri =
   "https://api.development.sinopia.io/resource/7b4c275d-b0c7-40a4-80b3-e95a0d9d987c"
 
@@ -24,10 +20,8 @@ describe("transfer", () => {
     describe("successful", () => {
       it("dispatches ADD_SUCCESS with the resource URI", async () => {
         sinopiaApi.postTransfer = jest.fn().mockResolvedValue()
-        const store = mockStore(createState())
-        await store.dispatch(
-          transfer(resourceUri, null, undefined, "testerrorkey")
-        )
+        createState()
+        await transfer(resourceUri, null, undefined, "testerrorkey")
 
         expect(sinopiaApi.postTransfer).toHaveBeenCalledWith(
           { instance_uri: resourceUri },
@@ -41,10 +35,8 @@ describe("transfer", () => {
     describe("failure", () => {
       it("dispatches ADD_ERROR", async () => {
         sinopiaApi.postTransfer = jest.fn().mockRejectedValue("Ooops!")
-        const store = mockStore(createState())
-        await store.dispatch(
-          transfer(resourceUri, null, undefined, "testerrorkey")
-        )
+        createState()
+        await transfer(resourceUri, null, undefined, "testerrorkey")
 
         expect(useEditorStore.getState().errors.testerrorkey).toContain(
           "Error requesting transfer: Ooops!"
@@ -59,10 +51,8 @@ describe("transfer", () => {
     describe("successful", () => {
       it("dispatches ADD_SUCCESS mentioning the identifier", async () => {
         sinopiaApi.postTransfer = jest.fn().mockResolvedValue()
-        const store = mockStore(createState())
-        await store.dispatch(
-          transfer(resourceUri, localId, undefined, "testerrorkey")
-        )
+        createState()
+        await transfer(resourceUri, localId, undefined, "testerrorkey")
 
         expect(sinopiaApi.postTransfer).toHaveBeenCalledWith(
           { instance_uri: resourceUri, local_id: localId },
@@ -76,10 +66,8 @@ describe("transfer", () => {
     describe("failure", () => {
       it("dispatches ADD_ERROR", async () => {
         sinopiaApi.postTransfer = jest.fn().mockRejectedValue("Ooops!")
-        const store = mockStore(createState())
-        await store.dispatch(
-          transfer(resourceUri, localId, undefined, "testerrorkey")
-        )
+        createState()
+        await transfer(resourceUri, localId, undefined, "testerrorkey")
 
         expect(useEditorStore.getState().errors.testerrorkey).toContain(
           "Error requesting transfer: Ooops!"

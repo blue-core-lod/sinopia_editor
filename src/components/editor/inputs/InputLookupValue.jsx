@@ -1,14 +1,8 @@
 import React, { useRef, useEffect, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
 import PropTypes from "prop-types"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faSearch } from "@fortawesome/free-solid-svg-icons"
-import {
-  updateLiteralValue,
-  updateURIValue,
-  removeValue,
-  addValue,
-} from "actions/resources"
+import useEntitiesStore from "stores/entitiesStore"
 import { newLiteralValue } from "utilities/valueFactory"
 import DiacriticsSelection from "components/editor/diacritics/DiacriticsSelection"
 import ScriptShifterSelection from "components/editor/diacritics/ScriptShifterSelection"
@@ -28,9 +22,8 @@ const InputLookupValue = ({
   displayValidations,
   shouldFocus,
 }) => {
-  const dispatch = useDispatch()
   const inputRef = useRef(null)
-  const defaultLang = useSelector((state) =>
+  const defaultLang = useEntitiesStore((state) =>
     selectDefaultLang(state, value.rootSubjectKey)
   )
   const [focusHasBeenSet, setFocusHasBeenSet] = useState(false)
@@ -79,8 +72,9 @@ const InputLookupValue = ({
   }
 
   const handleTranslate = (translatedText, marcCode) => {
-    dispatch(
-      addValue(
+    useEntitiesStore
+      .getState()
+      .addValue(
         newLiteralValue(
           value.property,
           value.propertyUri,
@@ -89,11 +83,10 @@ const InputLookupValue = ({
         ),
         value.key
       )
-    )
   }
 
   const handleRemoveClick = (event) => {
-    dispatch(removeValue(value.key))
+    useEntitiesStore.getState().removeValue(value.key)
     event.preventDefault()
   }
 
@@ -119,15 +112,13 @@ const InputLookupValue = ({
   const handleOwnUriClick = (event) => {
     hideLookup()
     closeDiacritics()
-    dispatch(
-      updateURIValue(
-        value.key,
-        null,
-        null,
-        chooseLang(propertyTemplate.languageSuppressed, defaultLang),
-        "InputURIValue"
-      )
-    )
+    useEntitiesStore.getState().updateValue({
+      valueKey: value.key,
+      uri: null,
+      label: null,
+      lang: chooseLang(propertyTemplate.languageSuppressed, defaultLang),
+      component: "InputURIValue",
+    })
     event.preventDefault()
   }
 
@@ -141,20 +132,24 @@ const InputLookupValue = ({
   const handleUpdateURI = (uri, label, lang) => {
     hideLookup()
     closeDiacritics()
-    dispatch(updateURIValue(value.key, uri, label, lang, "InputURIValue"))
+    useEntitiesStore.getState().updateValue({
+      valueKey: value.key,
+      uri: uri || null,
+      label: label || null,
+      lang: lang || null,
+      component: "InputURIValue",
+    })
   }
 
   const handleUpdateLiteral = (literal) => {
     hideLookup()
     closeDiacritics()
-    dispatch(
-      updateLiteralValue(
-        value.key,
-        literal,
-        propertyTemplate.languageSuppressed ? null : defaultLang,
-        "InputLiteralValue"
-      )
-    )
+    useEntitiesStore.getState().updateValue({
+      valueKey: value.key,
+      literal: literal || null,
+      lang: propertyTemplate.languageSuppressed ? null : defaultLang,
+      component: "InputLiteralValue",
+    })
   }
 
   const authorityLabels = propertyTemplate.authorities.map(

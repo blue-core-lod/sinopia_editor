@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react"
 import PropTypes from "prop-types"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import ResourceComponent from "./ResourceComponent"
 import Header from "../Header"
 import GroupChoiceModal from "./GroupChoiceModal"
@@ -32,10 +32,10 @@ const Editor = (props) => {
 
   const resourceKey = useEditorStore((state) => state.currentResource)
   // Resource ID is extracted from the URI. Presence indicates the resource has been saved.
-  const resourceId = useSelector((state) =>
+  const resourceId = useEntitiesStore((state) =>
     selectResourceId(state, resourceKey)
   )
-  const subjectTemplate = useSelector((state) =>
+  const subjectTemplate = useEntitiesStore((state) =>
     selectSubjectTemplateForSubject(state, resourceKey)
   )
   const subjectTemplateKey = subjectTemplate?.key
@@ -43,7 +43,7 @@ const Editor = (props) => {
   const displayErrors = useEditorStore(
     (state) => !!state.resourceValidation[resourceKey]
   )
-  const hasValidationErrors = useSelector((state) =>
+  const hasValidationErrors = useEntitiesStore((state) =>
     hasValidationErrorsSelector(state, resourceKey)
   )
 

@@ -4,6 +4,7 @@ import { createStore, renderComponent } from "testUtils"
 import { screen } from "@testing-library/react"
 import { createState } from "stateUtils"
 import { selectNormSubject } from "selectors/resources"
+import useEntitiesStore from "stores/entitiesStore"
 import ResourcePreviewHeader from "components/editor/preview/ResourcePreviewHeader"
 
 let mockKeycloak
@@ -29,7 +30,7 @@ describe("<ResourcePreviewHeader />", () => {
   it("displays label, url and edit groups", () => {
     const state = createState({ hasTwoLiteralResources: true })
     const store = createStore(state)
-    const resource = selectNormSubject(state, "t9zVwg2zO")
+    const resource = selectNormSubject(useEntitiesStore.getState(), "t9zVwg2zO")
     renderComponent(<ResourcePreviewHeader resource={resource} />, store)
     expect(screen.getByText("Abbreviated Title")).toBeTruthy // label is shown
     expect(screen.getByText("Stanford University")).toBeTruthy // owner is shown with full group name

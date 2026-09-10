@@ -1,21 +1,21 @@
 import { selectLookup } from "selectors/lookups"
-import { lookupOptionsRetrieved } from "actions/lookups"
+import useEntitiesStore from "stores/entitiesStore"
 import { nanoid } from "nanoid"
 import _ from "lodash"
 
-// A thunk that fetches a lookup, transforms it, and adds to state.
-export const fetchLookup = (uri) => (dispatch, getState) => {
-  const existingLookup = selectLookup(getState(), uri)
+// A function that fetches a lookup, transforms it, and adds to state.
+export const fetchLookup = (uri) => {
+  const existingLookup = selectLookup(useEntitiesStore.getState(), uri)
   if (existingLookup) {
     return existingLookup
   }
 
-  if (uri.startsWith("file:")) return dispatch(fetchFileLookup(uri))
+  if (uri.startsWith("file:")) return fetchFileLookup(uri)
 
-  return dispatch(fetchHttpLookup(uri))
+  return fetchHttpLookup(uri)
 }
 
-const fetchFileLookup = (uri) => (dispatch) => {
+const fetchFileLookup = (uri) => {
   /* eslint security/detect-non-literal-require: 'off' */
   const lookupJson = require(`../../static/${uri.substring(6)}`)
   const opts = lookupJson.map((authority) => ({
@@ -23,17 +23,17 @@ const fetchFileLookup = (uri) => (dispatch) => {
     label: authority.label,
     uri: authority.uri,
   }))
-  dispatch(lookupOptionsRetrieved(uri, opts))
+  useEntitiesStore.getState().lookupOptionsRetrieved(uri, opts)
   return opts
 }
 
-const fetchHttpLookup = (uri) => (dispatch) => {
+const fetchHttpLookup = (uri) => {
   const url = `${uri}.json`
   return fetch(url)
     .then((resp) => resp.json())
     .then((json) => responseToOptions(json))
     .then((opts) => {
-      dispatch(lookupOptionsRetrieved(uri, opts))
+      useEntitiesStore.getState().lookupOptionsRetrieved(uri, opts)
       return opts
     })
     .catch((err) => {
@@ -43,7 +43,7 @@ const fetchHttpLookup = (uri) => (dispatch) => {
           isError: true,
         },
       ]
-      dispatch(lookupOptionsRetrieved(uri, opts))
+      useEntitiesStore.getState().lookupOptionsRetrieved(uri, opts)
       return opts
     })
 }

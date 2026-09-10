@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react"
 import PropTypes from "prop-types"
-import { useDispatch } from "react-redux"
 import { Link } from "react-router-dom"
 import { newResource } from "actionCreators/resources"
 import useEditorStore from "stores/editorStore"
@@ -14,7 +13,6 @@ import { useKeycloak } from "../../KeycloakContext"
 import LoadingButton from "../buttons/LoadingButton"
 
 const NewResourceTemplateButton = (props) => {
-  const dispatch = useDispatch()
   const { keycloak } = useKeycloak()
   const { canCreate } = usePermissions()
   const errorKey = useAlerts()
@@ -35,11 +33,11 @@ const NewResourceTemplateButton = (props) => {
   const handleClick = (event) => {
     event.preventDefault()
     setIsLoading(true)
-    dispatch(
-      newResource(Config.rootResourceTemplateId, errorKey, true, keycloak)
-    ).then((result) => {
-      setNavigateEditor(result)
-    })
+    newResource(Config.rootResourceTemplateId, errorKey, true, keycloak).then(
+      (result) => {
+        setNavigateEditor(result)
+      }
+    )
   }
 
   if (!canCreate) return null

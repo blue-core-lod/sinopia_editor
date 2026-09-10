@@ -45,13 +45,11 @@ describe("saveResource with triples not covered by the template", () => {
   const extraTriple = `<${uri}> <${extraPredicate}> <ubertemplate1:property6> .`
 
   it("preserves the unused triples in the saved graph", async () => {
-    const store = createStore()
+    createStore()
 
     // Load the resource (with the extra triple) into real state.
     const dataset = await datasetFromN3(`${n3}${extraTriple}\n`)
-    const loaded = await store.dispatch(
-      newResourceFromDataset(dataset, uri, null, "testerror")
-    )
+    const loaded = await newResourceFromDataset(dataset, uri, null, "testerror")
     expect(loaded).toBe(true)
 
     const resourceKey = useEditorStore.getState().currentResource
@@ -65,11 +63,9 @@ describe("saveResource with triples not covered by the template", () => {
       return Promise.resolve({ ok: true, json: () => Promise.resolve({}) })
     })
 
-    await store.dispatch(
-      saveResource(resourceKey, "stanford", [], "testerror", {
-        token: "test-token",
-      })
-    )
+    await saveResource(resourceKey, "stanford", [], "testerror", {
+      token: "test-token",
+    })
 
     expect(capturedBody).not.toBeNull()
     const { data } = JSON.parse(capturedBody)

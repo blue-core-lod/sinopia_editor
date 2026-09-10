@@ -2,7 +2,6 @@
 /* eslint max-params: ["error", 4] */
 
 import React from "react"
-import { useDispatch } from "react-redux"
 import useSearchStore from "stores/searchStore"
 import ClassFilter from "./ClassFilter"
 import SearchResultRows from "./SearchResultRows"
@@ -14,7 +13,6 @@ import { useHistory } from "react-router-dom"
 import _ from "lodash"
 
 const SinopiaSearchResults = () => {
-  const dispatch = useDispatch()
   const history = useHistory()
   const searchResults = useSearchStore((state) => state.resource?.results)
   const filteredResults = useSearchStore((state) => {
@@ -29,11 +27,9 @@ const SinopiaSearchResults = () => {
   })
 
   const chooseResourceTemplate = (resourceTemplateId) => {
-    dispatch(completeResourceLoadingWithTemplate(resourceTemplateId)).then(
-      (result) => {
-        if (result) history.push("/editor")
-      }
-    )
+    completeResourceLoadingWithTemplate(resourceTemplateId).then((result) => {
+      if (result) history.push("/editor")
+    })
   }
 
   if (_.isEmpty(searchResults)) {

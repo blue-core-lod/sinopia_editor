@@ -2,7 +2,7 @@
 
 import React from "react"
 import PropTypes from "prop-types"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import { resourceHasChangesSinceLastSave } from "selectors/resources"
 import CloseResourceModal from "./CloseResourceModal"
 import useEditorStore from "stores/editorStore"
@@ -15,7 +15,7 @@ const CloseButton = (props) => {
   }
   const { handleCloseResource } = useEditor(resourceKey)
 
-  const resourceHasChanged = useSelector((state) =>
+  const resourceHasChanged = useEntitiesStore((state) =>
     resourceHasChangesSinceLastSave(state, resourceKey)
   )
 
