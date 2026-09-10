@@ -2,7 +2,7 @@
 
 import Config from "../Config"
 
-import { clearErrors } from "actions/errors"
+import useEditorStore from "stores/editorStore"
 import { loadUserData } from "actionCreators/user"
 import useAuthenticateStore from "stores/authenticateStore"
 
@@ -26,8 +26,8 @@ export const authenticate = (keycloak) => async (dispatch) => {
 
 export const signIn =
   (keycloak, errorKey, redirectUri = Config.sinopiaUrl) =>
-  (dispatch) => {
-    dispatch(clearErrors(errorKey))
+  () => {
+    useEditorStore.getState().clearErrors(errorKey)
     return Promise.resolve(keycloak.login({ redirectUri }))
   }
 

@@ -12,19 +12,13 @@ import {
   removeValue,
   saveResourceFinished,
   setBaseURL,
-  setCurrentEditResource,
-  setCurrentPreviewResource,
-  setUnusedRDF,
   showNavProperty,
   showNavSubject,
   showProperty,
   loadResourceFinished,
   setResourceGroup,
   setValueOrder,
-  clearResourceFromEditor,
-  saveResourceFinishedEditor,
   updateValue,
-  setCurrentDiffResources,
   setVersions,
   clearVersions,
   setValuePropertyURI,
@@ -51,7 +45,6 @@ const reducers = {
   REMOVE_VALUE: removeValue,
   SAVE_RESOURCE_FINISHED: saveResourceFinished,
   SET_BASE_URL: setBaseURL,
-  SET_CURRENT_DIFF_RESOURCES: setCurrentDiffResources,
   SET_PROPERTY_PROPERTY_URI: setPropertyPropertyURI,
   SET_RESOURCE_GROUP: setResourceGroup,
   SET_RESOURCE_CHANGED: setResourceChanged,
@@ -65,16 +58,6 @@ const reducers = {
 }
 
 const reducer = createReducer(reducers)
-
-const editorReducers = {
-  CLEAR_RESOURCE: clearResourceFromEditor,
-  SAVE_RESOURCE_FINISHED: saveResourceFinishedEditor,
-  SET_CURRENT_EDIT_RESOURCE: setCurrentEditResource,
-  SET_CURRENT_PREVIEW_RESOURCE: setCurrentPreviewResource,
-  SET_UNUSED_RDF: setUnusedRDF,
-}
-
-const editorReducer = createReducer(editorReducers)
 
 jest.mock("nanoid")
 nanoid.mockReturnValue("abc123")
@@ -978,23 +961,6 @@ describe("clearResource()", () => {
   })
 })
 
-describe("clearResourceFromEditor()", () => {
-  it("removes resource", () => {
-    const oldState = createState({ hasResourceWithLiteral: true })
-    oldState.editor.errors["resourceedit-t9zVwg2zO"] = ["An error"]
-
-    const action = {
-      type: "CLEAR_RESOURCE",
-      payload: "t9zVwg2zO",
-    }
-
-    const newState = editorReducer(oldState.editor, action)
-    expect(newState.errors["resourceedit-t9zVwg2zO"]).toBe(undefined)
-    expect(newState.currentResource).toBe(null)
-    expect(newState.resources).toStrictEqual([])
-  })
-})
-
 describe("hideProperty()", () => {
   it("sets show to false for property", () => {
     const oldState = {
@@ -1173,9 +1139,6 @@ describe("saveResourceFinished()", () => {
     }
     const newState = reducer(oldState.entities, action)
     expect(newState.subjects.t9zVwg2zO.changed).toBe(false)
-
-    const newState2 = editorReducer(oldState.editor, action)
-    expect(newState2.lastSave.t9zVwg2zO).toBe(1594667068562)
   })
 })
 
@@ -1222,111 +1185,6 @@ describe("setBaseURL()", () => {
       "https://sinopia.io/stanford/456hkl"
     )
     expect(newState.subjects.t9zVwg2zO.changed).toEqual(false)
-  })
-})
-
-describe("setCurrentEditResource()", () => {
-  it("sets current resource if resource is in editor resources", () => {
-    const oldState = createState({ hasResourceWithLiteral: true })
-    oldState.editor.currentResource = "abc123"
-
-    const action = {
-      type: "SET_CURRENT_EDIT_RESOURCE",
-      payload: "t9zVwg2zO",
-    }
-
-    const newState = editorReducer(oldState.editor, action)
-    expect(newState.currentResource).toBe("t9zVwg2zO")
-    expect(newState.resources).toStrictEqual(["t9zVwg2zO"])
-  })
-
-  it("sets current resource and adds to editor resources", () => {
-    const oldState = createState({ hasResourceWithLiteral: true })
-    oldState.editor.resources = []
-
-    const action = {
-      type: "SET_CURRENT_EDIT_RESOURCE",
-      payload: "t9zVwg2zO",
-    }
-
-    const newState = editorReducer(oldState.editor, action)
-    expect(newState.currentResource).toBe("t9zVwg2zO")
-    expect(newState.resources).toStrictEqual(["t9zVwg2zO"])
-  })
-
-  it("sets current resource to null", () => {
-    const oldState = createState({ hasResourceWithLiteral: true })
-
-    const action = {
-      type: "SET_CURRENT_EDIT_RESOURCE",
-      payload: null,
-    }
-
-    const newState = editorReducer(oldState.editor, action)
-    expect(newState.currentResource).toBeNull()
-    expect(newState.resources).toStrictEqual(["t9zVwg2zO"])
-  })
-})
-
-describe("setCurrentPreviewResource()", () => {
-  it("sets current preview resource if resource is in editor resources", () => {
-    const oldState = createState({ hasResourceWithLiteral: true })
-    oldState.editor.currentPreviewResource = "abc123"
-
-    const action = {
-      type: "SET_CURRENT_PREVIEW_RESOURCE",
-      payload: "t9zVwg2zO",
-    }
-
-    const newState = editorReducer(oldState.editor, action)
-    expect(newState.currentPreviewResource).toBe("t9zVwg2zO")
-    expect(newState.resources).toStrictEqual(["t9zVwg2zO"])
-  })
-
-  it("sets current preview resource and adds to editor resources", () => {
-    const oldState = createState({ hasResourceWithLiteral: true })
-    oldState.editor.resources = []
-
-    const action = {
-      type: "SET_CURRENT_PREVIEW_RESOURCE",
-      payload: "t9zVwg2zO",
-    }
-
-    const newState = editorReducer(oldState.editor, action)
-    expect(newState.currentPreviewResource).toBe("t9zVwg2zO")
-    expect(newState.resources).toStrictEqual(["t9zVwg2zO"])
-  })
-
-  it("sets current preview resource to null", () => {
-    const oldState = createState({ hasResourceWithLiteral: true })
-    oldState.currentPreviewResource = "abc123"
-
-    const action = {
-      type: "SET_CURRENT_PREVIEW_RESOURCE",
-      payload: null,
-    }
-
-    const newState = editorReducer(oldState.editor, action)
-    expect(newState.currentPreviewResource).toBeNull()
-    expect(newState.resources).toStrictEqual(["t9zVwg2zO"])
-  })
-})
-
-describe("setUnusedRDF()", () => {
-  it("sets unused RDF", () => {
-    const oldState = createState({ hasResourceWithLiteral: true })
-    const action = {
-      type: "SET_UNUSED_RDF",
-      payload: {
-        resourceKey: "t9zVwg2zO",
-        rdf: "<> <http://www.w3.org/1999/02/22-rdf-syntax-ns#value> 'abcde' .",
-      },
-    }
-
-    const newState = editorReducer(oldState.editor, action)
-    expect(newState.unusedRDF.t9zVwg2zO).toBe(
-      "<> <http://www.w3.org/1999/02/22-rdf-syntax-ns#value> 'abcde' ."
-    )
   })
 })
 
@@ -1795,62 +1653,6 @@ describe("updateValue()", () => {
         errors: [],
         component: "InputURIComponent",
       })
-    })
-  })
-})
-
-describe("setCurrentDiffResources()", () => {
-  it("replaces", () => {
-    const oldState = createState({ hasCurrentDiff: true })
-
-    const action = {
-      type: "SET_CURRENT_DIFF_RESOURCES",
-      payload: {
-        compareFromResourceKey: "i0SAJP-Zhd",
-        compareToResourceKey: "wihOjn-0Z",
-      },
-    }
-
-    const newState = reducer(oldState.editor, action)
-    expect(newState.currentDiff).toStrictEqual({
-      compareFrom: "i0SAJP-Zhd",
-      compareTo: "wihOjn-0Z",
-    })
-  })
-
-  it("clears when null", () => {
-    const oldState = createState({ hasCurrentDiff: true })
-
-    const action = {
-      type: "SET_CURRENT_DIFF_RESOURCES",
-      payload: {
-        compareFromResourceKey: null,
-        compareToResourceKey: null,
-      },
-    }
-
-    const newState = reducer(oldState.editor, action)
-    expect(newState.currentDiff).toStrictEqual({
-      compareFrom: null,
-      compareTo: null,
-    })
-  })
-
-  it("retains when undefined", () => {
-    const oldState = createState({ hasCurrentDiff: true })
-
-    const action = {
-      type: "SET_CURRENT_DIFF_RESOURCES",
-      payload: {
-        compareFromResourceKey: undefined,
-        compareToResourceKey: undefined,
-      },
-    }
-
-    const newState = reducer(oldState.editor, action)
-    expect(newState.currentDiff).toStrictEqual({
-      compareFrom: "7caLbfwwlf",
-      compareTo: "ljAblGiBW",
     })
   })
 })

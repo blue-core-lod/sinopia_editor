@@ -1,18 +1,16 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useState, useRef, useEffect } from "react"
-import { useSelector, useDispatch, shallowEqual } from "react-redux"
+import { useSelector, shallowEqual } from "react-redux"
 import PropTypes from "prop-types"
 import { postMarc, getMarcJob, getMarc } from "sinopiaApi"
 import { selectPickSubject } from "selectors/resources"
 import { isBfInstance } from "utilities/Bibframe"
 import { saveAs } from "file-saver"
-import { showMarcModal } from "actions/modals"
+import useEditorStore from "stores/editorStore"
 import useAlerts from "hooks/useAlerts"
-import { clearErrors, addError } from "actions/errors"
 
 const MarcButton = ({ resourceKey }) => {
-  const dispatch = useDispatch()
   const errorKey = useAlerts()
   const marcs = useRef({})
   const isMounted = useRef(false)
@@ -50,16 +48,16 @@ const MarcButton = ({ resourceKey }) => {
       })
       .catch((err) => {
         if (!isMounted.current) return
-        dispatch(
-          addError(errorKey, `Error requesting MARC: ${err.message || err}`)
-        )
+        useEditorStore
+          .getState()
+          .addError(errorKey, `Error requesting MARC: ${err.message || err}`)
         setRequesting(false)
       })
   }
 
   const handleRequest = (event) => {
     setRequesting(true)
-    dispatch(clearErrors(errorKey))
+    useEditorStore.getState().clearErrors(errorKey)
     delete marcs.current[resourceKey]
     postMarc(resource.uri)
       .then((marcJobUrl) => {
@@ -68,9 +66,9 @@ const MarcButton = ({ resourceKey }) => {
       })
       .catch((err) => {
         if (!isMounted.current) return
-        dispatch(
-          addError(errorKey, `Error requesting MARC: ${err.message || err}`)
-        )
+        useEditorStore
+          .getState()
+          .addError(errorKey, `Error requesting MARC: ${err.message || err}`)
         setRequesting(false)
       })
     event.preventDefault()
@@ -96,7 +94,7 @@ const MarcButton = ({ resourceKey }) => {
   }
 
   const handleViewMarc = (event) => {
-    dispatch(showMarcModal(marcs.current[resourceKey].marc))
+    useEditorStore.getState().showMarcModal(marcs.current[resourceKey].marc)
     event.preventDefault()
   }
 

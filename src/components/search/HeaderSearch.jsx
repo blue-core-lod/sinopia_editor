@@ -1,7 +1,6 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useRef, useEffect, useState } from "react"
-import { useSelector, useDispatch } from "react-redux"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faSearch, faInfoCircle } from "@fortawesome/free-solid-svg-icons"
 import { Popover } from "bootstrap"
@@ -9,13 +8,11 @@ import searchConfig from "../../../static/searchConfig.json"
 import { sinopiaSearchUri } from "utilities/authorityConfig"
 import useSearch from "hooks/useSearch"
 import { useKeycloak } from "../../KeycloakContext"
-import { selectHeaderSearch } from "selectors/editor"
-import { setHeaderSearch } from "actions/index"
+import useEditorStore from "stores/editorStore"
 import useAlerts from "hooks/useAlerts"
 
 const HeaderSearch = () => {
-  const dispatch = useDispatch()
-  const currentSearch = useSelector((state) => selectHeaderSearch(state))
+  const currentSearch = useEditorStore((state) => state.currentHeaderSearch)
   const { keycloak } = useKeycloak()
   const [uri, setUri] = useState(currentSearch.uri)
   const [query, setQuery] = useState(currentSearch.query || "")
@@ -49,19 +46,19 @@ const HeaderSearch = () => {
   }
 
   const handleQueryBlur = (event) => {
-    dispatch(setHeaderSearch(uri, event.target.value))
+    useEditorStore.getState().setHeaderSearch(uri, event.target.value)
   }
 
   const handleUriChange = (event) => {
     setUri(event.target.value)
-    dispatch(setHeaderSearch(event.target.value, query))
+    useEditorStore.getState().setHeaderSearch(event.target.value, query)
     event.preventDefault()
   }
 
   const runSearch = (event) => {
     event.preventDefault()
 
-    dispatch(setHeaderSearch(uri, query))
+    useEditorStore.getState().setHeaderSearch(uri, query)
 
     if (query === "") return
 

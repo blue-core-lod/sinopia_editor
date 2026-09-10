@@ -5,6 +5,7 @@ import {
   selectPropertyTemplate,
 } from "selectors/templates"
 import Config from "Config"
+import useEditorStore from "stores/editorStore"
 
 // Always use selectNormSubject/Property/Value in components.
 // selectSubject/Property/Value can be used in actionCreators.
@@ -74,13 +75,6 @@ export const selectNormProperty = (state, key) => state.entities.properties[key]
 
 export const selectNormValue = (state, key) => state.entities.values[key]
 
-export const selectCurrentResourceKey = (state) => state.editor.currentResource
-
-export const selectCurrentPreviewResourceKey = (state) =>
-  state.editor.currentPreviewResource
-
-export const selectCurrentDiffResourceKeys = (state) => state.editor.currentDiff
-
 export const selectFullSubject = (state, key) => {
   const subject = selectNormSubject(state, key)
   if (_.isEmpty(subject)) return null
@@ -131,14 +125,13 @@ const selectFullValue = (state, key, property) => {
  * @return {true} true if the resource has changed
  */
 export const resourceHasChangesSinceLastSave = (state, resourceKey) => {
-  const thisResourceKey = resourceKey || selectCurrentResourceKey(state)
+  const thisResourceKey =
+    resourceKey || useEditorStore.getState().currentResource
   return state.entities.subjects[thisResourceKey].changed
 }
 
-export const selectResourceKeys = (state) => state.editor.resources
-
 export const selectResourceUriMap = (state) => {
-  const resourceKeys = selectResourceKeys(state)
+  const resourceKeys = useEditorStore.getState().resources
   const resourceUriMap = {}
   resourceKeys.forEach((resourceKey) => {
     const subject = selectNormSubject(state, resourceKey)
@@ -146,9 +139,6 @@ export const selectResourceUriMap = (state) => {
   })
   return resourceUriMap
 }
-
-export const selectLastSave = (state, resourceKey) =>
-  state.editor.lastSave[resourceKey]
 
 export const selectNormValues = (state, valueKeys) => {
   if (!valueKeys) return null

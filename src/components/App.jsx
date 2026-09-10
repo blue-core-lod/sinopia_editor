@@ -22,14 +22,14 @@ import LoadResource from "./load/LoadResource"
 import Search from "./search/Search"
 import CanvasMenu from "./menu/CanvasMenu"
 import Vocab from "./vocabulary/Vocab"
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import { fetchGroups } from "actionCreators/groups"
 import { fetchLanguages } from "actionCreators/languages"
 import { fetchExports } from "actionCreators/exports"
 import Exports from "./exports/Exports"
 import { authenticate } from "actionCreators/authenticate"
 import useAuthenticateStore from "stores/authenticateStore"
-import { isModalOpen as isModalOpenSelector } from "selectors/modals"
+import useEditorStore from "stores/editorStore"
 import {
   newResource as newResourceCreator,
   loadResource,
@@ -38,7 +38,6 @@ import {
 } from "actionCreators/resources"
 import { useKeycloak } from "../KeycloakContext"
 import usePermissions from "hooks/usePermissions"
-import { showModal } from "actions/modals"
 import {
   dashboardErrorKey,
   templateErrorKey,
@@ -57,7 +56,7 @@ const App = (props) => {
   const [isFirstMountWithUser, setFirstMountWithUser] = useState(true)
   const { keycloak } = useKeycloak()
   const hasUser = useAuthenticateStore((state) => !!state.user)
-  const isModalOpen = useSelector((state) => isModalOpenSelector(state))
+  const isModalOpen = useEditorStore((state) => state.currentModal.length > 0)
 
   useEffect(() => {
     dispatch(fetchLanguages())
@@ -105,7 +104,7 @@ const App = (props) => {
             history.push("/editor")
           } else {
             dispatch(dispatchResourceForPreview(result))
-            dispatch(showModal("PreviewModal"))
+            useEditorStore.getState().showModal("PreviewModal")
             history.push("/dashboard")
           }
         })
@@ -123,7 +122,7 @@ const App = (props) => {
             dispatch(dispatchResourceForEditor(result, uri))
           } else {
             dispatch(dispatchResourceForPreview(result))
-            dispatch(showModal("PreviewModal"))
+            useEditorStore.getState().showModal("PreviewModal")
             history.push("/dashboard")
           }
         })
@@ -141,6 +140,7 @@ const App = (props) => {
     history,
     dispatch,
     isFirstMountWithUser,
+    keycloak,
   ])
 
   // We do not use standard bootstrap modals (i.e. they are not triggered automatically)

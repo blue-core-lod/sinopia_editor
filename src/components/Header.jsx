@@ -4,9 +4,9 @@ import React from "react"
 import PropTypes from "prop-types"
 import { NavLink, useLocation } from "react-router-dom"
 import Config from "Config"
-import { useSelector, useDispatch } from "react-redux"
+import { useDispatch } from "react-redux"
 import { signOut } from "actionCreators/authenticate"
-import { selectCurrentResourceKey } from "selectors/resources"
+import useEditorStore from "stores/editorStore"
 import { useKeycloak } from "../KeycloakContext"
 import usePermissions from "hooks/usePermissions"
 import useAuthenticateStore from "stores/authenticateStore"
@@ -25,7 +25,7 @@ const Header = (props) => {
 
   const { keycloak } = useKeycloak()
   const currentUser = useAuthenticateStore((state) => state.user)
-  const hasResource = useSelector((state) => !!selectCurrentResourceKey(state))
+  const hasResource = useEditorStore((state) => !!state.currentResource)
 
   return (
     <React.Fragment>

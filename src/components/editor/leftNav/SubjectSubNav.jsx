@@ -1,7 +1,7 @@
 import React from "react"
 import PropTypes from "prop-types"
 import { useSelector } from "react-redux"
-import { displayResourceValidations } from "selectors/errors"
+import useEditorStore from "stores/editorStore"
 import { selectNormSubject } from "selectors/resources"
 import { selectSubjectTemplate } from "selectors/templates"
 import PropertySubNav from "./PropertySubNav"
@@ -23,8 +23,8 @@ const SubjectSubNav = (props) => {
   const { navLinkId, handleNavLinkClick } = useNavLink(subject)
 
   const hasError = !_.isEmpty(subject.descWithErrorPropertyKeys)
-  const displayValidations = useSelector((state) =>
-    displayResourceValidations(state, subject?.rootSubjectKey)
+  const displayValidations = useEditorStore(
+    (state) => !!state.resourceValidation[subject?.rootSubjectKey]
   )
   const headingClassNames = ["left-nav-header"]
   if (displayValidations && hasError) headingClassNames.push("text-danger")

@@ -7,6 +7,7 @@ import { createState } from "stateUtils"
 import { nanoid } from "nanoid"
 import expectedAction from "../__action_fixtures__/newResourceCopy-ADD_SUBJECT"
 import { safeAction } from "actionUtils"
+import useEditorStore from "stores/editorStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -22,6 +23,15 @@ beforeEach(() => {
   nanoid.mockImplementation(() => "abc123")
   // Capture and not display console output
   restoreConsole = mockConsole(["error", "debug"])
+})
+
+afterEach(() => {
+  useEditorStore.setState({
+    errors: {},
+    currentResource: undefined,
+    unusedRDF: {},
+    currentComponent: {},
+  })
 })
 
 afterAll(() => {
@@ -49,15 +59,11 @@ describe("newResourceCopy", () => {
 
       expect(safeAction(addSubjectAction)).toEqual(expectedAction)
 
-      expect(actions).toHaveAction("SET_UNUSED_RDF", {
-        resourceKey: "abc123",
-        rdf: null,
-      })
-      expect(actions).toHaveAction("SET_CURRENT_EDIT_RESOURCE", "abc123")
-      expect(actions).toHaveAction("SET_CURRENT_COMPONENT", {
-        rootSubjectKey: "abc123",
-        rootPropertyKey: "abc123",
-        key: "abc123",
+      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
+      expect(useEditorStore.getState().currentResource).toBe("abc123")
+      expect(useEditorStore.getState().currentComponent.abc123).toEqual({
+        component: "abc123",
+        property: "abc123",
       })
     })
   })

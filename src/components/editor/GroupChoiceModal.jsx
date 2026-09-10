@@ -2,15 +2,12 @@
 
 import React, { useState, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux"
-import { hideModal } from "actions/modals"
 import {
   saveNewResource,
   saveResource as saveResourceAction,
 } from "actionCreators/resources"
-import {
-  selectCurrentResourceKey,
-  selectNormSubject,
-} from "selectors/resources"
+import { selectNormSubject } from "selectors/resources"
+import useEditorStore from "stores/editorStore"
 import useAuthenticateStore from "stores/authenticateStore"
 import { selectGroupMap } from "selectors/groups"
 import usePermissions from "hooks/usePermissions"
@@ -20,7 +17,7 @@ import { useKeycloak } from "KeycloakContext"
 
 const GroupChoiceModal = () => {
   const errorKey = useAlerts()
-  const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
+  const resourceKey = useEditorStore((state) => state.currentResource)
   const resource = useSelector((state) => selectNormSubject(state, resourceKey))
   const userGroupIds = useAuthenticateStore((state) => state.user?.groups)
   const groupMap = useSelector((state) => selectGroupMap(state))
@@ -56,12 +53,12 @@ const GroupChoiceModal = () => {
         saveNewResource(resourceKey, ownerGroupId, [], errorKey, keycloak)
       )
     }
-    dispatch(hideModal())
+    useEditorStore.getState().hideModal()
     event.preventDefault()
   }
 
   const close = (event) => {
-    dispatch(hideModal())
+    useEditorStore.getState().hideModal()
     event.preventDefault()
   }
 

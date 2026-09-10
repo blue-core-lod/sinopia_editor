@@ -11,10 +11,6 @@ import {
   hideNavProperty,
   showNavSubject,
   hideNavSubject,
-  setUnusedRDF,
-  setCurrentEditResource,
-  setCurrentPreviewResource,
-  setCurrentDiffResources,
   addSubject,
   addProperty,
   addValue,
@@ -25,8 +21,6 @@ import {
   loadResourceFinished,
   setResourceGroup,
   setValueOrder,
-  clearResourceFromEditor,
-  saveResourceFinishedEditor,
   updateValue,
   setVersions,
   clearVersions,
@@ -37,87 +31,9 @@ import {
   setSubjectComponentList,
 } from "./resources"
 import { setRelationships, clearRelationships } from "./relationships"
-import {
-  hideValidationErrors,
-  addError,
-  clearErrors,
-  showValidationErrors,
-  addSuccess,
-  clearSuccesses,
-} from "./errors"
-import { showModal, hideModal, showLangModal, showMarcModal } from "./modals"
-import { showCopyNewMessage } from "./messages"
 import { exportsReceived } from "./exports"
 import { addTemplates } from "./templates"
 import { lookupOptionsRetrieved } from "./lookups"
-import _ from "lodash"
-
-const setHeaderSearch = (state, action) => ({
-  ...state,
-  currentHeaderSearch: action.payload,
-})
-
-export const setCurrentComponent = (state, action) => {
-  const rootSubjectKey = action.payload.rootSubjectKey
-  const componentKey = action.payload.key
-  const rootPropertyKey = action.payload.rootPropertyKey
-
-  // Don't change if modal open
-  if (!_.isEmpty(state.currentModal)) return state
-
-  const currentComponent = state.currentComponent[rootSubjectKey]
-  if (
-    currentComponent?.component === componentKey &&
-    currentComponent?.property === rootPropertyKey
-  )
-    return state
-
-  return {
-    ...state,
-    currentComponent: {
-      ...state.currentComponent,
-      [rootSubjectKey]: {
-        component: componentKey,
-        property: rootPropertyKey,
-      },
-    },
-  }
-}
-
-export const setPendingResourceTemplateSelection = (state, action) => ({
-  ...state,
-  pendingResourceTemplateSelection: action.payload,
-})
-
-export const clearPendingResourceTemplateSelection = (state) => ({
-  ...state,
-  pendingResourceTemplateSelection: null,
-})
-
-const editorHandlers = {
-  ADD_ERROR: addError,
-  ADD_SUCCESS: addSuccess,
-  CLEAR_ERRORS: clearErrors,
-  CLEAR_SUCCESSES: clearSuccesses,
-  CLEAR_PENDING_RESOURCE_TEMPLATE_SELECTION:
-    clearPendingResourceTemplateSelection,
-  CLEAR_RESOURCE: clearResourceFromEditor,
-  HIDE_MODAL: hideModal,
-  HIDE_VALIDATION_ERRORS: hideValidationErrors,
-  SAVE_RESOURCE_FINISHED: saveResourceFinishedEditor,
-  SET_CURRENT_COMPONENT: setCurrentComponent,
-  SET_CURRENT_DIFF_RESOURCES: setCurrentDiffResources,
-  SET_CURRENT_EDIT_RESOURCE: setCurrentEditResource,
-  SET_CURRENT_PREVIEW_RESOURCE: setCurrentPreviewResource,
-  SET_HEADER_SEARCH: setHeaderSearch,
-  SET_PENDING_RESOURCE_TEMPLATE_SELECTION: setPendingResourceTemplateSelection,
-  SET_UNUSED_RDF: setUnusedRDF,
-  SHOW_COPY_NEW_MESSAGE: showCopyNewMessage,
-  SHOW_LANG_MODAL: showLangModal,
-  SHOW_MARC_MODAL: showMarcModal,
-  SHOW_MODAL: showModal,
-  SHOW_VALIDATION_ERRORS: showValidationErrors,
-}
 
 const entityHandlers = {
   ADD_PROPERTY: addProperty,
@@ -164,7 +80,6 @@ export const createReducer =
   }
 
 const appReducer = combineReducers({
-  editor: createReducer(editorHandlers),
   entities: createReducer(entityHandlers),
 })
 

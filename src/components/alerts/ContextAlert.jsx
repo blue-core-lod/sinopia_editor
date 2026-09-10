@@ -1,21 +1,18 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useEffect } from "react"
-import { useDispatch, useSelector } from "react-redux"
-import { selectErrors } from "selectors/errors"
+import useEditorStore from "stores/editorStore"
 import useAlerts from "hooks/useAlerts"
 import Alert from "./Alert"
-import { hideModal } from "actions/modals"
 import _ from "lodash"
 
 const ContextAlert = () => {
-  const dispatch = useDispatch()
   const errorKey = useAlerts()
-  const errors = useSelector((state) => selectErrors(state, errorKey))
+  const errors = useEditorStore((state) => state.errors[errorKey])
 
   useEffect(() => {
-    if (!_.isEmpty(errors)) dispatch(hideModal())
-  }, [errors, dispatch])
+    if (!_.isEmpty(errors)) useEditorStore.getState().hideModal()
+  }, [errors])
 
   if (_.isEmpty(errors)) return null
 

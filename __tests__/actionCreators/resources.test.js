@@ -15,6 +15,7 @@ import configureMockStore from "redux-mock-store"
 import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import { nanoid } from "nanoid"
+import useEditorStore from "stores/editorStore"
 import { safeAction } from "actionUtils"
 import expectedExpandPropertyAddValueAction from "../__action_fixtures__/expandProperty-ADD_VALUE"
 import expectedExpandPropertyAddPropertyAction from "../__action_fixtures__/expandProperty-ADD_PROPERTY"
@@ -176,9 +177,9 @@ describe("saveNewResource", () => {
 
     const actions = store.getActions()
 
-    expect(actions).toHaveAction("CLEAR_ERRORS")
+    expect(useEditorStore.getState().errors.testerror).toEqual([])
     expect(actions).toHaveAction("SET_BASE_URL")
-    expect(actions).toHaveAction("SAVE_RESOURCE_FINISHED")
+    expect(useEditorStore.getState().lastSave.t9zVwg2zO).toBeTruthy()
     expect(useHistoryStore.getState().resources).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -195,10 +196,8 @@ describe("saveNewResource", () => {
       editGroups: ["cornell"],
     })
 
-    const saveResourceFinishedAction = actions.find(
-      (action) => action.type === "SAVE_RESOURCE_FINISHED"
-    )
-    expect(saveResourceFinishedAction.payload.resourceKey).toEqual("t9zVwg2zO")
+    // saveResourceFinished now goes to Zustand
+    expect(useEditorStore.getState().lastSave.t9zVwg2zO).toBeTruthy()
 
     expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
       "Foo McBar",
@@ -219,10 +218,9 @@ describe("saveNewResource", () => {
 
     const actions = store.getActions()
 
-    expect(actions).toHaveAction("ADD_ERROR", {
-      errorKey: "testerror",
-      error: "Error saving new resource: Messed-up",
-    })
+    expect(useEditorStore.getState().errors.testerror).toContain(
+      "Error saving new resource: Messed-up"
+    )
   })
 })
 
@@ -244,8 +242,8 @@ describe("saveResource", () => {
     )
     const actions = store.getActions()
 
-    expect(actions).toHaveAction("CLEAR_ERRORS")
-    expect(actions).toHaveAction("SAVE_RESOURCE_FINISHED")
+    expect(useEditorStore.getState().errors.testerror).toEqual([])
+    expect(useEditorStore.getState().lastSave.t9zVwg2zO).toBeTruthy()
     expect(useHistoryStore.getState().resources).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -278,10 +276,9 @@ describe("saveResource", () => {
       saveResource("t9zVwg2zO", "stanford", ["cornell"], "testerror")
     )
     const actions = store.getActions()
-    expect(actions).toHaveAction("ADD_ERROR", {
-      errorKey: "testerror",
-      error: "Error saving: Messed-up",
-    })
+    expect(useEditorStore.getState().errors.testerror).toContain(
+      "Error saving: Messed-up"
+    )
   })
 })
 

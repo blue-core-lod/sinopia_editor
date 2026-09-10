@@ -16,6 +16,7 @@ import expectedAction from "../__action_fixtures__/loadResource-ADD_SUBJECT"
 import expectedMultiplePropertyUrisAction from "../__action_fixtures__/loadResource-ADD_SUBJECT-multiple-property-uris"
 import { safeAction, cloneAddResourceActionAsNewResource } from "actionUtils"
 import useHistoryStore from "stores/historyStore"
+import useEditorStore from "stores/editorStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -39,6 +40,17 @@ afterAll(() => {
 
 afterEach(() => {
   useHistoryStore.setState({ templates: [], searches: [], resources: [] })
+  useEditorStore.setState({
+    errors: {},
+    successes: {},
+    currentResource: undefined,
+    currentPreviewResource: undefined,
+    currentDiff: { compareFrom: undefined, compareTo: undefined },
+    currentModal: [],
+    unusedRDF: {},
+    pendingResourceTemplateSelection: null,
+    currentComponent: {},
+  })
 })
 
 // This forces Sinopia server to use fixtures
@@ -74,10 +86,12 @@ describe("loadResource", () => {
       // safeStringify is used because it removes circular references
       expect(safeAction(addSubjectAction)).toEqual(expectedAction)
 
-      expect(actions).toHaveAction("CLEAR_ERRORS")
+      expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
+        0
+      )
       expect(actions).toHaveAction("ADD_TEMPLATES")
-      expect(actions).toHaveAction("SET_UNUSED_RDF")
-      expect(actions).toHaveAction("SET_CURRENT_EDIT_RESOURCE")
+      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
+      expect(useEditorStore.getState().currentResource).toBe("abc123")
       expect(actions).toHaveAction("LOAD_RESOURCE_FINISHED")
       expect(useHistoryStore.getState().resources).toEqual(
         expect.arrayContaining([
@@ -130,15 +144,16 @@ describe("loadResource", () => {
       // safeStringify is used because it removes circular references
       expect(safeAction(addSubjectAction)).toEqual(newExpectedAction)
 
-      expect(actions).toHaveAction("CLEAR_ERRORS")
+      expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
+        0
+      )
       expect(actions).toHaveAction("ADD_TEMPLATES")
       expect(actions).toHaveAction("ADD_SUBJECT")
-      expect(actions).toHaveAction("SET_UNUSED_RDF")
-      expect(actions).toHaveAction("SET_CURRENT_EDIT_RESOURCE")
-      expect(actions).toHaveAction("SET_CURRENT_COMPONENT", {
-        rootSubjectKey: "abc123",
-        rootPropertyKey: "abc123",
-        key: "abc123",
+      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
+      expect(useEditorStore.getState().currentResource).toBe("abc123")
+      expect(useEditorStore.getState().currentComponent.abc123).toEqual({
+        component: "abc123",
+        property: "abc123",
       })
       expect(actions).not.toHaveAction("LOAD_RESOURCE_FINISHED")
     })
@@ -154,10 +169,12 @@ describe("loadResource", () => {
       expect(result).toBe(true)
 
       const actions = store.getActions()
-      expect(actions).toHaveAction("CLEAR_ERRORS")
+      expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
+        0
+      )
       expect(actions).toHaveAction("ADD_TEMPLATES")
-      expect(actions).toHaveAction("SET_UNUSED_RDF")
-      expect(actions).toHaveAction("SET_CURRENT_PREVIEW_RESOURCE")
+      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
+      expect(useEditorStore.getState().currentPreviewResource).toBe("abc123")
     })
   })
 
@@ -173,12 +190,12 @@ describe("loadResource", () => {
       expect(result).toBe(true)
 
       const actions = store.getActions()
-      expect(actions).toHaveAction("CLEAR_ERRORS")
+      expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
+        0
+      )
       expect(actions).toHaveAction("ADD_TEMPLATES")
-      expect(actions).toHaveAction("SET_UNUSED_RDF")
-      expect(actions).toHaveAction("SET_CURRENT_DIFF_RESOURCES", {
-        compareFromResourceKey: "abc123",
-      })
+      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
+      expect(useEditorStore.getState().currentDiff.compareFrom).toBe("abc123")
     })
   })
 
@@ -193,13 +210,9 @@ describe("loadResource", () => {
       )
       expect(result).toBe(false)
 
-      const actions = store.getActions()
-      expect(actions).toHaveAction("CLEAR_ERRORS")
-      expect(actions).toHaveAction("ADD_ERROR", {
-        errorKey: "testerrorkey",
-        error:
-          "A property template may not use the same property URI as another property template (http://id.loc.gov/ontologies/bibframe/geographicCoverage) unless both propery templates are of type nested resource and the nested resources are of different classes.",
-      })
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        "A property template may not use the same property URI as another property template (http://id.loc.gov/ontologies/bibframe/geographicCoverage) unless both propery templates are of type nested resource and the nested resources are of different classes."
+      )
     })
   })
 
@@ -214,9 +227,9 @@ describe("loadResource", () => {
       )
       expect(result).toBe(false)
 
-      const actions = store.getActions()
-      expect(actions).toHaveAction("CLEAR_ERRORS")
-      expect(actions).toHaveAction("SHOW_MODAL", "ResourceTemplateChoiceModal")
+      expect(useEditorStore.getState().currentModal).toContain(
+        "ResourceTemplateChoiceModal"
+      )
     })
   })
 
@@ -230,12 +243,9 @@ describe("loadResource", () => {
       )
       expect(result).toBe(false)
 
-      const actions = store.getActions()
-      expect(actions).toHaveAction("CLEAR_ERRORS")
-      expect(actions).toHaveAction("ADD_ERROR", {
-        errorKey: "testerrorkey",
-        error: "Error retrieving http://error: Error parsing resource: Ooops",
-      })
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        "Error retrieving http://error: Error parsing resource: Ooops"
+      )
     })
   })
 

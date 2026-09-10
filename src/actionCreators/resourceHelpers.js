@@ -4,14 +4,14 @@ import rdf from "rdf-ext"
 import { nanoid } from "nanoid"
 import _ from "lodash"
 import { loadResourceTemplate } from "actionCreators/templates"
-import { addSubject as addSubjectAction, setUnusedRDF } from "actions/resources"
+import { addSubject as addSubjectAction } from "actions/resources"
 import { selectProperty, selectSubject, selectValue } from "selectors/resources"
 import {
   newLiteralValue,
   newUriValue,
   newValueSubject,
 } from "utilities/valueFactory"
-import { clearErrors, addError } from "actions/errors"
+import useEditorStore from "stores/editorStore"
 import { fetchResource } from "sinopiaApi"
 import { findRootResourceTemplateId } from "utilities/Utilities"
 
@@ -32,7 +32,7 @@ const skipPropertyUris = [
 export const loadResource =
   (uri, errorKey, { asNewResource = false, version = null } = {}) =>
   (dispatch) => {
-    dispatch(clearErrors(errorKey))
+    useEditorStore.getState().clearErrors(errorKey)
     return fetchResource(uri, { version })
       .then(([dataset, response]) => {
         if (!dataset) return false
@@ -49,33 +49,33 @@ export const loadResource =
         )
           .then(([resource, usedDataset]) => {
             const unusedDataset = dataset.difference(usedDataset)
-            dispatch(
-              setUnusedRDF(
+            useEditorStore
+              .getState()
+              .setUnusedRDF(
                 resource.key,
                 unusedDataset.size > 0 ? unusedDataset.toCanonical() : null
               )
-            )
             return [response, resource, unusedDataset]
           })
           .catch((err) => {
             // ResourceTemplateErrors have already been dispatched.
             if (err.name !== "ResourceTemplateError") {
               console.error(err)
-              dispatch(
-                addError(
+              useEditorStore
+                .getState()
+                .addError(
                   errorKey,
                   `Error retrieving ${uri}: ${err.message || err}`
                 )
-              )
             }
             return false
           })
       })
       .catch((err) => {
         console.error(err)
-        dispatch(
-          addError(errorKey, `Error retrieving ${uri}: ${err.message || err}`)
-        )
+        useEditorStore
+          .getState()
+          .addError(errorKey, `Error retrieving ${uri}: ${err.message || err}`)
         return false
       })
   }

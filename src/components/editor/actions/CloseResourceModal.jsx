@@ -2,22 +2,20 @@
 
 import React from "react"
 import PropTypes from "prop-types"
-import { hideModal } from "actions/modals"
-import { useDispatch } from "react-redux"
+import useEditorStore from "stores/editorStore"
 import ModalWrapper from "../../ModalWrapper"
 import useEditor from "hooks/useEditor"
 
 const CloseResourceModal = ({ resourceKey }) => {
-  const dispatch = useDispatch()
   const { handleCloseResource } = useEditor(resourceKey)
 
   const handleClose = (event) => {
-    dispatch(hideModal())
+    useEditorStore.getState().hideModal()
     event.preventDefault()
   }
 
   const handleCloseResourceClick = (event) => {
-    dispatch(hideModal())
+    useEditorStore.getState().hideModal()
     handleCloseResource(event)
   }
 

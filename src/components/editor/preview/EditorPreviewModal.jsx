@@ -1,16 +1,17 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector } from "react-redux"
-import { isCurrentModal } from "selectors/modals"
+import useEditorStore from "stores/editorStore"
 import ModalWrapper from "../../ModalWrapper"
 import SaveAndPublishButton from "../actions/SaveAndPublishButton"
 import ResourceDisplay from "./ResourceDisplay"
-import { selectCurrentResourceKey } from "selectors/resources"
+import _ from "lodash"
 
 const EditorPreviewModal = () => {
-  const show = useSelector((state) => isCurrentModal(state, "RDFModal"))
-  const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
+  const show = useEditorStore(
+    (state) => (_.last(state.currentModal) || null) === "RDFModal"
+  )
+  const resourceKey = useEditorStore((state) => state.currentResource)
 
   const header = <h4 className="modal-title">Preview</h4>
 

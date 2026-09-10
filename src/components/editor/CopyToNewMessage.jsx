@@ -1,18 +1,12 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector } from "react-redux"
+import useEditorStore from "stores/editorStore"
 import ExpiringMessage from "./ExpiringMessage"
-import {
-  selectCopyToNewMessageOldUri,
-  selectCopyToNewMessageTimestamp,
-} from "selectors/messages"
 
 const CopyToNewMessage = () => {
-  const oldUri = useSelector((state) => selectCopyToNewMessageOldUri(state))
-  const timestamp = useSelector((state) =>
-    selectCopyToNewMessageTimestamp(state)
-  )
+  const oldUri = useEditorStore((state) => state.copyToNewMessage.oldUri)
+  const timestamp = useEditorStore((state) => state.copyToNewMessage.timestamp)
 
   return (
     <ExpiringMessage timestamp={timestamp}>

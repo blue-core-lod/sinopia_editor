@@ -1,9 +1,6 @@
 import useHistoryStore from "stores/historyStore"
-import { clearErrors, addError } from "actions/errors"
-import { showModal } from "actions/modals"
+import useEditorStore from "stores/editorStore"
 import {
-  setPendingResourceTemplateSelection,
-  clearPendingResourceTemplateSelection,
   addProperty as addPropertyAction,
   addValue as addValueAction,
   removeValue as removeValueAction,
@@ -11,13 +8,8 @@ import {
   addSubject as addSubjectAction,
   showProperty,
   setBaseURL,
-  setCurrentResource,
-  setCurrentPreviewResource,
-  saveResourceFinished,
-  setUnusedRDF,
   loadResourceFinished,
   setResourceGroup,
-  setCurrentDiff,
   clearVersions,
 } from "actions/resources"
 import {
@@ -39,16 +31,13 @@ import {
 } from "selectors/resources"
 import { newLiteralValue, newValueSubject } from "utilities/valueFactory"
 import useAuthenticateStore from "stores/authenticateStore"
-import { selectUnusedRDF } from "selectors/modals"
 import {
   addTemplateHistory as addUserTemplateHistory,
   addResourceHistory as addUserResourceHistory,
 } from "actionCreators/user"
 import { addResourceHistory } from "actionCreators/history"
 import _ from "lodash"
-import { setCurrentComponent } from "actions/index"
 import { loadRelationships } from "./relationships"
-import { useKeycloak } from "../KeycloakContext"
 
 /**
  * A thunk that loads an existing resource from Sinopia API and adds to state.
@@ -61,7 +50,7 @@ export const loadResource =
     { asNewResource = false, version = null, keycloak = null } = {}
   ) =>
   (dispatch) => {
-    dispatch(clearErrors(errorKey))
+    useEditorStore.getState().clearErrors(errorKey)
     return fetchResource(uri, { version })
       .then(([dataset, response]) => {
         if (!dataset) return false
@@ -69,17 +58,15 @@ export const loadResource =
 
         // If no resource template ID, store pending data and show modal
         if (!resourceTemplateId) {
-          dispatch(
-            setPendingResourceTemplateSelection(
-              uri,
-              dataset,
-              response,
-              asNewResource,
-              errorKey,
-              keycloak
-            )
-          )
-          dispatch(showModal("ResourceTemplateChoiceModal"))
+          useEditorStore.getState().setPendingResourceTemplateSelection({
+            uri,
+            dataset,
+            response,
+            asNewResource,
+            errorKey,
+            keycloak,
+          })
+          useEditorStore.getState().showModal("ResourceTemplateChoiceModal")
           return false
         }
 
@@ -95,12 +82,12 @@ export const loadResource =
         )
           .then(([resource, usedDataset]) => {
             const unusedDataset = dataset.difference(usedDataset)
-            dispatch(
-              setUnusedRDF(
+            useEditorStore
+              .getState()
+              .setUnusedRDF(
                 resource.key,
                 unusedDataset.size > 0 ? unusedDataset.toCanonical() : null
               )
-            )
             dispatch(loadRelationships(resource.key, uri, errorKey))
             return [response, resource, unusedDataset]
           })
@@ -108,21 +95,21 @@ export const loadResource =
             // ResourceTemplateErrors have already been dispatched.
             if (err.name !== "ResourceTemplateError") {
               console.error(err)
-              dispatch(
-                addError(
+              useEditorStore
+                .getState()
+                .addError(
                   errorKey,
                   `Error retrieving ${uri}: ${err.message || err}`
                 )
-              )
             }
             return false
           })
       })
       .catch((err) => {
         // console.error(err)
-        dispatch(
-          addError(errorKey, `Error retrieving ${uri}: ${err.message || err}`)
-        )
+        useEditorStore
+          .getState()
+          .addError(errorKey, `Error retrieving ${uri}: ${err.message || err}`)
         return false
       })
   }
@@ -142,14 +129,14 @@ export const dispatchResourceForEditor =
   (dispatch) => {
     if (!result) return false
     const [response, resource] = result
-    dispatch(
-      setCurrentComponent(
+    useEditorStore
+      .getState()
+      .setCurrentComponent(
         resource.key,
         resource.properties[0].key,
         resource.properties[0].key
       )
-    )
-    dispatch(setCurrentResource(resource.key))
+    useEditorStore.getState().setCurrentEditResource(resource.key)
     if (!asNewResource) {
       dispatch(addUserResourceHistory(uri, keycloak))
       dispatch(
@@ -171,8 +158,8 @@ export const dispatchResourceForEditor =
  * This is used when a resource doesn't have a template ID and the user selects one via modal.
  */
 export const completeResourceLoadingWithTemplate =
-  (resourceTemplateId) => (dispatch, getState) => {
-    const pending = getState().editor.pendingResourceTemplateSelection
+  (resourceTemplateId) => (dispatch) => {
+    const pending = useEditorStore.getState().pendingResourceTemplateSelection
     if (!pending) {
       console.error("No pending resource template selection found")
       return Promise.resolve(false)
@@ -182,7 +169,7 @@ export const completeResourceLoadingWithTemplate =
       pending
 
     // Clear pending state
-    dispatch(clearPendingResourceTemplateSelection())
+    useEditorStore.getState().clearPendingResourceTemplateSelection()
 
     // Load the resource with the selected template
     return dispatch(
@@ -197,12 +184,12 @@ export const completeResourceLoadingWithTemplate =
     )
       .then(([resource, usedDataset]) => {
         const unusedDataset = dataset.difference(usedDataset)
-        dispatch(
-          setUnusedRDF(
+        useEditorStore
+          .getState()
+          .setUnusedRDF(
             resource.key,
             unusedDataset.size > 0 ? unusedDataset.toCanonical() : null
           )
-        )
         dispatch(loadRelationships(resource.key, uri, errorKey))
         const result = [response, resource, unusedDataset]
         return dispatch(
@@ -212,9 +199,12 @@ export const completeResourceLoadingWithTemplate =
       .catch((err) => {
         if (err.name !== "ResourceTemplateError") {
           console.error(err)
-          dispatch(
-            addError(errorKey, `Error retrieving ${uri}: ${err.message || err}`)
-          )
+          useEditorStore
+            .getState()
+            .addError(
+              errorKey,
+              `Error retrieving ${uri}: ${err.message || err}`
+            )
         }
         return false
       })
@@ -227,10 +217,10 @@ export const loadResourceForPreview =
       dispatch(dispatchResourceForPreview(result))
     )
 
-export const dispatchResourceForPreview = (result) => (dispatch) => {
+export const dispatchResourceForPreview = (result) => () => {
   if (!result) return false
   const [, resource] = result
-  dispatch(setCurrentPreviewResource(resource.key))
+  useEditorStore.getState().setCurrentPreviewResource(resource.key)
   return true
 }
 
@@ -241,7 +231,15 @@ export const loadResourceForDiff =
       if (!result) return false
       const [, resource] = result
       // diffType: compareFromResourceKey or compareToResourceKey
-      dispatch(setCurrentDiff({ [diffType]: resource.key }))
+      if (diffType === "compareFromResourceKey") {
+        useEditorStore
+          .getState()
+          .setCurrentDiffResources(resource.key, undefined)
+      } else {
+        useEditorStore
+          .getState()
+          .setCurrentDiffResources(undefined, resource.key)
+      }
       return true
     })
 
@@ -252,18 +250,19 @@ export const loadResourceForDiff =
 export const newResource =
   (resourceTemplateId, errorKey, setCurrent = true, keycloak) =>
   (dispatch) => {
-    dispatch(clearErrors(errorKey))
+    useEditorStore.getState().clearErrors(errorKey)
     return dispatch(addEmptyResource(resourceTemplateId, errorKey))
       .then((resource) => {
-        dispatch(
-          setCurrentComponent(
+        useEditorStore
+          .getState()
+          .setCurrentComponent(
             resource.key,
             resource.properties[0].key,
             resource.properties[0].key
           )
-        )
-        if (setCurrent) dispatch(setCurrentResource(resource.key))
-        dispatch(setUnusedRDF(resource.key, null))
+        if (setCurrent)
+          useEditorStore.getState().setCurrentEditResource(resource.key)
+        useEditorStore.getState().setUnusedRDF(resource.key, null)
         useHistoryStore.getState().addTemplateHistory(resource.subjectTemplate)
         dispatch(addUserTemplateHistory(resourceTemplateId, keycloak))
         // This will mark the resource has unchanged.
@@ -274,12 +273,12 @@ export const newResource =
         // ResourceTemplateErrors have already been dispatched.
         if (err.name !== "ResourceTemplateError") {
           console.error(err)
-          dispatch(
-            addError(
+          useEditorStore
+            .getState()
+            .addError(
               errorKey,
               `Error creating new resource: ${err.message || err}`
             )
-          )
         }
         return false
       })
@@ -292,15 +291,15 @@ export const newResourceCopy = (resourceKey) => (dispatch) =>
   dispatch(newSubjectCopy(resourceKey))
     .then((newResource) => {
       dispatch(addSubjectAction(newResource))
-      dispatch(
-        setCurrentComponent(
+      useEditorStore
+        .getState()
+        .setCurrentComponent(
           newResource.key,
           newResource.properties[0].key,
           newResource.properties[0].key
         )
-      )
-      dispatch(setCurrentResource(newResource.key))
-      dispatch(setUnusedRDF(newResource.key, null))
+      useEditorStore.getState().setCurrentEditResource(newResource.key)
+      useEditorStore.getState().setUnusedRDF(newResource.key, null)
     })
     .catch((err) => {
       console.error(err)
@@ -331,13 +330,13 @@ export const newResourceFromDataset =
     )
       .then(([resource, usedDataset]) => {
         const unusedDataset = dataset.difference(usedDataset)
-        dispatch(
-          setUnusedRDF(
+        useEditorStore
+          .getState()
+          .setUnusedRDF(
             resource.key,
             unusedDataset.size > 0 ? unusedDataset.toCanonical() : null
           )
-        )
-        dispatch(setCurrentResource(resource.key))
+        useEditorStore.getState().setCurrentEditResource(resource.key)
         if (!asNewResource) dispatch(loadResourceFinished(resource.key))
         return true
       })
@@ -345,12 +344,12 @@ export const newResourceFromDataset =
         // ResourceTemplateErrors have already been dispatched.
         if (err.name !== "ResourceTemplateError") {
           console.error(err)
-          dispatch(
-            addError(
+          useEditorStore
+            .getState()
+            .addError(
               errorKey,
               `Error retrieving ${resourceTemplateId}: ${err.message || err}`
             )
-          )
         }
         return false
       })
@@ -363,9 +362,9 @@ export const saveNewResource =
     const state = getState()
     const resource = selectFullSubject(state, resourceKey)
     const currentUser = useAuthenticateStore.getState().user
-    const unusedRDF = selectUnusedRDF(state, resourceKey)
+    const unusedRDF = useEditorStore.getState().unusedRDF[resourceKey]
 
-    dispatch(clearErrors(errorKey))
+    useEditorStore.getState().clearErrors(errorKey)
 
     return postResource(
       resource,
@@ -378,7 +377,7 @@ export const saveNewResource =
       .then((resourceUrl) => {
         dispatch(setBaseURL(resourceKey, resourceUrl))
         dispatch(setResourceGroup(resourceKey, group, editGroups))
-        dispatch(saveResourceFinished(resourceKey))
+        useEditorStore.getState().saveResourceFinished(resourceKey, Date.now())
         dispatch(addUserResourceHistory(resourceUrl, keycloak))
         dispatch(
           addResourceHistory(resourceUrl, resource.subjectTemplate.class, group)
@@ -386,9 +385,12 @@ export const saveNewResource =
       })
       .catch((err) => {
         console.error(err)
-        dispatch(
-          addError(errorKey, `Error saving new resource: ${err.message || err}`)
-        )
+        useEditorStore
+          .getState()
+          .addError(
+            errorKey,
+            `Error saving new resource: ${err.message || err}`
+          )
       })
   }
 
@@ -399,9 +401,9 @@ export const saveResource =
     const state = getState()
     const resource = selectFullSubject(state, resourceKey)
     const currentUser = useAuthenticateStore.getState().user
-    const unusedRDF = selectUnusedRDF(state, resourceKey)
+    const unusedRDF = useEditorStore.getState().unusedRDF[resourceKey]
 
-    dispatch(clearErrors(errorKey))
+    useEditorStore.getState().clearErrors(errorKey)
 
     return putResource(
       resource,
@@ -414,7 +416,7 @@ export const saveResource =
     )
       .then(() => {
         dispatch(setResourceGroup(resourceKey, group, editGroups))
-        dispatch(saveResourceFinished(resourceKey))
+        useEditorStore.getState().saveResourceFinished(resourceKey, Date.now())
         dispatch(addUserResourceHistory(resource.uri, keycloak))
         dispatch(
           addResourceHistory(
@@ -427,7 +429,9 @@ export const saveResource =
       })
       .catch((err) => {
         console.error(err)
-        dispatch(addError(errorKey, `Error saving: ${err.message || err}`))
+        useEditorStore
+          .getState()
+          .addError(errorKey, `Error saving: ${err.message || err}`)
       })
   }
 

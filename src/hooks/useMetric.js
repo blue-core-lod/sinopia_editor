@@ -1,11 +1,9 @@
 import { useEffect, useState, useRef } from "react"
-import { useDispatch } from "react-redux"
 import { metricsErrorKey } from "utilities/errorKeyFactory"
-import { addError } from "actions/errors"
+import useEditorStore from "stores/editorStore"
 import * as sinopiaMetrics from "../sinopiaMetrics"
 
 const useMetric = (name, params = null, runMetric = true) => {
-  const dispatch = useDispatch()
   const [metric, setMetric] = useState(null)
   const isMountedRef = useRef(false)
 
@@ -24,15 +22,15 @@ const useMetric = (name, params = null, runMetric = true) => {
       })
       .catch((err) => {
         if (isMountedRef.current) {
-          dispatch(
-            addError(
+          useEditorStore
+            .getState()
+            .addError(
               metricsErrorKey,
               `Error retrieving metrics: ${err.message || err}`
             )
-          )
         }
       })
-  }, [name, params, dispatch, runMetric])
+  }, [name, params, runMetric])
 
   return metric
 }

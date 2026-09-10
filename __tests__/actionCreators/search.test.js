@@ -13,6 +13,7 @@ import * as QuestioningAuthority from "utilities/QuestioningAuthority"
 import rdf from "rdf-ext"
 import useHistoryStore from "stores/historyStore"
 import useSearchStore from "stores/searchStore"
+import useEditorStore from "stores/editorStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -21,6 +22,7 @@ jest.mock("KeycloakContext", () => ({
 afterEach(() => {
   useHistoryStore.setState({ templates: [], searches: [], resources: [] })
   useSearchStore.setState({ resource: null, template: null })
+  useEditorStore.setState({ errors: {}, successes: {} })
 })
 
 const mockStore = configureMockStore([thunk])
@@ -72,8 +74,8 @@ describe("fetchSinopiaSearchResults", () => {
 
     const actions = store.getActions()
 
-    expect(actions).toHaveLength(1)
-    expect(actions).toHaveAction("CLEAR_ERRORS")
+    expect(actions).toHaveLength(0)
+    expect(useEditorStore.getState().errors.testerrorkey).toEqual([])
     expect(useSearchStore.getState().resource).toMatchObject({
       error: undefined,
       uri: "urn:ld4p:sinopia",
@@ -187,8 +189,8 @@ describe("fetchQASearchResults", () => {
 
       const actions = store.getActions()
 
-      expect(actions).toHaveLength(1)
-      expect(actions).toHaveAction("CLEAR_ERRORS")
+      expect(actions).toHaveLength(0)
+      expect(useEditorStore.getState().errors.testerrorkey).toEqual([])
       expect(useSearchStore.getState().resource).toMatchObject({
         uri,
         query,
@@ -226,8 +228,7 @@ describe("fetchQASearchResults", () => {
 
       const actions = store.getActions()
 
-      expect(actions).toHaveLength(2)
-      expect(actions).toHaveAction("CLEAR_ERRORS")
+      expect(actions).toHaveLength(0)
       expect(useSearchStore.getState().resource).toMatchObject({
         uri,
         query,
@@ -237,10 +238,9 @@ describe("fetchQASearchResults", () => {
         facetResults: {},
         error: "Ooops...",
       })
-      expect(actions).toHaveAction("ADD_ERROR", {
-        errorKey: "testerrorkey",
-        error: "An error occurred while searching: Ooops...",
-      })
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        "An error occurred while searching: Ooops..."
+      )
     })
   })
 })
@@ -312,7 +312,7 @@ describe("fetchTemplateGuessSearchResults", () => {
 
       const actions = store.getActions()
 
-      expect(actions).toHaveLength(1)
+      expect(actions).toHaveLength(0)
       expect(useSearchStore.getState().templateguess).toMatchObject({
         error: "Ooops",
         uri: null,
@@ -324,10 +324,9 @@ describe("fetchTemplateGuessSearchResults", () => {
           startOfRange: 0,
         }),
       })
-      expect(actions).toHaveAction("ADD_ERROR", {
-        errorKey: "testerrorkey",
-        error: "Error searching for templates: Ooops",
-      })
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        "Error searching for templates: Ooops"
+      )
     })
   })
 })

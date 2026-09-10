@@ -1,17 +1,15 @@
 // Copyright 2020 Stanford University see LICENSE for license
 
 import React, { useState, useEffect } from "react"
-import { useSelector } from "react-redux"
 import Alert from "components/alerts/Alert"
 import RDFDisplay from "components/editor/preview/RDFDisplay"
-import { selectCurrentResourceKey } from "selectors/resources"
-import { selectUnusedRDF } from "selectors/modals"
+import useEditorStore from "stores/editorStore"
 import { datasetFromN3 } from "utilities/Utilities"
 import _ from "lodash"
 
 const UnusedRDFDisplay = () => {
-  const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
-  const unusedRDF = useSelector((state) => selectUnusedRDF(state, resourceKey))
+  const resourceKey = useEditorStore((state) => state.currentResource)
+  const unusedRDF = useEditorStore((state) => state.unusedRDF[resourceKey])
 
   const [error, setError] = useState(false)
   const [format, setFormat] = useState("table")
