@@ -7,6 +7,7 @@ import {
   createHistory,
 } from "../../testUtilities/testUtils"
 import { createState } from "stateUtils"
+import useEditorStore from "stores/editorStore"
 
 // Mock KeycloakContext with a token so getJwt works
 jest.mock("KeycloakContext", () => ({
@@ -23,6 +24,7 @@ const originalFetch = global.fetch
 afterEach(() => {
   global.fetch = originalFetch
   jest.restoreAllMocks()
+  useEditorStore.setState({ errors: {} })
 })
 
 const renderForm = () => {
@@ -161,14 +163,12 @@ describe("LoadByRDFForm", () => {
           statusText: "Internal Server Error",
         },
       })
-      const { store } = renderForm()
+      renderForm()
 
       uploadMarcFile()
 
       await waitFor(() => {
-        const actions = store.getActions ? store.getActions() : []
-        const state = store.getState()
-        const errors = Object.values(state.editor.errors).flat()
+        const errors = Object.values(useEditorStore.getState().errors).flat()
         expect(errors.some((e) => /marc2xml/.test(e))).toBe(true)
       })
     })
@@ -180,13 +180,12 @@ describe("LoadByRDFForm", () => {
           statusText: "Bad Request",
         },
       })
-      const { store } = renderForm()
+      renderForm()
 
       uploadMarcFile()
 
       await waitFor(() => {
-        const state = store.getState()
-        const errors = Object.values(state.editor.errors).flat()
+        const errors = Object.values(useEditorStore.getState().errors).flat()
         expect(errors.some((e) => /marc2bibframe/.test(e))).toBe(true)
       })
     })
@@ -263,7 +262,7 @@ describe("LoadByRDFForm", () => {
     })
 
     it("dispatches an error when /api/works fails", async () => {
-      const { store } = await setupMarcConversion()
+      await setupMarcConversion()
 
       global.fetch = jest.fn().mockResolvedValueOnce({
         ok: false,
@@ -273,8 +272,7 @@ describe("LoadByRDFForm", () => {
       fireEvent.click(screen.getByText("Submit"))
 
       await waitFor(() => {
-        const state = store.getState()
-        const errors = Object.values(state.editor.errors).flat()
+        const errors = Object.values(useEditorStore.getState().errors).flat()
         expect(errors.some((e) => /Error creating work/.test(e))).toBe(true)
       })
     })

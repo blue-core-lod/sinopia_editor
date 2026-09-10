@@ -90,9 +90,9 @@ describe("validateTemplates()", () => {
         )
       ).toBe(true)
       expect(store.getActions()).toHaveAction("ADD_TEMPLATES")
-      expect(
-        useEditorStore.getState().errors["testerrorkey"] || []
-      ).toHaveLength(0)
+      expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
+        0
+      )
     })
   })
 
@@ -121,21 +121,21 @@ describe("validateTemplates()", () => {
         errorKey: "testerrorkey",
         error: "Resource template id is missing from resource template.",
       }
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         payload1.error
       )
       const payload2 = {
         errorKey: "testerrorkey",
         error: "Resource template class is missing from resource template.",
       }
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         payload2.error
       )
       const payload3 = {
         errorKey: "testerrorkey",
         error: "Resource template label is missing from resource template.",
       }
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         payload3.error
       )
     })
@@ -171,7 +171,7 @@ describe("validateTemplates()", () => {
         errorKey: "testerrorkey",
         error: "Property template URI is required.",
       }
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         payload.error
       )
     })
@@ -211,7 +211,7 @@ describe("validateTemplates()", () => {
         error:
           "Property template label is required for http://id.loc.gov/ontologies/bibframe/mainTitle.",
       }
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         payload1.error
       )
       const payload2 = {
@@ -219,7 +219,7 @@ describe("validateTemplates()", () => {
         error:
           "Cannot determine type for http://id.loc.gov/ontologies/bibframe/mainTitle. Must be resource, lookup, or literal.",
       }
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         payload2.error
       )
       const payload3 = {
@@ -227,7 +227,7 @@ describe("validateTemplates()", () => {
         error:
           "Cannot determine component for http://id.loc.gov/ontologies/bibframe/mainTitle.",
       }
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         payload3.error
       )
     })
@@ -266,7 +266,7 @@ describe("validateTemplates()", () => {
         error:
           "Misconfigured authority xurn:ld4p:sinopia:bibframe:instance for http://id.loc.gov/ontologies/bibframe/instanceOf.",
       }
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         payload.error
       )
     })
@@ -319,7 +319,7 @@ describe("validateTemplates()", () => {
         error:
           "A property template may not use the same property URI as another property template (http://id.loc.gov/ontologies/bibframe/geographicCoverage) unless both propery templates are of type nested resource and the nested resources are of different classes.",
       }
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         payload.error
       )
     })
@@ -367,7 +367,7 @@ describe("validateTemplates()", () => {
         error:
           "A property template may not use the same property URI as another property template (http://sinopia.io/testing/DupeProperties/property1) unless both propery templates are of type nested resource and the nested resources are of different classes.",
       }
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         payload.error
       )
     })
@@ -539,7 +539,7 @@ describe("validateTemplates()", () => {
         error:
           "The following referenced resource templates are not available in Sinopia: lc:RT:bf2:Identifiers:Barcode, lc:RT:bf2:Identifiers:Copyright",
       }
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         payload.error
       )
     }, 10000)
@@ -584,7 +584,7 @@ describe("validateTemplates()", () => {
         error:
           "The following resource templates references for http://id.loc.gov/ontologies/bibframe/genreForm have the same class (http://id.loc.gov/ontologies/bibframe/GenreForm), but must be unique: ld4p:RT:bf2:Form, ld4p:RT:bf2:RareMat:RBMS",
       }
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         payload.error
       )
     })
@@ -628,9 +628,9 @@ describe("validateTemplates()", () => {
           validateTemplates(subjectTemplate, {}, "testerrorkey")
         )
       ).toBe(true)
-      expect(
-        useEditorStore.getState().errors["testerrorkey"] || []
-      ).toHaveLength(0)
+      expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
+        0
+      )
     })
   })
 
@@ -658,7 +658,7 @@ describe("validateTemplates()", () => {
         error:
           "A suppressible template cannot contain more than one property template.",
       }
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         payload.error
       )
     })
@@ -698,7 +698,7 @@ describe("validateTemplates()", () => {
         error:
           "The property for a suppressible template must be a URI or lookup.",
       }
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         payload.error
       )
     })

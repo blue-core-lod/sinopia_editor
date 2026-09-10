@@ -11,7 +11,7 @@ import {
   selectSubjectTemplate,
 } from "selectors/templates"
 import { selectNormSubject, selectMainTitleValue } from "selectors/resources"
-import { setCurrentResource } from "actions/resources"
+import useEditorStore from "stores/editorStore"
 
 import useAlerts from "hooks/useAlerts"
 import { useKeycloak } from "../../../KeycloakContext"
@@ -48,7 +48,7 @@ const ResourceList = (props) => {
             dispatch(addMainTitle(resourceKey, mainTitleValue))
           }
           if (resourceKey) {
-            dispatch(setCurrentResource(resourceKey))
+            useEditorStore.getState().setCurrentEditResource(resourceKey)
           } else {
             window.scrollTo(0, topRef.current?.offsetTop)
           }

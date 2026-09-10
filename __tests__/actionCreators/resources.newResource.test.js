@@ -9,6 +9,7 @@ import { nanoid } from "nanoid"
 import { safeAction } from "actionUtils"
 import expectedAction from "../__action_fixtures__/newResource-ADD_SUBJECT"
 import useHistoryStore from "stores/historyStore"
+import useEditorStore from "stores/editorStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -32,6 +33,14 @@ afterAll(() => {
 
 afterEach(() => {
   useHistoryStore.setState({ templates: [], searches: [], resources: [] })
+  useEditorStore.setState({
+    errors: {},
+    successes: {},
+    currentResource: undefined,
+    currentModal: [],
+    unusedRDF: {},
+    currentComponent: {},
+  })
 })
 
 // This forces Sinopia server to use fixtures
@@ -64,21 +73,17 @@ describe("newResource", () => {
 
       expect(safeAction(addSubjectAction)).toEqual(expectedAction)
 
-      expect(actions).toHaveAction("SET_UNUSED_RDF", {
-        resourceKey: "abc123",
-        rdf: null,
-      })
-      expect(actions).toHaveAction("SET_CURRENT_EDIT_RESOURCE", "abc123")
+      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
+      expect(useEditorStore.getState().currentResource).toBe("abc123")
       expect(actions).toHaveAction("LOAD_RESOURCE_FINISHED", "abc123")
       expect(useHistoryStore.getState().templates).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ id: resourceTemplateId }),
         ])
       )
-      expect(actions).toHaveAction("SET_CURRENT_COMPONENT", {
-        rootSubjectKey: "abc123",
-        rootPropertyKey: "abc123",
-        key: "abc123",
+      expect(useEditorStore.getState().currentComponent.abc123).toEqual({
+        component: "abc123",
+        property: "abc123",
       })
       expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
         "Foo McBar",
@@ -101,11 +106,9 @@ describe("newResource", () => {
 
       const actions = store.getActions()
       expect(actions).toHaveAction("ADD_TEMPLATES")
-      expect(actions).toHaveAction("ADD_ERROR", {
-        errorKey: "testerrorkey",
-        error:
-          "A property template may not use the same property URI as another property template (http://id.loc.gov/ontologies/bibframe/geographicCoverage) unless both propery templates are of type nested resource and the nested resources are of different classes.",
-      })
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        "A property template may not use the same property URI as another property template (http://id.loc.gov/ontologies/bibframe/geographicCoverage) unless both propery templates are of type nested resource and the nested resources are of different classes."
+      )
     })
   })
 })

@@ -5,6 +5,7 @@ import { screen } from "@testing-library/react"
 import ContextSuccess from "components/alerts/ContextSuccess"
 import { createStore, renderComponent } from "testUtils"
 import { createState } from "stateUtils"
+import useEditorStore from "stores/editorStore"
 
 let mockKeycloak
 
@@ -23,6 +24,10 @@ jest.mock("keycloak-js", () => {
   return jest.fn().mockImplementation(() => mockKeycloak)
 })
 
+afterEach(() => {
+  useEditorStore.setState({ successes: {} })
+})
+
 describe("<ContextSuccess />", () => {
   it("renders nothing when there are no success messages", () => {
     const store = createStore(createState())
@@ -31,37 +36,35 @@ describe("<ContextSuccess />", () => {
   })
 
   it("renders nothing when the success list for the context key is empty", () => {
-    const state = createState()
-    state.editor.successes = { testErrorKey: [] }
-    const store = createStore(state)
+    useEditorStore.setState({ successes: { testErrorKey: [] } })
+    const store = createStore(createState())
     const { container } = renderComponent(<ContextSuccess />, store)
     expect(container.firstChild).toBeNull()
   })
 
   it("renders success messages for the context key", () => {
-    const state = createState()
-    state.editor.successes = { testErrorKey: ["Saved successfully"] }
-    const store = createStore(state)
+    useEditorStore.setState({
+      successes: { testErrorKey: ["Saved successfully"] },
+    })
+    const store = createStore(createState())
     renderComponent(<ContextSuccess />, store)
     expect(screen.getByRole("alert")).toHaveClass("alert-success")
     expect(screen.getByText("Saved successfully")).toBeInTheDocument()
   })
 
   it("renders multiple success messages", () => {
-    const state = createState()
-    state.editor.successes = {
-      testErrorKey: ["Resource saved", "Export complete"],
-    }
-    const store = createStore(state)
+    useEditorStore.setState({
+      successes: { testErrorKey: ["Resource saved", "Export complete"] },
+    })
+    const store = createStore(createState())
     renderComponent(<ContextSuccess />, store)
     expect(screen.getByText("Resource saved")).toBeInTheDocument()
     expect(screen.getByText("Export complete")).toBeInTheDocument()
   })
 
   it("does not render messages belonging to a different key", () => {
-    const state = createState()
-    state.editor.successes = { otherKey: ["Should not appear"] }
-    const store = createStore(state)
+    useEditorStore.setState({ successes: { otherKey: ["Should not appear"] } })
+    const store = createStore(createState())
     const { container } = renderComponent(<ContextSuccess />, store)
     expect(container.firstChild).toBeNull()
   })

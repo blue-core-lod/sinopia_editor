@@ -3,12 +3,29 @@ import { fireEvent, waitFor, screen } from "@testing-library/react"
 import { featureSetup, resourceHeaderSelector } from "featureUtils"
 import * as lookup from "utilities/Lookup"
 import Config from "Config"
+import useEditorStore from "stores/editorStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
 }))
 
 featureSetup()
+
+afterEach(() => {
+  useEditorStore.setState({
+    errors: {},
+    successes: {},
+    currentResource: undefined,
+    currentPreviewResource: undefined,
+    currentDiff: { compareFrom: undefined, compareTo: undefined },
+    currentModal: [],
+    unusedRDF: {},
+    pendingResourceTemplateSelection: null,
+    currentComponent: {},
+    resources: [],
+    lastSave: {},
+  })
+})
 
 const result1 = {
   authorityConfig: {

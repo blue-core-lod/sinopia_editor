@@ -12,6 +12,7 @@ import expectedOrderedAction from "../__action_fixtures__/newResourceFromDataset
 import expectedBadOrderedAction from "../__action_fixtures__/newResourceFromDataset-ADD_SUBJECT-bad-ordered"
 import expectedNestedAction from "../__action_fixtures__/newResourceFromDataset-ADD_SUBJECT-nested"
 import { safeAction, cloneAddResourceActionAsNewResource } from "actionUtils"
+import useEditorStore from "stores/editorStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -32,6 +33,15 @@ const mockStore = configureMockStore([thunk])
 beforeAll(() => {
   // Capture and not display console output
   restoreConsole = mockConsole(["error", "debug"])
+})
+
+afterEach(() => {
+  useEditorStore.setState({
+    errors: {},
+    currentResource: undefined,
+    unusedRDF: {},
+    currentComponent: {},
+  })
 })
 
 afterAll(() => {
@@ -88,11 +98,8 @@ describe("newResourceFromDataset", () => {
       const expectedRdf = expectedGraph.toCanonical()
       expect(actualRdf).toMatch(expectedRdf)
 
-      expect(actions).toHaveAction("SET_UNUSED_RDF", {
-        resourceKey: "abc123",
-        rdf: null,
-      })
-      expect(actions).toHaveAction("SET_CURRENT_EDIT_RESOURCE", "abc123")
+      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
+      expect(useEditorStore.getState().currentResource).toBe("abc123")
       expect(actions).toHaveAction("LOAD_RESOURCE_FINISHED", "abc123")
     })
   })
@@ -136,11 +143,8 @@ describe("newResourceFromDataset", () => {
       const expectedRdf = expectedGraph.toCanonical()
       expect(actualRdf).toMatch(expectedRdf)
 
-      expect(actions).toHaveAction("SET_UNUSED_RDF", {
-        resourceKey: "abc123",
-        rdf: null,
-      })
-      expect(actions).toHaveAction("SET_CURRENT_EDIT_RESOURCE", "abc123")
+      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
+      expect(useEditorStore.getState().currentResource).toBe("abc123")
       expect(actions).toHaveAction("LOAD_RESOURCE_FINISHED", "abc123")
     })
   })
@@ -185,11 +189,8 @@ describe("newResourceFromDataset", () => {
       const expectedRdf = expectedGraph.toCanonical()
       expect(actualRdf).not.toMatch(expectedRdf)
 
-      expect(actions).toHaveAction("SET_UNUSED_RDF", {
-        resourceKey: "abc123",
-        rdf: null,
-      })
-      expect(actions).toHaveAction("SET_CURRENT_EDIT_RESOURCE", "abc123")
+      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
+      expect(useEditorStore.getState().currentResource).toBe("abc123")
       expect(actions).toHaveAction("LOAD_RESOURCE_FINISHED", "abc123")
     })
   })
@@ -234,10 +235,7 @@ describe("newResourceFromDataset", () => {
       )
       expect(safeAction(addSubjectAction)).toEqual(expectedAction)
 
-      expect(actions).toHaveAction("SET_UNUSED_RDF", {
-        resourceKey: "abc123",
-        rdf: extraRdf,
-      })
+      expect(useEditorStore.getState().unusedRDF.abc123).toBe(extraRdf)
     })
   })
 
@@ -260,10 +258,7 @@ describe("newResourceFromDataset", () => {
       )
       expect(safeAction(addSubjectAction)).toEqual(expectedAction)
 
-      expect(actions).toHaveAction("SET_UNUSED_RDF", {
-        resourceKey: "abc123",
-        rdf: null,
-      })
+      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
     })
   })
 
@@ -298,10 +293,7 @@ describe("newResourceFromDataset", () => {
 
       expect(safeAction(addSubjectAction)).toEqual(expectedOrderedAction)
 
-      expect(actions).toHaveAction("SET_UNUSED_RDF", {
-        resourceKey: "abc123",
-        rdf: null,
-      })
+      expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
     })
   })
 
@@ -328,12 +320,11 @@ describe("newResourceFromDataset", () => {
       )
       expect(safeAction(addSubjectAction)).toEqual(expectedBadOrderedAction)
 
-      expect(actions).toHaveAction("SET_UNUSED_RDF", {
-        resourceKey: "abc123",
-        rdf: `_:c14n0 <http://sinopia.io/testing/Literal/property1> "literal1"@en .
+      expect(useEditorStore.getState().unusedRDF.abc123).toBe(
+        `_:c14n0 <http://sinopia.io/testing/Literal/property1> "literal1"@en .
 _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Literal> .
-`,
-      })
+`
+      )
     })
   })
 
@@ -403,12 +394,9 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       )
       expect(result).toBe(false)
 
-      const actions = store.getActions()
-      expect(actions).toHaveAction("ADD_ERROR", {
-        errorKey: "testerrorkey",
-        error:
-          "A property template may not use the same property URI as another property template (http://id.loc.gov/ontologies/bibframe/geographicCoverage) unless both propery templates are of type nested resource and the nested resources are of different classes.",
-      })
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        "A property template may not use the same property URI as another property template (http://id.loc.gov/ontologies/bibframe/geographicCoverage) unless both propery templates are of type nested resource and the nested resources are of different classes."
+      )
     })
   })
 
