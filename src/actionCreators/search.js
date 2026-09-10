@@ -1,5 +1,5 @@
 // Copyright 2019 Stanford University see LICENSE for license
-import { setSearchResults } from "actions/search"
+import useSearchStore from "stores/searchStore"
 import {
   getSearchResultsWithFacets,
   getTemplateSearchResults,
@@ -55,8 +55,9 @@ export const fetchSinopiaSearchResults =
           facetResponse && Object.keys(facetResponse).length
             ? facetResponse
             : computeSearchFacets(response.results)
-        dispatch(
-          setSearchResults(
+        useSearchStore
+          .getState()
+          .setSearchResults(
             "resource",
             sinopiaSearchUri,
             response.results,
@@ -67,7 +68,6 @@ export const fetchSinopiaSearchResults =
             response.error,
             response.links
           )
-        )
         if (response.results) {
           response.results
             .filter((result) => isBfWorkInstanceItem(result.type))
@@ -98,8 +98,9 @@ export const fetchQASearchResults =
     dispatch(clearErrors(errorKey))
     return searchPromise.then((response) => {
       if (response.isError) {
-        dispatch(
-          setSearchResults(
+        useSearchStore
+          .getState()
+          .setSearchResults(
             "resource",
             uri,
             [],
@@ -109,7 +110,6 @@ export const fetchQASearchResults =
             options,
             response.errorObject.message
           )
-        )
         dispatch(
           addError(
             errorKey,
@@ -124,8 +124,9 @@ export const fetchQASearchResults =
         query,
       })
       dispatch(addApiSearchHistory(uri, query))
-      dispatch(
-        setSearchResults(
+      useSearchStore
+        .getState()
+        .setSearchResults(
           "resource",
           uri,
           response.results,
@@ -134,7 +135,6 @@ export const fetchQASearchResults =
           query,
           options
         )
-      )
       return true
     })
   }
@@ -144,8 +144,9 @@ export const fetchTemplateGuessSearchResults =
   (queryString, errorKey, options = {}) =>
   (dispatch) =>
     getTemplateSearchResults(queryString, options).then((response) => {
-      dispatch(
-        setSearchResults(
+      useSearchStore
+        .getState()
+        .setSearchResults(
           "templateguess",
           null,
           response.results,
@@ -155,7 +156,6 @@ export const fetchTemplateGuessSearchResults =
           options,
           response.error
         )
-      )
       if (response.error) {
         dispatch(
           addError(errorKey, `Error searching for templates: ${response.error}`)

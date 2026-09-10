@@ -1,7 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useMemo, useState, useEffect } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import { useDispatch } from "react-redux"
 import { clearErrors, addError } from "actions/errors"
 import { showModal } from "actions/modals"
 import ResourceTemplateChoiceModal from "../ResourceTemplateChoiceModal"
@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCopy } from "@fortawesome/free-solid-svg-icons"
 import _ from "lodash"
 import { datasetFromN3 } from "utilities/Utilities"
-import { selectSearchUri, selectSearchResults } from "selectors/search"
+import useSearchStore from "stores/searchStore"
 import useAlerts from "hooks/useAlerts"
 import { searchQARetrieveErrorKey } from "utilities/errorKeyFactory"
 
@@ -19,10 +19,8 @@ const QASearchResults = () => {
   const dispatch = useDispatch()
   const errorKey = useAlerts()
 
-  const searchResults = useSelector((state) =>
-    selectSearchResults(state, "resource")
-  )
-  const searchUri = useSelector((state) => selectSearchUri(state, "resource"))
+  const searchResults = useSearchStore((state) => state.resource?.results)
+  const searchUri = useSearchStore((state) => state.resource?.uri)
 
   const [resourceURI, setResourceURI] = useState(null)
   // Resource ID is for handling non-LD QA authorities, e.g., Discog

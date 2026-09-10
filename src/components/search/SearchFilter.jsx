@@ -1,13 +1,10 @@
 // Copyright 2019 Stanford University see LICENSE for license
 import React, { useState, useEffect } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import { useDispatch } from "react-redux"
 import PropTypes from "prop-types"
 import { fetchSinopiaSearchResults } from "actionCreators/search"
-import {
-  selectSearchOptions,
-  selectSearchQuery,
-  selectSearchFacetResults,
-} from "selectors/search"
+import useSearchStore from "stores/searchStore"
+import { defaultSearchResultsPerPage } from "utilities/Search"
 import useAlerts from "hooks/useAlerts"
 import { useKeycloak } from "../../KeycloakContext"
 import _ from "lodash"
@@ -21,12 +18,16 @@ const SearchFilter = ({
   const dispatch = useDispatch()
   const errorKey = useAlerts()
   const { keycloak } = useKeycloak()
-  const query = useSelector((state) => selectSearchQuery(state, "resource"))
-  const searchOptions = useSelector((state) =>
-    selectSearchOptions(state, "resource")
+  const query = useSearchStore((state) => state.resource?.query)
+  const searchOptions = useSearchStore(
+    (state) =>
+      state.resource?.options || {
+        startOfRange: 0,
+        resultsPerPage: defaultSearchResultsPerPage("resource"),
+      }
   )
-  const facetResults = useSelector((state) =>
-    selectSearchFacetResults(state, "resource", facet)
+  const facetResults = useSearchStore(
+    (state) => state.resource?.facetResults?.[facet]
   )
   const [showDropdown, setShowDropdown] = useState(false)
   const [selectedFilters, setSelectedFilters] = useState([])

@@ -1,20 +1,14 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector } from "react-redux"
 import PropTypes from "prop-types"
 import Header from "../Header"
 import SinopiaSearchResults from "./SinopiaSearchResults"
 import QASearchResults from "./QASearchResults"
 import SearchResultsPaging from "./SearchResultsPaging"
 import SearchResultsMessage from "./SearchResultsMessage"
-import {
-  selectSearchQuery,
-  selectSearchUri,
-  selectSearchOptions,
-  selectSearchTotalResults,
-  selectSearchLinks,
-} from "selectors/search"
+import useSearchStore from "stores/searchStore"
+import { defaultSearchResultsPerPage } from "utilities/Search"
 import { sinopiaSearchUri } from "utilities/authorityConfig"
 import useSearch from "hooks/useSearch"
 import AlertsContextProvider from "components/alerts/AlertsContextProvider"
@@ -29,17 +23,19 @@ const Search = (props) => {
 
   const { keycloak } = useKeycloak()
 
-  const searchOptions = useSelector((state) =>
-    selectSearchOptions(state, "resource")
+  const searchOptions = useSearchStore(
+    (state) =>
+      state.resource?.options || {
+        startOfRange: 0,
+        resultsPerPage: defaultSearchResultsPerPage("resource"),
+      }
   )
-  const uri = useSelector((state) => selectSearchUri(state, "resource"))
-  const queryString = useSelector((state) =>
-    selectSearchQuery(state, "resource")
+  const uri = useSearchStore((state) => state.resource?.uri)
+  const queryString = useSearchStore((state) => state.resource?.query)
+  const totalResults = useSearchStore(
+    (state) => state.resource?.totalResults || 0
   )
-  const totalResults = useSelector((state) =>
-    selectSearchTotalResults(state, "resource")
-  )
-  const links = useSelector((state) => selectSearchLinks(state, "resource"))
+  const links = useSearchStore((state) => state.resource?.links)
 
   const changeSearchPage = (linkOrOffset) => {
     if (typeof linkOrOffset === "number") {

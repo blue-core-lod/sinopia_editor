@@ -44,7 +44,9 @@ describe("routing in editor", () => {
     let store
     beforeEach(() => {
       const state = createState()
-      useAuthenticateStore.setState({ user: { username: "Foo McBar", groups: [] } })
+      useAuthenticateStore.setState({
+        user: { username: "Foo McBar", groups: [] },
+      })
       store = createStore(state)
     })
 
@@ -98,7 +100,9 @@ describe("routing in editor", () => {
     let store
     beforeEach(() => {
       const state = createState()
-      useAuthenticateStore.setState({ user: { username: "Foo McBar", groups: [] } })
+      useAuthenticateStore.setState({
+        user: { username: "Foo McBar", groups: [] },
+      })
       store = createStore(state)
     })
 

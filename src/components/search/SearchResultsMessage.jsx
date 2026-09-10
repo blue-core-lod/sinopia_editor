@@ -1,26 +1,36 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { connect } from "react-redux"
-import PropTypes from "prop-types"
-import {
-  selectSearchOptions,
-  selectSearchQuery,
-  selectSearchTotalResults,
-} from "selectors/search"
+import useSearchStore from "stores/searchStore"
+import { defaultSearchResultsPerPage } from "utilities/Search"
 
 // Renders the search results message after a search
-const SearchResultsMessage = (props) => {
-  if (props.query === undefined) {
+const SearchResultsMessage = () => {
+  const query = useSearchStore((state) => state.resource?.query)
+  const totalResults = useSearchStore(
+    (state) => state.resource?.totalResults || 0
+  )
+  const options = useSearchStore(
+    (state) =>
+      state.resource?.options || {
+        startOfRange: 0,
+        resultsPerPage: defaultSearchResultsPerPage("resource"),
+      }
+  )
+
+  if (query === undefined) {
     return null
   }
 
-  const lastItemOnPage =
-    props.startOfRange + props.resultsPerPage > props.totalResults
-      ? props.totalResults
-      : props.startOfRange + props.resultsPerPage
+  const startOfRange = options.startOfRange
+  const resultsPerPage = options.resultsPerPage
 
-  if (props.totalResults === 0) {
+  const lastItemOnPage =
+    startOfRange + resultsPerPage > totalResults
+      ? totalResults
+      : startOfRange + resultsPerPage
+
+  if (totalResults === 0) {
     return (
       <div id="search-results-message" className="row">
         <div className="col">
@@ -37,8 +47,7 @@ const SearchResultsMessage = (props) => {
       <div className="col">
         <div>
           <strong>
-            Displaying {props.startOfRange + 1} - {lastItemOnPage} of{" "}
-            {props.totalResults}
+            Displaying {startOfRange + 1} - {lastItemOnPage} of {totalResults}
           </strong>
         </div>
       </div>
@@ -46,21 +55,4 @@ const SearchResultsMessage = (props) => {
   )
 }
 
-SearchResultsMessage.propTypes = {
-  query: PropTypes.string,
-  totalResults: PropTypes.number,
-  startOfRange: PropTypes.number,
-  resultsPerPage: PropTypes.number,
-}
-
-const mapStateToProps = (state) => {
-  const options = selectSearchOptions(state, "resource")
-  return {
-    query: selectSearchQuery(state, "resource"),
-    totalResults: selectSearchTotalResults(state, "resource"),
-    startOfRange: options.startOfRange,
-    resultsPerPage: options.resultsPerPage,
-  }
-}
-
-export default connect(mapStateToProps, null)(SearchResultsMessage)
+export default SearchResultsMessage

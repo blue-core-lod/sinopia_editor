@@ -2,11 +2,8 @@
 /* eslint max-params: ["error", 4] */
 
 import React from "react"
-import { useSelector, useDispatch } from "react-redux"
-import {
-  selectSearchResults,
-  selectFilteredSearchResults,
-} from "selectors/search"
+import { useDispatch } from "react-redux"
+import useSearchStore from "stores/searchStore"
 import ClassFilter from "./ClassFilter"
 import SearchResultRows from "./SearchResultRows"
 import SinopiaSort from "./SinopiaSort"
@@ -19,12 +16,17 @@ import _ from "lodash"
 const SinopiaSearchResults = () => {
   const dispatch = useDispatch()
   const history = useHistory()
-  const searchResults = useSelector((state) =>
-    selectSearchResults(state, "resource")
-  )
-  const filteredResults = useSelector((state) =>
-    selectFilteredSearchResults(state, "resource")
-  )
+  const searchResults = useSearchStore((state) => state.resource?.results)
+  const filteredResults = useSearchStore((state) => {
+    const results = state.resource?.results
+    const typeFilter = state.resource?.options?.typeFilter
+    if (!results || typeFilter == null) return results
+    if (!typeFilter.length) return []
+    const activeFilters = Array.isArray(typeFilter) ? typeFilter : [typeFilter]
+    return results.filter((result) =>
+      result.type?.some((t) => activeFilters.includes(t))
+    )
+  })
 
   const chooseResourceTemplate = (resourceTemplateId) => {
     dispatch(completeResourceLoadingWithTemplate(resourceTemplateId)).then(

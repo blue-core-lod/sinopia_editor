@@ -8,10 +8,15 @@ import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import { datasetFromJsonld } from "utilities/Utilities"
 import instanceWithRefs from "../__resource_fixtures__/instance_with_refs.json"
+import useSearchStore from "stores/searchStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
 }))
+
+afterEach(() => {
+  useSearchStore.setState({ resource: null, template: null })
+})
 
 const mockStore = configureMockStore([thunk])
 
@@ -36,26 +41,41 @@ describe("loadRelationships()", () => {
 })
 
 describe("loadSearchRelationships()", () => {
-  it("fetches resource and dispatches refs extracted from BIBFRAME predicates", async () => {
+  beforeEach(() => {
+    // Seed the store with an existing resource so setSearchRelationships can merge into it
+    useSearchStore.setState({
+      resource: {
+        uri,
+        results: [],
+        totalResults: 0,
+        facetResults: {},
+        relationshipResults: {},
+        query: "",
+        options: {},
+        links: undefined,
+        error: undefined,
+      },
+    })
+  })
+
+  it("fetches resource and stores refs extracted from BIBFRAME predicates in Zustand", async () => {
     const dataset = await datasetFromJsonld(instanceWithRefs)
     sinopiaApi.fetchResource = jest.fn().mockResolvedValue([dataset, {}])
 
     const store = mockStore(createState())
     await store.dispatch(loadSearchRelationships(uri))
 
-    const actions = store.getActions()
-    expect(actions).toHaveLength(1)
-    expect(actions).toHaveAction("SET_SEARCH_RELATIONSHIPS", {
-      uri,
-      relationships: {
+    expect(store.getActions()).toHaveLength(0)
+    expect(useSearchStore.getState().resource.relationshipResults[uri]).toEqual(
+      {
         bfAdminMetadataRefs: [],
         bfItemRefs: [],
         bfInstanceRefs: [],
         bfWorkRefs: [
           "http://localhost:3000/resource/f6ee6410-5206-492b-8e48-3b6333010c33",
         ],
-      },
-    })
+      }
+    )
 
     expect(sinopiaApi.fetchResource).toHaveBeenCalledWith(uri)
   })
@@ -77,15 +97,14 @@ describe("loadSearchRelationships()", () => {
     const store = mockStore(createState())
     await store.dispatch(loadSearchRelationships(uri))
 
-    expect(store.getActions()).toHaveAction("SET_SEARCH_RELATIONSHIPS", {
-      uri,
-      relationships: {
+    expect(useSearchStore.getState().resource.relationshipResults[uri]).toEqual(
+      {
         bfAdminMetadataRefs: [],
         bfItemRefs: ["http://localhost:3000/resource/blue-core-item"],
         bfInstanceRefs: [],
         bfWorkRefs: [],
-      },
-    })
+      }
+    )
   })
 
   describe("when fetchResource errors", () => {

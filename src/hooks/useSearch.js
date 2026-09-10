@@ -4,7 +4,7 @@ import {
   fetchQASearchResults as fetchQASearchResultsCreator,
   fetchTemplateGuessSearchResults as fetchTemplateGuessSearchResultsCreator,
 } from "actionCreators/search"
-import { clearSearchResults } from "actions/search"
+import useSearchStore from "stores/searchStore"
 import { sinopiaSearchUri } from "utilities/authorityConfig"
 import { useHistory } from "react-router-dom"
 
@@ -87,7 +87,7 @@ const useSearch = (errorKey) => {
     )
 
   const clearTemplateGuessSearchResults = () => {
-    dispatch(clearSearchResults("templateguess"))
+    useSearchStore.getState().clearSearchResults("templateguess")
   }
 
   return {

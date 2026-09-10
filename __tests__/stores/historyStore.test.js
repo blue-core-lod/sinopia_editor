@@ -50,9 +50,10 @@ describe("historyStore", () => {
       addTemplateHistory({ key: "template2" })
       addTemplateHistory({ key: "template1" })
 
-      expect(
-        useHistoryStore.getState().templates.map((t) => t.id)
-      ).toEqual(["template1", "template2"])
+      expect(useHistoryStore.getState().templates.map((t) => t.id)).toEqual([
+        "template1",
+        "template2",
+      ])
     })
 
     it("limits to 10 items", () => {

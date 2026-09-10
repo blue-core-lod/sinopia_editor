@@ -50,27 +50,6 @@ export const initialState = {
     values: {},
     versions: {}, // {<resourceKey>: [versions...]}
   },
-  search: {
-    // Search model:
-    // {
-    //   results: [],
-    //   totalResults: 0,
-    //   facetResults: {},
-    //   relationshipResults: {}
-    //   query: undefined,
-    //   options: {
-    //     resultsPerPage: Config.searchResultsPerPage,
-    //     startOfRange: 0, // 0 based
-    //     sortField: undefined,
-    //     sortOrder: undefined,
-    //     typeFilter: undefined,
-    //     groupFilter: undefined,
-    //   },
-    //   error: undefined,
-    // },
-    resource: null,
-    template: null,
-  },
 }
 
 let composeEnhancers

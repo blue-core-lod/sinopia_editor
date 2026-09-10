@@ -36,11 +36,7 @@ import {
   setResourceChanged,
   setSubjectComponentList,
 } from "./resources"
-import {
-  setRelationships,
-  clearRelationships,
-  setSearchRelationships,
-} from "./relationships"
+import { setRelationships, clearRelationships } from "./relationships"
 import {
   hideValidationErrors,
   addError,
@@ -53,9 +49,13 @@ import { showModal, hideModal, showLangModal, showMarcModal } from "./modals"
 import { showCopyNewMessage } from "./messages"
 import { exportsReceived } from "./exports"
 import { addTemplates } from "./templates"
-import { clearSearchResults, setSearchResults, setHeaderSearch } from "./search"
 import { lookupOptionsRetrieved } from "./lookups"
 import _ from "lodash"
+
+const setHeaderSearch = (state, action) => ({
+  ...state,
+  currentHeaderSearch: action.payload,
+})
 
 export const setCurrentComponent = (state, action) => {
   const rootSubjectKey = action.payload.rootSubjectKey
@@ -156,12 +156,6 @@ const entityHandlers = {
   UPDATE_VALUE: updateValue,
 }
 
-const searchHandlers = {
-  CLEAR_SEARCH_RESULTS: clearSearchResults,
-  SET_SEARCH_RELATIONSHIPS: setSearchRelationships,
-  SET_SEARCH_RESULTS: setSearchResults,
-}
-
 export const createReducer =
   (handlers) =>
   (state = {}, action) => {
@@ -172,7 +166,6 @@ export const createReducer =
 const appReducer = combineReducers({
   editor: createReducer(editorHandlers),
   entities: createReducer(entityHandlers),
-  search: createReducer(searchHandlers),
 })
 
 export default appReducer

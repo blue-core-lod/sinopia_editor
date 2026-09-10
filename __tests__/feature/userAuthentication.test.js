@@ -25,7 +25,9 @@ jest.spyOn(sinopiaApi, "fetchUser").mockResolvedValue({
 describe("user authentication", () => {
   it("allows a logged in user to log out and allows a new one to login", async () => {
     const state = createState()
-    useAuthenticateStore.setState({ user: { username: "Foo McBar", groups: [] } })
+    useAuthenticateStore.setState({
+      user: { username: "Foo McBar", groups: [] },
+    })
     const store = createStore(state)
 
     renderApp(store)
