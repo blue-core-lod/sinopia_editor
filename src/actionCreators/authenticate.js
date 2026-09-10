@@ -39,5 +39,5 @@ export const signOut = (keycloak) => (dispatch) => {
 
 const toUser = (keycloakUser) => ({
   username: keycloakUser.preferred_username,
-  groups: ["blue core"], // This needs to be a separate call to the api
+  groups: [Config.defaultGroup], // This needs to be a separate call to the api
 })

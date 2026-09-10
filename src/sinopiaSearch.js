@@ -224,8 +224,8 @@ const hitsToResult = (payload) => {
       created: hit.created_at,
       modified: hit.updated_at,
       type: rdfTypes,
-      group: "blue core",
-      editGroups: ["blue core"],
+      group: Config.defaultGroup,
+      editGroups: [Config.defaultGroup],
     })
   })
   return {
@@ -371,7 +371,7 @@ const templateModFromBlueCore = (hit) => {
   return {
     author: resourceAuthor,
     date: resourceDate,
-    group: "blue core", // hardcoded for now
+    group: Config.defaultGroup,
     id: resourceId,
     originalURI: hit.uri,
     remark: resourceRemark,

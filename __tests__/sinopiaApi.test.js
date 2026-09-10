@@ -141,6 +141,37 @@ describe("fetchResource", () => {
       )
     })
 
+    it("preserves group and editGroups when the response provides them", async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        json: jest.fn().mockResolvedValue(resource),
+        ok: true,
+      })
+
+      const result = await fetchResource(
+        "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f"
+      )
+      expect(result[1].group).toBe("yale")
+      expect(result[1].editGroups).toEqual(["cornell"])
+    })
+
+    // The Blue Core API does not return group information. Without a default,
+    // canEdit() is false for every resource loaded from the API. See issue #172.
+    it("defaults group and editGroups when the response omits them", async () => {
+      const bluecoreResource = { ...resource }
+      delete bluecoreResource.group
+      delete bluecoreResource.editGroups
+      global.fetch = jest.fn().mockResolvedValue({
+        json: jest.fn().mockResolvedValue(bluecoreResource),
+        ok: true,
+      })
+
+      const result = await fetchResource(
+        "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f"
+      )
+      expect(result[1].group).toBe("blue core")
+      expect(result[1].editGroups).toEqual(["blue core"])
+    })
+
     it("errors when unable to retrieve resource", async () => {
       global.fetch = jest.fn().mockResolvedValue({
         json: jest.fn().mockRejectedValue("Parse error"),

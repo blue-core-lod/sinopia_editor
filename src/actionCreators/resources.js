@@ -157,7 +157,8 @@ export const dispatchResourceForEditor =
           resource.uri,
           resource.subjectTemplate.class,
           response.group,
-          response.timestamp,
+          // The Blue Core API calls this field updated_at.
+          response.timestamp ?? response.updated_at,
           keycloak
         )
       )

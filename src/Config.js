@@ -100,6 +100,13 @@ class Config {
     return process.env.HONEYBADGER_REVISION || ""
   }
 
+  // The single group that all Blue Core resources and users belong to. The
+  // Blue Core API does not (yet) return group information, so this is the
+  // default used wherever a group is expected. See issue #172.
+  static get defaultGroup() {
+    return process.env.DEFAULT_GROUP || "blue core"
+  }
+
   static get transferConfig() {
     return {
       ils: {
