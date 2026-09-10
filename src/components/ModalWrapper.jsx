@@ -1,10 +1,9 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector, useDispatch } from "react-redux"
 import PropTypes from "prop-types"
-import { hideModal } from "actions/modals"
-import { isCurrentModal } from "selectors/modals"
+import useEditorStore from "stores/editorStore"
+import _ from "lodash"
 import { DialogOverlay, DialogContent } from "@reach/dialog"
 import "@reach/dialog/styles.css"
 
@@ -19,11 +18,12 @@ const ModalWrapper = ({
   handleClose = null,
   ...props
 }) => {
-  const dispatch = useDispatch()
-  const show = useSelector((state) => isCurrentModal(state, modalName))
+  const show = useEditorStore(
+    (state) => (_.last(state.currentModal) || null) === modalName
+  )
 
   const close = (event) => {
-    dispatch(hideModal())
+    useEditorStore.getState().hideModal()
     event.preventDefault()
   }
 

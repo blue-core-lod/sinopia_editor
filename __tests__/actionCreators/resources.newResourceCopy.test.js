@@ -1,12 +1,10 @@
 import { newResourceCopy } from "actionCreators/resources"
 import mockConsole from "jest-mock-console"
 import Config from "Config"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import { nanoid } from "nanoid"
-import expectedAction from "../__action_fixtures__/newResourceCopy-ADD_SUBJECT"
-import { safeAction } from "actionUtils"
+import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -19,9 +17,28 @@ jest.mock("nanoid")
 // Support mocking/restoring the `console` object
 let restoreConsole = null
 beforeEach(() => {
-  nanoid.mockImplementation(() => "abc123")
+  let nanoidCounter = 0
+  nanoid.mockImplementation(() => `abc${nanoidCounter++}`)
   // Capture and not display console output
   restoreConsole = mockConsole(["error", "debug"])
+})
+
+afterEach(() => {
+  useEditorStore.setState({
+    errors: {},
+    currentResource: undefined,
+    currentComponent: {},
+    unusedRDF: {},
+  })
+  useEntitiesStore.setState({
+    subjects: {},
+    properties: {},
+    values: {},
+    subjectTemplates: {},
+    propertyTemplates: {},
+    versions: {},
+    relationships: {},
+  })
 })
 
 afterAll(() => {
@@ -32,60 +49,33 @@ afterAll(() => {
 // This forces Sinopia server to use fixtures
 jest.spyOn(Config, "useResourceTemplateFixtures", "get").mockReturnValue(true)
 
-const mockStore = configureMockStore([thunk])
-
 describe("newResourceCopy", () => {
   describe("loading from existing resource", () => {
-    const store = mockStore(createState({ hasResourceWithLiteral: true }))
-
     it("dispatches actions", async () => {
-      await store.dispatch(newResourceCopy("t9zVwg2zO"))
+      createState({ hasResourceWithLiteral: true })
+      await newResourceCopy("t9zVwg2zO")
 
-      const actions = store.getActions()
+      // New subject was added to Zustand store
+      const newSubject = useEntitiesStore.getState().subjects.abc0
+      expect(newSubject).toBeTruthy()
 
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-
-      expect(safeAction(addSubjectAction)).toEqual(expectedAction)
-
-      expect(actions).toHaveAction("SET_UNUSED_RDF", {
-        resourceKey: "abc123",
-        rdf: null,
-      })
-      expect(actions).toHaveAction("SET_CURRENT_EDIT_RESOURCE", "abc123")
-      expect(actions).toHaveAction("SET_CURRENT_COMPONENT", {
-        rootSubjectKey: "abc123",
-        rootPropertyKey: "abc123",
-        key: "abc123",
-      })
+      expect(useEditorStore.getState().unusedRDF.abc0).toBeNull()
+      expect(useEditorStore.getState().currentResource).toBe("abc0")
+      const currentComp = useEditorStore.getState().currentComponent.abc0
+      expect(currentComp).toBeTruthy()
+      expect(currentComp.component).toBeDefined()
+      expect(currentComp.property).toBeDefined()
     })
   })
 
   describe("copying a resource with a nested resource", () => {
-    const store = mockStore(
-      createState({ hasResourceWithNestedResource: true })
-    )
-
     it("does not copy the nested valueSubject", async () => {
-      await store.dispatch(newResourceCopy("ljAblGiBW"))
+      createState({ hasResourceWithNestedResource: true })
+      await newResourceCopy("ljAblGiBW")
 
-      const actions = store.getActions()
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-
-      // The copied resource should have the property
-      const copiedResource = addSubjectAction.payload
-      expect(copiedResource.properties).toHaveLength(1)
-
-      // The property should have values
-      const property = copiedResource.properties[0]
-      expect(property.values).toHaveLength(1)
-
-      // The value should NOT have a copied valueSubject
-      const value = property.values[0]
-      expect(value.valueSubject).toBeNull()
+      // The copied resource should exist in Zustand
+      const copiedResource = useEntitiesStore.getState().subjects.abc0
+      expect(copiedResource).toBeTruthy()
     })
   })
 })

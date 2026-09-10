@@ -1,15 +1,13 @@
-import { useDispatch } from "react-redux"
 import {
   fetchSinopiaSearchResults as fetchSinopiaSearchResultsCreator,
   fetchQASearchResults as fetchQASearchResultsCreator,
   fetchTemplateGuessSearchResults as fetchTemplateGuessSearchResultsCreator,
 } from "actionCreators/search"
-import { clearSearchResults } from "actions/search"
+import useSearchStore from "stores/searchStore"
 import { sinopiaSearchUri } from "utilities/authorityConfig"
 import { useHistory } from "react-router-dom"
 
 const useSearch = (errorKey) => {
-  const dispatch = useDispatch()
   const history = useHistory()
 
   const fetchQASearchResults = (
@@ -18,12 +16,10 @@ const useSearch = (errorKey) => {
     searchOptions,
     startOfRange
   ) =>
-    dispatch(
-      fetchQASearchResultsCreator(queryString, uri, errorKey, {
-        ...searchOptions,
-        startOfRange,
-      })
-    )
+    fetchQASearchResultsCreator(queryString, uri, errorKey, {
+      ...searchOptions,
+      startOfRange,
+    })
 
   const fetchSinopiaSearchResults = (
     queryString,
@@ -31,16 +27,14 @@ const useSearch = (errorKey) => {
     startOfRange,
     keycloak
   ) =>
-    dispatch(
-      fetchSinopiaSearchResultsCreator(
-        queryString,
-        {
-          ...searchOptions,
-          startOfRange,
-        },
-        errorKey,
-        keycloak
-      )
+    fetchSinopiaSearchResultsCreator(
+      queryString,
+      {
+        ...searchOptions,
+        startOfRange,
+      },
+      errorKey,
+      keycloak
     )
 
   const fetchSearchResults = (
@@ -78,16 +72,10 @@ const useSearch = (errorKey) => {
     queryString,
     searchOptions = { startOfRange: 0 }
   ) =>
-    dispatch(
-      fetchTemplateGuessSearchResultsCreator(
-        queryString,
-        errorKey,
-        searchOptions
-      )
-    )
+    fetchTemplateGuessSearchResultsCreator(queryString, errorKey, searchOptions)
 
   const clearTemplateGuessSearchResults = () => {
-    dispatch(clearSearchResults("templateguess"))
+    useSearchStore.getState().clearSearchResults("templateguess")
   }
 
   return {

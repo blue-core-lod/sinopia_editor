@@ -1,8 +1,12 @@
 import React from "react"
 import { screen } from "@testing-library/react"
 import QASearchResults from "components/search/QASearchResults"
-import { createStore, renderComponent } from "testUtils"
-import { createState } from "stateUtils"
+import { renderComponent } from "testUtils"
+import useSearchStore from "stores/searchStore"
+
+afterEach(() => {
+  useSearchStore.setState({ resource: null, template: null })
+})
 
 let mockKeycloak
 
@@ -25,78 +29,82 @@ jest.mock("keycloak-js", () => {
 
 describe("<QASearchResults />", () => {
   it("renders results", () => {
-    const state = createState()
-    state.search.resource = {
-      results: [
-        {
-          uri: "http://share-vde.org/sharevde/rdfBibframe/Work/3107365",
-          id: "http://share-vde.org/sharevde/rdfBibframe/Work/3107365",
-          label: "These twain",
-          context: [
-            {
-              property: "Title",
-              values: ["These twain"],
-              selectable: true,
-              drillable: false,
-            },
-            {
-              property: "Type",
-              values: [
-                "http://id.loc.gov/ontologies/bflc/Hub",
-                "http://id.loc.gov/ontologies/bibframe/Work",
-              ],
-              selectable: false,
-              drillable: false,
-            },
-            {
-              property: "Contributor",
-              values: ["Bennett, Arnold,1867-1931."],
-              selectable: false,
-              drillable: false,
-            },
-          ],
-        },
-        {
-          uri: "http://share-vde.org/sharevde/rdfBibframe/Work/3107366",
-          id: "http://share-vde.org/sharevde/rdfBibframe/Work/31073656",
-          label: "Those twain",
-          context: [
-            {
-              property: "Title",
-              values: ["Those twain"],
-              selectable: true,
-              drillable: false,
-            },
-            {
-              property: "Type",
-              values: [
-                "http://id.loc.gov/ontologies/bibframe/Text",
-                "http://id.loc.gov/ontologies/bibframe/Work",
-              ],
-              selectable: false,
-              drillable: false,
-            },
-            {
-              property: "Contributor",
-              values: ["Bennett, Arnold."],
-              selectable: false,
-              drillable: false,
-            },
-            {
-              property: "Image URL",
-              values: [
-                "https://img.discogs.com/ilqScil5LIpcF_povstRcaEtEeg=/fit-in/600x527/filters:strip_icc():format(jpeg):mode_rgb():quality(90)/discogs-images/R-1622463-1425003720-8692.jpeg.jpg",
-              ],
-            },
-          ],
-        },
-      ],
-      totalResults: 2,
-      query: "twain",
-    }
+    useSearchStore.setState({
+      resource: {
+        results: [
+          {
+            uri: "http://share-vde.org/sharevde/rdfBibframe/Work/3107365",
+            id: "http://share-vde.org/sharevde/rdfBibframe/Work/3107365",
+            label: "These twain",
+            context: [
+              {
+                property: "Title",
+                values: ["These twain"],
+                selectable: true,
+                drillable: false,
+              },
+              {
+                property: "Type",
+                values: [
+                  "http://id.loc.gov/ontologies/bflc/Hub",
+                  "http://id.loc.gov/ontologies/bibframe/Work",
+                ],
+                selectable: false,
+                drillable: false,
+              },
+              {
+                property: "Contributor",
+                values: ["Bennett, Arnold,1867-1931."],
+                selectable: false,
+                drillable: false,
+              },
+            ],
+          },
+          {
+            uri: "http://share-vde.org/sharevde/rdfBibframe/Work/3107366",
+            id: "http://share-vde.org/sharevde/rdfBibframe/Work/31073656",
+            label: "Those twain",
+            context: [
+              {
+                property: "Title",
+                values: ["Those twain"],
+                selectable: true,
+                drillable: false,
+              },
+              {
+                property: "Type",
+                values: [
+                  "http://id.loc.gov/ontologies/bibframe/Text",
+                  "http://id.loc.gov/ontologies/bibframe/Work",
+                ],
+                selectable: false,
+                drillable: false,
+              },
+              {
+                property: "Contributor",
+                values: ["Bennett, Arnold."],
+                selectable: false,
+                drillable: false,
+              },
+              {
+                property: "Image URL",
+                values: [
+                  "https://img.discogs.com/ilqScil5LIpcF_povstRcaEtEeg=/fit-in/600x527/filters:strip_icc():format(jpeg):mode_rgb():quality(90)/discogs-images/R-1622463-1425003720-8692.jpeg.jpg",
+                ],
+              },
+            ],
+          },
+        ],
+        totalResults: 2,
+        query: "twain",
+        uri: "urn:ld4p:qa:test",
+        options: {},
+        facetResults: {},
+        relationshipResults: {},
+      },
+    })
 
-    const store = createStore(state)
-    renderComponent(<QASearchResults history={{}} />, store)
+    renderComponent(<QASearchResults history={{}} />)
 
     // Headers
     screen.getByText("Label")

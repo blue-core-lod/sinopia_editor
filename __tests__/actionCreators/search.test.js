@@ -5,18 +5,23 @@ import {
   fetchTemplateGuessSearchResults,
 } from "actionCreators/search"
 import * as server from "sinopiaSearch"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import * as sinopiaApi from "sinopiaApi"
 import * as QuestioningAuthority from "utilities/QuestioningAuthority"
 import rdf from "rdf-ext"
+import useHistoryStore from "stores/historyStore"
+import useSearchStore from "stores/searchStore"
+import useEditorStore from "stores/editorStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
 }))
 
-const mockStore = configureMockStore([thunk])
+afterEach(() => {
+  useHistoryStore.setState({ templates: [], searches: [], resources: [] })
+  useSearchStore.setState({ resource: null, template: null })
+  useEditorStore.setState({ errors: {}, successes: {} })
+})
 
 describe("fetchSinopiaSearchResults", () => {
   const query = "*"
@@ -48,47 +53,43 @@ describe("fetchSinopiaSearchResults", () => {
       .mockResolvedValue([mockSearchResults, mockFacetResults])
     sinopiaApi.putUserHistory = jest.fn().mockResolvedValue()
     const keycloak = { token: "test-token" }
-    const store = mockStore(createState())
-    await store.dispatch(
-      fetchSinopiaSearchResults(
-        query,
-        {
-          startOfRange: 5,
-          resultsPerPage: 10,
-          sortField: "label",
-          sortOrder: "desc",
-        },
-        "testerrorkey",
-        keycloak
-      )
+    createState()
+    await fetchSinopiaSearchResults(
+      query,
+      {
+        startOfRange: 5,
+        resultsPerPage: 10,
+        sortField: "label",
+        sortOrder: "desc",
+      },
+      "testerrorkey",
+      keycloak
     )
 
-    const actions = store.getActions()
-
-    expect(actions).toHaveLength(4)
-    expect(actions).toHaveAction("CLEAR_ERRORS")
-    expect(actions).toHaveAction("SET_SEARCH_RESULTS", {
-      searchType: "resource",
+    expect(useEditorStore.getState().errors.testerrorkey).toEqual([])
+    expect(useSearchStore.getState().resource).toMatchObject({
       error: undefined,
       uri: "urn:ld4p:sinopia",
       query: "*",
       results: mockSearchResults.results,
       totalResults: mockSearchResults.totalHits,
       facetResults: mockFacetResults,
-      options: {
+      options: expect.objectContaining({
         sortField: "label",
         sortOrder: "desc",
         startOfRange: 5,
         resultsPerPage: 10,
-      },
-      links: undefined,
+      }),
     })
-    expect(actions).toHaveAction("ADD_SEARCH_HISTORY", {
-      authorityUri: "urn:ld4p:sinopia",
-      authorityLabel: "Sinopia resources",
-      query: "*",
-      keycloak,
-    })
+    expect(useHistoryStore.getState().searches).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          authorityUri: "urn:ld4p:sinopia",
+          authorityLabel: "Sinopia resources",
+          query: "*",
+        }),
+      ])
+    )
     expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
       "Foo McBar",
       "search",
@@ -174,30 +175,28 @@ describe("fetchQASearchResults", () => {
     })
 
     it("dispatches action", async () => {
-      const store = mockStore(createState())
-      await store.dispatch(fetchQASearchResults(query, uri, "testerrorkey"))
+      createState()
+      await fetchQASearchResults(query, uri, "testerrorkey")
 
-      const actions = store.getActions()
-
-      expect(actions).toHaveLength(3)
-      expect(actions).toHaveAction("CLEAR_ERRORS")
-      expect(actions).toHaveAction("SET_SEARCH_RESULTS", {
-        searchType: "resource",
+      expect(useEditorStore.getState().errors.testerrorkey).toEqual([])
+      expect(useSearchStore.getState().resource).toMatchObject({
         uri,
         query,
         results: mockSearchResults,
         totalResults: 15,
-        options: {},
+        options: expect.objectContaining({}),
         error: undefined,
         facetResults: {},
-        links: undefined,
       })
-      expect(actions).toHaveAction("ADD_SEARCH_HISTORY", {
-        authorityUri: uri,
-        authorityLabel: "OCLCFAST Topic (QA) - direct",
-        query,
-        keycloak: undefined,
-      })
+      expect(useHistoryStore.getState().searches).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            authorityUri: uri,
+            authorityLabel: "OCLCFAST Topic (QA) - direct",
+            query,
+          }),
+        ])
+      )
     })
   })
 
@@ -212,28 +211,21 @@ describe("fetchQASearchResults", () => {
     })
 
     it("dispatches action when error", async () => {
-      const store = mockStore(createState())
-      await store.dispatch(fetchQASearchResults(query, uri, "testerrorkey"))
+      createState()
+      await fetchQASearchResults(query, uri, "testerrorkey")
 
-      const actions = store.getActions()
-
-      expect(actions).toHaveLength(3)
-      expect(actions).toHaveAction("CLEAR_ERRORS")
-      expect(actions).toHaveAction("SET_SEARCH_RESULTS", {
-        searchType: "resource",
+      expect(useSearchStore.getState().resource).toMatchObject({
         uri,
         query,
         results: [],
         totalResults: 0,
-        options: {},
+        options: expect.objectContaining({}),
         facetResults: {},
         error: "Ooops...",
-        links: undefined,
       })
-      expect(actions).toHaveAction("ADD_ERROR", {
-        errorKey: "testerrorkey",
-        error: "An error occurred while searching: Ooops...",
-      })
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        "An error occurred while searching: Ooops..."
+      )
     })
   })
 })
@@ -260,28 +252,21 @@ describe("fetchTemplateGuessSearchResults", () => {
       server.getTemplateSearchResults = jest
         .fn()
         .mockResolvedValue(mockSearchResults)
-      const store = mockStore(createState())
-      await store.dispatch(
-        fetchTemplateGuessSearchResults(query, "testerrorkey", {
-          startOfRange: 0,
-        })
-      )
+      createState()
+      await fetchTemplateGuessSearchResults(query, "testerrorkey", {
+        startOfRange: 0,
+      })
 
-      const actions = store.getActions()
-
-      expect(actions).toHaveLength(1)
-      expect(actions).toHaveAction("SET_SEARCH_RESULTS", {
-        searchType: "templateguess",
+      expect(useSearchStore.getState().templateguess).toMatchObject({
         error: undefined,
         uri: null,
         query,
         results: mockSearchResults.results,
         totalResults: mockSearchResults.totalHits,
         facetResults: {},
-        options: {
+        options: expect.objectContaining({
           startOfRange: 0,
-        },
-        links: undefined,
+        }),
       })
     })
   })
@@ -298,33 +283,25 @@ describe("fetchTemplateGuessSearchResults", () => {
       server.getTemplateSearchResults = jest
         .fn()
         .mockResolvedValue(mockSearchResults)
-      const store = mockStore(createState())
-      await store.dispatch(
-        fetchTemplateGuessSearchResults(query, "testerrorkey", {
-          startOfRange: 0,
-        })
-      )
+      createState()
+      await fetchTemplateGuessSearchResults(query, "testerrorkey", {
+        startOfRange: 0,
+      })
 
-      const actions = store.getActions()
-
-      expect(actions).toHaveLength(2)
-      expect(actions).toHaveAction("SET_SEARCH_RESULTS", {
-        searchType: "templateguess",
+      expect(useSearchStore.getState().templateguess).toMatchObject({
         error: "Ooops",
         uri: null,
         query,
         results: [],
         totalResults: 0,
         facetResults: {},
-        options: {
+        options: expect.objectContaining({
           startOfRange: 0,
-        },
-        links: undefined,
+        }),
       })
-      expect(actions).toHaveAction("ADD_ERROR", {
-        errorKey: "testerrorkey",
-        error: "Error searching for templates: Ooops",
-      })
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        "Error searching for templates: Ooops"
+      )
     })
   })
 })

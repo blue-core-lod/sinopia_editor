@@ -1,11 +1,17 @@
 // Copyright 2020 Stanford University see LICENSE for license
 import { exportsReceived } from "reducers/exports"
-import { createReducer } from "reducers/index"
 import { createState } from "stateUtils"
 
 const handlers = {
   EXPORTS_RECEIVED: exportsReceived,
 }
+const createReducer =
+  (handlers) =>
+  (state = {}, action) => {
+    const fn = handlers[action.type]
+    return fn ? fn(state, action) : state
+  }
+
 const reducer = createReducer(handlers)
 
 describe("exportsReceived", () => {

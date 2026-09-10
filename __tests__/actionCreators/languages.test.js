@@ -1,55 +1,54 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import { fetchLanguages } from "actionCreators/languages"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
-
-const mockStore = configureMockStore([thunk])
+import useEntitiesStore from "stores/entitiesStore"
 
 describe("fetchLanguages", () => {
-  const store = mockStore(createState({ noLanguage: true }))
-
   it("dispatches actions", async () => {
-    await store.dispatch(fetchLanguages())
-    const actions = store.getActions()
-    expect(actions).toHaveLength(1)
-    const action = actions[0]
-    expect(action.type).toEqual("LANGUAGES_RECEIVED")
-    const {
-      languages,
-      languageLookup,
-      scripts,
-      scriptLookup,
-      transliterations,
-      transliterationLookup,
-    } = action.payload
+    useEntitiesStore.setState({ languages: {}, languageLookup: [] })
+    createState({ noLanguage: true })
+    await fetchLanguages()
 
-    expect(languages.taw).toEqual("Tai")
-    expect(languages.en).toEqual("English")
-    expect(languages.eng).toEqual("English")
+    const state = useEntitiesStore.getState()
 
-    expect(languageLookup).toContainEqual({ id: "taw", label: "Tai (taw)" })
-    expect(languageLookup).toContainEqual({ id: "en", label: "English (en)" })
+    expect(state.languages.taw).toEqual("Tai")
+    expect(state.languages.en).toEqual("English")
+    expect(state.languages.eng).toEqual("English")
 
-    expect(scripts.Adlm).toEqual("Adlam")
-    expect(scripts.Latn).toEqual("Latin")
+    expect(state.languageLookup).toContainEqual({
+      id: "taw",
+      label: "Tai (taw)",
+    })
+    expect(state.languageLookup).toContainEqual({
+      id: "en",
+      label: "English (en)",
+    })
 
-    expect(scriptLookup).toContainEqual({ id: "Adlm", label: "Adlam (Adlm)" })
-    expect(scriptLookup).toContainEqual({ id: "Latn", label: "Latin (Latn)" })
+    expect(state.scripts.Adlm).toEqual("Adlam")
+    expect(state.scripts.Latn).toEqual("Latin")
 
-    expect(transliterations.alaloc).toEqual(
+    expect(state.scriptLookup).toContainEqual({
+      id: "Adlm",
+      label: "Adlam (Adlm)",
+    })
+    expect(state.scriptLookup).toContainEqual({
+      id: "Latn",
+      label: "Latin (Latn)",
+    })
+
+    expect(state.transliterations.alaloc).toEqual(
       "American Library Association-Library of Congress"
     )
-    expect(transliterations.buckwalt).toEqual(
+    expect(state.transliterations.buckwalt).toEqual(
       "Buckwalter Arabic transliteration system"
     )
 
-    expect(transliterationLookup).toContainEqual({
+    expect(state.transliterationLookup).toContainEqual({
       id: "alaloc",
       label: "American Library Association-Library of Congress (alaloc)",
     })
-    expect(transliterationLookup).toContainEqual({
+    expect(state.transliterationLookup).toContainEqual({
       id: "buckwalt",
       label: "Buckwalter Arabic transliteration system (buckwalt)",
     })

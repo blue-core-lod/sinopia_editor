@@ -1,6 +1,6 @@
 // Copyright 2020 Stanford University see LICENSE for license
 
-import { setSearchRelationships } from "actions/relationships"
+import useSearchStore from "stores/searchStore"
 import { fetchResource } from "sinopiaApi"
 import { isBlueCoreUri } from "utilities/Utilities"
 import rdf from "rdf-ext"
@@ -32,16 +32,18 @@ const refsFromDataset = (dataset) => {
  * Relationships for resources in the editor are already tracked on the subject
  * via updateBibframeRefs as values are loaded. No separate API call is needed.
  */
-export const loadRelationships = () => () => Promise.resolve(true)
+export const loadRelationships = () => Promise.resolve(true)
 
 /**
- * A thunk that loads relationships for a search result by fetching the resource
+ * A function that loads relationships for a search result by fetching the resource
  * and extracting BIBFRAME ref predicates from its dataset.
  */
-export const loadSearchRelationships = (uri) => (dispatch) =>
+export const loadSearchRelationships = (uri) =>
   fetchResource(uri)
     .then(([dataset]) => {
-      dispatch(setSearchRelationships(uri, refsFromDataset(dataset)))
+      useSearchStore
+        .getState()
+        .setSearchRelationships(uri, refsFromDataset(dataset))
       return true
     })
     .catch((err) => {

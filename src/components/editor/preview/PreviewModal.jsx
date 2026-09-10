@@ -1,14 +1,10 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useDispatch, useSelector } from "react-redux"
 import ModalWrapper from "components/ModalWrapper"
-import { hideModal } from "actions/modals"
-import {
-  selectCurrentPreviewResourceKey,
-  selectNormSubject,
-} from "selectors/resources"
-import { setCurrentPreviewResource, clearResource } from "actions/resources"
+import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
+import { selectNormSubject } from "selectors/resources"
 import ResourceDisplay from "./ResourceDisplay"
 import usePermissions from "hooks/usePermissions"
 import MarcButton from "../actions/MarcButton"
@@ -20,15 +16,14 @@ import EditButton from "../../buttons/EditButton"
 import useAlerts from "hooks/useAlerts"
 
 const PreviewModal = () => {
-  const dispatch = useDispatch()
   const errorKey = useAlerts()
   const { canEdit, canCreate } = usePermissions()
 
   // Ensure there is a current resource before attempting to render a resource component
-  const currentResourceKey = useSelector((state) =>
-    selectCurrentPreviewResourceKey(state)
+  const currentResourceKey = useEditorStore(
+    (state) => state.currentPreviewResource
   )
-  const currentResource = useSelector((state) =>
+  const currentResource = useEntitiesStore((state) =>
     selectNormSubject(state, currentResourceKey)
   )
 
@@ -39,8 +34,8 @@ const PreviewModal = () => {
 
   const close = (event) => {
     event.preventDefault()
-    dispatch(setCurrentPreviewResource(null))
-    dispatch(hideModal())
+    useEditorStore.getState().setCurrentPreviewResource(null)
+    useEditorStore.getState().hideModal()
   }
 
   const handleEditClick = (event) => {
@@ -55,7 +50,10 @@ const PreviewModal = () => {
 
   const handleCloseClick = (event) => {
     close(event)
-    if (currentResourceKey) dispatch(clearResource(currentResourceKey))
+    if (currentResourceKey) {
+      useEditorStore.getState().clearResource(currentResourceKey)
+      useEntitiesStore.getState().clearResource(currentResourceKey)
+    }
   }
 
   const header = (

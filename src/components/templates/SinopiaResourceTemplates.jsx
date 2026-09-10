@@ -1,10 +1,9 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector } from "react-redux"
 import ResourceTemplateSearchResult from "./ResourceTemplateSearchResult"
-import { selectHistoricalTemplates } from "selectors/history"
-import { selectSearchResults } from "selectors/search"
+import useHistoryStore from "stores/historyStore"
+import useSearchStore from "stores/searchStore"
 import ExpandingResourceTemplates from "./ExpandingResourceTemplates"
 import _ from "lodash"
 
@@ -12,12 +11,8 @@ import _ from "lodash"
  * This is the list view of all the templates
  */
 const SinopiaResourceTemplates = () => {
-  const searchResults = useSelector((state) =>
-    selectSearchResults(state, "template")
-  )
-  const historicalTemplates = useSelector((state) =>
-    selectHistoricalTemplates(state)
-  )
+  const searchResults = useSearchStore((state) => state.template?.results)
+  const historicalTemplates = useHistoryStore((state) => state.templates)
 
   return (
     <section id="resource-templates">

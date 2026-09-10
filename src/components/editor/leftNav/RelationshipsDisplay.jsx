@@ -1,14 +1,14 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useState, useEffect } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import PreviewModal from "../preview/PreviewModal"
 import { selectRelationships } from "selectors/relationships"
 import { fetchResource } from "sinopiaApi"
 import rdf from "rdf-ext"
 import { labelFromDataset } from "utilities/Bibframe"
-import { addError } from "actions/errors"
+import useEditorStore from "stores/editorStore"
 import RelationshipRow from "./RelationshipRow"
 import useAlerts from "hooks/useAlerts"
 import _ from "lodash"
@@ -28,7 +28,6 @@ const rowFromDataset = (uri, dataset, response) => ({
 })
 
 const RelationshipsDisplay = ({ resourceKey, displayActions = true }) => {
-  const dispatch = useDispatch()
   const errorKey = useAlerts()
 
   const [resourceRowMaps, setResourceRowMaps] = useState({})
@@ -36,7 +35,10 @@ const RelationshipsDisplay = ({ resourceKey, displayActions = true }) => {
   // Note that when loading a new resource the inferred refs may arrive asynchronously, which means the refs
   // may change during the lifecycle of the component.
   const { bfAdminMetadataRefs, bfItemRefs, bfInstanceRefs, bfWorkRefs } =
-    useSelector((state) => selectRelationships(state, resourceKey), _.isEqual)
+    useEntitiesStore(
+      (state) => selectRelationships(state, resourceKey),
+      _.isEqual
+    )
 
   useEffect(() => () => setMounted(false), [])
 
@@ -55,12 +57,12 @@ const RelationshipsDisplay = ({ resourceKey, displayActions = true }) => {
             rowFromDataset(refUri, dataset, response)
           )
           .catch((err) => {
-            dispatch(
-              addError(
+            useEditorStore
+              .getState()
+              .addError(
                 errorKey,
                 `Error getting relationship ${refUri}: ${err.message || err}`
               )
-            )
             return null
           })
       )
@@ -83,7 +85,6 @@ const RelationshipsDisplay = ({ resourceKey, displayActions = true }) => {
     isMounted,
     resourceKey,
     errorKey,
-    dispatch,
   ])
 
   const relationshipList = (label, refs) => {

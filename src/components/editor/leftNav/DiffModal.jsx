@@ -1,28 +1,25 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector, useDispatch } from "react-redux"
-import { hideModal } from "actions/modals"
-import { isCurrentModal } from "selectors/modals"
-import {
-  selectCurrentDiffResourceKeys,
-  selectFullSubject,
-} from "selectors/resources"
+import useEntitiesStore from "stores/entitiesStore"
+import useEditorStore from "stores/editorStore"
+import { selectFullSubject } from "selectors/resources"
 import ModalWrapper from "components/ModalWrapper"
-import { setCurrentDiff } from "actions/resources"
+import _ from "lodash"
 import ResourceDiffer from "ResourceDiffer"
 import DiffDisplay from "./DiffDisplay"
 
 const DiffModal = () => {
-  const dispatch = useDispatch()
-  const { compareFrom, compareTo } = useSelector((state) =>
-    selectCurrentDiffResourceKeys(state)
+  const { compareFrom, compareTo } = useEditorStore(
+    (state) => state.currentDiff
   )
-  const show = useSelector((state) => isCurrentModal(state, "DiffModal"))
-  const compareFromResource = useSelector((state) =>
+  const show = useEditorStore(
+    (state) => (_.last(state.currentModal) || null) === "DiffModal"
+  )
+  const compareFromResource = useEntitiesStore((state) =>
     selectFullSubject(state, compareFrom)
   )
-  const compareToResource = useSelector((state) =>
+  const compareToResource = useEntitiesStore((state) =>
     selectFullSubject(state, compareTo)
   )
 
@@ -31,13 +28,8 @@ const DiffModal = () => {
     diff = new ResourceDiffer(compareFromResource, compareToResource).diff
 
   const close = (event) => {
-    dispatch(hideModal())
-    dispatch(
-      setCurrentDiff({
-        compareFromResourceKey: null,
-        compareToResourceKey: null,
-      })
-    )
+    useEditorStore.getState().hideModal()
+    useEditorStore.getState().setCurrentDiffResources(null, null)
     event.preventDefault()
   }
 

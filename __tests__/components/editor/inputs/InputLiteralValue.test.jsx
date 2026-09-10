@@ -1,9 +1,7 @@
 import React from "react"
 import { render, act } from "@testing-library/react"
-import { Provider } from "react-redux"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
+import useEntitiesStore from "stores/entitiesStore"
 
 import InputLiteralValue from "components/editor/inputs/InputLiteralValue"
 import LcshTypeahead from "components/editor/inputs/LcshTypeahead"
@@ -18,24 +16,23 @@ jest.mock("components/editor/inputs/LcshTypeahead", () => ({
   default: jest.fn(),
 }))
 
-const mockStore = configureMockStore([thunk])
-
 const MADS_AUTH_LABEL = "http://www.loc.gov/mads/rdf/v1#authoritativeLabel"
 const VALUE_KEY = "val-key-1"
 const PROPERTY_KEY = "prop-key-1"
 const SUBJECT_KEY = "subj-key-1"
 const SUBJECT_URI = "http://id.loc.gov/authorities/subjects/sh85002058"
 
-const makeState = ({ subjectKey = SUBJECT_KEY } = {}) => ({
-  ...createState(),
-  entities: {
-    ...createState().entities,
+const makeState = ({ subjectKey = SUBJECT_KEY } = {}) => {
+  const state = createState()
+  // Seed Zustand entities store with test-specific data
+  useEntitiesStore.setState({
     properties: {
       [PROPERTY_KEY]: { subjectKey },
     },
     values: {},
-  },
-})
+  })
+  return state
+}
 
 const value = {
   key: VALUE_KEY,
@@ -55,16 +52,14 @@ const propertyTemplate = {
   uris: { [MADS_AUTH_LABEL]: "Authoritative Label" },
 }
 
-const renderComponent = (store, overrideValue = value) =>
+const renderComponent = (overrideValue = value) =>
   render(
-    <Provider store={store}>
-      <InputLiteralValue
-        value={overrideValue}
-        propertyTemplate={propertyTemplate}
-        displayValidations={false}
-        shouldFocus={false}
-      />
-    </Provider>
+    <InputLiteralValue
+      value={overrideValue}
+      propertyTemplate={propertyTemplate}
+      displayValidations={false}
+      shouldFocus={false}
+    />
   )
 
 describe("InputLiteralValue handleLcshSelect", () => {
@@ -83,72 +78,86 @@ describe("InputLiteralValue handleLcshSelect", () => {
   })
 
   it("dispatches updateLiteralValue with the selected label", () => {
-    const store = mockStore(makeState())
-    renderComponent(store)
+    const spy = jest
+      .spyOn(useEntitiesStore.getState(), "updateValue")
+      .mockImplementation(() => {})
+    makeState()
+    renderComponent()
 
     act(() => {
       capturedOnSelect({ label: "Agricultural economics", uri: SUBJECT_URI })
     })
 
-    const actions = store.getActions()
-    expect(actions).toContainEqual(
+    expect(spy).toHaveBeenCalledWith(
       expect.objectContaining({
-        type: "UPDATE_VALUE",
-        payload: expect.objectContaining({
-          valueKey: VALUE_KEY,
-          literal: "Agricultural economics",
-          lang: "en",
-        }),
+        valueKey: VALUE_KEY,
+        literal: "Agricultural economics",
+        lang: "en",
       })
     )
+    spy.mockRestore()
   })
 
   it("dispatches setSubjectComponentList when uri and subjectKey are present", () => {
-    const store = mockStore(makeState())
-    renderComponent(store)
+    jest
+      .spyOn(useEntitiesStore.getState(), "updateValue")
+      .mockImplementation(() => {})
+    const spy = jest
+      .spyOn(useEntitiesStore.getState(), "setSubjectComponentList")
+      .mockImplementation(() => {})
+    makeState()
+    renderComponent()
 
     act(() => {
       capturedOnSelect({ label: "Agricultural economics", uri: SUBJECT_URI })
     })
 
-    const actions = store.getActions()
-    expect(actions).toContainEqual({
-      type: "SET_SUBJECT_COMPONENT_LIST",
-      payload: { subjectKey: SUBJECT_KEY, uri: SUBJECT_URI },
-    })
+    expect(spy).toHaveBeenCalledWith(SUBJECT_KEY, SUBJECT_URI)
+    spy.mockRestore()
+    useEntitiesStore.getState().updateValue.mockRestore?.()
   })
 
   it("does not dispatch setSubjectComponentList when uri is absent", () => {
-    const store = mockStore(makeState())
-    renderComponent(store)
+    jest
+      .spyOn(useEntitiesStore.getState(), "updateValue")
+      .mockImplementation(() => {})
+    const spy = jest
+      .spyOn(useEntitiesStore.getState(), "setSubjectComponentList")
+      .mockImplementation(() => {})
+    makeState()
+    renderComponent()
 
     act(() => {
       capturedOnSelect({ label: "Agricultural economics", uri: "" })
     })
 
-    const actions = store.getActions()
-    expect(actions).not.toContainEqual(
-      expect.objectContaining({ type: "SET_SUBJECT_COMPONENT_LIST" })
-    )
+    expect(spy).not.toHaveBeenCalled()
+    spy.mockRestore()
+    useEntitiesStore.getState().updateValue.mockRestore?.()
   })
 
   it("does not dispatch setSubjectComponentList when subjectKey is absent", () => {
-    const store = mockStore(makeState({ subjectKey: null }))
-    renderComponent(store)
+    jest
+      .spyOn(useEntitiesStore.getState(), "updateValue")
+      .mockImplementation(() => {})
+    const spy = jest
+      .spyOn(useEntitiesStore.getState(), "setSubjectComponentList")
+      .mockImplementation(() => {})
+    makeState({ subjectKey: null })
+    renderComponent()
 
     act(() => {
       capturedOnSelect({ label: "Agricultural economics", uri: SUBJECT_URI })
     })
 
-    const actions = store.getActions()
-    expect(actions).not.toContainEqual(
-      expect.objectContaining({ type: "SET_SUBJECT_COMPONENT_LIST" })
-    )
+    expect(spy).not.toHaveBeenCalled()
+    spy.mockRestore()
+    useEntitiesStore.getState().updateValue.mockRestore?.()
   })
 
   it("renders LcshTypeahead when propertyUri is the MADS authoritative label URI", () => {
-    const store = mockStore(makeState())
-    renderComponent(store)
+    makeState()
+    renderComponent()
 
     expect(LcshTypeahead).toHaveBeenCalledWith(
       expect.objectContaining({ query: value.literal }),
@@ -157,8 +166,8 @@ describe("InputLiteralValue handleLcshSelect", () => {
   })
 
   it("does not render LcshTypeahead when propertyUri is a different URI", () => {
-    const store = mockStore(makeState())
-    renderComponent(store, {
+    makeState()
+    renderComponent({
       ...value,
       propertyUri: "http://id.loc.gov/ontologies/bibframe/mainTitle",
     })

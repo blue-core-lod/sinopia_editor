@@ -1,5 +1,5 @@
 import { fetchUser, putUserHistory } from "sinopiaApi"
-import { selectUser } from "selectors/authenticate"
+import useAuthenticateStore from "stores/authenticateStore"
 import {
   loadTemplateHistory,
   loadSearchHistory,
@@ -7,26 +7,26 @@ import {
 } from "actionCreators/history"
 import md5 from "crypto-js/md5"
 
-export const loadUserData = (userId, keycloak) => (dispatch) =>
+export const loadUserData = (userId, keycloak) =>
   fetchUser(userId)
     .then((userData) => {
       const templateIds = userData.data.history.template.map(
         (historyItem) => historyItem.payload
       )
-      dispatch(loadTemplateHistory(templateIds))
+      loadTemplateHistory(templateIds)
       const searches = userData.data.history.search.map((historyItem) =>
         JSON.parse(historyItem.payload)
       )
-      dispatch(loadSearchHistory(searches, keycloak))
+      loadSearchHistory(searches, keycloak)
       const resourceUris = userData.data.history.resource.map(
         (historyItem) => historyItem.payload
       )
-      dispatch(loadResourceHistory(resourceUris))
+      loadResourceHistory(resourceUris)
     })
     .catch((err) => console.error(err))
 
-const addHistory = (historyType, payload, keycloak) => (dispatch, getState) => {
-  const user = selectUser(getState())
+const addHistory = (historyType, payload, keycloak) => {
+  const user = useAuthenticateStore.getState().user
   if (!user || !keycloak) return
   return putUserHistory(
     user.username,
@@ -37,14 +37,13 @@ const addHistory = (historyType, payload, keycloak) => (dispatch, getState) => {
   ).catch((err) => console.error(err))
 }
 
-export const addTemplateHistory = (templateId, keycloak) => (dispatch) =>
-  dispatch(addHistory("template", templateId, keycloak))
+export const addTemplateHistory = (templateId, keycloak) =>
+  addHistory("template", templateId, keycloak)
 
-export const addResourceHistory = (uri, keycloak) => (dispatch) =>
-  dispatch(addHistory("resource", uri, keycloak))
+export const addResourceHistory = (uri, keycloak) =>
+  addHistory("resource", uri, keycloak)
 
-export const addSearchHistory =
-  (authorityUri, query, keycloak) => (dispatch) => {
-    const payload = JSON.stringify({ authorityUri, query })
-    return dispatch(addHistory("search", payload, keycloak))
-  }
+export const addSearchHistory = (authorityUri, query, keycloak) => {
+  const payload = JSON.stringify({ authorityUri, query })
+  return addHistory("search", payload, keycloak)
+}

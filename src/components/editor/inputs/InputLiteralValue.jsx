@@ -1,13 +1,7 @@
 import React, { useRef, useEffect, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
 import PropTypes from "prop-types"
 import TextareaAutosize from "react-textarea-autosize"
-import {
-  updateLiteralValue,
-  removeValue,
-  addValue,
-  setSubjectComponentList,
-} from "actions/resources"
+import useEntitiesStore from "stores/entitiesStore"
 import { newLiteralValue } from "utilities/valueFactory"
 import LanguageButton from "./LanguageButton"
 import DiacriticsButton from "./DiacriticsButton"
@@ -29,7 +23,6 @@ const InputLiteralValue = ({
   displayValidations,
   shouldFocus,
 }) => {
-  const dispatch = useDispatch()
   const inputLiteralRef = useRef(null)
   const [focusHasBeenSet, setFocusHasBeenSet] = useState(false)
   const [showScriptShifter, setShowScriptShifter] = useState(false)
@@ -67,7 +60,11 @@ const InputLiteralValue = ({
 
   const handleBlur = (event) => {
     if (handleBlurDiacritics(event)) {
-      dispatch(updateLiteralValue(value.key, currentContent, value.lang))
+      useEntitiesStore.getState().updateValue({
+        valueKey: value.key,
+        literal: currentContent || null,
+        lang: value.lang || null,
+      })
       event.preventDefault()
     }
   }
@@ -89,8 +86,9 @@ const InputLiteralValue = ({
   }
 
   const handleTranslate = (translatedText, marcCode) => {
-    dispatch(
-      addValue(
+    useEntitiesStore
+      .getState()
+      .addValue(
         newLiteralValue(
           value.property,
           value.propertyUri,
@@ -99,17 +97,20 @@ const InputLiteralValue = ({
         ),
         value.key
       )
-    )
   }
 
   const handleRemoveClick = (event) => {
-    dispatch(removeValue(value.key))
+    useEntitiesStore.getState().removeValue(value.key)
     event.preventDefault()
   }
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
-      dispatch(updateLiteralValue(value.key, currentContent, value.lang))
+      useEntitiesStore.getState().updateValue({
+        valueKey: value.key,
+        literal: currentContent || null,
+        lang: value.lang || null,
+      })
       event.preventDefault()
     }
     handleKeyDownResourceHasChanged()
@@ -117,17 +118,21 @@ const InputLiteralValue = ({
     handleKeyDownDiacritics(event)
   }
 
-  const subjectKey = useSelector(
-    (state) => state.entities.properties[value.propertyKey]?.subjectKey
+  const subjectKey = useEntitiesStore(
+    (state) => state.properties[value.propertyKey]?.subjectKey
   )
 
   const isLcshAuthLabel = value.propertyUri === MADS_AUTH_LABEL
 
   const handleLcshSelect = ({ label, uri }) => {
     setCurrentContent(label)
-    dispatch(updateLiteralValue(value.key, label, value.lang))
+    useEntitiesStore.getState().updateValue({
+      valueKey: value.key,
+      literal: label || null,
+      lang: value.lang || null,
+    })
     if (uri && subjectKey) {
-      dispatch(setSubjectComponentList(subjectKey, uri))
+      useEntitiesStore.getState().setSubjectComponentList(subjectKey, uri)
     }
   }
 

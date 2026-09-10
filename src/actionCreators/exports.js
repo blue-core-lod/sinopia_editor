@@ -1,13 +1,13 @@
 import Config from "Config"
-import { addError, clearErrors } from "actions/errors"
-import { exportsReceived } from "actions/exports"
+import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 import { hasExports } from "selectors/exports"
 
-export const fetchExports = (errorKey) => (dispatch, getState) => {
+export const fetchExports = (errorKey) => {
   // Return if already loaded.
-  if (hasExports(getState())) return
+  if (hasExports(useEntitiesStore.getState())) return
 
-  dispatch(clearErrors(errorKey))
+  useEditorStore.getState().clearErrors(errorKey)
   // Not using AWS SDK because requires credentials, which is way too much overhead.
   return fetch(Config.exportBucketUrl)
     .then((response) => response.text())
@@ -18,15 +18,15 @@ export const fetchExports = (errorKey) => (dispatch, getState) => {
       for (let i = 0; i < elems.length; i++) {
         keys.push(elems.item(i).innerHTML)
       }
-      dispatch(exportsReceived(keys))
+      useEntitiesStore.getState().exportsReceived(keys)
     })
     .catch((err) =>
-      dispatch(
-        addError(
+      useEditorStore
+        .getState()
+        .addError(
           errorKey,
           `Error retrieving list of exports: ${err.message || err}`
         )
-      )
     )
 }
 

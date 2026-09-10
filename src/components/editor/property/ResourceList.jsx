@@ -1,7 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useEffect, useRef, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import { getTemplateSearchResults } from "sinopiaSearch"
 import { nanoid } from "nanoid"
@@ -11,30 +11,29 @@ import {
   selectSubjectTemplate,
 } from "selectors/templates"
 import { selectNormSubject, selectMainTitleValue } from "selectors/resources"
-import { setCurrentResource } from "actions/resources"
+import useEditorStore from "stores/editorStore"
 
 import useAlerts from "hooks/useAlerts"
 import { useKeycloak } from "../../../KeycloakContext"
 import _ from "lodash"
 
 const ResourceList = (props) => {
-  const dispatch = useDispatch()
   const { keycloak } = useKeycloak()
   const [newResourceList, setNewResourceList] = useState([])
   const errorKey = useAlerts()
   const topRef = useRef(null)
 
-  const propertyTemplate = useSelector((state) =>
+  const propertyTemplate = useEntitiesStore((state) =>
     selectPropertyTemplate(state, props.property?.propertyTemplateKey)
   )
-  const subject = useSelector((state) =>
+  const subject = useEntitiesStore((state) =>
     selectNormSubject(state, props.property?.subjectKey)
   )
-  const subjectTemplate = useSelector((state) =>
+  const subjectTemplate = useEntitiesStore((state) =>
     selectSubjectTemplate(state, subject?.subjectTemplateKey)
   )
 
-  const mainTitleValue = useSelector((state) =>
+  const mainTitleValue = useEntitiesStore((state) =>
     selectMainTitleValue(state, props.property?.rootSubjectKey)
   )
 
@@ -42,13 +41,13 @@ const ResourceList = (props) => {
     let isMounted = true
     const handleChange = (resourceTemplateId, event) => {
       event.preventDefault()
-      dispatch(newResource(resourceTemplateId, errorKey, false, keycloak)).then(
+      newResource(resourceTemplateId, errorKey, false, keycloak).then(
         (resourceKey) => {
           if (resourceKey && mainTitleValue) {
-            dispatch(addMainTitle(resourceKey, mainTitleValue))
+            addMainTitle(resourceKey, mainTitleValue)
           }
           if (resourceKey) {
-            dispatch(setCurrentResource(resourceKey))
+            useEditorStore.getState().setCurrentEditResource(resourceKey)
           } else {
             window.scrollTo(0, topRef.current?.offsetTop)
           }
@@ -91,7 +90,6 @@ const ResourceList = (props) => {
       isMounted = false
     }
   }, [
-    dispatch,
     propertyTemplate.authorities,
     subjectTemplate.class,
     errorKey,

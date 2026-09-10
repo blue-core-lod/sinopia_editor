@@ -1,7 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector, useDispatch, shallowEqual } from "react-redux"
+import { shallow } from "zustand/shallow"
 import PropTypes from "prop-types"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
@@ -19,28 +19,24 @@ import {
   addSiblingValueSubject,
   resetValueSubject,
 } from "actionCreators/resources"
-import {
-  removeValue as removeValueAction,
-  setValueOrder,
-} from "actions/resources"
+import useEntitiesStore from "stores/entitiesStore"
 import useAlerts from "hooks/useAlerts"
 import _ from "lodash"
 
 const NestedResourceActionButtons = ({ value }) => {
-  const dispatch = useDispatch()
   const errorKey = useAlerts()
 
-  const property = useSelector((state) =>
+  const property = useEntitiesStore((state) =>
     selectNormProperty(state, value.propertyKey)
   )
-  const propertyTemplate = useSelector((state) =>
+  const propertyTemplate = useEntitiesStore((state) =>
     selectPropertyTemplate(state, property.propertyTemplateKey)
   )
-  const siblingValues = useSelector(
+  const siblingValues = useEntitiesStore(
     (state) => selectSiblingValues(state, value.key),
-    shallowEqual
+    shallow
   )
-  const subjectTemplate = useSelector((state) =>
+  const subjectTemplate = useEntitiesStore((state) =>
     selectSubjectTemplateForSubject(state, value.valueSubjectKey)
   )
   const index = property.valueKeys.indexOf(value.key) + 1
@@ -57,27 +53,27 @@ const NestedResourceActionButtons = ({ value }) => {
 
   const addAnother = (event) => {
     event.preventDefault()
-    return dispatch(addSiblingValueSubject(_.last(siblingValues).key, errorKey))
+    return addSiblingValueSubject(_.last(siblingValues).key, errorKey)
   }
 
   const moveUp = (event) => {
-    dispatch(setValueOrder(value.key, index - 1))
+    useEntitiesStore.getState().setValueOrder(value.key, index - 1)
     event.preventDefault()
   }
 
   const moveDown = (event) => {
-    dispatch(setValueOrder(value.key, index + 1))
+    useEntitiesStore.getState().setValueOrder(value.key, index + 1)
     event.preventDefault()
   }
 
   const removeValue = (event) => {
-    dispatch(removeValueAction(value.key))
+    useEntitiesStore.getState().removeValue(value.key)
     event.preventDefault()
   }
 
   const resetValue = (event) => {
     event.preventDefault()
-    dispatch(resetValueSubject(value.key, errorKey))
+    resetValueSubject(value.key, errorKey)
   }
 
   return (

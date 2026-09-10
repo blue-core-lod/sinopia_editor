@@ -1,36 +1,37 @@
 // Copyright 2019 Stanford University see LICENSE for license
 import React from "react"
-import { useSelector, useDispatch } from "react-redux"
 import { fetchSinopiaSearchResults } from "actionCreators/search"
-import { selectSearchOptions, selectSearchQuery } from "selectors/search"
+import useSearchStore from "stores/searchStore"
+import { defaultSearchResultsPerPage } from "utilities/Search"
 import { useKeycloak } from "../../KeycloakContext"
 import useAlerts from "hooks/useAlerts"
 
 const SinopiaSort = () => {
-  const query = useSelector((state) => selectSearchQuery(state, "resource"))
+  const query = useSearchStore((state) => state.resource?.query)
   const errorKey = useAlerts()
   const { keycloak } = useKeycloak()
 
-  const searchOptions = useSelector((state) =>
-    selectSearchOptions(state, "resource")
+  const searchOptions = useSearchStore(
+    (state) =>
+      state.resource?.options || {
+        startOfRange: 0,
+        resultsPerPage: defaultSearchResultsPerPage("resource"),
+      }
   )
   const curSortField = searchOptions.sortField
   const curSortOrder = searchOptions.sortOrder
 
-  const dispatch = useDispatch()
   const handleSort = (sortField, sortOrder) =>
-    dispatch(
-      fetchSinopiaSearchResults(
-        query,
-        {
-          ...searchOptions,
-          startOfRange: 0,
-          sortField,
-          sortOrder,
-        },
-        errorKey,
-        keycloak
-      )
+    fetchSinopiaSearchResults(
+      query,
+      {
+        ...searchOptions,
+        startOfRange: 0,
+        sortField,
+        sortOrder,
+      },
+      errorKey,
+      keycloak
     )
 
   const getClasses = (sortField, sortOrder) =>

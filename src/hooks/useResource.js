@@ -1,21 +1,13 @@
 import { useEffect, useState } from "react"
-import { useSelector, useDispatch } from "react-redux"
 import {
   newResource,
   loadResourceForEditor,
   loadResourceForPreview,
 } from "actionCreators/resources"
-import { selectErrors } from "selectors/errors"
-import {
-  selectCurrentResourceKey,
-  selectResourceUriMap,
-} from "selectors/resources"
+import { selectResourceUriMap } from "selectors/resources"
+import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 import _ from "lodash"
-import { showModal } from "actions/modals"
-import {
-  setCurrentResource,
-  setCurrentPreviewResource,
-} from "actions/resources"
 import { useHistory } from "react-router-dom"
 import { useKeycloak } from "../KeycloakContext"
 
@@ -23,13 +15,14 @@ const useResource = (
   errorKey,
   { resourceTemplateId = null, resourceURI = null }
 ) => {
-  const dispatch = useDispatch()
   const history = useHistory()
   const { keycloak } = useKeycloak()
-  const errors = useSelector((state) => selectErrors(state, errorKey))
-  const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
+  const errors = useEditorStore((state) => state.errors[errorKey])
+  const resourceKey = useEditorStore((state) => state.currentResource)
   // These are resources that are already loaded
-  const resourceUriMap = useSelector((state) => selectResourceUriMap(state))
+  const resourceUriMap = useEntitiesStore((state) =>
+    selectResourceUriMap(state)
+  )
 
   const [navigateEditor, setNavigateEditor] = useState(false)
   const [status, setStatus] = useState("ready")
@@ -44,24 +37,20 @@ const useResource = (
   const handleNew = (event) => {
     if (event) event.preventDefault()
     setStatus("loading new")
-    dispatch(newResource(resourceTemplateId, errorKey, true, keycloak)).then(
-      (result) => {
-        setStatus("ready")
-        if (result) setNavigateEditor(true)
-      }
-    )
+    newResource(resourceTemplateId, errorKey, true, keycloak).then((result) => {
+      setStatus("ready")
+      if (result) setNavigateEditor(true)
+    })
   }
 
   const handleCopy = (event) => {
     if (event) event.preventDefault()
     setStatus("loading copy")
-    dispatch(
-      loadResourceForEditor(
-        resourceURI,
-        errorKey,
-        { asNewResource: true },
-        keycloak
-      )
+    loadResourceForEditor(
+      resourceURI,
+      errorKey,
+      { asNewResource: true },
+      keycloak
     ).then((result) => {
       setStatus("ready")
       if (result) setNavigateEditor(true)
@@ -72,11 +61,13 @@ const useResource = (
     if (event) event.preventDefault()
     // Check if already open
     if (resourceUriMap[resourceURI]) {
-      dispatch(setCurrentResource(resourceUriMap[resourceURI]))
+      useEditorStore
+        .getState()
+        .setCurrentEditResource(resourceUriMap[resourceURI])
       setNavigateEditor(true)
     } else {
       setStatus("loading edit")
-      dispatch(loadResourceForEditor(resourceURI, errorKey, {}, keycloak)).then(
+      loadResourceForEditor(resourceURI, errorKey, {}, keycloak).then(
         (result) => {
           setStatus("ready")
           if (result) setNavigateEditor(true)
@@ -88,13 +79,15 @@ const useResource = (
   const handleView = (event) => {
     if (event) event.preventDefault()
     if (resourceUriMap[resourceURI]) {
-      dispatch(setCurrentPreviewResource(resourceUriMap[resourceURI]))
-      dispatch(showModal("PreviewModal"))
+      useEditorStore
+        .getState()
+        .setCurrentPreviewResource(resourceUriMap[resourceURI])
+      useEditorStore.getState().showModal("PreviewModal")
     } else {
       setStatus("loading view")
-      dispatch(loadResourceForPreview(resourceURI, errorKey)).then((result) => {
+      loadResourceForPreview(resourceURI, errorKey).then((result) => {
         setStatus("ready")
-        if (result) dispatch(showModal("PreviewModal"))
+        if (result) useEditorStore.getState().showModal("PreviewModal")
       })
     }
   }

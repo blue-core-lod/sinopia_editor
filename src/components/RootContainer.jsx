@@ -4,10 +4,8 @@ import React, { useState } from "react"
 import { hot } from "react-hot-loader"
 import { OffCanvas, OffCanvasBody, OffCanvasMenu } from "react-offcanvas"
 import { BrowserRouter } from "react-router-dom"
-import { Provider } from "react-redux"
 import CanvasMenu from "./menu/CanvasMenu"
 import App from "./App"
-import store from "../store"
 import Config from "../Config"
 import { KeycloakProvider } from "../KeycloakContext"
 import HoneybadgerNotifier from "Honeybadger"
@@ -31,12 +29,10 @@ const RootContainer = () => {
           >
             <OffCanvasBody className={offcanvasClass}>
               <BrowserRouter basename="/sinopia">
-                <Provider store={store}>
-                  <App
-                    isMenuOpened={isMenuOpened}
-                    handleOffsetMenu={() => setMenuOpened(!isMenuOpened)}
-                  />
-                </Provider>
+                <App
+                  isMenuOpened={isMenuOpened}
+                  handleOffsetMenu={() => setMenuOpened(!isMenuOpened)}
+                />
               </BrowserRouter>
             </OffCanvasBody>
             <OffCanvasMenu className="offcanvas-menu">

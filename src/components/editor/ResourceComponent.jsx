@@ -1,16 +1,14 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useEffect, useState } from "react"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import PanelResource from "./property/PanelResource"
 import CopyToNewMessage from "./CopyToNewMessage"
 import ResourceURIMessage from "./ResourceURIMessage"
 import PermissionsAction from "./actions/PermissionsAction"
 import SaveAlert from "./SaveAlert"
-import {
-  selectCurrentResourceKey,
-  selectNormSubject,
-} from "selectors/resources"
+import { selectNormSubject } from "selectors/resources"
+import useEditorStore from "stores/editorStore"
 import UnusedRDFDisplay from "./UnusedRDFDisplay"
 import { isInViewport } from "utilities/Utilities"
 import CloseButton from "./actions/CloseButton"
@@ -24,8 +22,10 @@ import TopButton from "./actions/TopButton"
  * This is the root component of the editor on the resource edit page
  */
 const ResourceComponent = () => {
-  const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
-  const resource = useSelector((state) => selectNormSubject(state, resourceKey))
+  const resourceKey = useEditorStore((state) => state.currentResource)
+  const resource = useEntitiesStore((state) =>
+    selectNormSubject(state, resourceKey)
+  )
   const [isHeaderInViewport, setHeaderInViewport] = useState(true)
 
   useEffect(() => {

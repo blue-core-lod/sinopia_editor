@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import PanelResourceNav from "./PanelResourceNav"
 import Versions from "./Versions"
@@ -8,7 +8,7 @@ import { hasRelationships as hasRelationshipsSelector } from "selectors/relation
 
 const LeftNav = ({ resource }) => {
   const [currentTab, setCurrentTab] = useState("nav")
-  const hasRelationships = useSelector((state) =>
+  const hasRelationships = useEntitiesStore((state) =>
     hasRelationshipsSelector(state, resource.key)
   )
 

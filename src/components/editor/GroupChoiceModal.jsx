@@ -1,17 +1,14 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useState, useRef } from "react"
-import { useSelector, useDispatch } from "react-redux"
-import { hideModal } from "actions/modals"
+import useEntitiesStore from "stores/entitiesStore"
 import {
   saveNewResource,
   saveResource as saveResourceAction,
 } from "actionCreators/resources"
-import {
-  selectCurrentResourceKey,
-  selectNormSubject,
-} from "selectors/resources"
-import { selectGroups } from "selectors/authenticate"
+import { selectNormSubject } from "selectors/resources"
+import useEditorStore from "stores/editorStore"
+import useAuthenticateStore from "stores/authenticateStore"
 import { selectGroupMap } from "selectors/groups"
 import usePermissions from "hooks/usePermissions"
 import useAlerts from "hooks/useAlerts"
@@ -20,10 +17,12 @@ import { useKeycloak } from "KeycloakContext"
 
 const GroupChoiceModal = () => {
   const errorKey = useAlerts()
-  const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
-  const resource = useSelector((state) => selectNormSubject(state, resourceKey))
-  const userGroupIds = useSelector((state) => selectGroups(state))
-  const groupMap = useSelector((state) => selectGroupMap(state))
+  const resourceKey = useEditorStore((state) => state.currentResource)
+  const resource = useEntitiesStore((state) =>
+    selectNormSubject(state, resourceKey)
+  )
+  const userGroupIds = useAuthenticateStore((state) => state.user?.groups)
+  const groupMap = useEntitiesStore((state) => selectGroupMap(state))
   const [ownerGroupId, setOwnerGroupId] = useState(
     resource.group || userGroupIds[0]
   )
@@ -32,7 +31,6 @@ const GroupChoiceModal = () => {
   const ownerGroupLabel = groupMap[ownerGroupId]
   const { canChangeGroups } = usePermissions()
   const canChange = canChangeGroups(resource) || !resource.uri
-  const dispatch = useDispatch()
   const { keycloak } = useKeycloak()
 
   const ownerGroupOptions = userGroupIds.map((groupId) => (
@@ -48,20 +46,16 @@ const GroupChoiceModal = () => {
 
   const saveAndClose = (event) => {
     if (resource.uri) {
-      dispatch(
-        saveResourceAction(resourceKey, ownerGroupId, [], errorKey, keycloak)
-      )
+      saveResourceAction(resourceKey, ownerGroupId, [], errorKey, keycloak)
     } else {
-      dispatch(
-        saveNewResource(resourceKey, ownerGroupId, [], errorKey, keycloak)
-      )
+      saveNewResource(resourceKey, ownerGroupId, [], errorKey, keycloak)
     }
-    dispatch(hideModal())
+    useEditorStore.getState().hideModal()
     event.preventDefault()
   }
 
   const close = (event) => {
-    dispatch(hideModal())
+    useEditorStore.getState().hideModal()
     event.preventDefault()
   }
 

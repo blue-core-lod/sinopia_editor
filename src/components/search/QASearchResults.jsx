@@ -1,9 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useMemo, useState, useEffect } from "react"
-import { useSelector, useDispatch } from "react-redux"
-import { clearErrors, addError } from "actions/errors"
-import { showModal } from "actions/modals"
+import useEditorStore from "stores/editorStore"
 import ResourceTemplateChoiceModal from "../ResourceTemplateChoiceModal"
 import { getTerm, getContextValues } from "utilities/QuestioningAuthority"
 import useRdfResource from "hooks/useRdfResource"
@@ -11,18 +9,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCopy } from "@fortawesome/free-solid-svg-icons"
 import _ from "lodash"
 import { datasetFromN3 } from "utilities/Utilities"
-import { selectSearchUri, selectSearchResults } from "selectors/search"
+import useSearchStore from "stores/searchStore"
 import useAlerts from "hooks/useAlerts"
 import { searchQARetrieveErrorKey } from "utilities/errorKeyFactory"
 
 const QASearchResults = () => {
-  const dispatch = useDispatch()
   const errorKey = useAlerts()
 
-  const searchResults = useSelector((state) =>
-    selectSearchResults(state, "resource")
-  )
-  const searchUri = useSelector((state) => selectSearchUri(state, "resource"))
+  const searchResults = useSearchStore((state) => state.resource?.results)
+  const searchUri = useSearchStore((state) => state.resource?.uri)
 
   const [resourceURI, setResourceURI] = useState(null)
   // Resource ID is for handling non-LD QA authorities, e.g., Discog
@@ -41,26 +36,29 @@ const QASearchResults = () => {
     if (!resourceURI || !searchUri) {
       return
     }
-    dispatch(clearErrors(errorKey))
+    useEditorStore.getState().clearErrors(errorKey)
     getTerm(resourceURI, resourceId, searchUri)
       .then((resourceN3) => {
         datasetFromN3(resourceN3)
           .then((newDataset) => setDataset(newDataset))
           .catch((err) =>
-            dispatch(
-              addError(
+            useEditorStore
+              .getState()
+              .addError(
                 errorKey,
                 `Error parsing resource: ${err.message || err}`
               )
-            )
           )
       })
       .catch((err) =>
-        dispatch(
-          addError(errorKey, `Error retrieving resource: ${err.message || err}`)
-        )
+        useEditorStore
+          .getState()
+          .addError(
+            errorKey,
+            `Error retrieving resource: ${err.message || err}`
+          )
       )
-  }, [dispatch, resourceId, resourceURI, searchUri, errorKey])
+  }, [resourceId, resourceURI, searchUri, errorKey])
 
   // Transform the results into the format to be displayed in the table.
   const tableData = useMemo(() => {
@@ -94,7 +92,7 @@ const QASearchResults = () => {
     setResourceURI(uri)
     setResourceId(id)
     setResourceTemplateId(null)
-    dispatch(showModal("ResourceTemplateChoiceModal"))
+    useEditorStore.getState().showModal("ResourceTemplateChoiceModal")
   }
 
   // Passed into resource template chooser to allow it to pass back selected resource template id.

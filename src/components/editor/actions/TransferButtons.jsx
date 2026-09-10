@@ -1,20 +1,21 @@
 import React, { useMemo } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import { selectNormSubject } from "selectors/resources"
-import { selectGroups } from "selectors/authenticate"
+import useAuthenticateStore from "stores/authenticateStore"
 import Config from "Config"
 import TransferModal from "./TransferModal"
-import { showModal } from "actions/modals"
+import useEditorStore from "stores/editorStore"
 import useAlerts from "hooks/useAlerts"
 import { isBfInstance } from "utilities/Bibframe"
 import _ from "lodash"
 
 const TransferButtons = ({ resourceKey }) => {
-  const dispatch = useDispatch()
   const errorKey = useAlerts()
-  const resource = useSelector((state) => selectNormSubject(state, resourceKey))
-  const userGroups = useSelector((state) => selectGroups(state))
+  const resource = useEntitiesStore((state) =>
+    selectNormSubject(state, resourceKey)
+  )
+  const userGroups = useAuthenticateStore((state) => state.user?.groups)
 
   const transferTargets = useMemo(() => {
     const newTargets = []
@@ -39,7 +40,7 @@ const TransferButtons = ({ resourceKey }) => {
     const modalName = `TransferModal-${target}-${group}-${resourceKey}`
 
     const handleClick = (event) => {
-      dispatch(showModal(modalName))
+      useEditorStore.getState().showModal(modalName)
       event.preventDefault()
     }
 

@@ -1,19 +1,31 @@
 import { validateTemplates } from "actionCreators/templateValidationHelpers"
 import Config from "Config"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import ResourceBuilder from "resourceBuilderUtils"
+import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
 }))
 
+afterEach(() => {
+  useEditorStore.setState({ errors: {}, successes: {} })
+  useEntitiesStore.setState({
+    subjects: {},
+    properties: {},
+    values: {},
+    subjectTemplates: {},
+    propertyTemplates: {},
+    versions: {},
+    relationships: {},
+  })
+})
+
 // This forces Sinopia server to use fixtures
 jest.spyOn(Config, "useResourceTemplateFixtures", "get").mockReturnValue(true)
 
 const build = new ResourceBuilder()
-const mockStore = configureMockStore([thunk])
 
 describe("validateTemplates()", () => {
   describe("a valid template", () => {
@@ -77,15 +89,18 @@ describe("validateTemplates()", () => {
     })
 
     it("returns no errors", async () => {
-      const store = mockStore(createState())
+      createState()
 
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        true
+      )
+      // Templates were added to Zustand entities store during validation
       expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(true)
-      expect(store.getActions()).toHaveAction("ADD_TEMPLATES")
-      expect(store.getActions()).not.toHaveAction("ADD_ERROR")
+        Object.keys(useEntitiesStore.getState().subjectTemplates).length
+      ).toBeGreaterThan(0)
+      expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
+        0
+      )
     })
   })
 
@@ -103,28 +118,32 @@ describe("validateTemplates()", () => {
     }
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload1 = {
         errorKey: "testerrorkey",
         error: "Resource template id is missing from resource template.",
       }
-      expect(store.getActions()).toHaveAction("ADD_ERROR", payload1)
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        payload1.error
+      )
       const payload2 = {
         errorKey: "testerrorkey",
         error: "Resource template class is missing from resource template.",
       }
-      expect(store.getActions()).toHaveAction("ADD_ERROR", payload2)
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        payload2.error
+      )
       const payload3 = {
         errorKey: "testerrorkey",
         error: "Resource template label is missing from resource template.",
       }
-      expect(store.getActions()).toHaveAction("ADD_ERROR", payload3)
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        payload3.error
+      )
     })
   })
 
@@ -147,18 +166,18 @@ describe("validateTemplates()", () => {
     subjectTemplate.propertyTemplates[0].uris = undefined
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload = {
         errorKey: "testerrorkey",
         error: "Property template URI is required.",
       }
-      expect(store.getActions()).toHaveAction("ADD_ERROR", payload)
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        payload.error
+      )
     })
   })
 
@@ -184,31 +203,35 @@ describe("validateTemplates()", () => {
     subjectTemplate.propertyTemplates[0].type = null
     subjectTemplate.propertyTemplates[0].component = null
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload1 = {
         errorKey: "testerrorkey",
         error:
           "Property template label is required for http://id.loc.gov/ontologies/bibframe/mainTitle.",
       }
-      expect(store.getActions()).toHaveAction("ADD_ERROR", payload1)
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        payload1.error
+      )
       const payload2 = {
         errorKey: "testerrorkey",
         error:
           "Cannot determine type for http://id.loc.gov/ontologies/bibframe/mainTitle. Must be resource, lookup, or literal.",
       }
-      expect(store.getActions()).toHaveAction("ADD_ERROR", payload2)
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        payload2.error
+      )
       const payload3 = {
         errorKey: "testerrorkey",
         error:
           "Cannot determine component for http://id.loc.gov/ontologies/bibframe/mainTitle.",
       }
-      expect(store.getActions()).toHaveAction("ADD_ERROR", payload3)
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        payload3.error
+      )
     })
   })
 
@@ -233,19 +256,19 @@ describe("validateTemplates()", () => {
     })
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload = {
         errorKey: "testerrorkey",
         error:
           "Misconfigured authority xurn:ld4p:sinopia:bibframe:instance for http://id.loc.gov/ontologies/bibframe/instanceOf.",
       }
-      expect(store.getActions()).toHaveAction("ADD_ERROR", payload)
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        payload.error
+      )
     })
   })
 
@@ -284,19 +307,19 @@ describe("validateTemplates()", () => {
     })
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload = {
         errorKey: "testerrorkey",
         error:
           "A property template may not use the same property URI as another property template (http://id.loc.gov/ontologies/bibframe/geographicCoverage) unless both propery templates are of type nested resource and the nested resources are of different classes.",
       }
-      expect(store.getActions()).toHaveAction("ADD_ERROR", payload)
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        payload.error
+      )
     })
   })
 
@@ -330,19 +353,19 @@ describe("validateTemplates()", () => {
     })
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload = {
         errorKey: "testerrorkey",
         error:
           "A property template may not use the same property URI as another property template (http://sinopia.io/testing/DupeProperties/property1) unless both propery templates are of type nested resource and the nested resources are of different classes.",
       }
-      expect(store.getActions()).toHaveAction("ADD_ERROR", payload)
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        payload.error
+      )
     })
   })
 
@@ -376,13 +399,11 @@ describe("validateTemplates()", () => {
     })
 
     it("does not return returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(true)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        true
+      )
     })
   })
 
@@ -418,13 +439,11 @@ describe("validateTemplates()", () => {
     })
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
     })
   })
 
@@ -457,13 +476,11 @@ describe("validateTemplates()", () => {
     })
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
     })
   })
 
@@ -500,19 +517,19 @@ describe("validateTemplates()", () => {
     })
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload = {
         errorKey: "testerrorkey",
         error:
           "The following referenced resource templates are not available in Sinopia: lc:RT:bf2:Identifiers:Barcode, lc:RT:bf2:Identifiers:Copyright",
       }
-      expect(store.getActions()).toHaveAction("ADD_ERROR", payload)
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        payload.error
+      )
     }, 10000)
   })
 
@@ -543,19 +560,19 @@ describe("validateTemplates()", () => {
     })
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload = {
         errorKey: "testerrorkey",
         error:
           "The following resource templates references for http://id.loc.gov/ontologies/bibframe/genreForm have the same class (http://id.loc.gov/ontologies/bibframe/GenreForm), but must be unique: ld4p:RT:bf2:Form, ld4p:RT:bf2:RareMat:RBMS",
       }
-      expect(store.getActions()).toHaveAction("ADD_ERROR", payload)
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        payload.error
+      )
     })
   })
 
@@ -590,14 +607,14 @@ describe("validateTemplates()", () => {
     })
 
     it("returns no errors", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(true)
-      expect(store.getActions()).not.toHaveAction("ADD_ERROR")
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        true
+      )
+      expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
+        0
+      )
     })
   })
 
@@ -613,19 +630,19 @@ describe("validateTemplates()", () => {
     })
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload = {
         errorKey: "testerrorkey",
         error:
           "A suppressible template cannot contain more than one property template.",
       }
-      expect(store.getActions()).toHaveAction("ADD_ERROR", payload)
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        payload.error
+      )
     })
   })
 
@@ -651,19 +668,19 @@ describe("validateTemplates()", () => {
     })
 
     it("returns error", async () => {
-      const store = mockStore(createState())
+      createState()
 
-      expect(
-        await store.dispatch(
-          validateTemplates(subjectTemplate, {}, "testerrorkey")
-        )
-      ).toBe(false)
+      expect(await validateTemplates(subjectTemplate, {}, "testerrorkey")).toBe(
+        false
+      )
       const payload = {
         errorKey: "testerrorkey",
         error:
           "The property for a suppressible template must be a URI or lookup.",
       }
-      expect(store.getActions()).toHaveAction("ADD_ERROR", payload)
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        payload.error
+      )
     })
   })
 })

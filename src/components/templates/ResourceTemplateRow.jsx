@@ -1,7 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import LongDate from "components/LongDate"
 import usePermissions from "hooks/usePermissions"
@@ -19,7 +19,7 @@ import useAlerts from "hooks/useAlerts"
 const ResourceTemplateRow = ({ row }) => {
   const { canCreate, canEdit } = usePermissions()
   const errorKey = useAlerts()
-  const groupMap = useSelector((state) => selectGroupMap(state))
+  const groupMap = useEntitiesStore((state) => selectGroupMap(state))
 
   const {
     handleNew,

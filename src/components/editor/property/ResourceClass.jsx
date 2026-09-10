@@ -1,13 +1,11 @@
 import React from "react"
-import { useDispatch, useSelector } from "react-redux"
 import PropTypes from "prop-types"
 import { selectSubjectTemplate } from "selectors/templates"
-import { setClasses } from "actions/resources"
+import useEntitiesStore from "stores/entitiesStore"
 import _ from "lodash"
 
 const ResourceClass = ({ resource, readOnly }) => {
-  const dispatch = useDispatch()
-  const subjectTemplate = useSelector((state) =>
+  const subjectTemplate = useEntitiesStore((state) =>
     selectSubjectTemplate(state, resource?.subjectTemplateKey)
   )
 
@@ -26,16 +24,16 @@ const ResourceClass = ({ resource, readOnly }) => {
 
   const handleCheckboxClick = (event) => {
     if (resource.classes.includes(event.target.value)) {
-      dispatch(
-        setClasses(
+      useEntitiesStore
+        .getState()
+        .setClasses(
           resource.key,
           _.without(resource.classes, event.target.value)
         )
-      )
     } else {
-      dispatch(
-        setClasses(resource.key, [...resource.classes, event.target.value])
-      )
+      useEntitiesStore
+        .getState()
+        .setClasses(resource.key, [...resource.classes, event.target.value])
     }
   }
 

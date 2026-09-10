@@ -2,48 +2,41 @@
 
 import React, { useEffect, useRef, useState, useCallback } from "react"
 import { getTemplateSearchResults } from "sinopiaSearch"
-import { useDispatch, useSelector } from "react-redux"
-import {
-  clearSearchResults as clearSearchResultsAction,
-  setSearchResults,
-} from "actions/search"
+import useSearchStore from "stores/searchStore"
+import useEditorStore from "stores/editorStore"
 import SinopiaResourceTemplates from "./SinopiaResourceTemplates"
 import SearchResultsPaging from "components/search/SearchResultsPaging"
 import NewResourceTemplateButton from "./NewResourceTemplateButton"
-import {
-  selectSearchQuery,
-  selectSearchOptions,
-  selectSearchTotalResults,
-} from "selectors/search"
-import { clearErrors, addError } from "actions/errors"
+import { defaultSearchResultsPerPage } from "utilities/Search"
 import PropTypes from "prop-types"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons"
 import useAlerts from "hooks/useAlerts"
 
 const TemplateSearch = (props) => {
-  const dispatch = useDispatch()
   const errorKey = useAlerts()
   // Tokens allow us to cancel an existing search. Does not actually stop the
   // search, but causes result to be ignored.
   const tokens = useRef([])
 
-  const lastQueryString = useSelector((state) =>
-    selectSearchQuery(state, "template")
+  const lastQueryString = useSearchStore((state) => state.template?.query)
+  const searchOptions = useSearchStore(
+    (state) =>
+      state.template?.options || {
+        startOfRange: 0,
+        resultsPerPage: defaultSearchResultsPerPage("template"),
+      }
   )
-  const searchOptions = useSelector((state) =>
-    selectSearchOptions(state, "template")
-  )
-  const totalResults = useSelector((state) =>
-    selectSearchTotalResults(state, "template")
+  const totalResults = useSearchStore(
+    (state) => state.template?.totalResults || 0
   )
 
   const [queryString, setQueryString] = useState(lastQueryString || "")
   const [startOfRange, setStartOfRange] = useState(0)
 
   const clearSearchResults = useCallback(
-    () => dispatch(clearSearchResultsAction("template")),
-    [dispatch]
+    () => useSearchStore.getState().clearSearchResults("template"),
+    []
   )
 
   useEffect(() => {
@@ -61,9 +54,10 @@ const TemplateSearch = (props) => {
     tokens.current.push(token)
     getTemplateSearchResults(queryString, { startOfRange }).then((response) => {
       if (!token.cancel) {
-        if (queryString !== "") dispatch(clearErrors(errorKey))
-        dispatch(
-          setSearchResults(
+        if (queryString !== "") useEditorStore.getState().clearErrors(errorKey)
+        useSearchStore
+          .getState()
+          .setSearchResults(
             "template",
             null,
             response.results,
@@ -73,18 +67,17 @@ const TemplateSearch = (props) => {
             { startOfRange },
             response.error
           )
-        )
         if (response.error) {
-          dispatch(
-            addError(
+          useEditorStore
+            .getState()
+            .addError(
               errorKey,
               `Error searching for templates: ${response.error}`
             )
-          )
         }
       }
     })
-  }, [dispatch, queryString, startOfRange, errorKey])
+  }, [queryString, startOfRange, errorKey])
 
   const changePage = (startOfRange) => {
     setStartOfRange(startOfRange)

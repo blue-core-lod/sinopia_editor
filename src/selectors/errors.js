@@ -1,30 +1,10 @@
 import { selectProperty, selectSubject, selectNormSubject } from "./resources"
 import _ from "lodash"
 
-/**
- * Determines if resource validation should be displayed.
- * @param {Object} state the redux state
- * @param {string} resourceKey of the resource to check; if omitted, current resource key is used
- * @return {boolean} true if resource validations should be displayed
- */
-export const displayResourceValidations = (state, resourceKey) =>
-  !!state.editor.resourceValidation[resourceKey]
-
 export const hasValidationErrors = (state, resourceKey) => {
   const subject = selectNormSubject(state, resourceKey)
   return !_.isEmpty(subject?.descWithErrorPropertyKeys)
 }
-
-/**
- * @returns {function} a function that returns the errors for an error key
- */
-export const selectErrors = (state, errorKey) => state.editor.errors[errorKey]
-
-/**
- * @returns {Array} the success messages for a given success key
- */
-export const selectSuccesses = (state, successKey) =>
-  state.editor.successes?.[successKey]
 
 export const selectValidationErrors = (state, resourceKey) => {
   const subject = selectSubject(state, resourceKey)

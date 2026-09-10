@@ -2,11 +2,9 @@
 
 import React, { useEffect, useState } from "react"
 import PropTypes from "prop-types"
-import { useSelector, useDispatch } from "react-redux"
 import { Link } from "react-router-dom"
 import { newResource } from "actionCreators/resources"
-import { selectErrors } from "selectors/errors"
-import { selectCurrentResourceKey } from "selectors/resources"
+import useEditorStore from "stores/editorStore"
 import _ from "lodash"
 import Config from "Config"
 import usePermissions from "hooks/usePermissions"
@@ -15,14 +13,13 @@ import { useKeycloak } from "../../KeycloakContext"
 import LoadingButton from "../buttons/LoadingButton"
 
 const NewResourceTemplateButton = (props) => {
-  const dispatch = useDispatch()
   const { keycloak } = useKeycloak()
   const { canCreate } = usePermissions()
   const errorKey = useAlerts()
   const [isLoading, setIsLoading] = useState(false)
 
-  const errors = useSelector((state) => selectErrors(state, errorKey))
-  const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
+  const errors = useEditorStore((state) => state.errors[errorKey])
+  const resourceKey = useEditorStore((state) => state.currentResource)
 
   const [navigateEditor, setNavigateEditor] = useState(false)
 
@@ -36,11 +33,11 @@ const NewResourceTemplateButton = (props) => {
   const handleClick = (event) => {
     event.preventDefault()
     setIsLoading(true)
-    dispatch(
-      newResource(Config.rootResourceTemplateId, errorKey, true, keycloak)
-    ).then((result) => {
-      setNavigateEditor(result)
-    })
+    newResource(Config.rootResourceTemplateId, errorKey, true, keycloak).then(
+      (result) => {
+        setNavigateEditor(result)
+      }
+    )
   }
 
   if (!canCreate) return null

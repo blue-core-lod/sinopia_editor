@@ -3,9 +3,15 @@
 import { fireEvent, waitFor, screen } from "@testing-library/react"
 import { createStore, renderApp, createHistory } from "testUtils"
 import { createState } from "stateUtils"
+import useEntitiesStore from "stores/entitiesStore"
 import fetchMock from "fetch-mock-jest"
 import { featureSetup, resourceHeaderSelector } from "featureUtils"
 import * as sinopiaApi from "sinopiaApi"
+import useSearchStore from "stores/searchStore"
+
+afterEach(() => {
+  useSearchStore.setState({ resource: null, template: null })
+})
 
 const mockUseKeycloak = jest.fn()
 
@@ -35,17 +41,18 @@ describe("<App />", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockUseKeycloak.mockReturnValue({
-      keycloak: {
-        authenticated: false,
-      },
+      keycloak: {},
     })
   })
 
   it("loads languages", async () => {
-    const store = createStore()
-    renderApp(store)
+    renderApp()
 
-    await waitFor(() => store.getState().entities.languages.size > 0)
+    // Languages are loaded via Zustand - check the store directly
+    await waitFor(() => {
+      const languages = useEntitiesStore.getState().languages
+      expect(Object.keys(languages).length).toBeGreaterThan(0)
+    })
   })
 
   it("sets app version", async () => {
@@ -183,10 +190,32 @@ describe("<App />", () => {
     })
 
     it("renders search results for /search", () => {
-      const state = createState({ hasSearchResults: true })
-      const store = createStore(state)
+      useSearchStore.setState({
+        resource: {
+          uri: "urn:ld4p:sinopia",
+          results: [
+            {
+              uri: "http://localhost:3000/resource/4ea0b514-0475-48c6-a076-7ed30ab4d6f4",
+              label: "Foo1",
+              modified: "2021-10-12T21:29:51.950Z",
+              type: ["http://foo/bar"],
+              group: "stanford",
+              editGroups: [],
+            },
+          ],
+          totalResults: 1,
+          facetResults: {
+            types: [{ key: "http://foo/bar", doc_count: 1 }],
+            groups: [{ key: "stanford", doc_count: 1 }],
+          },
+          query: "*",
+          options: { resultsPerPage: 10, startOfRange: 0 },
+          relationshipResults: {},
+        },
+      })
+
       const history = createHistory(["/search"])
-      renderApp(store, history)
+      renderApp(null, history)
 
       screen.getByText("Filter by")
     })

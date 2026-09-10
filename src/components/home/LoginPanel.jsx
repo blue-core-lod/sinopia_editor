@@ -1,25 +1,20 @@
 import React, { useState } from "react"
-import { useSelector, useDispatch } from "react-redux"
-import { hasUser as hasUserSelector } from "selectors/authenticate"
+import useAuthenticateStore from "stores/authenticateStore"
 import { signIn } from "actionCreators/authenticate"
 import { useKeycloak } from "../../KeycloakContext"
-import Config from "Config"
-import { selectErrors } from "selectors/errors"
+import useEditorStore from "stores/editorStore"
 import _ from "lodash"
 import { signInErrorKey } from "utilities/errorKeyFactory"
 
 const LoginPanel = () => {
-  const dispatch = useDispatch()
-  const hasUser = useSelector((state) => hasUserSelector(state))
+  const hasUser = useAuthenticateStore((state) => !!state.user)
 
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
 
   const { keycloak } = useKeycloak()
 
-  const error = _.first(
-    useSelector((state) => selectErrors(state, signInErrorKey))
-  )
+  const error = _.first(useEditorStore((state) => state.errors[signInErrorKey]))
 
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -27,7 +22,7 @@ const LoginPanel = () => {
       "resource"
     )
     const redirectUri = resourceParam ? window.location.href : undefined
-    dispatch(signIn(keycloak, signInErrorKey, redirectUri))
+    signIn(keycloak, signInErrorKey, redirectUri)
   }
 
   if (hasUser) return null

@@ -4,17 +4,15 @@ import React from "react"
 import PropTypes from "prop-types"
 import { Link } from "react-router-dom"
 import Config from "Config"
-import { connect } from "react-redux"
-import { selectUser } from "selectors/authenticate"
 import { signOut } from "actionCreators/authenticate"
 import { useKeycloak } from "../../KeycloakContext"
-
-import { bindActionCreators } from "redux"
+import useAuthenticateStore from "stores/authenticateStore"
 
 const bcLogo = require("../../styles/bluecore-small.png")
 
 const Header = (props) => {
   const { keycloak } = useKeycloak()
+  const currentUser = useAuthenticateStore((state) => state.user)
 
   return (
     <div className="navbar homepage-navbar">
@@ -31,11 +29,11 @@ const Header = (props) => {
         </a>
       </div>
       <ul className="nav">
-        {props.currentUser && (
+        {currentUser && (
           <React.Fragment>
             <li className="nav-item">
               <span className="nav-link editor-header-user">
-                {props.currentUser.username}
+                {currentUser.username}
               </span>
             </li>
             <div className="nav-link">•</div>
@@ -46,7 +44,7 @@ const Header = (props) => {
             </li>
           </React.Fragment>
         )}
-        {props.currentUser && <div className="nav-link">•</div>}
+        {currentUser && <div className="nav-link">•</div>}
         <li className="menu nav-item">
           <a
             href="#"
@@ -56,13 +54,13 @@ const Header = (props) => {
             Help
           </a>
         </li>
-        {props.currentUser && <div className="nav-link">•</div>}
-        {props.currentUser && (
+        {currentUser && <div className="nav-link">•</div>}
+        {currentUser && (
           <li className="nav-item">
             <a
               href="#"
               className="nav-link editor-header-logout"
-              onClick={() => props.signOut(keycloak)}
+              onClick={() => signOut(keycloak)}
             >
               Logout
             </a>
@@ -75,15 +73,6 @@ const Header = (props) => {
 
 Header.propTypes = {
   triggerHomePageMenu: PropTypes.func,
-  currentUser: PropTypes.object,
-  signOut: PropTypes.func,
 }
 
-const mapStateToProps = (state) => ({
-  currentUser: selectUser(state),
-})
-
-const mapDispatchToProps = (dispatch) =>
-  bindActionCreators({ signOut }, dispatch)
-
-export default connect(mapStateToProps, mapDispatchToProps)(Header)
+export default Header

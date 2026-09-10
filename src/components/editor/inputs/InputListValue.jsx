@@ -1,9 +1,9 @@
 import React, { useRef, useEffect, useState, useMemo } from "react"
-import { useDispatch, useSelector, shallowEqual } from "react-redux"
+import { shallow } from "zustand/shallow"
 import PropTypes from "prop-types"
-import { updateURIValue, removeValue } from "actions/resources"
 import { fetchLookup } from "actionCreators/lookups"
 import { selectLookup } from "selectors/lookups"
+import useEntitiesStore from "stores/entitiesStore"
 import RemoveButton from "./RemoveButton"
 import ValuePropertyURI from "../property/ValuePropertyURI"
 import _ from "lodash"
@@ -14,19 +14,18 @@ const InputListValue = ({
   displayValidations,
   shouldFocus,
 }) => {
-  const dispatch = useDispatch()
   const inputLiteralRef = useRef(null)
   const [focusHasBeenSet, setFocusHasBeenSet] = useState(false)
   const id = `inputlist-${value.key}`
 
   // Map of authority URIs to authority values
-  const authorityMap = useSelector((state) => {
+  const authorityMap = useEntitiesStore((state) => {
     const newAuthorityMap = {}
     propertyTemplate.authorities.forEach((authority) => {
       newAuthorityMap[authority.uri] = selectLookup(state, authority.uri)
     })
     return newAuthorityMap
-  }, shallowEqual)
+  }, shallow)
 
   // Map of URIs to authority items
   const itemMap = useMemo(() => {
@@ -49,21 +48,25 @@ const InputListValue = ({
   // Retrieve the lookups
   useEffect(() => {
     propertyTemplate.authorities.forEach((authority) => {
-      dispatch(fetchLookup(authority.uri))
+      fetchLookup(authority.uri)
     })
-  }, [dispatch, propertyTemplate.authorities])
+  }, [propertyTemplate.authorities])
 
   const handleRemoveClick = (event) => {
-    dispatch(removeValue(value.key))
+    useEntitiesStore.getState().removeValue(value.key)
     event.preventDefault()
   }
 
   const handleChange = (event) => {
     const item = itemMap[event.target.value]
     if (item)
-      dispatch(
-        updateURIValue(value.key, item.uri, item.label, null, "InputURIValue")
-      )
+      useEntitiesStore.getState().updateValue({
+        valueKey: value.key,
+        uri: item.uri || null,
+        label: item.label || null,
+        lang: null,
+        component: "InputURIValue",
+      })
     event.preventDefault()
   }
 

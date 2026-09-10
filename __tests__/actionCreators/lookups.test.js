@@ -1,13 +1,10 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import { fetchLookup } from "actionCreators/lookups"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { nanoid } from "nanoid"
 import "isomorphic-fetch"
 import { createState } from "stateUtils"
-
-const mockStore = configureMockStore([thunk])
+import useEntitiesStore from "stores/entitiesStore"
 
 jest.mock("nanoid")
 nanoid.mockReturnValue("abc123")
@@ -77,11 +74,10 @@ describe("fetchLookup", () => {
       .fn()
       .mockImplementation(() => Promise.resolve({ json: () => carriers }))
 
-    const store = mockStore(createState())
-    await store.dispatch(fetchLookup(uri))
+    createState()
+    await fetchLookup(uri)
 
-    const actions = store.getActions()
-    const lookup = [
+    const expectedLookup = [
       {
         id: "abc123",
         label: "flipchart",
@@ -93,12 +89,7 @@ describe("fetchLookup", () => {
         uri: "http://id.loc.gov/vocabulary/carriers/nz",
       },
     ]
-    expect(actions).toEqual([
-      {
-        type: "LOOKUP_OPTIONS_RETRIEVED",
-        payload: { uri, lookup },
-      },
-    ])
+    expect(useEntitiesStore.getState().lookups[uri]).toEqual(expectedLookup)
   })
 
   it("handles fetch error and adds to state", async () => {
@@ -106,20 +97,14 @@ describe("fetchLookup", () => {
       .fn()
       .mockImplementation(() => Promise.reject(new Error("fail")))
 
-    const store = mockStore(createState())
-    await store.dispatch(fetchLookup(uri))
+    createState()
+    await fetchLookup(uri)
 
-    const actions = store.getActions()
-    const lookup = [
+    const expectedLookup = [
       {
         isError: true,
       },
     ]
-    expect(actions).toEqual([
-      {
-        type: "LOOKUP_OPTIONS_RETRIEVED",
-        payload: { uri, lookup },
-      },
-    ])
+    expect(useEntitiesStore.getState().lookups[uri]).toEqual(expectedLookup)
   })
 })

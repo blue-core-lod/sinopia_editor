@@ -2,9 +2,13 @@ import React from "react"
 import SinopiaSort from "components/search/SinopiaSort"
 import * as server from "sinopiaSearch"
 import { fireEvent, screen } from "@testing-library/react"
-import { createStore, renderComponent } from "testUtils"
-import { createState } from "stateUtils"
+import { renderComponent } from "testUtils"
+import useSearchStore from "stores/searchStore"
 import { putUserHistory } from "../../../src/sinopiaApi"
+
+afterEach(() => {
+  useSearchStore.setState({ resource: null, template: null })
+})
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -28,16 +32,18 @@ describe("<SinopiaSort />", () => {
   })
 
   it("renders with selected sort order", () => {
-    const state = createState()
-    state.search.resource = {
-      options: {
-        sortField: "label",
-        sortOrder: "asc",
+    useSearchStore.setState({
+      resource: {
+        options: {
+          sortField: "label",
+          sortOrder: "asc",
+        },
+        relationshipResults: {},
+        facetResults: {},
       },
-    }
-    const store = createStore(state)
+    })
 
-    renderComponent(<SinopiaSort />, store)
+    renderComponent(<SinopiaSort />)
 
     screen.getByText("Label, ascending", { selector: ".active" })
   })
@@ -61,18 +67,19 @@ describe("<SinopiaSort />", () => {
       },
     ])
 
-    const state = createState()
-    state.search.resource = {
-      query: "twain",
-      options: {
-        startOfRange: 10,
-        resultsPerPage: 15,
+    useSearchStore.setState({
+      resource: {
+        query: "twain",
+        options: {
+          startOfRange: 10,
+          resultsPerPage: 15,
+        },
+        relationshipResults: {},
+        facetResults: {},
       },
-    }
+    })
 
-    const store = createStore(state)
-
-    renderComponent(<SinopiaSort />, store)
+    renderComponent(<SinopiaSort />)
 
     fireEvent.click(screen.getByText("Sort by"))
     fireEvent.click(screen.getByText("Label, ascending"))

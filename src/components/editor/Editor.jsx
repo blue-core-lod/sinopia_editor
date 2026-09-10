@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react"
 import PropTypes from "prop-types"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import ResourceComponent from "./ResourceComponent"
 import Header from "../Header"
 import GroupChoiceModal from "./GroupChoiceModal"
@@ -10,11 +10,9 @@ import EditorActions from "./EditorActions"
 import ErrorMessages from "./ErrorMessages"
 import ContextSuccess from "components/alerts/ContextSuccess"
 import ResourcesNav from "./ResourcesNav"
-import {
-  displayResourceValidations,
-  hasValidationErrors as hasValidationErrorsSelector,
-} from "selectors/errors"
-import { selectCurrentResourceKey, selectResourceId } from "selectors/resources"
+import { hasValidationErrors as hasValidationErrorsSelector } from "selectors/errors"
+import { selectResourceId } from "selectors/resources"
+import useEditorStore from "stores/editorStore"
 import { useHistory, useRouteMatch } from "react-router-dom"
 import EditorPreviewModal from "./preview/EditorPreviewModal"
 import { selectSubjectTemplateForSubject } from "selectors/templates"
@@ -32,20 +30,20 @@ const Editor = (props) => {
   })
   const editorResourceMatch = useRouteMatch("/editor/resource/:resourceId")
 
-  const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
+  const resourceKey = useEditorStore((state) => state.currentResource)
   // Resource ID is extracted from the URI. Presence indicates the resource has been saved.
-  const resourceId = useSelector((state) =>
+  const resourceId = useEntitiesStore((state) =>
     selectResourceId(state, resourceKey)
   )
-  const subjectTemplate = useSelector((state) =>
+  const subjectTemplate = useEntitiesStore((state) =>
     selectSubjectTemplateForSubject(state, resourceKey)
   )
   const subjectTemplateKey = subjectTemplate?.key
 
-  const displayErrors = useSelector((state) =>
-    displayResourceValidations(state, resourceKey)
+  const displayErrors = useEditorStore(
+    (state) => !!state.resourceValidation[resourceKey]
   )
-  const hasValidationErrors = useSelector((state) =>
+  const hasValidationErrors = useEntitiesStore((state) =>
     hasValidationErrorsSelector(state, resourceKey)
   )
 

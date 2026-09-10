@@ -1,11 +1,11 @@
 // Copyright 2019 Stanford University see LICENSE for license
 import React from "react"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import { selectGroupMap } from "selectors/groups"
 import SearchFilter from "./SearchFilter"
 
 const GroupFilter = () => {
-  const groupMap = useSelector((state) => selectGroupMap(state))
+  const groupMap = useEntitiesStore((state) => selectGroupMap(state))
 
   const filterLabelFunc = (key) => groupMap[key] || "Unknown"
 

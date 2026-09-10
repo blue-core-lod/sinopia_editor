@@ -1,20 +1,17 @@
-import { useDispatch, useSelector } from "react-redux"
-import { clearResource } from "actions/resources"
-import { selectResourceKeys } from "selectors/resources"
+import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 import { useHistory } from "react-router-dom"
 
 const useEditor = (resourceKey) => {
-  const dispatch = useDispatch()
   const history = useHistory()
 
-  const resourceKeyCount = useSelector(
-    (state) => selectResourceKeys(state).length
-  )
+  const resourceKeyCount = useEditorStore((state) => state.resources.length)
 
   const handleCloseResource = (event) => {
     if (event) event.preventDefault()
 
-    dispatch(clearResource(resourceKey))
+    useEditorStore.getState().clearResource(resourceKey)
+    useEntitiesStore.getState().clearResource(resourceKey)
     // If this is the last resource, then return to dashboard.
     if (resourceKeyCount <= 1) history.push("/dashboard")
   }

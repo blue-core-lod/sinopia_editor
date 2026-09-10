@@ -1,20 +1,17 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useState } from "react"
-import { useDispatch } from "react-redux"
 import ModalWrapper from "components/ModalWrapper"
 import PropTypes from "prop-types"
-import { hideModal } from "actions/modals"
+import useEditorStore from "stores/editorStore"
 import InputTemplate from "./InputTemplate"
 
 const ResourceTemplateChoiceModal = (props) => {
-  const dispatch = useDispatch()
-
   const [selectedValue, setSelectedValue] = useState(undefined)
 
   const close = (event) => {
     event.preventDefault()
-    dispatch(hideModal())
+    useEditorStore.getState().hideModal()
   }
 
   const saveAndClose = (event) => {

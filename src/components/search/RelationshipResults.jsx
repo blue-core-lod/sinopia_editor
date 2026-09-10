@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react"
-import { useSelector, useDispatch } from "react-redux"
 import PropTypes from "prop-types"
-import { selectSearchRelationships } from "selectors/relationships"
+import useSearchStore from "stores/searchStore"
 import { fetchResource } from "sinopiaApi"
 import rdf from "rdf-ext"
 import { labelFromDataset } from "utilities/Bibframe"
 import useAlerts from "hooks/useAlerts"
 import usePermissions from "hooks/usePermissions"
 import SearchResultRow from "./SearchResultRow"
-import { addError } from "actions/errors"
+import useEditorStore from "stores/editorStore"
 import _ from "lodash"
 
 const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
@@ -26,10 +25,9 @@ const rowFromDataset = (uri, dataset, response) => ({
 })
 
 const RelationshipResults = ({ uri }) => {
-  const dispatch = useDispatch()
   const errorKey = useAlerts()
-  const relationships = useSelector((state) =>
-    selectSearchRelationships(state, uri)
+  const relationships = useSearchStore(
+    (state) => state.resource?.relationshipResults?.[uri]
   )
   const { canEdit, canCreate } = usePermissions()
 
@@ -53,12 +51,12 @@ const RelationshipResults = ({ uri }) => {
             rowFromDataset(refUri, dataset, response)
           )
           .catch((err) => {
-            dispatch(
-              addError(
+            useEditorStore
+              .getState()
+              .addError(
                 errorKey,
                 `Error getting relationship ${refUri}: ${err.message || err}`
               )
-            )
             return null
           })
       )
@@ -70,7 +68,7 @@ const RelationshipResults = ({ uri }) => {
       })
       setResourceRowMap(newResourceRowMap)
     })
-  }, [relationships, isMounted, errorKey, dispatch])
+  }, [relationships, isMounted, errorKey])
 
   const relationshipList = (label, refs) => {
     if (_.isEmpty(refs)) return null

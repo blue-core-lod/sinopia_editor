@@ -4,6 +4,7 @@ import { createStore, renderComponent } from "testUtils"
 import { screen } from "@testing-library/react"
 import { createState } from "stateUtils"
 import { selectSubjectAndPropertyTemplates } from "selectors/templates"
+import useEntitiesStore from "stores/entitiesStore"
 import PropertyLabelInfoTooltip from "components/editor/property/PropertyLabelInfoTooltip"
 
 let mockKeycloak
@@ -30,7 +31,7 @@ describe("<PropertyLabelInfoTooltip />", () => {
     const state = createState({ hasResourceWithNestedResource: true })
     const store = createStore(state)
     const propertyTemplate = selectSubjectAndPropertyTemplates(
-      state,
+      useEntitiesStore.getState(),
       "resourceTemplate:testing:uber1"
     )
     renderComponent(
@@ -46,7 +47,7 @@ describe("<PropertyLabelInfoTooltip />", () => {
     const state = createState({ hasResourceWithNestedResource: true })
     const store = createStore(state)
     const propertyTemplate = selectSubjectAndPropertyTemplates(
-      state,
+      useEntitiesStore.getState(),
       "resourceTemplate:testing:uber2"
     )
     renderComponent(

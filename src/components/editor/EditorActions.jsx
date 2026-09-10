@@ -1,18 +1,15 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector } from "react-redux"
+import useEditorStore from "stores/editorStore"
 import CloseButton from "./actions/CloseButton"
 import SaveAndPublishButton from "./actions/SaveAndPublishButton"
 import MarcButton from "./actions/MarcButton"
 import TransferButtons from "./actions/TransferButtons"
-import { selectCurrentResourceKey } from "selectors/resources"
 
 // CopyToNewButton and PreviewButton are now called from ResourceComponent
 const EditorActions = () => {
-  const currentResourceKey = useSelector((state) =>
-    selectCurrentResourceKey(state)
-  )
+  const currentResourceKey = useEditorStore((state) => state.currentResource)
 
   return (
     <div className="row">

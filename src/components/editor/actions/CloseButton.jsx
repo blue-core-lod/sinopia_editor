@@ -2,31 +2,26 @@
 
 import React from "react"
 import PropTypes from "prop-types"
-import { useDispatch, useSelector } from "react-redux"
-import {
-  resourceHasChangesSinceLastSave,
-  selectCurrentResourceKey,
-} from "selectors/resources"
+import useEntitiesStore from "stores/entitiesStore"
+import { resourceHasChangesSinceLastSave } from "selectors/resources"
 import CloseResourceModal from "./CloseResourceModal"
-import { showModal } from "actions/modals"
+import useEditorStore from "stores/editorStore"
 import useEditor from "hooks/useEditor"
 
 const CloseButton = (props) => {
-  const dispatch = useDispatch()
-
-  let resourceKey = useSelector((state) => selectCurrentResourceKey(state))
+  let resourceKey = useEditorStore((state) => state.currentResource)
   if (props.resourceKey) {
     resourceKey = props.resourceKey
   }
   const { handleCloseResource } = useEditor(resourceKey)
 
-  const resourceHasChanged = useSelector((state) =>
+  const resourceHasChanged = useEntitiesStore((state) =>
     resourceHasChangesSinceLastSave(state, resourceKey)
   )
 
   const handleClick = (event) => {
     if (resourceHasChanged) {
-      dispatch(showModal(`CloseResourceModal-${resourceKey}`))
+      useEditorStore.getState().showModal(`CloseResourceModal-${resourceKey}`)
     } else {
       handleCloseResource()
     }

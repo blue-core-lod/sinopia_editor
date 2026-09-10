@@ -6,7 +6,6 @@ import {
   setDefaultLang,
 } from "reducers/languages"
 
-import { createReducer } from "reducers/index"
 import { createState } from "stateUtils"
 
 const reducers = {
@@ -14,6 +13,13 @@ const reducers = {
   LANGUAGES_RECEIVED: languagesReceived,
   SET_DEFAULT_LANG: setDefaultLang,
 }
+const createReducer =
+  (handlers) =>
+  (state = {}, action) => {
+    const fn = handlers[action.type]
+    return fn ? fn(state, action) : state
+  }
+
 const reducer = createReducer(reducers)
 
 describe("setLanguage", () => {

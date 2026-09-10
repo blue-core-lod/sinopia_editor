@@ -2,12 +2,11 @@ import { newResource } from "actionCreators/resources"
 import mockConsole from "jest-mock-console"
 import * as sinopiaApi from "sinopiaApi"
 import Config from "Config"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import { nanoid } from "nanoid"
-import { safeAction } from "actionUtils"
-import expectedAction from "../__action_fixtures__/newResource-ADD_SUBJECT"
+import useHistoryStore from "stores/historyStore"
+import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -19,7 +18,8 @@ jest.mock("nanoid")
 // Support mocking/restoring the `console` object
 let restoreConsole = null
 beforeEach(() => {
-  nanoid.mockImplementation(() => "abc123")
+  let nanoidCounter = 0
+  nanoid.mockImplementation(() => `abc${nanoidCounter++}`)
   // Capture and not display console output
   restoreConsole = mockConsole(["error", "debug"])
 })
@@ -29,10 +29,29 @@ afterAll(() => {
   restoreConsole()
 })
 
+afterEach(() => {
+  useHistoryStore.setState({ templates: [], searches: [], resources: [] })
+  useEditorStore.setState({
+    errors: {},
+    successes: {},
+    currentResource: undefined,
+    currentModal: [],
+    unusedRDF: {},
+    currentComponent: {},
+  })
+  useEntitiesStore.setState({
+    subjects: {},
+    properties: {},
+    values: {},
+    subjectTemplates: {},
+    propertyTemplates: {},
+    versions: {},
+    relationships: {},
+  })
+})
+
 // This forces Sinopia server to use fixtures
 jest.spyOn(Config, "useResourceTemplateFixtures", "get").mockReturnValue(true)
-
-const mockStore = configureMockStore([thunk])
 
 const resourceTemplateId = "resourceTemplate:testing:inputs"
 
@@ -40,37 +59,29 @@ describe("newResource", () => {
   sinopiaApi.putUserHistory = jest.fn().mockResolvedValue()
 
   describe("loading from resource template", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const keycloak = { token: "test-token" }
-      const result = await store.dispatch(
-        newResource(resourceTemplateId, "testerrorkey", true, keycloak)
+      const result = await newResource(
+        resourceTemplateId,
+        "testerrorkey",
+        true,
+        keycloak
       )
-      expect(result).toBe("abc123")
+      expect(result).toBe("abc0")
 
-      const actions = store.getActions()
-      // ADD_TEMPLATES is dispatched numerous times since mock store doesn't update state.
-      expect(actions).toHaveAction("ADD_TEMPLATES")
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+      expect(useEditorStore.getState().unusedRDF.abc0).toBeNull()
+      expect(useEditorStore.getState().currentResource).toBe("abc0")
+      expect(useHistoryStore.getState().templates).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: resourceTemplateId }),
+        ])
       )
-
-      expect(safeAction(addSubjectAction)).toEqual(expectedAction)
-
-      expect(actions).toHaveAction("SET_UNUSED_RDF", {
-        resourceKey: "abc123",
-        rdf: null,
-      })
-      expect(actions).toHaveAction("SET_CURRENT_EDIT_RESOURCE", "abc123")
-      expect(actions).toHaveAction("LOAD_RESOURCE_FINISHED", "abc123")
-      expect(actions).toHaveAction("ADD_TEMPLATE_HISTORY")
-      expect(actions).toHaveAction("SET_CURRENT_COMPONENT", {
-        rootSubjectKey: "abc123",
-        rootPropertyKey: "abc123",
-        key: "abc123",
-      })
+      const currentComp = useEditorStore.getState().currentComponent.abc0
+      expect(currentComp).toBeTruthy()
+      expect(currentComp.component).toBeDefined()
+      expect(currentComp.property).toBeDefined()
       expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
         "Foo McBar",
         "template",
@@ -82,21 +93,18 @@ describe("newResource", () => {
   })
 
   describe("loading from invalid resource template", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
-      const result = await store.dispatch(
-        newResource("rt:repeated:propertyURI:propertyLabel", "testerrorkey")
+      const result = await newResource(
+        "rt:repeated:propertyURI:propertyLabel",
+        "testerrorkey"
       )
       expect(result).toBe(false)
 
-      const actions = store.getActions()
-      expect(actions).toHaveAction("ADD_TEMPLATES")
-      expect(actions).toHaveAction("ADD_ERROR", {
-        errorKey: "testerrorkey",
-        error:
-          "A property template may not use the same property URI as another property template (http://id.loc.gov/ontologies/bibframe/geographicCoverage) unless both propery templates are of type nested resource and the nested resources are of different classes.",
-      })
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
+        "A property template may not use the same property URI as another property template (http://id.loc.gov/ontologies/bibframe/geographicCoverage) unless both propery templates are of type nested resource and the nested resources are of different classes."
+      )
     })
   })
 })

@@ -3,7 +3,7 @@ import mockConsole from "jest-mock-console"
 import Config from "Config"
 import { createStore } from "testUtils"
 import { datasetFromN3, datasetFromJsonld } from "utilities/Utilities"
-import { selectCurrentResourceKey } from "selectors/resources"
+import useEditorStore from "stores/editorStore"
 import { nanoid } from "nanoid"
 
 jest.mock("KeycloakContext", () => ({
@@ -45,16 +45,14 @@ describe("saveResource with triples not covered by the template", () => {
   const extraTriple = `<${uri}> <${extraPredicate}> <ubertemplate1:property6> .`
 
   it("preserves the unused triples in the saved graph", async () => {
-    const store = createStore()
+    createStore()
 
     // Load the resource (with the extra triple) into real state.
     const dataset = await datasetFromN3(`${n3}${extraTriple}\n`)
-    const loaded = await store.dispatch(
-      newResourceFromDataset(dataset, uri, null, "testerror")
-    )
+    const loaded = await newResourceFromDataset(dataset, uri, null, "testerror")
     expect(loaded).toBe(true)
 
-    const resourceKey = selectCurrentResourceKey(store.getState())
+    const resourceKey = useEditorStore.getState().currentResource
 
     // Capture the body PUT to the resource uri. Do not mock putResource, since
     // the real GraphBuilder / serialization path is what we are exercising.
@@ -65,11 +63,9 @@ describe("saveResource with triples not covered by the template", () => {
       return Promise.resolve({ ok: true, json: () => Promise.resolve({}) })
     })
 
-    await store.dispatch(
-      saveResource(resourceKey, "stanford", [], "testerror", {
-        token: "test-token",
-      })
-    )
+    await saveResource(resourceKey, "stanford", [], "testerror", {
+      token: "test-token",
+    })
 
     expect(capturedBody).not.toBeNull()
     const { data } = JSON.parse(capturedBody)

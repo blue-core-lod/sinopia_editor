@@ -1,15 +1,16 @@
 // Copyright 2019 Stanford University see LICENSE for license
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import * as sinopiaApi from "sinopiaApi"
 import { createState } from "stateUtils"
 import { transfer } from "actionCreators/transfer"
+import useEditorStore from "stores/editorStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
 }))
 
-const mockStore = configureMockStore([thunk])
+afterEach(() => {
+  useEditorStore.setState({ errors: {}, successes: {} })
+})
 
 const resourceUri =
   "https://api.development.sinopia.io/resource/7b4c275d-b0c7-40a4-80b3-e95a0d9d987c"
@@ -19,33 +20,27 @@ describe("transfer", () => {
     describe("successful", () => {
       it("dispatches ADD_SUCCESS with the resource URI", async () => {
         sinopiaApi.postTransfer = jest.fn().mockResolvedValue()
-        const store = mockStore(createState())
-        await store.dispatch(
-          transfer(resourceUri, null, undefined, "testerrorkey")
-        )
+        createState()
+        await transfer(resourceUri, null, undefined, "testerrorkey")
 
         expect(sinopiaApi.postTransfer).toHaveBeenCalledWith(
           { instance_uri: resourceUri },
           undefined
         )
-        expect(store.getActions()).toHaveAction("ADD_SUCCESS", {
-          successKey: "testerrorkey",
-          message: `Export of ${resourceUri} requested. You will be notified by email once processed.`,
-        })
+        expect(useEditorStore.getState().successes.testerrorkey).toContain(
+          `Export of ${resourceUri} requested. You will be notified by email once processed.`
+        )
       })
     })
     describe("failure", () => {
       it("dispatches ADD_ERROR", async () => {
         sinopiaApi.postTransfer = jest.fn().mockRejectedValue("Ooops!")
-        const store = mockStore(createState())
-        await store.dispatch(
-          transfer(resourceUri, null, undefined, "testerrorkey")
-        )
+        createState()
+        await transfer(resourceUri, null, undefined, "testerrorkey")
 
-        expect(store.getActions()).toHaveAction("ADD_ERROR", {
-          errorKey: "testerrorkey",
-          error: "Error requesting transfer: Ooops!",
-        })
+        expect(useEditorStore.getState().errors.testerrorkey).toContain(
+          "Error requesting transfer: Ooops!"
+        )
       })
     })
   })
@@ -56,33 +51,27 @@ describe("transfer", () => {
     describe("successful", () => {
       it("dispatches ADD_SUCCESS mentioning the identifier", async () => {
         sinopiaApi.postTransfer = jest.fn().mockResolvedValue()
-        const store = mockStore(createState())
-        await store.dispatch(
-          transfer(resourceUri, localId, undefined, "testerrorkey")
-        )
+        createState()
+        await transfer(resourceUri, localId, undefined, "testerrorkey")
 
         expect(sinopiaApi.postTransfer).toHaveBeenCalledWith(
           { instance_uri: resourceUri, local_id: localId },
           undefined
         )
-        expect(store.getActions()).toHaveAction("ADD_SUCCESS", {
-          successKey: "testerrorkey",
-          message: `Export of ${resourceUri} using identifier ${localId} requested. You will be notified by email once processed.`,
-        })
+        expect(useEditorStore.getState().successes.testerrorkey).toContain(
+          `Export of ${resourceUri} using identifier ${localId} requested. You will be notified by email once processed.`
+        )
       })
     })
     describe("failure", () => {
       it("dispatches ADD_ERROR", async () => {
         sinopiaApi.postTransfer = jest.fn().mockRejectedValue("Ooops!")
-        const store = mockStore(createState())
-        await store.dispatch(
-          transfer(resourceUri, localId, undefined, "testerrorkey")
-        )
+        createState()
+        await transfer(resourceUri, localId, undefined, "testerrorkey")
 
-        expect(store.getActions()).toHaveAction("ADD_ERROR", {
-          errorKey: "testerrorkey",
-          error: "Error requesting transfer: Ooops!",
-        })
+        expect(useEditorStore.getState().errors.testerrorkey).toContain(
+          "Error requesting transfer: Ooops!"
+        )
       })
     })
   })

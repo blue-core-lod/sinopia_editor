@@ -8,7 +8,7 @@ const expectedAction = {
     key: "JQEtq-vmq8",
     subjectKey: "t9zVwg2zO",
     propertyTemplateKey:
-      "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle",
+      "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal",
     show: true,
     values: [],
   }),

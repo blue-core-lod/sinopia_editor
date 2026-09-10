@@ -1,21 +1,23 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import InputLiteralOrURI from "../inputs/InputLiteralOrURI"
 import NestedResource from "./NestedResource"
 import ReadOnlyInputLiteralOrURI from "../inputs/ReadOnlyInputLiteralOrURI"
 import Alert from "components/alerts/Alert"
-import { displayResourceValidations } from "selectors/errors"
+import useEditorStore from "stores/editorStore"
 import { selectUri } from "selectors/resources"
 
 // Decides how to render this property.
 const PropertyComponent = ({ property, propertyTemplate, readOnly }) => {
-  const uri = useSelector((state) => selectUri(state, property.rootSubjectKey))
+  const uri = useEntitiesStore((state) =>
+    selectUri(state, property.rootSubjectKey)
+  )
 
-  const displayValidations = useSelector((state) =>
-    displayResourceValidations(state, property.rootSubjectKey)
+  const displayValidations = useEditorStore(
+    (state) => !!state.resourceValidation[property.rootSubjectKey]
   )
 
   // Immutable properties cannot be changed once saved.

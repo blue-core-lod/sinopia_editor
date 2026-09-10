@@ -1,11 +1,11 @@
 import { selectNormSubject } from "./resources"
+import useSearchStore from "stores/searchStore"
 import _ from "lodash"
 
 // Merges relationships from the resource and inferred relationships
 export const selectRelationships = (state, resourceKey) => {
   const resource = selectNormSubject(state, resourceKey) || emptyRelationships
-  const relationships =
-    state.entities.relationships[resourceKey] || emptyRelationships
+  const relationships = state.relationships[resourceKey] || emptyRelationships
 
   const mergeRelationship = (field) => {
     const resourceRelationships = resource[field] || []
@@ -31,11 +31,16 @@ const emptyRelationships = {
 export const hasRelationships = (state, resourceKey) =>
   !isEmpty(selectRelationships(state, resourceKey))
 
-export const hasSearchRelationships = (state, uri) =>
-  !isEmpty(selectSearchRelationships(state, uri))
+export const hasSearchRelationships = (uri) => {
+  const relationshipResults =
+    useSearchStore.getState().resource?.relationshipResults || {}
+  const relationships = relationshipResults[uri]
+  return !isEmpty(relationships)
+}
 
-export const selectSearchRelationships = (state, uri) => {
-  const relationshipResults = state.search.resource?.relationshipResults || {}
+export const selectSearchRelationships = (uri) => {
+  const relationshipResults =
+    useSearchStore.getState().resource?.relationshipResults || {}
   return relationshipResults[uri]
 }
 
