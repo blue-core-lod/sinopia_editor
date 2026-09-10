@@ -15,17 +15,19 @@ describe("searchStore", () => {
 
   describe("setSearchResults", () => {
     it("sets search results for a given search type", () => {
-      useSearchStore.getState().setSearchResults(
-        "resource",
-        "urn:ld4p:sinopia",
-        [{ uri: "http://example.com/1" }],
-        1,
-        { types: [{ key: "Work", doc_count: 1 }] },
-        "test query",
-        { startOfRange: 0, resultsPerPage: 10 },
-        undefined,
-        undefined
-      )
+      useSearchStore
+        .getState()
+        .setSearchResults(
+          "resource",
+          "urn:ld4p:sinopia",
+          [{ uri: "http://example.com/1" }],
+          1,
+          { types: [{ key: "Work", doc_count: 1 }] },
+          "test query",
+          { startOfRange: 0, resultsPerPage: 10 },
+          undefined,
+          undefined
+        )
 
       const state = useSearchStore.getState()
       expect(state.resource).toEqual({
@@ -49,17 +51,19 @@ describe("searchStore", () => {
     })
 
     it("uses default resultsPerPage when not provided", () => {
-      useSearchStore.getState().setSearchResults(
-        "template",
-        null,
-        [],
-        0,
-        {},
-        "query",
-        undefined,
-        undefined,
-        undefined
-      )
+      useSearchStore
+        .getState()
+        .setSearchResults(
+          "template",
+          null,
+          [],
+          0,
+          {},
+          "query",
+          undefined,
+          undefined,
+          undefined
+        )
 
       const state = useSearchStore.getState()
       expect(state.template.options.resultsPerPage).toBeDefined()
@@ -98,23 +102,20 @@ describe("searchStore", () => {
           relationshipResults: {},
         },
       })
-      useSearchStore.getState().setSearchRelationships(
-        "http://example.com/1",
-        { bfWorkRefs: [], bfInstanceRefs: [] }
-      )
+      useSearchStore.getState().setSearchRelationships("http://example.com/1", {
+        bfWorkRefs: [],
+        bfInstanceRefs: [],
+      })
 
-      expect(
-        useSearchStore.getState().resource.relationshipResults
-      ).toEqual({
+      expect(useSearchStore.getState().resource.relationshipResults).toEqual({
         "http://example.com/1": { bfWorkRefs: [], bfInstanceRefs: [] },
       })
     })
 
     it("does nothing when resource is null", () => {
-      useSearchStore.getState().setSearchRelationships(
-        "http://example.com/1",
-        {}
-      )
+      useSearchStore
+        .getState()
+        .setSearchRelationships("http://example.com/1", {})
       expect(useSearchStore.getState().resource).toBeNull()
     })
   })
