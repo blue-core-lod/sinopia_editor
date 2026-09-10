@@ -7,7 +7,6 @@ import { faTrashAlt } from "@fortawesome/free-solid-svg-icons"
 import PropertyLabel from "./PropertyLabel"
 import PropertyLabelInfo from "./PropertyLabelInfo"
 import { expandProperty, contractProperty } from "actionCreators/resources"
-import { useDispatch } from "react-redux"
 import useEntitiesStore from "stores/entitiesStore"
 import ToggleButton from "../ToggleButton"
 import useAlerts from "hooks/useAlerts"
@@ -15,7 +14,6 @@ import PropertyPropertyURI from "./PropertyPropertyURI"
 
 const NestedPropertyHeader = ({ property, propertyTemplate, readOnly }) => {
   const errorKey = useAlerts()
-  const dispatch = useDispatch()
 
   const toggleLabel =
     property.show === true
@@ -42,7 +40,7 @@ const NestedPropertyHeader = ({ property, propertyTemplate, readOnly }) => {
             <button
               type="button"
               className="btn btn-add btn-add-property"
-              onClick={() => dispatch(expandProperty(property.key, errorKey))}
+              onClick={() => expandProperty(property.key, errorKey)}
               aria-label={`Add ${propertyTemplate.label}`}
               data-testid={`Add ${propertyTemplate.label}`}
               data-id={property.key}
@@ -89,7 +87,7 @@ const NestedPropertyHeader = ({ property, propertyTemplate, readOnly }) => {
           <button
             type="button"
             className="btn btn-sm btn-remove pull-right"
-            onClick={() => dispatch(contractProperty(property.key))}
+            onClick={() => contractProperty(property.key)}
             aria-label={`Remove ${propertyTemplate.label}`}
             data-testid={`Remove ${propertyTemplate.label}`}
             data-id={property.key}

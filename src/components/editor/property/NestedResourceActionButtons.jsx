@@ -1,7 +1,6 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useDispatch } from "react-redux"
 import { shallow } from "zustand/shallow"
 import PropTypes from "prop-types"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -25,7 +24,6 @@ import useAlerts from "hooks/useAlerts"
 import _ from "lodash"
 
 const NestedResourceActionButtons = ({ value }) => {
-  const dispatch = useDispatch()
   const errorKey = useAlerts()
 
   const property = useEntitiesStore((state) =>
@@ -55,7 +53,7 @@ const NestedResourceActionButtons = ({ value }) => {
 
   const addAnother = (event) => {
     event.preventDefault()
-    return dispatch(addSiblingValueSubject(_.last(siblingValues).key, errorKey))
+    return addSiblingValueSubject(_.last(siblingValues).key, errorKey)
   }
 
   const moveUp = (event) => {
@@ -75,7 +73,7 @@ const NestedResourceActionButtons = ({ value }) => {
 
   const resetValue = (event) => {
     event.preventDefault()
-    dispatch(resetValueSubject(value.key, errorKey))
+    resetValueSubject(value.key, errorKey)
   }
 
   return (

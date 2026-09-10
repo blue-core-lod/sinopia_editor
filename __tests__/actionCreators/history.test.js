@@ -5,8 +5,6 @@ import {
   addResourceHistory,
 } from "actionCreators/history"
 import Config from "Config"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import * as sinopiaSearch from "sinopiaSearch"
 import useHistoryStore from "stores/historyStore"
@@ -23,16 +21,14 @@ afterEach(() => {
   useHistoryStore.setState({ templates: [], searches: [], resources: [] })
 })
 
-const mockStore = configureMockStore([thunk])
-
 describe("loadTemplateHistory()", () => {
   sinopiaSearch.getTemplateSearchResultsByIds = jest
     .fn()
     .mockResolvedValue({ results: [{ id: "template1" }, { id: "template2" }] })
   it("fetches from search and adds to Zustand store", async () => {
-    const store = mockStore(createState())
+    createState()
 
-    await store.dispatch(loadTemplateHistory(["template1", "template2"]))
+    await loadTemplateHistory(["template1", "template2"])
 
     expect(useHistoryStore.getState().templates).toEqual([
       { id: "template1" },
@@ -48,16 +44,14 @@ describe("loadTemplateHistory()", () => {
 
 describe("loadSearchHistory()", () => {
   it("adds label and stores in Zustand", async () => {
-    const store = mockStore(createState())
+    createState()
 
-    await store.dispatch(
-      loadSearchHistory([
-        {
-          authorityUri: "urn:ld4p:qa:oclc_fast:topic",
-          query: "leland",
-        },
-      ])
-    )
+    await loadSearchHistory([
+      {
+        authorityUri: "urn:ld4p:qa:oclc_fast:topic",
+        query: "leland",
+      },
+    ])
 
     expect(useHistoryStore.getState().searches).toEqual([
       {
@@ -79,8 +73,8 @@ describe("loadResourceHistory()", () => {
     .fn()
     .mockResolvedValue({ results: [{ uri: uri1 }, { uri: uri2 }] })
   it("fetches from search and adds to Zustand store", async () => {
-    const store = mockStore(createState())
-    await store.dispatch(loadResourceHistory([uri1, uri2]))
+    createState()
+    await loadResourceHistory([uri1, uri2])
 
     expect(useHistoryStore.getState().resources).toEqual([
       { uri: uri1 },
@@ -104,13 +98,11 @@ describe("addResourceHistory()", () => {
         .fn()
         .mockResolvedValue({ results: [{ uri }] })
 
-      const store = mockStore(createState())
-      await store.dispatch(
-        addResourceHistory(
-          uri,
-          "http://id.loc.gov/ontologies/bibframe/Work",
-          "stanford"
-        )
+      createState()
+      await addResourceHistory(
+        uri,
+        "http://id.loc.gov/ontologies/bibframe/Work",
+        "stanford"
       )
 
       expect(useHistoryStore.getState().resources).toEqual([{ uri }])
@@ -125,13 +117,11 @@ describe("addResourceHistory()", () => {
         .fn()
         .mockResolvedValue({ results: [] })
 
-      const store = mockStore(createState())
-      await store.dispatch(
-        addResourceHistory(
-          uri,
-          "http://id.loc.gov/ontologies/bibframe/Work",
-          "stanford"
-        )
+      createState()
+      await addResourceHistory(
+        uri,
+        "http://id.loc.gov/ontologies/bibframe/Work",
+        "stanford"
       )
 
       expect(useHistoryStore.getState().resources).toEqual([

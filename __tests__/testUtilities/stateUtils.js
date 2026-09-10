@@ -1,5 +1,4 @@
 // Copyright 2019 Stanford University see LICENSE for license
-import { initialState } from "store"
 import StateResourceBuilder from "./stateResourceBuilderUtils"
 import _ from "lodash"
 import useAuthenticateStore from "stores/authenticateStore"
@@ -25,6 +24,27 @@ const editorInitialState = {
   marc: null,
   pendingResourceTemplateSelection: null,
   currentHeaderSearch: { query: null, uri: "urn:ld4p:sinopia" },
+}
+
+const initialState = {
+  entities: {
+    languageLookup: [],
+    languages: {},
+    scriptLookup: [],
+    scripts: {},
+    transliterations: {},
+    transliterationLookup: [],
+    groupMap: {},
+    lookups: {},
+    exports: [],
+    properties: {},
+    propertyTemplates: {},
+    relationships: {},
+    subjects: {},
+    subjectTemplates: {},
+    values: {},
+    versions: {},
+  },
 }
 
 export const createState = (options = {}) => {

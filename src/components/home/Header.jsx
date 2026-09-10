@@ -4,7 +4,6 @@ import React from "react"
 import PropTypes from "prop-types"
 import { Link } from "react-router-dom"
 import Config from "Config"
-import { useDispatch } from "react-redux"
 import { signOut } from "actionCreators/authenticate"
 import { useKeycloak } from "../../KeycloakContext"
 import useAuthenticateStore from "stores/authenticateStore"
@@ -13,7 +12,6 @@ const bcLogo = require("../../styles/bluecore-small.png")
 
 const Header = (props) => {
   const { keycloak } = useKeycloak()
-  const dispatch = useDispatch()
   const currentUser = useAuthenticateStore((state) => state.user)
 
   return (
@@ -62,7 +60,7 @@ const Header = (props) => {
             <a
               href="#"
               className="nav-link editor-header-logout"
-              onClick={() => dispatch(signOut(keycloak))}
+              onClick={() => signOut(keycloak)}
             >
               Logout
             </a>

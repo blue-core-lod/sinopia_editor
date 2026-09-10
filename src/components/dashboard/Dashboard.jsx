@@ -2,7 +2,6 @@
 
 import React from "react"
 import PropTypes from "prop-types"
-import { useDispatch } from "react-redux"
 import useHistoryStore from "stores/historyStore"
 import Header from "../Header"
 import ResourceList from "./ResourceList"
@@ -19,18 +18,15 @@ import { completeResourceLoadingWithTemplate } from "actionCreators/resources"
 import { useHistory } from "react-router-dom"
 
 const Dashboard = (props) => {
-  const dispatch = useDispatch()
   const history = useHistory()
   const historicalTemplates = useHistoryStore((state) => state.templates)
   const historicalSearches = useHistoryStore((state) => state.searches)
   const historicalResources = useHistoryStore((state) => state.resources)
 
   const chooseResourceTemplate = (resourceTemplateId) => {
-    dispatch(completeResourceLoadingWithTemplate(resourceTemplateId)).then(
-      (result) => {
-        if (result) history.push("/editor")
-      }
-    )
+    completeResourceLoadingWithTemplate(resourceTemplateId).then((result) => {
+      if (result) history.push("/editor")
+    })
   }
 
   const showWelcome =

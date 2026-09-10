@@ -1,8 +1,5 @@
 import React from "react"
 import { render, act } from "@testing-library/react"
-import { Provider } from "react-redux"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import useEntitiesStore from "stores/entitiesStore"
 
@@ -18,8 +15,6 @@ jest.mock("components/editor/inputs/LcshTypeahead", () => ({
   __esModule: true,
   default: jest.fn(),
 }))
-
-const mockStore = configureMockStore([thunk])
 
 const MADS_AUTH_LABEL = "http://www.loc.gov/mads/rdf/v1#authoritativeLabel"
 const VALUE_KEY = "val-key-1"
@@ -57,16 +52,14 @@ const propertyTemplate = {
   uris: { [MADS_AUTH_LABEL]: "Authoritative Label" },
 }
 
-const renderComponent = (store, overrideValue = value) =>
+const renderComponent = (overrideValue = value) =>
   render(
-    <Provider store={store}>
-      <InputLiteralValue
-        value={overrideValue}
-        propertyTemplate={propertyTemplate}
-        displayValidations={false}
-        shouldFocus={false}
-      />
-    </Provider>
+    <InputLiteralValue
+      value={overrideValue}
+      propertyTemplate={propertyTemplate}
+      displayValidations={false}
+      shouldFocus={false}
+    />
   )
 
 describe("InputLiteralValue handleLcshSelect", () => {
@@ -88,8 +81,8 @@ describe("InputLiteralValue handleLcshSelect", () => {
     const spy = jest
       .spyOn(useEntitiesStore.getState(), "updateValue")
       .mockImplementation(() => {})
-    const store = mockStore(makeState())
-    renderComponent(store)
+    makeState()
+    renderComponent()
 
     act(() => {
       capturedOnSelect({ label: "Agricultural economics", uri: SUBJECT_URI })
@@ -112,8 +105,8 @@ describe("InputLiteralValue handleLcshSelect", () => {
     const spy = jest
       .spyOn(useEntitiesStore.getState(), "setSubjectComponentList")
       .mockImplementation(() => {})
-    const store = mockStore(makeState())
-    renderComponent(store)
+    makeState()
+    renderComponent()
 
     act(() => {
       capturedOnSelect({ label: "Agricultural economics", uri: SUBJECT_URI })
@@ -131,8 +124,8 @@ describe("InputLiteralValue handleLcshSelect", () => {
     const spy = jest
       .spyOn(useEntitiesStore.getState(), "setSubjectComponentList")
       .mockImplementation(() => {})
-    const store = mockStore(makeState())
-    renderComponent(store)
+    makeState()
+    renderComponent()
 
     act(() => {
       capturedOnSelect({ label: "Agricultural economics", uri: "" })
@@ -150,8 +143,8 @@ describe("InputLiteralValue handleLcshSelect", () => {
     const spy = jest
       .spyOn(useEntitiesStore.getState(), "setSubjectComponentList")
       .mockImplementation(() => {})
-    const store = mockStore(makeState({ subjectKey: null }))
-    renderComponent(store)
+    makeState({ subjectKey: null })
+    renderComponent()
 
     act(() => {
       capturedOnSelect({ label: "Agricultural economics", uri: SUBJECT_URI })
@@ -163,8 +156,8 @@ describe("InputLiteralValue handleLcshSelect", () => {
   })
 
   it("renders LcshTypeahead when propertyUri is the MADS authoritative label URI", () => {
-    const store = mockStore(makeState())
-    renderComponent(store)
+    makeState()
+    renderComponent()
 
     expect(LcshTypeahead).toHaveBeenCalledWith(
       expect.objectContaining({ query: value.literal }),
@@ -173,8 +166,8 @@ describe("InputLiteralValue handleLcshSelect", () => {
   })
 
   it("does not render LcshTypeahead when propertyUri is a different URI", () => {
-    const store = mockStore(makeState())
-    renderComponent(store, {
+    makeState()
+    renderComponent({
       ...value,
       propertyUri: "http://id.loc.gov/ontologies/bibframe/mainTitle",
     })

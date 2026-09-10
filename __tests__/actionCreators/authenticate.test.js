@@ -1,7 +1,5 @@
 // Copyright 2019 Stanford University see LICENSE for license
 import { authenticate, signIn, signOut } from "actionCreators/authenticate"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import * as sinopiaApi from "sinopiaApi"
 import useAuthenticateStore from "stores/authenticateStore"
 import useEditorStore from "stores/editorStore"
@@ -11,7 +9,6 @@ jest.mock("KeycloakContext", () => ({
 }))
 
 // Still need mock Redux store for non-auth dispatches (clearErrors, loadUserData)
-const mockStore = configureMockStore([thunk])
 
 const userData = {
   data: { history: { template: [], resource: [], search: [] } },
@@ -30,9 +27,7 @@ describe("authenticate", () => {
     it("does not authenticate", async () => {
       useAuthenticateStore.setState({ user: { username: "havram" } })
       const mockKeycloak = {}
-      const store = mockStore({})
-      await store.dispatch(authenticate(mockKeycloak))
-      expect(store.getActions()).toEqual([])
+      await authenticate(mockKeycloak)
       // User unchanged
       expect(useAuthenticateStore.getState().user).toEqual({
         username: "havram",
@@ -52,9 +47,7 @@ describe("authenticate", () => {
           preferred_username: "havram",
         },
       }
-
-      const store = mockStore({})
-      await store.dispatch(authenticate(mockKeycloak))
+      await authenticate(mockKeycloak)
 
       expect(useAuthenticateStore.getState().user).toEqual({
         username: "havram",
@@ -69,8 +62,7 @@ describe("authenticate", () => {
         user: { username: "stale", groups: [] },
       })
       const mockKeycloak = { authenticated: false }
-      const store = mockStore({})
-      await store.dispatch(authenticate(mockKeycloak))
+      await authenticate(mockKeycloak)
       expect(useAuthenticateStore.getState().user).toBeUndefined()
     })
   })
@@ -84,13 +76,12 @@ describe("signIn", () => {
   describe("successful", () => {
     sinopiaApi.fetchUser = jest.fn().mockResolvedValue(userData)
     it("dispatches clearErrors and calls keycloak login", async () => {
-      const store = mockStore({})
       const mockKeycloak = {
         login: jest.fn(() => Promise.resolve(true)),
         isTokenExpired: jest.fn(),
         updateToken: jest.fn(),
       }
-      await store.dispatch(signIn(mockKeycloak, "testerrorkey"))
+      await signIn(mockKeycloak, "testerrorkey")
       expect(useEditorStore.getState().errors.testerrorkey).toEqual([])
 
       // Simulate redirect back — keycloak now authenticated
@@ -98,7 +89,7 @@ describe("signIn", () => {
       mockKeycloak.tokenParsed = {
         preferred_username: "havram",
       }
-      await store.dispatch(authenticate(mockKeycloak))
+      await authenticate(mockKeycloak)
 
       expect(useAuthenticateStore.getState().user).toEqual({
         username: "havram",
@@ -109,15 +100,14 @@ describe("signIn", () => {
   })
   describe("failure", () => {
     it("dispatches clearErrors then removes user on failed auth", async () => {
-      const store = mockStore({})
       const mockKeycloak = {
         login: jest.fn(() => Promise.resolve(false)),
       }
-      await store.dispatch(signIn(mockKeycloak, "testerrorkey"))
+      await signIn(mockKeycloak, "testerrorkey")
       expect(useEditorStore.getState().errors.testerrorkey).toEqual([])
 
       // Simulate user refreshing Sinopia — not authenticated
-      await store.dispatch(authenticate(mockKeycloak))
+      await authenticate(mockKeycloak)
       expect(useAuthenticateStore.getState().user).toBeUndefined()
     })
   })
@@ -129,11 +119,10 @@ describe("signOut", () => {
       useAuthenticateStore.setState({
         user: { username: "havram", groups: ["blue core"] },
       })
-      const store = mockStore({})
       const mockKeycloak = {
         logout: jest.fn(() => Promise.resolve(true)),
       }
-      await store.dispatch(signOut(mockKeycloak))
+      await signOut(mockKeycloak)
 
       expect(useAuthenticateStore.getState().user).toBeUndefined()
       expect(mockKeycloak.logout).toHaveBeenCalled()

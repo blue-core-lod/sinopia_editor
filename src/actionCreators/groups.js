@@ -5,7 +5,7 @@ import { hasGroups } from "selectors/groups"
 
 import { getGroups } from "sinopiaApi"
 
-export const fetchGroups = () => () => {
+export const fetchGroups = () => {
   if (hasGroups(useEntitiesStore.getState())) {
     return // Groups already loaded
   }

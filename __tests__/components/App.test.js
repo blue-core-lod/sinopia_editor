@@ -3,6 +3,7 @@
 import { fireEvent, waitFor, screen } from "@testing-library/react"
 import { createStore, renderApp, createHistory } from "testUtils"
 import { createState } from "stateUtils"
+import useEntitiesStore from "stores/entitiesStore"
 import fetchMock from "fetch-mock-jest"
 import { featureSetup, resourceHeaderSelector } from "featureUtils"
 import * as sinopiaApi from "sinopiaApi"
@@ -45,10 +46,13 @@ describe("<App />", () => {
   })
 
   it("loads languages", async () => {
-    const store = createStore()
-    renderApp(store)
+    renderApp()
 
-    await waitFor(() => store.getState().entities.languages.size > 0)
+    // Languages are loaded via Zustand - check the store directly
+    await waitFor(() => {
+      const languages = useEntitiesStore.getState().languages
+      expect(Object.keys(languages).length).toBeGreaterThan(0)
+    })
   })
 
   it("sets app version", async () => {

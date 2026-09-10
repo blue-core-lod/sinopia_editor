@@ -1,13 +1,11 @@
 import React, { useState, useRef } from "react"
 import PropTypes from "prop-types"
-import { useDispatch } from "react-redux"
 import { transfer } from "actionCreators/transfer"
 import useEditorStore from "stores/editorStore"
 import ModalWrapper from "../../ModalWrapper"
 import { useKeycloak } from "../../../KeycloakContext"
 
 const TransferModal = ({ modalName, label, resourceUri, errorKey }) => {
-  const dispatch = useDispatch()
   const { keycloak } = useKeycloak()
   const [localId, setLocalId] = useState("")
   const initialInputRef = useRef()
@@ -20,13 +18,13 @@ const TransferModal = ({ modalName, label, resourceUri, errorKey }) => {
   }
 
   const handleOverlayClick = (event) => {
-    dispatch(transfer(resourceUri, localId.trim(), keycloak, errorKey))
+    transfer(resourceUri, localId.trim(), keycloak, errorKey)
     closeAndReset()
     event.preventDefault()
   }
 
   const handleExportClick = (event) => {
-    dispatch(transfer(resourceUri, null, keycloak, errorKey))
+    transfer(resourceUri, null, keycloak, errorKey)
     closeAndReset()
     event.preventDefault()
   }

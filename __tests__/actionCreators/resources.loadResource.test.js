@@ -7,8 +7,6 @@ import mockConsole from "jest-mock-console"
 import * as sinopiaApi from "sinopiaApi"
 import * as sinopiaSearch from "sinopiaSearch"
 import Config from "Config"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import { nanoid } from "nanoid"
 import * as relationshipActionCreators from "actionCreators/relationships"
@@ -64,14 +62,12 @@ afterEach(() => {
 // This forces Sinopia server to use fixtures
 jest.spyOn(Config, "useResourceTemplateFixtures", "get").mockReturnValue(true)
 
-const mockStore = configureMockStore([thunk])
-
 const uri =
   "http://localhost:3000/resource/b6c5f4c0-e7cd-4ca5-a20f-2a37fe1080d6"
 
 describe("loadResource", () => {
   describe("loading a resource for editor", () => {
-    const store = mockStore(createState())
+    createState()
     sinopiaApi.putUserHistory = jest.fn().mockResolvedValue()
     sinopiaSearch.getSearchResultsByUris = jest
       .fn()
@@ -80,8 +76,11 @@ describe("loadResource", () => {
 
     it("dispatches actions", async () => {
       const keycloak = { token: "test-token" }
-      const result = await store.dispatch(
-        loadResourceForEditor(uri, "testerrorkey", {}, keycloak)
+      const result = await loadResourceForEditor(
+        uri,
+        "testerrorkey",
+        {},
+        keycloak
       )
       expect(result).toBe(true)
 
@@ -119,14 +118,12 @@ describe("loadResource", () => {
   })
 
   describe("loading a new resource", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
-      const result = await store.dispatch(
-        loadResourceForEditor(uri, "testerrorkey", {
-          asNewResource: true,
-        })
-      )
+      const result = await loadResourceForEditor(uri, "testerrorkey", {
+        asNewResource: true,
+      })
       expect(result).toBe(true)
 
       expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
@@ -142,12 +139,10 @@ describe("loadResource", () => {
   })
 
   describe("loading a resource for preview", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
-      const result = await store.dispatch(
-        loadResourceForPreview(uri, "testerrorkey")
-      )
+      const result = await loadResourceForPreview(uri, "testerrorkey")
       expect(result).toBe(true)
 
       expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
@@ -159,13 +154,16 @@ describe("loadResource", () => {
   })
 
   describe("loading a resource for diff", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
-      const result = await store.dispatch(
-        loadResourceForDiff(uri, "testerrorkey", "compareFromResourceKey", {
+      const result = await loadResourceForDiff(
+        uri,
+        "testerrorkey",
+        "compareFromResourceKey",
+        {
           version: "2019-10-16T17:13:45.084Z",
-        })
+        }
       )
       expect(result).toBe(true)
 
@@ -178,14 +176,12 @@ describe("loadResource", () => {
   })
 
   describe("loading an invalid resource", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const uri =
         "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f-invalid"
-      const result = await store.dispatch(
-        loadResourceForEditor(uri, "testerrorkey")
-      )
+      const result = await loadResourceForEditor(uri, "testerrorkey")
       expect(result).toBe(false)
 
       expect(useEditorStore.getState().errors.testerrorkey).toContain(
@@ -195,14 +191,12 @@ describe("loadResource", () => {
   })
 
   describe("loading a resource without a resource template", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const uri =
         "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f-invalid-template"
-      const result = await store.dispatch(
-        loadResourceForEditor(uri, "testerrorkey")
-      )
+      const result = await loadResourceForEditor(uri, "testerrorkey")
       expect(result).toBe(false)
 
       expect(useEditorStore.getState().currentModal).toContain(
@@ -212,13 +206,11 @@ describe("loadResource", () => {
   })
 
   describe("load error", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       // http://error is a special URI that will cause an error to be thrown.
-      const result = await store.dispatch(
-        loadResourceForEditor("http://error", "testerrorkey")
-      )
+      const result = await loadResourceForEditor("http://error", "testerrorkey")
       expect(result).toBe(false)
 
       expect(useEditorStore.getState().errors.testerrorkey).toContain(
@@ -230,7 +222,7 @@ describe("loadResource", () => {
   describe("loading a resource with multiple property uris", () => {
     const uri =
       "http://localhost:3000/resource/c7c5f4c0-e7cd-4ca5-a20f-2a37fe1080d7"
-    const store = mockStore(createState())
+    createState()
     sinopiaApi.putUserHistory = jest.fn().mockResolvedValue()
     sinopiaSearch.getSearchResultsByUris = jest
       .fn()
@@ -238,9 +230,7 @@ describe("loadResource", () => {
     jest.spyOn(relationshipActionCreators, "loadRelationships")
 
     it("dispatches actions", async () => {
-      const result = await store.dispatch(
-        loadResourceForEditor(uri, "testerrorkey")
-      )
+      const result = await loadResourceForEditor(uri, "testerrorkey")
       expect(result).toBe(true)
     })
   })

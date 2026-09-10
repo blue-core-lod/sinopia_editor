@@ -1,5 +1,4 @@
 import React, { useRef, useEffect, useState, useMemo } from "react"
-import { useDispatch } from "react-redux"
 import { shallow } from "zustand/shallow"
 import PropTypes from "prop-types"
 import { fetchLookup } from "actionCreators/lookups"
@@ -15,7 +14,6 @@ const InputListValue = ({
   displayValidations,
   shouldFocus,
 }) => {
-  const dispatch = useDispatch()
   const inputLiteralRef = useRef(null)
   const [focusHasBeenSet, setFocusHasBeenSet] = useState(false)
   const id = `inputlist-${value.key}`
@@ -50,9 +48,9 @@ const InputListValue = ({
   // Retrieve the lookups
   useEffect(() => {
     propertyTemplate.authorities.forEach((authority) => {
-      dispatch(fetchLookup(authority.uri))
+      fetchLookup(authority.uri)
     })
-  }, [dispatch, propertyTemplate.authorities])
+  }, [propertyTemplate.authorities])
 
   const handleRemoveClick = (event) => {
     useEntitiesStore.getState().removeValue(value.key)

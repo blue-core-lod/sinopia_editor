@@ -27,7 +27,6 @@ import {
 } from "reducers/resources"
 
 import { createState } from "stateUtils"
-import { createReducer } from "reducers/index"
 import { nanoid } from "nanoid"
 import StateResourceBuilder from "stateResourceBuilderUtils"
 
@@ -56,6 +55,13 @@ const reducers = {
   SHOW_PROPERTY: showProperty,
   UPDATE_VALUE: updateValue,
 }
+
+const createReducer =
+  (handlers) =>
+  (state = {}, action) => {
+    const fn = handlers[action.type]
+    return fn ? fn(state, action) : state
+  }
 
 const reducer = createReducer(reducers)
 

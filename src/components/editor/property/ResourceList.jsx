@@ -1,7 +1,6 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useEffect, useRef, useState } from "react"
-import { useDispatch } from "react-redux"
 import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import { getTemplateSearchResults } from "sinopiaSearch"
@@ -19,7 +18,6 @@ import { useKeycloak } from "../../../KeycloakContext"
 import _ from "lodash"
 
 const ResourceList = (props) => {
-  const dispatch = useDispatch()
   const { keycloak } = useKeycloak()
   const [newResourceList, setNewResourceList] = useState([])
   const errorKey = useAlerts()
@@ -43,10 +41,10 @@ const ResourceList = (props) => {
     let isMounted = true
     const handleChange = (resourceTemplateId, event) => {
       event.preventDefault()
-      dispatch(newResource(resourceTemplateId, errorKey, false, keycloak)).then(
+      newResource(resourceTemplateId, errorKey, false, keycloak).then(
         (resourceKey) => {
           if (resourceKey && mainTitleValue) {
-            dispatch(addMainTitle(resourceKey, mainTitleValue))
+            addMainTitle(resourceKey, mainTitleValue)
           }
           if (resourceKey) {
             useEditorStore.getState().setCurrentEditResource(resourceKey)
@@ -92,7 +90,6 @@ const ResourceList = (props) => {
       isMounted = false
     }
   }, [
-    dispatch,
     propertyTemplate.authorities,
     subjectTemplate.class,
     errorKey,

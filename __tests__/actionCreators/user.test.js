@@ -5,8 +5,6 @@ import {
   addSearchHistory,
 } from "actionCreators/user"
 import * as sinopiaApi from "sinopiaApi"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import * as sinopiaSearch from "sinopiaSearch"
 import useAuthenticateStore from "stores/authenticateStore"
@@ -26,12 +24,10 @@ jest.mock("keycloak-js", () => {
     },
   }
 
-  return jest.fn().mockImplementation((config) => {
+  return jest.fn().mockImplementation((_config) => {
     return mockKeycloak
   })
 })
-
-const mockStore = configureMockStore([thunk])
 
 beforeEach(() => {
   useAuthenticateStore.setState({
@@ -79,10 +75,9 @@ describe("loadUserData()", () => {
         },
       ],
     })
-    const store = mockStore(createState())
+    createState()
 
-    await store.dispatch(loadUserData("ekostova"))
-    const actions = store.getActions()
+    await loadUserData("ekostova")
 
     expect(useHistoryStore.getState().templates).toEqual(
       expect.arrayContaining([expect.objectContaining({ id: "template1" })])
@@ -114,10 +109,10 @@ describe("loadUserData()", () => {
 describe("addTemplateHistory()", () => {
   it("sends to API", async () => {
     sinopiaApi.putUserHistory = jest.fn().mockResolvedValue()
-    const store = mockStore(createState())
+    createState()
     const keycloak = { token: "test-token" }
 
-    await store.dispatch(addTemplateHistory("template1", keycloak))
+    await addTemplateHistory("template1", keycloak)
 
     expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
       "Foo McBar",
@@ -132,14 +127,12 @@ describe("addTemplateHistory()", () => {
 describe("addResourceHistory()", () => {
   it("sends to API", async () => {
     sinopiaApi.putUserHistory = jest.fn().mockResolvedValue()
-    const store = mockStore(createState())
+    createState()
     const keycloak = { token: "test-token" }
 
-    await store.dispatch(
-      addResourceHistory(
-        "https://api.development.sinopia.io/resource/3f90a592-5070-4244-a2d9-47f503329e39",
-        keycloak
-      )
+    await addResourceHistory(
+      "https://api.development.sinopia.io/resource/3f90a592-5070-4244-a2d9-47f503329e39",
+      keycloak
     )
 
     expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
@@ -155,10 +148,10 @@ describe("addResourceHistory()", () => {
 describe("addSearchHistory()", () => {
   it("sends to API", async () => {
     sinopiaApi.putUserHistory = jest.fn().mockResolvedValue()
-    const store = mockStore(createState())
+    createState()
     const keycloak = { token: "test-token" }
 
-    await store.dispatch(addSearchHistory("sinopia", "ants", keycloak))
+    await addSearchHistory("sinopia", "ants", keycloak)
 
     expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
       "Foo McBar",

@@ -11,8 +11,6 @@ import mockConsole from "jest-mock-console"
 import * as sinopiaApi from "sinopiaApi"
 import * as sinopiaSearch from "sinopiaSearch"
 import Config from "Config"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import { nanoid } from "nanoid"
 import useEditorStore from "stores/editorStore"
@@ -51,15 +49,11 @@ afterAll(() => {
 // This forces Sinopia server to use fixtures
 jest.spyOn(Config, "useResourceTemplateFixtures", "get").mockReturnValue(true)
 
-const mockStore = configureMockStore([thunk])
-
 describe("expandProperty", () => {
   describe("expand a nested resource", () => {
     it("dispatches actions", async () => {
-      const store = mockStore(
-        createState({ hasResourceWithContractedNestedResource: true })
-      )
-      await store.dispatch(expandProperty("v1o90QO1Qx", "testerrorkey"))
+      createState({ hasResourceWithContractedNestedResource: true })
+      await expandProperty("v1o90QO1Qx", "testerrorkey")
 
       // Property should now be shown in Zustand state
       const property = useEntitiesStore.getState().properties.v1o90QO1Qx
@@ -70,10 +64,8 @@ describe("expandProperty", () => {
 
   describe("expand a literal", () => {
     it("dispatches actions", async () => {
-      const store = mockStore(
-        createState({ hasResourceWithContractedLiteral: true })
-      )
-      await store.dispatch(expandProperty("JQEtq-vmq8", "testerrorkey"))
+      createState({ hasResourceWithContractedLiteral: true })
+      await expandProperty("JQEtq-vmq8", "testerrorkey")
 
       // Property should now be shown in Zustand state
       const property = useEntitiesStore.getState().properties["JQEtq-vmq8"]
@@ -85,10 +77,8 @@ describe("expandProperty", () => {
 
 describe("addSiblingValueSubject", () => {
   it("dispatches actions", async () => {
-    const store = mockStore(
-      createState({ hasResourceWithNestedResource: true })
-    )
-    await store.dispatch(addSiblingValueSubject("VDOeQCnFA8", "testerrorkey"))
+    createState({ hasResourceWithNestedResource: true })
+    await addSiblingValueSubject("VDOeQCnFA8", "testerrorkey")
 
     // Should have added a new value to the property
     const property = useEntitiesStore.getState().properties.v1o90QO1Qx
@@ -98,10 +88,8 @@ describe("addSiblingValueSubject", () => {
 
 describe("resetValueSubject", () => {
   it("dispatches ADD_VALUE then REMOVE_VALUE", async () => {
-    const store = mockStore(
-      createState({ hasResourceWithNestedResource: true })
-    )
-    await store.dispatch(resetValueSubject("VDOeQCnFA8", "testerrorkey"))
+    createState({ hasResourceWithNestedResource: true })
+    await resetValueSubject("VDOeQCnFA8", "testerrorkey")
 
     // Original value should be removed from Zustand
     const value = useEntitiesStore.getState().values.VDOeQCnFA8
@@ -117,18 +105,16 @@ describe("saveNewResource", () => {
     .mockResolvedValue({ results: [] })
 
   it("saves a new resource", async () => {
-    const store = mockStore(createState({ hasResourceWithLiteral: true }))
+    createState({ hasResourceWithLiteral: true })
     sinopiaApi.postResource = jest.fn().mockResolvedValue(uri)
     const keycloak = { token: "test-token" }
 
-    await store.dispatch(
-      saveNewResource(
-        "t9zVwg2zO",
-        "stanford",
-        ["cornell"],
-        "testerror",
-        keycloak
-      )
+    await saveNewResource(
+      "t9zVwg2zO",
+      "stanford",
+      ["cornell"],
+      "testerror",
+      keycloak
     )
 
     expect(useEditorStore.getState().errors.testerror).toEqual([])
@@ -160,12 +146,10 @@ describe("saveNewResource", () => {
   })
 
   it("error when saving a new resource", async () => {
-    const store = mockStore(createState({ hasResourceWithLiteral: true }))
+    createState({ hasResourceWithLiteral: true })
     sinopiaApi.postResource.mockRejectedValue(new Error("Messed-up"))
 
-    await store.dispatch(
-      saveNewResource("t9zVwg2zO", "stanford", ["cornell"], "testerror")
-    )
+    await saveNewResource("t9zVwg2zO", "stanford", ["cornell"], "testerror")
 
     expect(useEditorStore.getState().errors.testerror).toContain(
       "Error saving new resource: Messed-up"
@@ -192,11 +176,15 @@ describe("saveResource", () => {
         },
       },
     })
-    const store = mockStore(state)
+    state
     const keycloak = { token: "test-token" }
 
-    await store.dispatch(
-      saveResource("t9zVwg2zO", "stanford", ["cornell"], "testerror", keycloak)
+    await saveResource(
+      "t9zVwg2zO",
+      "stanford",
+      ["cornell"],
+      "testerror",
+      keycloak
     )
 
     expect(useEditorStore.getState().errors.testerror).toEqual([])
@@ -227,10 +215,8 @@ describe("saveResource", () => {
 
   it("error when trying to save existing resource", async () => {
     sinopiaApi.putResource = jest.fn().mockRejectedValue(new Error("Messed-up"))
-    const store = mockStore(createState({ hasResourceWithLiteral: true }))
-    await store.dispatch(
-      saveResource("t9zVwg2zO", "stanford", ["cornell"], "testerror")
-    )
+    createState({ hasResourceWithLiteral: true })
+    await saveResource("t9zVwg2zO", "stanford", ["cornell"], "testerror")
     expect(useEditorStore.getState().errors.testerror).toContain(
       "Error saving: Messed-up"
     )
@@ -239,8 +225,8 @@ describe("saveResource", () => {
 
 describe("contractProperty", () => {
   it("removes a property values from state", async () => {
-    const store = mockStore(createState({ hasResourceWithLiteral: true }))
-    await store.dispatch(contractProperty("JQEtq-vmq8"))
+    createState({ hasResourceWithLiteral: true })
+    await contractProperty("JQEtq-vmq8")
     // Property values should be null in Zustand
     const property = useEntitiesStore.getState().properties["JQEtq-vmq8"]
     expect(property.valueKeys).toBeNull()
@@ -249,14 +235,12 @@ describe("contractProperty", () => {
 
 describe("addMainTitle", () => {
   it("add title value to state", async () => {
-    const store = mockStore(createState({ hasResourceWithMainTitle: true }))
-    await store.dispatch(
-      addMainTitle("cqxLskA9kjAfMFDeuvzGq", {
-        literal: "Tang",
-        lang: "en",
-        propertyUri: "http://id.loc.gov/ontologies/bibframe/mainTitle",
-      })
-    )
+    createState({ hasResourceWithMainTitle: true })
+    await addMainTitle("cqxLskA9kjAfMFDeuvzGq", {
+      literal: "Tang",
+      lang: "en",
+      propertyUri: "http://id.loc.gov/ontologies/bibframe/mainTitle",
+    })
     // Check Zustand state for updated value
     const value = useEntitiesStore.getState().values.JjUhYxaBo9nuIh8GKd9k5
     expect(value.literal).toEqual("Tang")

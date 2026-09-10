@@ -6,7 +6,7 @@ import useEditorStore from "stores/editorStore"
 import { loadUserData } from "actionCreators/user"
 import useAuthenticateStore from "stores/authenticateStore"
 
-export const authenticate = (keycloak) => async (dispatch) => {
+export const authenticate = async (keycloak) => {
   const { user, setUser, removeUser } = useAuthenticateStore.getState()
   if (!keycloak) return Promise.resolve(false)
   if (user && keycloak.authenticated !== false) return Promise.resolve(true)
@@ -17,21 +17,19 @@ export const authenticate = (keycloak) => async (dispatch) => {
     }
     const userInfo = keycloak.tokenParsed
     setUser(toUser(userInfo))
-    dispatch(loadUserData(userInfo.preferred_username, keycloak))
+    loadUserData(userInfo.preferred_username, keycloak)
     return Promise.resolve(true)
   }
   removeUser()
   return Promise.resolve(false)
 }
 
-export const signIn =
-  (keycloak, errorKey, redirectUri = Config.sinopiaUrl) =>
-  () => {
-    useEditorStore.getState().clearErrors(errorKey)
-    return Promise.resolve(keycloak.login({ redirectUri }))
-  }
+export const signIn = (keycloak, errorKey, redirectUri = Config.sinopiaUrl) => {
+  useEditorStore.getState().clearErrors(errorKey)
+  return Promise.resolve(keycloak.login({ redirectUri }))
+}
 
-export const signOut = (keycloak) => () => {
+export const signOut = (keycloak) => {
   const { removeUser } = useAuthenticateStore.getState()
   removeUser()
   keycloak.logout({ redirectUri: Config.sinopiaUrl })

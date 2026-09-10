@@ -3,8 +3,6 @@ import {
   loadSearchRelationships,
 } from "actionCreators/relationships"
 import * as sinopiaApi from "sinopiaApi"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import { datasetFromJsonld } from "utilities/Utilities"
 import instanceWithRefs from "../__resource_fixtures__/instance_with_refs.json"
@@ -18,25 +16,20 @@ afterEach(() => {
   useSearchStore.setState({ resource: null, template: null })
 })
 
-const mockStore = configureMockStore([thunk])
-
 const uri =
   "http://localhost:3000/resource/a5c5f4c0-e7cd-4ca5-a20f-2a37fe1080d5"
 
 describe("loadRelationships()", () => {
   it("is a no-op — refs are tracked on the subject via updateBibframeRefs", async () => {
-    const store = mockStore(createState())
+    createState()
 
-    const result = await store.dispatch(
-      loadRelationships(
-        "7d7d-40ac-b38e",
-        "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
-        "testerrorkey"
-      )
+    const result = await loadRelationships(
+      "7d7d-40ac-b38e",
+      "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
+      "testerrorkey"
     )
 
     expect(result).toBe(true)
-    expect(store.getActions()).toHaveLength(0)
   })
 })
 
@@ -62,10 +55,9 @@ describe("loadSearchRelationships()", () => {
     const dataset = await datasetFromJsonld(instanceWithRefs)
     sinopiaApi.fetchResource = jest.fn().mockResolvedValue([dataset, {}])
 
-    const store = mockStore(createState())
-    await store.dispatch(loadSearchRelationships(uri))
+    createState()
+    await loadSearchRelationships(uri)
 
-    expect(store.getActions()).toHaveLength(0)
     expect(useSearchStore.getState().resource.relationshipResults[uri]).toEqual(
       {
         bfAdminMetadataRefs: [],
@@ -94,8 +86,8 @@ describe("loadSearchRelationships()", () => {
     const dataset = await datasetFromJsonld(jsonld)
     sinopiaApi.fetchResource = jest.fn().mockResolvedValue([dataset, {}])
 
-    const store = mockStore(createState())
-    await store.dispatch(loadSearchRelationships(uri))
+    createState()
+    await loadSearchRelationships(uri)
 
     expect(useSearchStore.getState().resource.relationshipResults[uri]).toEqual(
       {
@@ -111,11 +103,10 @@ describe("loadSearchRelationships()", () => {
     it("silently handles error", async () => {
       sinopiaApi.fetchResource = jest.fn().mockRejectedValue(new Error("Ooops"))
 
-      const store = mockStore(createState())
-      const result = await store.dispatch(loadSearchRelationships(uri))
+      createState()
+      const result = await loadSearchRelationships(uri)
 
       expect(result).toBe(false)
-      expect(store.getActions()).toHaveLength(0)
     })
   })
 })

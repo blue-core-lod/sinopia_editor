@@ -1,12 +1,8 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import { fetchExports } from "actionCreators/exports"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import useEditorStore from "stores/editorStore"
 import useEntitiesStore from "stores/entitiesStore"
-
-const mockStore = configureMockStore([thunk])
 
 afterEach(() => {
   useEditorStore.setState({ errors: {}, successes: {} })
@@ -29,8 +25,7 @@ describe("export", () => {
 
     it("dispatches actions", async () => {
       useEntitiesStore.setState({ exports: [] })
-      const store = mockStore({ entities: { exports: [] } })
-      await store.dispatch(fetchExports("testerrorkey"))
+      await fetchExports("testerrorkey")
       expect(useEditorStore.getState().errors.testerrorkey).toEqual([])
       expect(useEntitiesStore.getState().exports).toEqual([
         "alberta_2019-10-28T16:44:08.978Z.zip",
@@ -48,8 +43,7 @@ describe("export", () => {
 
     it("dispatches actions", async () => {
       useEntitiesStore.setState({ exports: [] })
-      const store = mockStore({ entities: { exports: [] } })
-      await store.dispatch(fetchExports("testerrorkey"))
+      await fetchExports("testerrorkey")
       expect(useEditorStore.getState().errors.testerrorkey).toContain(
         "Error retrieving list of exports: S3 fail"
       )

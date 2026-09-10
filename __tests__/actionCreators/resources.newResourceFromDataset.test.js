@@ -1,8 +1,6 @@
 import { newResourceFromDataset } from "actionCreators/resources"
 import mockConsole from "jest-mock-console"
 import Config from "Config"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import useEntitiesStore from "stores/entitiesStore"
 import { selectFullSubject } from "selectors/resources"
@@ -25,8 +23,6 @@ let restoreConsole = null
 
 // This forces Sinopia server to use fixtures
 jest.spyOn(Config, "useResourceTemplateFixtures", "get").mockReturnValue(true)
-
-const mockStore = configureMockStore([thunk])
 
 beforeAll(() => {
   // Capture and not display console output
@@ -79,12 +75,15 @@ describe("newResourceFromDataset", () => {
   `
 
   describe("loading a resource", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
@@ -112,12 +111,15 @@ describe("newResourceFromDataset", () => {
     <http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en .    
     `
 
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
@@ -146,12 +148,15 @@ describe("newResourceFromDataset", () => {
     <http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en .  
     `
 
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
@@ -173,27 +178,33 @@ describe("newResourceFromDataset", () => {
 
   describe("loading a legacy resource (<> as root)", () => {
     // Legacy resources have <> as the root resource rather than <[uri]>.
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const dataset = await datasetFromN3(n3)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
     })
   })
 
   describe("loading a resource with extra triples", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const extraRdf = `<> <http://id.loc.gov/ontologies/bibframe/uber/template1/property6x> <ubertemplate1:property6> .
 <x> <http://id.loc.gov/ontologies/bibframe/uber/template1/property6> <ubertemplate1:property6> .
 `
       const dataset = await datasetFromN3(n3 + extraRdf)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
@@ -202,14 +213,17 @@ describe("newResourceFromDataset", () => {
   })
 
   describe("loading a resource with extra label triple", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const extraRdf = `<http://uri/value> <http://www.w3.org/2000/01/rdf-schema#label> "An extra label"@en .`
 
       const dataset = await datasetFromN3(n3 + extraRdf)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
@@ -231,12 +245,15 @@ describe("newResourceFromDataset", () => {
     _:b12 <http://sinopia.io/testing/Literal/property1> "literal2"@en .    
     `
 
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const dataset = await datasetFromN3(n3)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
@@ -245,7 +262,7 @@ describe("newResourceFromDataset", () => {
   })
 
   describe("loading a resource with with ordered triples for ordered property", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const n3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:ordered" .
@@ -255,8 +272,11 @@ describe("newResourceFromDataset", () => {
     _:b9 <http://sinopia.io/testing/Literal/property1> "literal1"@en .    
 `
       const dataset = await datasetFromN3(n3)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
@@ -269,12 +289,16 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
   })
 
   describe("loading a new resource", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey", true)
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey",
+        true
       )
       expect(result).toBe(true)
 
@@ -283,7 +307,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
   })
 
   describe("loading a resource with provided resource template id", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       // Change the hasResourceTemplate triple.
@@ -292,15 +316,18 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
         `${resourceTemplateId}x`
       )
       const dataset = await datasetFromN3(fixtureRdf)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, resourceTemplateId, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        resourceTemplateId,
+        "testerrorkey"
       )
       expect(result).toBe(true)
     })
   })
 
   describe("loading a resource with errors", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const fixtureRdf = n3.replace(
@@ -308,8 +335,11 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
         "rt:repeated:propertyURI:propertyLabel"
       )
       const dataset = await datasetFromN3(fixtureRdf)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(false)
 
@@ -334,12 +364,15 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     _:b1 <http://sinopia.io/testing/MergeDefaultsMatch/property1> "Real value"@en .
     `
 
-    const store = mockStore(createState())
+    createState()
 
     it("does not apply the unmatched sibling template's default value", async () => {
       const dataset = await datasetFromN3(mergeDefaultsN3)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, mergeDefaultsUri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        mergeDefaultsUri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
@@ -385,12 +418,15 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     <http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en .
     `
 
-    const store = mockStore(createState())
+    createState()
 
     it("recovers the value using the sole suppressible candidate", async () => {
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        uri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
@@ -433,12 +469,15 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     <http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en .
     `
 
-    const store = mockStore(createState())
+    createState()
 
     it("does not guess which candidate the value represents", async () => {
       const dataset = await datasetFromN3(n3)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, ambiguousUri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        ambiguousUri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 
@@ -476,12 +515,15 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     <${requiredUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/RequiredSingleDefaultHost> .
     `
 
-    const store = mockStore(createState())
+    createState()
 
     it("does not apply the candidate template's default value", async () => {
       const dataset = await datasetFromN3(n3)
-      const result = await store.dispatch(
-        newResourceFromDataset(dataset, requiredUri, null, "testerrorkey")
+      const result = await newResourceFromDataset(
+        dataset,
+        requiredUri,
+        null,
+        "testerrorkey"
       )
       expect(result).toBe(true)
 

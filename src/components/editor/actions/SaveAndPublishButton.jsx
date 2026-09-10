@@ -1,7 +1,6 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useDispatch } from "react-redux"
 import { shallow } from "zustand/shallow"
 import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
@@ -17,7 +16,6 @@ import { useKeycloak } from "../../../KeycloakContext"
 import useAlerts from "hooks/useAlerts"
 
 const SaveAndPublishButton = (props) => {
-  const dispatch = useDispatch()
   const errorKey = useAlerts()
   const { keycloak } = useKeycloak()
 
@@ -55,14 +53,12 @@ const SaveAndPublishButton = (props) => {
     event.preventDefault()
     if (formIsValid()) {
       if (isSaved) {
-        dispatch(
-          saveResourceAction(
-            resourceKey,
-            resource.group,
-            resource.editGroups,
-            errorKey,
-            keycloak
-          )
+        saveResourceAction(
+          resourceKey,
+          resource.group,
+          resource.editGroups,
+          errorKey,
+          keycloak
         )
       } else {
         // Show group chooser

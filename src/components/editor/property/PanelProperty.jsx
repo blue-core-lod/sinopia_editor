@@ -1,7 +1,6 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useDispatch } from "react-redux"
 import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import PropertyLabel from "./PropertyLabel"
@@ -18,7 +17,6 @@ import _ from "lodash"
 import PropertyPropertyURI from "./PropertyPropertyURI"
 
 const PanelProperty = ({ propertyKey, readOnly, id, isTemplate }) => {
-  const dispatch = useDispatch()
   const errorKey = useAlerts()
   const property = useEntitiesStore((state) =>
     selectNormProperty(state, propertyKey)
@@ -68,7 +66,7 @@ const PanelProperty = ({ propertyKey, readOnly, id, isTemplate }) => {
               <button
                 type="button"
                 className="btn btn-sm btn-add btn-link pull-right"
-                onClick={() => dispatch(expandProperty(property.key, errorKey))}
+                onClick={() => expandProperty(property.key, errorKey)}
                 aria-label={`Add ${propertyTemplate.label}`}
                 data-testid={`Add ${propertyTemplate.label}`}
                 data-id={property.key}
@@ -82,7 +80,7 @@ const PanelProperty = ({ propertyKey, readOnly, id, isTemplate }) => {
                 className="btn btn-sm btn-remove pull-right"
                 aria-label={`Remove ${propertyTemplate.label}`}
                 data-testid={`Remove ${propertyTemplate.label}`}
-                onClick={() => dispatch(contractProperty(property.key))}
+                onClick={() => contractProperty(property.key)}
                 data-id={id}
               >
                 <FontAwesomeIcon className="trash-icon" icon={trashIcon} />

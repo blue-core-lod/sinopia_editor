@@ -1,7 +1,6 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useDispatch } from "react-redux"
 import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import useEditorStore from "stores/editorStore"
@@ -11,14 +10,13 @@ import { selectNormSubject } from "selectors/resources"
 import { newResourceCopy } from "actionCreators/resources"
 
 const CopyToNewButton = (props) => {
-  const dispatch = useDispatch()
   const resourceKey = useEditorStore((state) => state.currentResource)
   const resource = useEntitiesStore((state) =>
     selectNormSubject(state, resourceKey)
   )
 
   const handleClick = () => {
-    dispatch(newResourceCopy(resource.key))
+    newResourceCopy(resource.key)
     useEditorStore.getState().showCopyNewMessage(resource.uri)
   }
 

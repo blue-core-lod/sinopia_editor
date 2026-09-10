@@ -1,6 +1,5 @@
 // Copyright 2019 Stanford University see LICENSE for license
 import React, { useState, useEffect } from "react"
-import { useDispatch } from "react-redux"
 import PropTypes from "prop-types"
 import { fetchSinopiaSearchResults } from "actionCreators/search"
 import useSearchStore from "stores/searchStore"
@@ -15,7 +14,6 @@ const SearchFilter = ({
   facet,
   filterSearchOption,
 }) => {
-  const dispatch = useDispatch()
   const errorKey = useAlerts()
   const { keycloak } = useKeycloak()
   const query = useSearchStore((state) => state.resource?.query)
@@ -49,17 +47,15 @@ const SearchFilter = ({
   }, [facetResults])
 
   const performFilter = (selectedFilters) => {
-    dispatch(
-      fetchSinopiaSearchResults(
-        query,
-        {
-          ...searchOptions,
-          startOfRange: 0,
-          [filterSearchOption]: selectedFilters,
-        },
-        errorKey,
-        keycloak
-      )
+    fetchSinopiaSearchResults(
+      query,
+      {
+        ...searchOptions,
+        startOfRange: 0,
+        [filterSearchOption]: selectedFilters,
+      },
+      errorKey,
+      keycloak
     )
   }
 

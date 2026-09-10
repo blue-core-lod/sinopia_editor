@@ -3,19 +3,19 @@ import useEntitiesStore from "stores/entitiesStore"
 import { nanoid } from "nanoid"
 import _ from "lodash"
 
-// A thunk that fetches a lookup, transforms it, and adds to state.
-export const fetchLookup = (uri) => (dispatch) => {
+// A function that fetches a lookup, transforms it, and adds to state.
+export const fetchLookup = (uri) => {
   const existingLookup = selectLookup(useEntitiesStore.getState(), uri)
   if (existingLookup) {
     return existingLookup
   }
 
-  if (uri.startsWith("file:")) return dispatch(fetchFileLookup(uri))
+  if (uri.startsWith("file:")) return fetchFileLookup(uri)
 
-  return dispatch(fetchHttpLookup(uri))
+  return fetchHttpLookup(uri)
 }
 
-const fetchFileLookup = (uri) => () => {
+const fetchFileLookup = (uri) => {
   /* eslint security/detect-non-literal-require: 'off' */
   const lookupJson = require(`../../static/${uri.substring(6)}`)
   const opts = lookupJson.map((authority) => ({
@@ -27,7 +27,7 @@ const fetchFileLookup = (uri) => () => {
   return opts
 }
 
-const fetchHttpLookup = (uri) => () => {
+const fetchHttpLookup = (uri) => {
   const url = `${uri}.json`
   return fetch(url)
     .then((resp) => resp.json())

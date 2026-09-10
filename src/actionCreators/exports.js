@@ -3,7 +3,7 @@ import useEditorStore from "stores/editorStore"
 import useEntitiesStore from "stores/entitiesStore"
 import { hasExports } from "selectors/exports"
 
-export const fetchExports = (errorKey) => () => {
+export const fetchExports = (errorKey) => {
   // Return if already loaded.
   if (hasExports(useEntitiesStore.getState())) return
 

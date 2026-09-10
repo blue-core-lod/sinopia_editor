@@ -1,18 +1,14 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import { fetchLanguages } from "actionCreators/languages"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import useEntitiesStore from "stores/entitiesStore"
-
-const mockStore = configureMockStore([thunk])
 
 describe("fetchLanguages", () => {
   it("dispatches actions", async () => {
     useEntitiesStore.setState({ languages: {}, languageLookup: [] })
-    const store = mockStore(createState({ noLanguage: true }))
-    await store.dispatch(fetchLanguages())
+    createState({ noLanguage: true })
+    await fetchLanguages()
 
     const state = useEntitiesStore.getState()
 

@@ -2,8 +2,6 @@ import { newResource } from "actionCreators/resources"
 import mockConsole from "jest-mock-console"
 import * as sinopiaApi from "sinopiaApi"
 import Config from "Config"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import { nanoid } from "nanoid"
 import useHistoryStore from "stores/historyStore"
@@ -55,20 +53,21 @@ afterEach(() => {
 // This forces Sinopia server to use fixtures
 jest.spyOn(Config, "useResourceTemplateFixtures", "get").mockReturnValue(true)
 
-const mockStore = configureMockStore([thunk])
-
 const resourceTemplateId = "resourceTemplate:testing:inputs"
 
 describe("newResource", () => {
   sinopiaApi.putUserHistory = jest.fn().mockResolvedValue()
 
   describe("loading from resource template", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
       const keycloak = { token: "test-token" }
-      const result = await store.dispatch(
-        newResource(resourceTemplateId, "testerrorkey", true, keycloak)
+      const result = await newResource(
+        resourceTemplateId,
+        "testerrorkey",
+        true,
+        keycloak
       )
       expect(result).toBe("abc0")
 
@@ -94,11 +93,12 @@ describe("newResource", () => {
   })
 
   describe("loading from invalid resource template", () => {
-    const store = mockStore(createState())
+    createState()
 
     it("dispatches actions", async () => {
-      const result = await store.dispatch(
-        newResource("rt:repeated:propertyURI:propertyLabel", "testerrorkey")
+      const result = await newResource(
+        "rt:repeated:propertyURI:propertyLabel",
+        "testerrorkey"
       )
       expect(result).toBe(false)
 

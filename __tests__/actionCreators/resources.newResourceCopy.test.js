@@ -1,8 +1,6 @@
 import { newResourceCopy } from "actionCreators/resources"
 import mockConsole from "jest-mock-console"
 import Config from "Config"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import { nanoid } from "nanoid"
 import useEditorStore from "stores/editorStore"
@@ -51,13 +49,11 @@ afterAll(() => {
 // This forces Sinopia server to use fixtures
 jest.spyOn(Config, "useResourceTemplateFixtures", "get").mockReturnValue(true)
 
-const mockStore = configureMockStore([thunk])
-
 describe("newResourceCopy", () => {
   describe("loading from existing resource", () => {
     it("dispatches actions", async () => {
-      const store = mockStore(createState({ hasResourceWithLiteral: true }))
-      await store.dispatch(newResourceCopy("t9zVwg2zO"))
+      createState({ hasResourceWithLiteral: true })
+      await newResourceCopy("t9zVwg2zO")
 
       // New subject was added to Zustand store
       const newSubject = useEntitiesStore.getState().subjects.abc0
@@ -74,10 +70,8 @@ describe("newResourceCopy", () => {
 
   describe("copying a resource with a nested resource", () => {
     it("does not copy the nested valueSubject", async () => {
-      const store = mockStore(
-        createState({ hasResourceWithNestedResource: true })
-      )
-      await store.dispatch(newResourceCopy("ljAblGiBW"))
+      createState({ hasResourceWithNestedResource: true })
+      await newResourceCopy("ljAblGiBW")
 
       // The copied resource should exist in Zustand
       const copiedResource = useEntitiesStore.getState().subjects.abc0

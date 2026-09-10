@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { useDispatch } from "react-redux"
 import {
   newResource,
   loadResourceForEditor,
@@ -16,7 +15,6 @@ const useResource = (
   errorKey,
   { resourceTemplateId = null, resourceURI = null }
 ) => {
-  const dispatch = useDispatch()
   const history = useHistory()
   const { keycloak } = useKeycloak()
   const errors = useEditorStore((state) => state.errors[errorKey])
@@ -39,24 +37,20 @@ const useResource = (
   const handleNew = (event) => {
     if (event) event.preventDefault()
     setStatus("loading new")
-    dispatch(newResource(resourceTemplateId, errorKey, true, keycloak)).then(
-      (result) => {
-        setStatus("ready")
-        if (result) setNavigateEditor(true)
-      }
-    )
+    newResource(resourceTemplateId, errorKey, true, keycloak).then((result) => {
+      setStatus("ready")
+      if (result) setNavigateEditor(true)
+    })
   }
 
   const handleCopy = (event) => {
     if (event) event.preventDefault()
     setStatus("loading copy")
-    dispatch(
-      loadResourceForEditor(
-        resourceURI,
-        errorKey,
-        { asNewResource: true },
-        keycloak
-      )
+    loadResourceForEditor(
+      resourceURI,
+      errorKey,
+      { asNewResource: true },
+      keycloak
     ).then((result) => {
       setStatus("ready")
       if (result) setNavigateEditor(true)
@@ -73,7 +67,7 @@ const useResource = (
       setNavigateEditor(true)
     } else {
       setStatus("loading edit")
-      dispatch(loadResourceForEditor(resourceURI, errorKey, {}, keycloak)).then(
+      loadResourceForEditor(resourceURI, errorKey, {}, keycloak).then(
         (result) => {
           setStatus("ready")
           if (result) setNavigateEditor(true)
@@ -91,7 +85,7 @@ const useResource = (
       useEditorStore.getState().showModal("PreviewModal")
     } else {
       setStatus("loading view")
-      dispatch(loadResourceForPreview(resourceURI, errorKey)).then((result) => {
+      loadResourceForPreview(resourceURI, errorKey).then((result) => {
         setStatus("ready")
         if (result) useEditorStore.getState().showModal("PreviewModal")
       })

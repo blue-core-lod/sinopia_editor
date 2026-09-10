@@ -1,14 +1,10 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import { fetchLookup } from "actionCreators/lookups"
-import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
 import { nanoid } from "nanoid"
 import "isomorphic-fetch"
 import { createState } from "stateUtils"
 import useEntitiesStore from "stores/entitiesStore"
-
-const mockStore = configureMockStore([thunk])
 
 jest.mock("nanoid")
 nanoid.mockReturnValue("abc123")
@@ -78,8 +74,8 @@ describe("fetchLookup", () => {
       .fn()
       .mockImplementation(() => Promise.resolve({ json: () => carriers }))
 
-    const store = mockStore(createState())
-    await store.dispatch(fetchLookup(uri))
+    createState()
+    await fetchLookup(uri)
 
     const expectedLookup = [
       {
@@ -101,8 +97,8 @@ describe("fetchLookup", () => {
       .fn()
       .mockImplementation(() => Promise.reject(new Error("fail")))
 
-    const store = mockStore(createState())
-    await store.dispatch(fetchLookup(uri))
+    createState()
+    await fetchLookup(uri)
 
     const expectedLookup = [
       {

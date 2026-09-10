@@ -6,7 +6,7 @@ import _ from "lodash"
 import isoMapping from "../../static/iso639toBCP47.json"
 import Config from "../Config"
 
-export const fetchLanguages = () => () => {
+export const fetchLanguages = () => {
   if (hasLanguages(useEntitiesStore.getState())) {
     return // Languages already loaded
   }
