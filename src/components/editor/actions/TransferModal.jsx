@@ -1,8 +1,8 @@
 import React, { useState, useRef } from "react"
 import PropTypes from "prop-types"
 import { useDispatch } from "react-redux"
-import { hideModal } from "actions/modals"
 import { transfer } from "actionCreators/transfer"
+import useEditorStore from "stores/editorStore"
 import ModalWrapper from "../../ModalWrapper"
 import { useKeycloak } from "../../../KeycloakContext"
 
@@ -15,7 +15,7 @@ const TransferModal = ({ modalName, label, resourceUri, errorKey }) => {
   const handleLocalIdChange = (event) => setLocalId(event.target.value)
 
   const closeAndReset = () => {
-    dispatch(hideModal())
+    useEditorStore.getState().hideModal()
     setLocalId("")
   }
 

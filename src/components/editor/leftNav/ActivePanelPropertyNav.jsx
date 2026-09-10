@@ -1,7 +1,7 @@
 import React from "react"
 import PropTypes from "prop-types"
 import { useSelector, shallowEqual } from "react-redux"
-import { displayResourceValidations } from "selectors/errors"
+import useEditorStore from "stores/editorStore"
 import { selectNormProperty, selectNormValues } from "selectors/resources"
 import { selectPropertyTemplate } from "selectors/templates"
 import SubjectSubNav from "./SubjectSubNav"
@@ -23,8 +23,8 @@ const ActivePanelPropertyNav = (props) => {
   const propertyTemplate = useSelector((state) =>
     selectPropertyTemplate(state, property?.propertyTemplateKey)
   )
-  const displayValidations = useSelector((state) =>
-    displayResourceValidations(state, property?.rootSubjectKey)
+  const displayValidations = useEditorStore(
+    (state) => !!state.resourceValidation[property?.rootSubjectKey]
   )
 
   const { handleToggleClick, isExpanded } = useLeftNav(property)

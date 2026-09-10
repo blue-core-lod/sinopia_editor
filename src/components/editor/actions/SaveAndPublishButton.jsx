@@ -7,20 +7,9 @@ import { saveResource as saveResourceAction } from "actionCreators/resources"
 import {
   resourceHasChangesSinceLastSave,
   selectPickSubject,
-  selectCurrentResourceKey,
 } from "selectors/resources"
-import {
-  displayResourceValidations,
-  hasValidationErrors as hasValidationErrorsSelector,
-} from "selectors/errors"
-import {
-  showModal as showModalAction,
-  hideModal as hideModalAction,
-} from "actions/modals"
-import {
-  showValidationErrors as showValidationErrorsAction,
-  hideValidationErrors as hideValidationErrorsAction,
-} from "actions/errors"
+import { hasValidationErrors as hasValidationErrorsSelector } from "selectors/errors"
+import useEditorStore from "stores/editorStore"
 import { useKeycloak } from "../../../KeycloakContext"
 
 import useAlerts from "hooks/useAlerts"
@@ -30,7 +19,7 @@ const SaveAndPublishButton = (props) => {
   const errorKey = useAlerts()
   const { keycloak } = useKeycloak()
 
-  const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
+  const resourceKey = useEditorStore((state) => state.currentResource)
   // selectPickSubject and shallowEqual prevents rerender from unrelated changed.
   const resource = useSelector(
     (state) =>
@@ -43,8 +32,8 @@ const SaveAndPublishButton = (props) => {
   const hasValidationErrors = useSelector((state) =>
     hasValidationErrorsSelector(state, resourceKey)
   )
-  const validationErrorsAreShowing = useSelector((state) =>
-    displayResourceValidations(state, resourceKey)
+  const validationErrorsAreShowing = useEditorStore(
+    (state) => !!state.resourceValidation[resourceKey]
   )
 
   const isSaved = !!resource.uri
@@ -53,10 +42,10 @@ const SaveAndPublishButton = (props) => {
 
   const formIsValid = () => {
     if (hasValidationErrors) {
-      dispatch(showValidationErrorsAction(resourceKey))
+      useEditorStore.getState().showValidationErrors(resourceKey)
       return false
     }
-    dispatch(hideValidationErrorsAction(resourceKey))
+    useEditorStore.getState().hideValidationErrors(resourceKey)
     return true
   }
 
@@ -75,8 +64,8 @@ const SaveAndPublishButton = (props) => {
         )
       } else {
         // Show group chooser
-        dispatch(hideModalAction())
-        dispatch(showModalAction("GroupChoiceModal"))
+        useEditorStore.getState().hideModal()
+        useEditorStore.getState().showModal("GroupChoiceModal")
       }
     }
   }

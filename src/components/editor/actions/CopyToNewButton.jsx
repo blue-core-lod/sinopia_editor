@@ -3,23 +3,20 @@
 import React from "react"
 import { useDispatch, useSelector } from "react-redux"
 import PropTypes from "prop-types"
-import { showCopyNewMessage } from "actions/messages"
+import useEditorStore from "stores/editorStore"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCopy } from "@fortawesome/free-solid-svg-icons"
-import {
-  selectCurrentResourceKey,
-  selectNormSubject,
-} from "selectors/resources"
+import { selectNormSubject } from "selectors/resources"
 import { newResourceCopy } from "actionCreators/resources"
 
 const CopyToNewButton = (props) => {
   const dispatch = useDispatch()
-  const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
+  const resourceKey = useEditorStore((state) => state.currentResource)
   const resource = useSelector((state) => selectNormSubject(state, resourceKey))
 
   const handleClick = () => {
     dispatch(newResourceCopy(resource.key))
-    dispatch(showCopyNewMessage(resource.uri))
+    useEditorStore.getState().showCopyNewMessage(resource.uri)
   }
 
   return (

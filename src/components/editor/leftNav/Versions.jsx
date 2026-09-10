@@ -10,8 +10,8 @@ import {
   loadResourceForDiff,
   loadResourceForPreview,
 } from "actionCreators/resources"
-import { setCurrentDiff, setVersions } from "actions/resources"
-import { showModal } from "actions/modals"
+import { setVersions } from "actions/resources"
+import useEditorStore from "stores/editorStore"
 import VersionPreviewModal from "../preview/VersionPreviewModal"
 import DiffModal from "./DiffModal"
 import { selectVersions } from "selectors/resources"
@@ -38,7 +38,7 @@ const Versions = ({ resource }) => {
       loadResourceForPreview(resource.uri, errorKey, { version: timestamp })
     ).then((result) => {
       setLoadingView(false)
-      if (result) dispatch(showModal("VersionPreviewModal"))
+      if (result) useEditorStore.getState().showModal("VersionPreviewModal")
     })
   }
 
@@ -69,7 +69,9 @@ const Versions = ({ resource }) => {
 
     const loadPromises = []
     if (compareFrom === "current") {
-      dispatch(setCurrentDiff({ compareFromResourceKey: resource.key }))
+      useEditorStore
+        .getState()
+        .setCurrentDiffResources(resource.key, undefined)
     } else {
       loadPromises.push(
         dispatch(
@@ -84,7 +86,9 @@ const Versions = ({ resource }) => {
     }
 
     if (compareTo === "current") {
-      dispatch(setCurrentDiff({ compareToResourceKey: resource.key }))
+      useEditorStore
+        .getState()
+        .setCurrentDiffResources(undefined, resource.key)
     } else {
       loadPromises.push(
         dispatch(
@@ -97,7 +101,7 @@ const Versions = ({ resource }) => {
 
     Promise.all(loadPromises).then((results) => {
       if (results.every((result) => result)) {
-        dispatch(showModal("DiffModal"))
+        useEditorStore.getState().showModal("DiffModal")
       }
     })
   }

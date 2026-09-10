@@ -5,6 +5,7 @@ import {
   selectSuccesses,
   selectValidationErrors,
 } from "selectors/errors"
+import useEditorStore from "stores/editorStore"
 
 describe("displayResourceValidations()", () => {
   it("defaults to false", () => {
@@ -54,13 +55,13 @@ describe("selectSuccesses()", () => {
 
   it("returns messages for a given success key", () => {
     const state = createState()
-    state.editor.successes = { abc123: ["Saved successfully"] }
+    useEditorStore.setState({ successes: { abc123: ["Saved successfully"] } })
     expect(selectSuccesses(state, "abc123")).toEqual(["Saved successfully"])
   })
 
   it("returns undefined for a key with no messages", () => {
     const state = createState()
-    state.editor.successes = { other: ["Something else"] }
+    useEditorStore.setState({ successes: { other: ["Something else"] } })
     expect(selectSuccesses(state, "abc123")).toBeUndefined()
   })
 })

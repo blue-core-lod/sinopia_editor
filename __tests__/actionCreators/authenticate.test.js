@@ -4,6 +4,7 @@ import configureMockStore from "redux-mock-store"
 import thunk from "redux-thunk"
 import * as sinopiaApi from "sinopiaApi"
 import useAuthenticateStore from "stores/authenticateStore"
+import useEditorStore from "stores/editorStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -90,7 +91,7 @@ describe("signIn", () => {
         updateToken: jest.fn(),
       }
       await store.dispatch(signIn(mockKeycloak, "testerrorkey"))
-      expect(store.getActions()).toHaveAction("CLEAR_ERRORS", "testerrorkey")
+      expect(useEditorStore.getState().errors["testerrorkey"]).toEqual([])
 
       // Simulate redirect back — keycloak now authenticated
       mockKeycloak.authenticated = true
@@ -113,7 +114,7 @@ describe("signIn", () => {
         login: jest.fn(() => Promise.resolve(false)),
       }
       await store.dispatch(signIn(mockKeycloak, "testerrorkey"))
-      expect(store.getActions()).toHaveAction("CLEAR_ERRORS", "testerrorkey")
+      expect(useEditorStore.getState().errors["testerrorkey"]).toEqual([])
 
       // Simulate user refreshing Sinopia — not authenticated
       await store.dispatch(authenticate(mockKeycloak))

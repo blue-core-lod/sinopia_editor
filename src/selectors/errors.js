@@ -1,4 +1,5 @@
 import { selectProperty, selectSubject, selectNormSubject } from "./resources"
+import useEditorStore from "stores/editorStore"
 import _ from "lodash"
 
 /**
@@ -8,7 +9,7 @@ import _ from "lodash"
  * @return {boolean} true if resource validations should be displayed
  */
 export const displayResourceValidations = (state, resourceKey) =>
-  !!state.editor.resourceValidation[resourceKey]
+  !!useEditorStore.getState().resourceValidation[resourceKey]
 
 export const hasValidationErrors = (state, resourceKey) => {
   const subject = selectNormSubject(state, resourceKey)
@@ -18,13 +19,14 @@ export const hasValidationErrors = (state, resourceKey) => {
 /**
  * @returns {function} a function that returns the errors for an error key
  */
-export const selectErrors = (state, errorKey) => state.editor.errors[errorKey]
+export const selectErrors = (state, errorKey) =>
+  useEditorStore.getState().errors[errorKey]
 
 /**
  * @returns {Array} the success messages for a given success key
  */
 export const selectSuccesses = (state, successKey) =>
-  state.editor.successes?.[successKey]
+  useEditorStore.getState().successes?.[successKey]
 
 export const selectValidationErrors = (state, resourceKey) => {
   const subject = selectSubject(state, resourceKey)

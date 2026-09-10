@@ -4,10 +4,15 @@ import thunk from "redux-thunk"
 import * as sinopiaApi from "sinopiaApi"
 import { createState } from "stateUtils"
 import { transfer } from "actionCreators/transfer"
+import useEditorStore from "stores/editorStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
 }))
+
+afterEach(() => {
+  useEditorStore.setState({ errors: {}, successes: {} })
+})
 
 const mockStore = configureMockStore([thunk])
 
@@ -28,10 +33,11 @@ describe("transfer", () => {
           { instance_uri: resourceUri },
           undefined
         )
-        expect(store.getActions()).toHaveAction("ADD_SUCCESS", {
-          successKey: "testerrorkey",
-          message: `Export of ${resourceUri} requested. You will be notified by email once processed.`,
-        })
+        expect(
+          useEditorStore.getState().successes["testerrorkey"]
+        ).toContain(
+          `Export of ${resourceUri} requested. You will be notified by email once processed.`
+        )
       })
     })
     describe("failure", () => {
@@ -42,10 +48,9 @@ describe("transfer", () => {
           transfer(resourceUri, null, undefined, "testerrorkey")
         )
 
-        expect(store.getActions()).toHaveAction("ADD_ERROR", {
-          errorKey: "testerrorkey",
-          error: "Error requesting transfer: Ooops!",
-        })
+        expect(
+          useEditorStore.getState().errors["testerrorkey"]
+        ).toContain("Error requesting transfer: Ooops!")
       })
     })
   })
@@ -65,10 +70,11 @@ describe("transfer", () => {
           { instance_uri: resourceUri, local_id: localId },
           undefined
         )
-        expect(store.getActions()).toHaveAction("ADD_SUCCESS", {
-          successKey: "testerrorkey",
-          message: `Export of ${resourceUri} using identifier ${localId} requested. You will be notified by email once processed.`,
-        })
+        expect(
+          useEditorStore.getState().successes["testerrorkey"]
+        ).toContain(
+          `Export of ${resourceUri} using identifier ${localId} requested. You will be notified by email once processed.`
+        )
       })
     })
     describe("failure", () => {
@@ -79,10 +85,9 @@ describe("transfer", () => {
           transfer(resourceUri, localId, undefined, "testerrorkey")
         )
 
-        expect(store.getActions()).toHaveAction("ADD_ERROR", {
-          errorKey: "testerrorkey",
-          error: "Error requesting transfer: Ooops!",
-        })
+        expect(
+          useEditorStore.getState().errors["testerrorkey"]
+        ).toContain("Error requesting transfer: Ooops!")
       })
     })
   })

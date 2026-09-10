@@ -1,11 +1,10 @@
 import React from "react"
-import { useSelector } from "react-redux"
-import { selectMarc } from "selectors/modals"
+import useEditorStore from "stores/editorStore"
 import ModalWrapper from "../../ModalWrapper"
 import ClipboardButton from "../../ClipboardButton"
 
 const MarcModal = () => {
-  const marc = useSelector((state) => selectMarc(state))
+  const marc = useEditorStore((state) => state.marc)
 
   const body = (
     <React.Fragment>

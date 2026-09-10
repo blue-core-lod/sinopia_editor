@@ -1,20 +1,17 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useEffect } from "react"
-import { useDispatch } from "react-redux"
 import PropTypes from "prop-types"
 import AlertsContextProvider from "components/alerts/AlertsContextProvider"
 import ContextAlert from "components/alerts/ContextAlert"
 import { metricsErrorKey } from "utilities/errorKeyFactory"
 import Header from "../Header"
-import { clearErrors } from "actions/errors"
+import useEditorStore from "stores/editorStore"
 
 const MetricsWrapper = ({ title, children, triggerHandleOffsetMenu }) => {
-  const dispatch = useDispatch()
-
   useEffect(() => {
-    dispatch(clearErrors(metricsErrorKey))
-  }, [dispatch])
+    useEditorStore.getState().clearErrors(metricsErrorKey)
+  }, [])
 
   return (
     <AlertsContextProvider value={metricsErrorKey}>

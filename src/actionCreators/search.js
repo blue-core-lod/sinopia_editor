@@ -11,7 +11,7 @@ import {
 } from "utilities/authorityConfig"
 import { addSearchHistory as addApiSearchHistory } from "actionCreators/user"
 import useHistoryStore from "stores/historyStore"
-import { clearErrors, addError } from "actions/errors"
+import useEditorStore from "stores/editorStore"
 import { isBfWorkInstanceItem } from "utilities/Bibframe"
 import { loadSearchRelationships } from "./relationships"
 
@@ -39,7 +39,7 @@ const computeSearchFacets = (results) => {
 
 export const fetchSinopiaSearchResults =
   (query, options, errorKey, keycloak) => (dispatch) => {
-    dispatch(clearErrors(errorKey))
+    useEditorStore.getState().clearErrors(errorKey)
     return getSearchResultsWithFacets(query, options, keycloak).then(
       ([response, facetResponse]) => {
         useHistoryStore.getState().addSearchHistory({
@@ -76,12 +76,12 @@ export const fetchSinopiaSearchResults =
             })
         }
         if (response.error) {
-          dispatch(
-            addError(
+          useEditorStore
+            .getState()
+            .addError(
               errorKey,
               `An error occurred while searching: ${response.error.toString()}`
             )
-          )
           return false
         }
         return true
@@ -95,7 +95,7 @@ export const fetchQASearchResults =
     const authorityConfig = findAuthorityConfig(uri)
     const searchPromise = createLookupPromise(query, authorityConfig, options)
 
-    dispatch(clearErrors(errorKey))
+    useEditorStore.getState().clearErrors(errorKey)
     return searchPromise.then((response) => {
       if (response.isError) {
         useSearchStore
@@ -110,12 +110,12 @@ export const fetchQASearchResults =
             options,
             response.errorObject.message
           )
-        dispatch(
-          addError(
+        useEditorStore
+          .getState()
+          .addError(
             errorKey,
             `An error occurred while searching: ${response.errorObject.message}`
           )
-        )
         return false
       }
       useHistoryStore.getState().addSearchHistory({
@@ -142,7 +142,7 @@ export const fetchQASearchResults =
 // These will be used as suggestions to the user when the user performs a Sinopia search.
 export const fetchTemplateGuessSearchResults =
   (queryString, errorKey, options = {}) =>
-  (dispatch) =>
+  () =>
     getTemplateSearchResults(queryString, options).then((response) => {
       useSearchStore
         .getState()
@@ -157,8 +157,11 @@ export const fetchTemplateGuessSearchResults =
           response.error
         )
       if (response.error) {
-        dispatch(
-          addError(errorKey, `Error searching for templates: ${response.error}`)
-        )
+        useEditorStore
+          .getState()
+          .addError(
+            errorKey,
+            `Error searching for templates: ${response.error}`
+          )
       }
     })

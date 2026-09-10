@@ -19,6 +19,7 @@ const useEditorStore = create((set, get) => ({
     compareTo: undefined,
   },
   errors: {},
+  successes: {},
   lastSave: {},
   resources: [],
   resourceValidation: {},

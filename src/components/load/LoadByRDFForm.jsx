@@ -1,15 +1,13 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useState, useEffect } from "react"
-import { useDispatch } from "react-redux"
 import {
   datasetFromRdf,
   findRootResourceTemplateId,
   hasQuadsForRootResourceTemplateId,
 } from "utilities/Utilities"
 import useRdfResource from "hooks/useRdfResource"
-import { clearErrors, addError } from "actions/errors"
-import { showModal } from "actions/modals"
+import useEditorStore from "stores/editorStore"
 import ResourceTemplateChoiceModal from "../ResourceTemplateChoiceModal"
 import useAlerts from "hooks/useAlerts"
 import { useHistory } from "react-router-dom"
@@ -46,7 +44,6 @@ const prettyXml = (xml) => {
 }
 
 const LoadByRDFForm = () => {
-  const dispatch = useDispatch()
   const errorKey = useAlerts()
   const { keycloak } = useKeycloak()
   const history = useHistory()
@@ -66,7 +63,7 @@ const LoadByRDFForm = () => {
 
     setIsConvertingMarc(true)
     setMarcText("")
-    dispatch(clearErrors(errorKey))
+    useEditorStore.getState().clearErrors(errorKey)
 
     const reader = new FileReader()
     reader.onload = (e) => {
@@ -104,9 +101,9 @@ const LoadByRDFForm = () => {
           setIsMarcBibframe(true)
         })
         .catch((err) =>
-          dispatch(
-            addError(errorKey, `Error converting MARC: ${err.message || err}`)
-          )
+          useEditorStore
+            .getState()
+            .addError(errorKey, `Error converting MARC: ${err.message || err}`)
         )
         .finally(() => setIsConvertingMarc(false))
     }
@@ -122,11 +119,11 @@ const LoadByRDFForm = () => {
     // Clear resource template id so that useRdfResource doesn't trigger with previous resource template id.
     setResourceTemplateId(null)
     // Clear errors
-    if (!dataset) dispatch(clearErrors(errorKey))
-  }, [dispatch, dataset, errorKey])
+    if (!dataset) useEditorStore.getState().clearErrors(errorKey)
+  }, [dataset, errorKey])
 
   const changeRdf = (event) => {
-    dispatch(clearErrors(errorKey))
+    useEditorStore.getState().clearErrors(errorKey)
     setRdf(event.target.value)
     setIsMarcBibframe(false)
     // This will get set on submit.
@@ -137,7 +134,7 @@ const LoadByRDFForm = () => {
   const handleSubmit = (event) => {
     event.preventDefault()
     setDataset(false)
-    dispatch(clearErrors(errorKey))
+    useEditorStore.getState().clearErrors(errorKey)
 
     if (isMarcBibframe) {
       fetch(`${Config.sinopiaApiBase}/works`, {
@@ -157,9 +154,9 @@ const LoadByRDFForm = () => {
           history.push(`/editor/${json.uuid}`)
         })
         .catch((err) =>
-          dispatch(
-            addError(errorKey, `Error creating work: ${err.message || err}`)
-          )
+          useEditorStore
+            .getState()
+            .addError(errorKey, `Error creating work: ${err.message || err}`)
         )
       return
     }
@@ -169,7 +166,9 @@ const LoadByRDFForm = () => {
       .then((newDataset) => {
         // Determine if base URI must be provided.
         if (!hasQuadsForRootResourceTemplateId(baseURI, newDataset)) {
-          dispatch(addError(errorKey, "Base URI must be provided."))
+          useEditorStore
+            .getState()
+            .addError(errorKey, "Base URI must be provided.")
           return
         }
 
@@ -181,12 +180,16 @@ const LoadByRDFForm = () => {
         if (resourceTemplateId) {
           setResourceTemplateId(resourceTemplateId)
         } else {
-          dispatch(showModal("ResourceTemplateChoiceModal"))
+          useEditorStore
+            .getState()
+            .showModal("ResourceTemplateChoiceModal")
         }
         setDataset(newDataset)
       })
       .catch((err) => {
-        dispatch(addError(errorKey, `Error parsing: ${err}`))
+        useEditorStore
+          .getState()
+          .addError(errorKey, `Error parsing: ${err}`)
       })
   }
 

@@ -3,14 +3,11 @@
 import React from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faEye } from "@fortawesome/free-solid-svg-icons"
-import { useDispatch } from "react-redux"
-import { showModal } from "actions/modals"
+import useEditorStore from "stores/editorStore"
 
 const PreviewButton = () => {
-  const dispatch = useDispatch()
-
   const handleClick = (event) => {
-    dispatch(showModal("RDFModal"))
+    useEditorStore.getState().showModal("RDFModal")
     event.preventDefault()
   }
 

@@ -1,18 +1,12 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector } from "react-redux"
-import {
-  selectCurrentResourceKey,
-  selectResourceKeys,
-} from "selectors/resources"
+import useEditorStore from "stores/editorStore"
 import ResourcesNavTab from "./ResourcesNavTab"
 
 const ResourcesNav = () => {
-  const currentResourceKey = useSelector((state) =>
-    selectCurrentResourceKey(state)
-  )
-  const resourceKeys = useSelector((state) => selectResourceKeys(state))
+  const currentResourceKey = useEditorStore((state) => state.currentResource)
+  const resourceKeys = useEditorStore((state) => state.resources)
 
   const navTabs = resourceKeys.map((resourceKey) => (
     <ResourcesNavTab

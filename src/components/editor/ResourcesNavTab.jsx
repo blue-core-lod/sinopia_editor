@@ -1,23 +1,21 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector, useDispatch } from "react-redux"
+import { useSelector } from "react-redux"
 import PropTypes from "prop-types"
 import CloseButton from "./actions/CloseButton"
 import { selectPickSubject } from "selectors/resources"
-import { setCurrentResource } from "actions/resources"
+import useEditorStore from "stores/editorStore"
 import ResourceTitle from "./ResourceTitle"
 
 const ResourcesNavTab = ({ resourceKey, active }) => {
-  const dispatch = useDispatch()
-
   const resource = useSelector((state) =>
     selectPickSubject(state, resourceKey, ["label", "classes"])
   )
 
   const handleResourceNavClick = (event) => {
     event.preventDefault()
-    dispatch(setCurrentResource(resourceKey))
+    useEditorStore.getState().setCurrentEditResource(resourceKey)
   }
 
   const itemClasses = ["nav-item"]

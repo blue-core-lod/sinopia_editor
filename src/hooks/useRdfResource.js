@@ -1,9 +1,8 @@
 /* eslint max-params: ["error", 5] */
 import { useState, useEffect } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import { newResourceFromDataset } from "actionCreators/resources"
-import { clearErrors } from "actions/errors"
-import { selectCurrentResourceKey } from "selectors/resources"
+import useEditorStore from "stores/editorStore"
 import { useHistory } from "react-router-dom"
 
 /**
@@ -18,7 +17,9 @@ import { useHistory } from "react-router-dom"
 const useRdfResource = (dataset, baseURI, resourceTemplateId, errorKey) => {
   const dispatch = useDispatch()
   const history = useHistory()
-  const hasResource = useSelector((state) => !!selectCurrentResourceKey(state))
+  const hasResource = useEditorStore(
+    (state) => !!state.currentResource
+  )
 
   // Indicates that would like to change to editor once resource is in state
   const [navigateEditor, setNavigateEditor] = useState(false)
@@ -27,7 +28,7 @@ const useRdfResource = (dataset, baseURI, resourceTemplateId, errorKey) => {
     if (!dataset || baseURI === undefined || !resourceTemplateId) {
       return
     }
-    dispatch(clearErrors(errorKey))
+    useEditorStore.getState().clearErrors(errorKey)
     dispatch(
       newResourceFromDataset(
         dataset,

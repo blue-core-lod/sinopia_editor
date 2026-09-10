@@ -3,12 +3,9 @@
 import React from "react"
 import { useDispatch, useSelector } from "react-redux"
 import ModalWrapper from "components/ModalWrapper"
-import { hideModal } from "actions/modals"
-import {
-  selectCurrentPreviewResourceKey,
-  selectNormSubject,
-} from "selectors/resources"
-import { setCurrentPreviewResource, clearResource } from "actions/resources"
+import useEditorStore from "stores/editorStore"
+import { selectNormSubject } from "selectors/resources"
+import { clearResource } from "actions/resources"
 import ResourceDisplay from "./ResourceDisplay"
 import ResourcePreviewHeader from "./ResourcePreviewHeader"
 
@@ -16,8 +13,8 @@ const VersionPreviewModal = () => {
   const dispatch = useDispatch()
 
   // Ensure there is a current resource before attempting to render a resource component
-  const currentResourceKey = useSelector((state) =>
-    selectCurrentPreviewResourceKey(state)
+  const currentResourceKey = useEditorStore(
+    (state) => state.currentPreviewResource
   )
   const currentResource = useSelector((state) =>
     selectNormSubject(state, currentResourceKey)
@@ -25,8 +22,9 @@ const VersionPreviewModal = () => {
 
   const close = (event) => {
     event.preventDefault()
-    dispatch(setCurrentPreviewResource(null))
-    dispatch(hideModal())
+    useEditorStore.getState().setCurrentPreviewResource(null)
+    useEditorStore.getState().hideModal()
+    useEditorStore.getState().clearResource(currentResourceKey)
     dispatch(clearResource(currentResourceKey))
   }
 

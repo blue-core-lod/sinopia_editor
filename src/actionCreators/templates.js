@@ -1,5 +1,5 @@
 // Copyright 2019 Stanford University see LICENSE for license
-import { addError } from "actions/errors"
+import useEditorStore from "stores/editorStore"
 import { validateTemplates } from "./templateValidationHelpers"
 import Config from "Config"
 import { addTemplates } from "actions/templates"
@@ -28,12 +28,12 @@ export const loadResourceTemplate =
         ).then((isValid) => (isValid ? subjectTemplate : null))
       )
       .catch((err) => {
-        dispatch(
-          addError(
+        useEditorStore
+          .getState()
+          .addError(
             errorKey,
             `Error retrieving ${resourceTemplateId}: ${err.message || err}`
           )
-        )
         return null
       })
 

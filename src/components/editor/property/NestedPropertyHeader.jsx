@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons"
 import PropertyLabel from "./PropertyLabel"
 import PropertyLabelInfo from "./PropertyLabelInfo"
-import { displayResourceValidations } from "selectors/errors"
+import useEditorStore from "stores/editorStore"
 import { showProperty, hideProperty } from "actions/resources"
 import { expandProperty, contractProperty } from "actionCreators/resources"
 import { bindActionCreators } from "redux"
@@ -122,10 +122,9 @@ NestedPropertyHeader.propTypes = {
 
 const mapStateToProps = (state, ownProps) => ({
   collapsed: false,
-  displayValidations: displayResourceValidations(
-    state,
+  displayValidations: !!useEditorStore.getState().resourceValidation[
     ownProps.property?.rootSubjectKey
-  ),
+  ],
   resourceKey: ownProps.property?.rootSubjectKey,
 })
 

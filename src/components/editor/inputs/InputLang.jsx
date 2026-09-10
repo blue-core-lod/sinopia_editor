@@ -3,9 +3,8 @@
 import React, { useState, useEffect } from "react"
 import { Typeahead } from "react-bootstrap-typeahead"
 import { useSelector, useDispatch } from "react-redux"
-import { selectCurrentLangModalValue } from "selectors/modals"
+import useEditorStore from "stores/editorStore"
 import { languageSelected, setDefaultLang } from "actions/languages"
-import { hideModal } from "actions/modals"
 import ModalWrapper from "components/ModalWrapper"
 import {
   selectLanguages,
@@ -23,7 +22,7 @@ import _ from "lodash"
 const InputLang = () => {
   const dispatch = useDispatch()
   const { keycloak } = useKeycloak()
-  const valueKey = useSelector((state) => selectCurrentLangModalValue(state))
+  const valueKey = useEditorStore((state) => state.currentLangModalValue)
   const value = useSelector((state) => selectNormValue(state, valueKey))
   const langOptions = useSelector((state) => selectLanguages(state))
   const scriptOptions = useSelector((state) => selectScripts(state))
@@ -120,7 +119,7 @@ const InputLang = () => {
 
   const close = (event) => {
     event.preventDefault()
-    dispatch(hideModal())
+    useEditorStore.getState().hideModal()
   }
 
   const handleLangSubmit = (event) => {

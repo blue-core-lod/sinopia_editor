@@ -1,24 +1,16 @@
 import { useEffect } from "react"
-import { setCurrentComponent } from "actions/index"
-import { useDispatch, useSelector } from "react-redux"
-import {
-  isCurrentProperty as isCurrentPropertySelector,
-  isCurrentComponent as isCurrentComponentSelector,
-} from "selectors/index"
+import useEditorStore from "stores/editorStore"
 import { stickyScrollIntoView } from "utilities/Utilities"
 
 const useNavLink = (navObj) => {
-  const dispatch = useDispatch()
-
-  const isCurrentProperty = useSelector((state) =>
-    isCurrentPropertySelector(
-      state,
-      navObj.rootSubjectKey,
+  const isCurrentProperty = useEditorStore(
+    (state) =>
+      state.currentComponent[navObj.rootSubjectKey]?.property ===
       navObj.rootPropertyKey
-    )
   )
-  const isCurrentComponent = useSelector((state) =>
-    isCurrentComponentSelector(state, navObj.rootSubjectKey, navObj.key)
+  const isCurrentComponent = useEditorStore(
+    (state) =>
+      state.currentComponent[navObj.rootSubjectKey]?.component === navObj.key
   )
   const navLinkId = `navLink-${navObj.key}`
   const navTargetId = `navTarget-${navObj.key}`
@@ -37,13 +29,13 @@ const useNavLink = (navObj) => {
     event.preventDefault()
 
     stickyScrollIntoView(`#${navTargetId}`)
-    dispatch(
-      setCurrentComponent(
+    useEditorStore
+      .getState()
+      .setCurrentComponent(
         navObj.rootSubjectKey,
         navObj.rootPropertyKey,
         navObj.key
       )
-    )
   }
 
   return { navLinkId, handleNavLinkClick, isCurrentProperty }

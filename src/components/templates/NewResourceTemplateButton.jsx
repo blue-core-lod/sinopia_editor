@@ -2,11 +2,10 @@
 
 import React, { useEffect, useState } from "react"
 import PropTypes from "prop-types"
-import { useSelector, useDispatch } from "react-redux"
+import { useDispatch } from "react-redux"
 import { Link } from "react-router-dom"
 import { newResource } from "actionCreators/resources"
-import { selectErrors } from "selectors/errors"
-import { selectCurrentResourceKey } from "selectors/resources"
+import useEditorStore from "stores/editorStore"
 import _ from "lodash"
 import Config from "Config"
 import usePermissions from "hooks/usePermissions"
@@ -21,8 +20,8 @@ const NewResourceTemplateButton = (props) => {
   const errorKey = useAlerts()
   const [isLoading, setIsLoading] = useState(false)
 
-  const errors = useSelector((state) => selectErrors(state, errorKey))
-  const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
+  const errors = useEditorStore((state) => state.errors[errorKey])
+  const resourceKey = useEditorStore((state) => state.currentResource)
 
   const [navigateEditor, setNavigateEditor] = useState(false)
 

@@ -1,4 +1,4 @@
-import { addError } from "actions/errors"
+import useEditorStore from "stores/editorStore"
 import _ from "lodash"
 import { loadResourceTemplateWithoutValidation } from "./templates"
 
@@ -39,7 +39,9 @@ export const validateTemplates =
       ),
     ]).then((errors) => {
       const flatErrors = errors.flat()
-      flatErrors.forEach((error) => dispatch(addError(errorKey, error)))
+      flatErrors.forEach((error) =>
+        useEditorStore.getState().addError(errorKey, error)
+      )
       return _.isEmpty(flatErrors)
     })
 

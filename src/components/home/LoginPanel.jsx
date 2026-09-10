@@ -1,10 +1,9 @@
 import React, { useState } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import { useDispatch } from "react-redux"
 import useAuthenticateStore from "stores/authenticateStore"
 import { signIn } from "actionCreators/authenticate"
 import { useKeycloak } from "../../KeycloakContext"
-import Config from "Config"
-import { selectErrors } from "selectors/errors"
+import useEditorStore from "stores/editorStore"
 import _ from "lodash"
 import { signInErrorKey } from "utilities/errorKeyFactory"
 
@@ -18,7 +17,7 @@ const LoginPanel = () => {
   const { keycloak } = useKeycloak()
 
   const error = _.first(
-    useSelector((state) => selectErrors(state, signInErrorKey))
+    useEditorStore((state) => state.errors[signInErrorKey])
   )
 
   const handleSubmit = (event) => {

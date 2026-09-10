@@ -10,11 +10,9 @@ import EditorActions from "./EditorActions"
 import ErrorMessages from "./ErrorMessages"
 import ContextSuccess from "components/alerts/ContextSuccess"
 import ResourcesNav from "./ResourcesNav"
-import {
-  displayResourceValidations,
-  hasValidationErrors as hasValidationErrorsSelector,
-} from "selectors/errors"
-import { selectCurrentResourceKey, selectResourceId } from "selectors/resources"
+import { hasValidationErrors as hasValidationErrorsSelector } from "selectors/errors"
+import { selectResourceId } from "selectors/resources"
+import useEditorStore from "stores/editorStore"
 import { useHistory, useRouteMatch } from "react-router-dom"
 import EditorPreviewModal from "./preview/EditorPreviewModal"
 import { selectSubjectTemplateForSubject } from "selectors/templates"
@@ -32,7 +30,7 @@ const Editor = (props) => {
   })
   const editorResourceMatch = useRouteMatch("/editor/resource/:resourceId")
 
-  const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
+  const resourceKey = useEditorStore((state) => state.currentResource)
   // Resource ID is extracted from the URI. Presence indicates the resource has been saved.
   const resourceId = useSelector((state) =>
     selectResourceId(state, resourceKey)
@@ -42,8 +40,8 @@ const Editor = (props) => {
   )
   const subjectTemplateKey = subjectTemplate?.key
 
-  const displayErrors = useSelector((state) =>
-    displayResourceValidations(state, resourceKey)
+  const displayErrors = useEditorStore(
+    (state) => !!state.resourceValidation[resourceKey]
   )
   const hasValidationErrors = useSelector((state) =>
     hasValidationErrorsSelector(state, resourceKey)

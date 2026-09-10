@@ -3,6 +3,7 @@ import { initialState } from "store"
 import StateResourceBuilder from "./stateResourceBuilderUtils"
 import _ from "lodash"
 import useAuthenticateStore from "stores/authenticateStore"
+import useEditorStore from "stores/editorStore"
 
 const build = new StateResourceBuilder()
 
@@ -27,6 +28,13 @@ export const createState = (options = {}) => {
   buildLookups(state, options)
   buildSearchResults(state, options)
   buildCurrentDiff(state, options)
+
+  // Sync editor state to Zustand store for tests
+  if (state.editor) {
+    useEditorStore.setState({
+      ...state.editor,
+    })
+  }
 
   return state
 }

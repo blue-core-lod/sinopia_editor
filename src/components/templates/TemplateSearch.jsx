@@ -2,20 +2,18 @@
 
 import React, { useEffect, useRef, useState, useCallback } from "react"
 import { getTemplateSearchResults } from "sinopiaSearch"
-import { useDispatch } from "react-redux"
 import useSearchStore from "stores/searchStore"
+import useEditorStore from "stores/editorStore"
 import SinopiaResourceTemplates from "./SinopiaResourceTemplates"
 import SearchResultsPaging from "components/search/SearchResultsPaging"
 import NewResourceTemplateButton from "./NewResourceTemplateButton"
 import { defaultSearchResultsPerPage } from "utilities/Search"
-import { clearErrors, addError } from "actions/errors"
 import PropTypes from "prop-types"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons"
 import useAlerts from "hooks/useAlerts"
 
 const TemplateSearch = (props) => {
-  const dispatch = useDispatch()
   const errorKey = useAlerts()
   // Tokens allow us to cancel an existing search. Does not actually stop the
   // search, but causes result to be ignored.
@@ -56,7 +54,7 @@ const TemplateSearch = (props) => {
     tokens.current.push(token)
     getTemplateSearchResults(queryString, { startOfRange }).then((response) => {
       if (!token.cancel) {
-        if (queryString !== "") dispatch(clearErrors(errorKey))
+        if (queryString !== "") useEditorStore.getState().clearErrors(errorKey)
         useSearchStore
           .getState()
           .setSearchResults(
@@ -70,16 +68,16 @@ const TemplateSearch = (props) => {
             response.error
           )
         if (response.error) {
-          dispatch(
-            addError(
+          useEditorStore
+            .getState()
+            .addError(
               errorKey,
               `Error searching for templates: ${response.error}`
             )
-          )
         }
       }
     })
-  }, [dispatch, queryString, startOfRange, errorKey])
+  }, [queryString, startOfRange, errorKey])
 
   const changePage = (startOfRange) => {
     setStartOfRange(startOfRange)
