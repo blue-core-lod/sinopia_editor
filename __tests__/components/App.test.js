@@ -156,6 +156,50 @@ describe("<App />", () => {
       await waitFor(() => expect(history.location.pathname).toContain("editor"))
     })
 
+    // The Blue Core API returns no group/editGroups, so canEdit() used to be
+    // false for every deep-linked resource and it opened read-only in the
+    // preview modal instead of the editor. See issue #172.
+    it("navigates to editor for /?resource=<uri> when the API omits groups", async () => {
+      const state = createState({ notAuthenticated: false })
+      // Production hardcodes every user into the single Blue Core group.
+      state.authenticate.user.groups = ["blue core"]
+      const store = createStore(state)
+
+      const resourceUri =
+        "https://bcld.info/works/4b8c1e1a-1111-4222-8333-000000000001"
+      fetchMock.mock(resourceUri, {
+        id: 1,
+        type: "works",
+        uri: resourceUri,
+        uuid: "4b8c1e1a-1111-4222-8333-000000000001",
+        created_at: "2026-09-09T12:00:00.000Z",
+        updated_at: "2026-09-09T12:00:00.000Z",
+        data: [
+          {
+            "@id": resourceUri,
+            "@type": ["http://id.loc.gov/ontologies/bibframe/Note"],
+            "http://sinopia.io/vocabulary/hasResourceTemplate": [
+              { "@value": "resourceTemplate:bf2:Note" },
+            ],
+          },
+        ],
+      })
+      fetchMock.mock(`${resourceUri}/relationships`, {
+        bfAdminMetadataRefs: [],
+        bfItemRefs: [],
+        bfInstanceRefs: [],
+        bfWorkRefs: [],
+        sinopiaHasLocalAdminMetadataInferredRefs: [],
+      })
+
+      const history = createHistory([
+        `/?resource=${encodeURIComponent(resourceUri)}`,
+      ])
+      renderApp(store, history)
+
+      await waitFor(() => expect(history.location.pathname).toContain("editor"))
+    })
+
     it("creates new resource and renders editor for /editor/<rtId>", async () => {
       const state = createState({ notAuthenticated: false })
       const store = createStore(state)

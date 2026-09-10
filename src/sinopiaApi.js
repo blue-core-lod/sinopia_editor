@@ -70,12 +70,28 @@ export const fetchResource = (
 
   return fetchPromise
     .then((response) =>
-      Promise.all([datasetFromJsonld(response.data), Promise.resolve(response)])
+      Promise.all([
+        datasetFromJsonld(response.data),
+        Promise.resolve(withDefaultGroups(response)),
+      ])
     )
     .catch((err) => {
       throw new Error(`Error parsing resource: ${err.message || err}`)
     })
 }
+
+// The Blue Core API does not return group information, so supply the default
+// group when it is absent. Without this, permission checks such as
+// usePermissions.canEdit() fail for every resource loaded from the API and the
+// resource opens read-only. See issue #172. Values that are present (fixtures,
+// or a future API that models groups) are left alone.
+const withDefaultGroups = (response) => ({
+  ...response,
+  group: response.group ?? Config.defaultGroup,
+  editGroups: response.editGroups?.length
+    ? response.editGroups
+    : [Config.defaultGroup],
+})
 
 const isBaseTemplateUri = (uri) =>
   uri.startsWith(`${Config.sinopiaApiBase}/resource/sinopia:template:`)
@@ -108,7 +124,7 @@ export const fetchResourceRelationships = (uri) => {
 
 // Fetches list of groups
 export const getGroups = () =>
-  Promise.resolve([{ id: "blue core", label: "Blue Core" }])
+  Promise.resolve([{ id: Config.defaultGroup, label: "Blue Core" }])
 
 // Sends a serialized resource body to the Blue Core API with the appropriate
 // auth header. Shared by postResource and putResource.

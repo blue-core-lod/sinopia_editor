@@ -101,7 +101,9 @@ const App = (props) => {
           }
           const [, resource] = result
           if (canEdit(resource)) {
-            dispatch(dispatchResourceForEditor(result, resourceParam))
+            dispatch(
+              dispatchResourceForEditor(result, resourceParam, {}, keycloak)
+            )
             history.push("/editor")
           } else {
             dispatch(dispatchResourceForPreview(result))
@@ -120,7 +122,7 @@ const App = (props) => {
           }
           const [, resource] = result
           if (canEdit(resource)) {
-            dispatch(dispatchResourceForEditor(result, uri))
+            dispatch(dispatchResourceForEditor(result, uri, {}, keycloak))
           } else {
             dispatch(dispatchResourceForPreview(result))
             dispatch(showModal("PreviewModal"))
