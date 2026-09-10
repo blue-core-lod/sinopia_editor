@@ -1,5 +1,4 @@
 import React from "react"
-import { useDispatch } from "react-redux"
 import PropTypes from "prop-types"
 
 const PropertyURI = ({
@@ -8,8 +7,6 @@ const PropertyURI = ({
   changePropertyUri,
   readOnly,
 }) => {
-  const dispatch = useDispatch()
-
   const propertyUriLabel = (uri) => {
     const label = propertyTemplate.uris[uri]
     return uri === label ? uri : `${label} (${uri})`
@@ -32,7 +29,7 @@ const PropertyURI = ({
   const handleChange = (event) => {
     event.preventDefault()
     if (event.target.value !== obj.propertyUri) {
-      dispatch(changePropertyUri(obj.key, event.target.value))
+      changePropertyUri(obj.key, event.target.value)
     }
   }
 

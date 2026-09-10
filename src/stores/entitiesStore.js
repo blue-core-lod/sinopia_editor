@@ -86,14 +86,12 @@ const useEntitiesStore = create((set, get) => ({
     applyReducer(get, set, loadResourceFinishedReducer, resourceKey),
   saveResourceFinished: (resourceKey) =>
     applyReducer(get, set, saveResourceFinishedReducer, { resourceKey }),
-  addSubject: (subject) =>
-    applyReducer(get, set, addSubjectReducer, subject),
+  addSubject: (subject) => applyReducer(get, set, addSubjectReducer, subject),
   addProperty: (property) =>
     applyReducer(get, set, addPropertyReducer, property),
   addValue: (value, siblingValueKey) =>
     applyReducer(get, set, addValueReducer, { value, siblingValueKey }),
-  updateValue: (payload) =>
-    applyReducer(get, set, updateValueReducer, payload),
+  updateValue: (payload) => applyReducer(get, set, updateValueReducer, payload),
   removeValue: (valueKey) =>
     applyReducer(get, set, removeValueReducer, valueKey),
   removeSubject: (subjectKey) =>

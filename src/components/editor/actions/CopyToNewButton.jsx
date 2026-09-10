@@ -1,7 +1,8 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import useEditorStore from "stores/editorStore"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -12,7 +13,9 @@ import { newResourceCopy } from "actionCreators/resources"
 const CopyToNewButton = (props) => {
   const dispatch = useDispatch()
   const resourceKey = useEditorStore((state) => state.currentResource)
-  const resource = useSelector((state) => selectNormSubject(state, resourceKey))
+  const resource = useEntitiesStore((state) =>
+    selectNormSubject(state, resourceKey)
+  )
 
   const handleClick = () => {
     dispatch(newResourceCopy(resource.key))

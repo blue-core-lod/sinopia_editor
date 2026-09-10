@@ -1,22 +1,19 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useDispatch, useSelector } from "react-redux"
 import ModalWrapper from "components/ModalWrapper"
 import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 import { selectNormSubject } from "selectors/resources"
-import { clearResource } from "actions/resources"
 import ResourceDisplay from "./ResourceDisplay"
 import ResourcePreviewHeader from "./ResourcePreviewHeader"
 
 const VersionPreviewModal = () => {
-  const dispatch = useDispatch()
-
   // Ensure there is a current resource before attempting to render a resource component
   const currentResourceKey = useEditorStore(
     (state) => state.currentPreviewResource
   )
-  const currentResource = useSelector((state) =>
+  const currentResource = useEntitiesStore((state) =>
     selectNormSubject(state, currentResourceKey)
   )
 
@@ -25,7 +22,7 @@ const VersionPreviewModal = () => {
     useEditorStore.getState().setCurrentPreviewResource(null)
     useEditorStore.getState().hideModal()
     useEditorStore.getState().clearResource(currentResourceKey)
-    dispatch(clearResource(currentResourceKey))
+    useEntitiesStore.getState().clearResource(currentResourceKey)
   }
 
   const header = (

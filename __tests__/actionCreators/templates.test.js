@@ -5,6 +5,7 @@ import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import useAuthenticateStore from "stores/authenticateStore"
 import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -39,12 +40,12 @@ describe("loadResourceTemplate()", () => {
         "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal"
       )
 
-      expect(store.getActions()).toEqual([
-        {
-          type: "ADD_TEMPLATES",
-          payload: expect.toBeSubjectTemplate("ld4p:RT:bf2:Title:AbbrTitle"),
-        },
-      ])
+      // Template was added to Zustand store
+      expect(
+        useEntitiesStore.getState().subjectTemplates[
+          "ld4p:RT:bf2:Title:AbbrTitle"
+        ]
+      ).toBeSubjectTemplate("ld4p:RT:bf2:Title:AbbrTitle")
     })
   })
 
@@ -78,14 +79,13 @@ describe("loadResourceTemplate()", () => {
       )
       expect(subjectTemplate).toBeNull()
 
-      expect(store.getActions()).toEqual([
-        {
-          type: "ADD_TEMPLATES",
-          payload: expect.toBeSubjectTemplate(
-            "rt:repeated:propertyURI:propertyLabel"
-          ),
-        },
-      ])
+      // Template was added to Zustand store
+      expect(
+        useEntitiesStore.getState().subjectTemplates[
+          "rt:repeated:propertyURI:propertyLabel"
+        ]
+      ).toBeSubjectTemplate("rt:repeated:propertyURI:propertyLabel")
+
       expect(useEditorStore.getState().errors.testerrorkey).toContain(
         "A property template may not use the same property URI as another property template (http://id.loc.gov/ontologies/bibframe/geographicCoverage) unless both propery templates are of type nested resource and the nested resources are of different classes."
       )

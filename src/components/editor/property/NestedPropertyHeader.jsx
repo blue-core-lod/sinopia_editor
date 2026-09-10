@@ -6,9 +6,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons"
 import PropertyLabel from "./PropertyLabel"
 import PropertyLabelInfo from "./PropertyLabelInfo"
-import { showProperty, hideProperty } from "actions/resources"
 import { expandProperty, contractProperty } from "actionCreators/resources"
 import { useDispatch } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import ToggleButton from "../ToggleButton"
 import useAlerts from "hooks/useAlerts"
 import PropertyPropertyURI from "./PropertyPropertyURI"
@@ -28,9 +28,9 @@ const NestedPropertyHeader = ({ property, propertyTemplate, readOnly }) => {
   const toggleProperty = (event) => {
     event.preventDefault()
     if (property.show) {
-      dispatch(hideProperty(property.key))
+      useEntitiesStore.getState().hideProperty(property.key)
     } else {
-      dispatch(showProperty(property.key))
+      useEntitiesStore.getState().showProperty(property.key)
     }
   }
 

@@ -4,7 +4,7 @@ import rdf from "rdf-ext"
 import { nanoid } from "nanoid"
 import _ from "lodash"
 import { loadResourceTemplate } from "actionCreators/templates"
-import { addSubject as addSubjectAction } from "actions/resources"
+import useEntitiesStore from "stores/entitiesStore"
 import { selectProperty, selectSubject, selectValue } from "selectors/resources"
 import {
   newLiteralValue,
@@ -127,7 +127,7 @@ export const addResourceFromDataset =
         )
       }
 
-      dispatch(addSubjectAction(newResource))
+      useEntitiesStore.getState().addSubject(newResource)
       return [newResource, context.usedDataset]
     })
   }
@@ -146,7 +146,8 @@ export const addEmptyResource = (resourceTemplateId, errorKey) => (dispatch) =>
         return Promise.all(promises)
           .then((expandedProperties) => {
             subject.properties = expandedProperties
-            return dispatch(addSubjectAction(subject))
+            useEntitiesStore.getState().addSubject(subject)
+            return subject
           })
           .then(() => subject)
       }
@@ -671,8 +672,8 @@ const valuesForExpandedProperty =
     return Promise.resolve([])
   }
 
-export const newSubjectCopy = (subjectKey, value) => (dispatch, getState) => {
-  const subject = selectSubject(getState(), subjectKey)
+export const newSubjectCopy = (subjectKey, value) => (dispatch) => {
+  const subject = selectSubject(useEntitiesStore.getState(), subjectKey)
   const newSubject = _.pick(subject, ["subjectTemplate", "classes"])
 
   // Add to value
@@ -690,8 +691,8 @@ export const newSubjectCopy = (subjectKey, value) => (dispatch, getState) => {
   ).then(() => newSubject)
 }
 
-const newPropertyCopy = (propertyKey, subject) => (dispatch, getState) => {
-  const property = selectProperty(getState(), propertyKey)
+const newPropertyCopy = (propertyKey, subject) => (dispatch) => {
+  const property = selectProperty(useEntitiesStore.getState(), propertyKey)
 
   // Skip Work-Instance relationship properties
   const templateUris = Object.keys(property.propertyTemplate?.uris || {})
@@ -723,8 +724,8 @@ const newPropertyCopy = (propertyKey, subject) => (dispatch, getState) => {
   return newProperty
 }
 
-const newValueCopy = (valueKey, property) => (dispatch, getState) => {
-  const value = selectValue(getState(), valueKey)
+const newValueCopy = (valueKey, property) => () => {
+  const value = selectValue(useEntitiesStore.getState(), valueKey)
   const newValue = _.pick(value, [
     "literal",
     "lang",

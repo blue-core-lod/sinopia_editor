@@ -1,17 +1,6 @@
 import useHistoryStore from "stores/historyStore"
 import useEditorStore from "stores/editorStore"
-import {
-  addProperty as addPropertyAction,
-  addValue as addValueAction,
-  removeValue as removeValueAction,
-  updateLiteralValue,
-  addSubject as addSubjectAction,
-  showProperty,
-  setBaseURL,
-  loadResourceFinished,
-  setResourceGroup,
-  clearVersions,
-} from "actions/resources"
+import useEntitiesStore from "stores/entitiesStore"
 import {
   addResourceFromDataset,
   addEmptyResource,
@@ -148,7 +137,7 @@ export const dispatchResourceForEditor =
           keycloak
         )
       )
-      dispatch(loadResourceFinished(resource.key))
+      useEntitiesStore.getState().loadResourceFinished(resource.key)
     }
     return true
   }
@@ -266,7 +255,7 @@ export const newResource =
         useHistoryStore.getState().addTemplateHistory(resource.subjectTemplate)
         dispatch(addUserTemplateHistory(resourceTemplateId, keycloak))
         // This will mark the resource has unchanged.
-        dispatch(loadResourceFinished(resource.key))
+        useEntitiesStore.getState().loadResourceFinished(resource.key)
         return resource.key
       })
       .catch((err) => {
@@ -290,7 +279,7 @@ export const newResource =
 export const newResourceCopy = (resourceKey) => (dispatch) =>
   dispatch(newSubjectCopy(resourceKey))
     .then((newResource) => {
-      dispatch(addSubjectAction(newResource))
+      useEntitiesStore.getState().addSubject(newResource)
       useEditorStore
         .getState()
         .setCurrentComponent(
@@ -337,7 +326,8 @@ export const newResourceFromDataset =
             unusedDataset.size > 0 ? unusedDataset.toCanonical() : null
           )
         useEditorStore.getState().setCurrentEditResource(resource.key)
-        if (!asNewResource) dispatch(loadResourceFinished(resource.key))
+        if (!asNewResource)
+          useEntitiesStore.getState().loadResourceFinished(resource.key)
         return true
       })
       .catch((err) => {
@@ -357,10 +347,8 @@ export const newResourceFromDataset =
 
 // A thunk that publishes (saves) a new resource
 export const saveNewResource =
-  (resourceKey, group, editGroups, errorKey, keycloak) =>
-  (dispatch, getState) => {
-    const state = getState()
-    const resource = selectFullSubject(state, resourceKey)
+  (resourceKey, group, editGroups, errorKey, keycloak) => (dispatch) => {
+    const resource = selectFullSubject(useEntitiesStore.getState(), resourceKey)
     const currentUser = useAuthenticateStore.getState().user
     const unusedRDF = useEditorStore.getState().unusedRDF[resourceKey]
 
@@ -375,8 +363,10 @@ export const saveNewResource =
       unusedRDF
     )
       .then((resourceUrl) => {
-        dispatch(setBaseURL(resourceKey, resourceUrl))
-        dispatch(setResourceGroup(resourceKey, group, editGroups))
+        useEntitiesStore.getState().setBaseURL(resourceKey, resourceUrl)
+        useEntitiesStore
+          .getState()
+          .setResourceGroup(resourceKey, group, editGroups)
         useEditorStore.getState().saveResourceFinished(resourceKey, Date.now())
         dispatch(addUserResourceHistory(resourceUrl, keycloak))
         dispatch(
@@ -396,10 +386,8 @@ export const saveNewResource =
 
 // A thunk that saves an existing resource
 export const saveResource =
-  (resourceKey, group, editGroups, errorKey, keycloak) =>
-  (dispatch, getState) => {
-    const state = getState()
-    const resource = selectFullSubject(state, resourceKey)
+  (resourceKey, group, editGroups, errorKey, keycloak) => (dispatch) => {
+    const resource = selectFullSubject(useEntitiesStore.getState(), resourceKey)
     const currentUser = useAuthenticateStore.getState().user
     const unusedRDF = useEditorStore.getState().unusedRDF[resourceKey]
 
@@ -415,7 +403,9 @@ export const saveResource =
       unusedRDF
     )
       .then(() => {
-        dispatch(setResourceGroup(resourceKey, group, editGroups))
+        useEntitiesStore
+          .getState()
+          .setResourceGroup(resourceKey, group, editGroups)
         useEditorStore.getState().saveResourceFinished(resourceKey, Date.now())
         dispatch(addUserResourceHistory(resource.uri, keycloak))
         dispatch(
@@ -425,7 +415,7 @@ export const saveResource =
             resource.group
           )
         )
-        dispatch(clearVersions(resourceKey))
+        useEntitiesStore.getState().clearVersions(resourceKey)
       })
       .catch((err) => {
         console.error(err)
@@ -439,128 +429,125 @@ export const saveResource =
  * A thunk that expands a property based on resource template and adds to state.
  * Note that this is NOT showing/hiding a property.
  */
-export const expandProperty =
-  (propertyKey, errorKey) => (dispatch, getState) => {
-    const property = selectProperty(getState(), propertyKey)
-    let promises
-    if (property.propertyTemplate.type === "resource") {
-      promises = property.propertyTemplate.valueSubjectTemplateKeys.map(
-        (resourceTemplateId) =>
-          dispatch(newSubject(null, resourceTemplateId, {}, errorKey)).then(
-            (subject) =>
-              dispatch(
-                newPropertiesFromTemplates(subject, false, errorKey)
-              ).then((properties) => {
+export const expandProperty = (propertyKey, errorKey) => (dispatch) => {
+  const property = selectProperty(useEntitiesStore.getState(), propertyKey)
+  let promises
+  if (property.propertyTemplate.type === "resource") {
+    promises = property.propertyTemplate.valueSubjectTemplateKeys.map(
+      (resourceTemplateId) =>
+        dispatch(newSubject(null, resourceTemplateId, {}, errorKey)).then(
+          (subject) =>
+            dispatch(newPropertiesFromTemplates(subject, false, errorKey)).then(
+              (properties) => {
                 subject.properties = properties
                 const newValue = newValueSubject(
                   property,
                   property.propertyTemplate.defaultUri,
                   subject
                 )
-                return dispatch(addValueAction(newValue))
-              })
-          )
-      )
-    } else {
-      property.values = defaultValuesFor(property)
-      if (!_.isEmpty(property.values)) property.show = true
-      promises = [
-        dispatch(
-          addPropertyAction(
-            _.pick(property, [
-              "key",
-              "subjectKey",
-              "propertyTemplateKey",
-              "propertyUri",
-              "show",
-              "values",
-            ])
-          )
-        ),
-      ]
-    }
-    return Promise.all(promises).then(() =>
-      dispatch(showProperty(property.key))
+                useEntitiesStore.getState().addValue(newValue)
+              }
+            )
+        )
     )
+  } else {
+    property.values = defaultValuesFor(property)
+    if (!_.isEmpty(property.values)) property.show = true
+    promises = [
+      useEntitiesStore
+        .getState()
+        .addProperty(
+          _.pick(property, [
+            "key",
+            "subjectKey",
+            "propertyTemplateKey",
+            "propertyUri",
+            "show",
+            "values",
+          ])
+        ),
+    ]
   }
+  return Promise.all(promises).then(() =>
+    useEntitiesStore.getState().showProperty(property.key)
+  )
+}
 
 /**
  * A thunk that clears the values from a property from state (the opposite of expandProperty).
  * Note that this is NOT showing/hiding a property.
  */
-export const contractProperty = (propertyKey) => (dispatch, getState) => {
-  const property = selectProperty(getState(), propertyKey)
+export const contractProperty = (propertyKey) => () => {
+  const property = selectProperty(useEntitiesStore.getState(), propertyKey)
   property.values = null
-  dispatch(addPropertyAction(property))
+  useEntitiesStore.getState().addProperty(property)
 }
 
 /**
  * A thunk that adds a new value subject that is based on an existing value subject (i.e., "add another").
  */
-export const addSiblingValueSubject =
-  (valueKey, errorKey) => (dispatch, getState) => {
-    const value = selectValue(getState(), valueKey)
-    return dispatch(
-      newSubject(null, value.valueSubject.subjectTemplate.id, {}, errorKey)
-    ).then((subject) =>
-      dispatch(newPropertiesFromTemplates(subject, false, errorKey)).then(
-        (properties) => {
-          subject.properties = properties
-          const newValue = newValueSubject(
-            value.property,
-            value.propertyUri,
-            subject
-          )
-          return dispatch(addValueAction(newValue, valueKey))
-        }
-      )
+export const addSiblingValueSubject = (valueKey, errorKey) => (dispatch) => {
+  const value = selectValue(useEntitiesStore.getState(), valueKey)
+  return dispatch(
+    newSubject(null, value.valueSubject.subjectTemplate.id, {}, errorKey)
+  ).then((subject) =>
+    dispatch(newPropertiesFromTemplates(subject, false, errorKey)).then(
+      (properties) => {
+        subject.properties = properties
+        const newValue = newValueSubject(
+          value.property,
+          value.propertyUri,
+          subject
+        )
+        useEntitiesStore.getState().addValue(newValue, valueKey)
+      }
     )
-  }
+  )
+}
 
 /**
  * A thunk that resets a nested resource value to a fresh blank subject of the same template.
  */
-export const resetValueSubject =
-  (valueKey, errorKey) => (dispatch, getState) => {
-    const value = selectValue(getState(), valueKey)
-    const templateId = value.valueSubject.subjectTemplate.id
-    return dispatch(newSubject(null, templateId, {}, errorKey)).then(
-      (subject) =>
-        dispatch(newPropertiesFromTemplates(subject, false, errorKey)).then(
-          (properties) => {
-            subject.properties = properties
-            const newValue = newValueSubject(
-              value.property,
-              value.propertyUri,
-              subject
-            )
-            dispatch(addValueAction(newValue, valueKey))
-            dispatch(removeValueAction(valueKey))
-          }
+export const resetValueSubject = (valueKey, errorKey) => (dispatch) => {
+  const value = selectValue(useEntitiesStore.getState(), valueKey)
+  const templateId = value.valueSubject.subjectTemplate.id
+  return dispatch(newSubject(null, templateId, {}, errorKey)).then((subject) =>
+    dispatch(newPropertiesFromTemplates(subject, false, errorKey)).then(
+      (properties) => {
+        subject.properties = properties
+        const newValue = newValueSubject(
+          value.property,
+          value.propertyUri,
+          subject
         )
+        useEntitiesStore.getState().addValue(newValue, valueKey)
+        useEntitiesStore.getState().removeValue(valueKey)
+      }
     )
+  )
+}
+
+export const addMainTitle = (resourceKey, mainTitle) => () => {
+  const property = selectMainTitleProperty(
+    useEntitiesStore.getState(),
+    resourceKey
+  )
+  if (!property) return
+
+  if (_.isEmpty(property.valueKeys)) {
+    const value = newLiteralValue(
+      property,
+      mainTitle.propertyUri,
+      mainTitle.literal,
+      mainTitle.lang
+    )
+    useEntitiesStore.getState().addValue(value)
+    return
   }
 
-export const addMainTitle =
-  (resourceKey, mainTitle) => (dispatch, getState) => {
-    const property = selectMainTitleProperty(getState(), resourceKey)
-    if (!property) return
-
-    if (_.isEmpty(property.valueKeys)) {
-      const value = newLiteralValue(
-        property,
-        mainTitle.propertyUri,
-        mainTitle.literal,
-        mainTitle.lang
-      )
-      return dispatch(addValueAction(value))
-    }
-
-    return dispatch(
-      updateLiteralValue(
-        property.valueKeys[0],
-        mainTitle.literal,
-        mainTitle.lang
-      )
-    )
-  }
+  useEntitiesStore.getState().updateValue({
+    valueKey: property.valueKeys[0],
+    literal: mainTitle.literal || null,
+    lang: mainTitle.lang || null,
+  })
+}

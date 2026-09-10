@@ -1,7 +1,8 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector, useDispatch } from "react-redux"
+import { useDispatch } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import PropertyLabel from "./PropertyLabel"
 import PropertyLabelInfo from "./PropertyLabelInfo"
@@ -19,10 +20,10 @@ import PropertyPropertyURI from "./PropertyPropertyURI"
 const PanelProperty = ({ propertyKey, readOnly, id, isTemplate }) => {
   const dispatch = useDispatch()
   const errorKey = useAlerts()
-  const property = useSelector((state) =>
+  const property = useEntitiesStore((state) =>
     selectNormProperty(state, propertyKey)
   )
-  const propertyTemplate = useSelector((state) =>
+  const propertyTemplate = useEntitiesStore((state) =>
     selectPropertyTemplate(state, property?.propertyTemplateKey)
   )
 

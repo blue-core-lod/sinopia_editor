@@ -1,13 +1,13 @@
 // Copyright 2021 Stanford University see LICENSE for license
 
 import React, { useState } from "react"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import ResourceURIMessage from "../ResourceURIMessage"
 import { selectGroupMap } from "selectors/groups"
 
 const ResourcePreviewHeader = ({ resource }) => {
-  const groupMap = useSelector((state) => selectGroupMap(state))
+  const groupMap = useEntitiesStore((state) => selectGroupMap(state))
   const editableBy = resource.editGroups
     .map((group) => groupMap[group]) // look up the group name from the ID
     .filter((group) => group) // ditch any undefined group (an unmatched groupID for whatever reason)

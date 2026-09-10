@@ -6,6 +6,7 @@ import GraphBuilder from "GraphBuilder"
 import { createState } from "stateUtils"
 import { selectFullSubject } from "selectors/resources"
 import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 import * as dataSetUtils from "utilities/Utilities"
 import { featureSetup } from "featureUtils"
 
@@ -31,9 +32,12 @@ jest.mock("keycloak-js", () => {
 featureSetup()
 
 describe("<RDFDisplay />", () => {
-  const state = createState({ hasTwoLiteralResources: true })
+  createState({ hasTwoLiteralResources: true })
   const dataset = new GraphBuilder(
-    selectFullSubject(state, useEditorStore.getState().currentResource)
+    selectFullSubject(
+      useEntitiesStore.getState(),
+      useEditorStore.getState().currentResource
+    )
   ).graph
 
   it("renders as a table", async () => {

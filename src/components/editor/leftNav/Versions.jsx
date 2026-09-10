@@ -1,7 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useState, useEffect } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import PropTypes from "prop-types"
 import { fetchResourceVersions } from "sinopiaApi"
 import TimeAgo from "javascript-time-ago"
@@ -10,8 +10,8 @@ import {
   loadResourceForDiff,
   loadResourceForPreview,
 } from "actionCreators/resources"
-import { setVersions } from "actions/resources"
 import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 import VersionPreviewModal from "../preview/VersionPreviewModal"
 import DiffModal from "./DiffModal"
 import { selectVersions } from "selectors/resources"
@@ -22,7 +22,9 @@ import _ from "lodash"
 const Versions = ({ resource }) => {
   const dispatch = useDispatch()
   const errorKey = useAlerts()
-  const versions = useSelector((state) => selectVersions(state, resource.key))
+  const versions = useEntitiesStore((state) =>
+    selectVersions(state, resource.key)
+  )
 
   const [compareFrom, setCompareFrom] = useState()
   const [compareTo, setCompareTo] = useState("current")
@@ -45,7 +47,9 @@ const Versions = ({ resource }) => {
   useEffect(() => {
     if (!_.isEmpty(versions)) return
     fetchResourceVersions(resource.uri).then((newVersions) => {
-      dispatch(setVersions(resource.key, newVersions.reverse()))
+      useEntitiesStore
+        .getState()
+        .setVersions(resource.key, newVersions.reverse())
       setCompareFrom(_.first(newVersions).timestamp)
     })
   }, [resource.uri, resource.key, versions, dispatch])

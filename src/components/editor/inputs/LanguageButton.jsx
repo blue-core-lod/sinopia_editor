@@ -2,12 +2,12 @@
 
 import React from "react"
 import PropTypes from "prop-types"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import useEditorStore from "stores/editorStore"
 import { selectLanguageLabel } from "selectors/languages"
 
 const LanguageButton = ({ value }) => {
-  const langLabel = useSelector((state) =>
+  const langLabel = useEntitiesStore((state) =>
     selectLanguageLabel(state, value.lang)
   )
 

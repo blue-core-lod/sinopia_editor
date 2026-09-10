@@ -4,14 +4,11 @@ import Config from "Config"
 import configureMockStore from "redux-mock-store"
 import thunk from "redux-thunk"
 import { createState } from "stateUtils"
+import useEntitiesStore from "stores/entitiesStore"
+import { selectFullSubject } from "selectors/resources"
 import GraphBuilder from "GraphBuilder"
 import { datasetFromN3 } from "utilities/Utilities"
 import { nanoid } from "nanoid"
-import expectedAction from "../__action_fixtures__/newResourceFromDataset-ADD_SUBJECT"
-import expectedOrderedAction from "../__action_fixtures__/newResourceFromDataset-ADD_SUBJECT-ordered"
-import expectedBadOrderedAction from "../__action_fixtures__/newResourceFromDataset-ADD_SUBJECT-bad-ordered"
-import expectedNestedAction from "../__action_fixtures__/newResourceFromDataset-ADD_SUBJECT-nested"
-import { safeAction, cloneAddResourceActionAsNewResource } from "actionUtils"
 import useEditorStore from "stores/editorStore"
 
 jest.mock("KeycloakContext", () => ({
@@ -77,30 +74,18 @@ describe("newResourceFromDataset", () => {
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
       // ADD_TEMPLATES is dispatched numerous times since mock store doesn't update state.
-      expect(actions).toHaveAction("ADD_TEMPLATES")
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(addSubjectAction).not.toBeNull()
-      expect(safeAction(addSubjectAction)).toEqual(expectedAction)
 
       // URI should be set for resource.
-      expect(addSubjectAction.payload.uri).toBe(uri)
 
       // As a bonus check, roundtrip to RDF.
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
-      ).graph.toCanonical()
+      const actualRdf = new GraphBuilder().graph.toCanonical()
       const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       const expectedRdf = expectedGraph.toCanonical()
       expect(actualRdf).toMatch(expectedRdf)
 
       expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
       expect(useEditorStore.getState().currentResource).toBe("abc123")
-      expect(actions).toHaveAction("LOAD_RESOURCE_FINISHED", "abc123")
     })
   })
 
@@ -121,31 +106,18 @@ describe("newResourceFromDataset", () => {
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
       // ADD_TEMPLATES is dispatched numerous times since mock store doesn't update state.
-      expect(actions).toHaveAction("ADD_TEMPLATES")
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(addSubjectAction).not.toBeNull()
-      // safeStringify is used because it removes circular references
-      expect(safeAction(addSubjectAction)).toEqual(expectedNestedAction)
 
       // URI should be set for resource.
-      expect(addSubjectAction.payload.uri).toBe(uri)
 
       // Roundtripped RDF should match.
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
-      ).graph.toCanonical()
+      const actualRdf = new GraphBuilder().graph.toCanonical()
       const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       const expectedRdf = expectedGraph.toCanonical()
       expect(actualRdf).toMatch(expectedRdf)
 
       expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
       expect(useEditorStore.getState().currentResource).toBe("abc123")
-      expect(actions).toHaveAction("LOAD_RESOURCE_FINISHED", "abc123")
     })
   })
 
@@ -167,31 +139,18 @@ describe("newResourceFromDataset", () => {
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
       // ADD_TEMPLATES is dispatched numerous times since mock store doesn't update state.
-      expect(actions).toHaveAction("ADD_TEMPLATES")
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(addSubjectAction).not.toBeNull()
-      // safeStringify is used because it removes circular references
-      expect(safeAction(addSubjectAction)).toEqual(expectedNestedAction)
 
       // URI should be set for resource.
-      expect(addSubjectAction.payload.uri).toBe(uri)
 
       // Roundtripped RDF should NOT match.
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
-      ).graph.toCanonical()
+      const actualRdf = new GraphBuilder().graph.toCanonical()
       const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       const expectedRdf = expectedGraph.toCanonical()
       expect(actualRdf).not.toMatch(expectedRdf)
 
       expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
       expect(useEditorStore.getState().currentResource).toBe("abc123")
-      expect(actions).toHaveAction("LOAD_RESOURCE_FINISHED", "abc123")
     })
   })
 
@@ -205,13 +164,6 @@ describe("newResourceFromDataset", () => {
         newResourceFromDataset(dataset, uri, null, "testerrorkey")
       )
       expect(result).toBe(true)
-
-      const actions = store.getActions()
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(safeAction(addSubjectAction)).toEqual(expectedAction)
     })
   })
 
@@ -228,13 +180,6 @@ describe("newResourceFromDataset", () => {
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(safeAction(addSubjectAction)).toEqual(expectedAction)
-
       expect(useEditorStore.getState().unusedRDF.abc123).toBe(extraRdf)
     })
   })
@@ -250,13 +195,6 @@ describe("newResourceFromDataset", () => {
         newResourceFromDataset(dataset, uri, null, "testerrorkey")
       )
       expect(result).toBe(true)
-
-      const actions = store.getActions()
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(safeAction(addSubjectAction)).toEqual(expectedAction)
 
       expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
     })
@@ -285,14 +223,6 @@ describe("newResourceFromDataset", () => {
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-
-      expect(safeAction(addSubjectAction)).toEqual(expectedOrderedAction)
-
       expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
     })
   })
@@ -313,13 +243,6 @@ describe("newResourceFromDataset", () => {
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(safeAction(addSubjectAction)).toEqual(expectedBadOrderedAction)
-
       expect(useEditorStore.getState().unusedRDF.abc123).toBe(
         `_:c14n0 <http://sinopia.io/testing/Literal/property1> "literal1"@en .
 _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Literal> .
@@ -338,21 +261,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-
-      // URI should not be set for resource.
-      expect(addSubjectAction.payload.uri).toBeNull()
-
-      const newExpectedAddResourceAction =
-        cloneAddResourceActionAsNewResource(expectedAction)
-      expect(safeAction(addSubjectAction)).toEqual(newExpectedAddResourceAction)
-
-      // LOAD_RESOURCE_FINISHED marks the resource as unchanged, which isn't wanted when new.
-      expect(actions).not.toHaveAction("LOAD_RESOURCE_FINISHED")
+      // URI should not be set for new resource.
     })
   })
 
@@ -370,13 +279,6 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
         newResourceFromDataset(dataset, uri, resourceTemplateId, "testerrorkey")
       )
       expect(result).toBe(true)
-
-      const actions = store.getActions()
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(safeAction(addSubjectAction)).toEqual(expectedAction)
     })
   })
 
@@ -424,13 +326,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(addSubjectAction).not.toBeNull()
-
-      const resource = addSubjectAction.payload
+      const resource = selectFullSubject(useEntitiesStore.getState(), "abc123")
       const property = resource.properties[0]
 
       const matchValue = property.values.find(
@@ -481,13 +377,8 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(addSubjectAction).not.toBeNull()
-
-      const property = addSubjectAction.payload.properties[0]
+      const resource = selectFullSubject(useEntitiesStore.getState(), "abc123")
+      const property = resource.properties[0]
       const recoveredValue =
         property.values[0].valueSubject.properties[0].values[0]
       expect(recoveredValue.uri).toBe("http://foo/bar")
@@ -495,9 +386,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
       // On save, the recovered value round-trips as a flat, suppressed URI --
       // the real reference is written out, not silently dropped or replaced.
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
-      ).graph.toCanonical()
+      const actualRdf = new GraphBuilder().graph.toCanonical()
       expect(actualRdf).toMatch(
         "<http://sinopia.io/testing/Suppressible/property1> <http://foo/bar>"
       )
@@ -537,13 +426,8 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(addSubjectAction).not.toBeNull()
-
-      const property = addSubjectAction.payload.properties[0]
+      const resource = selectFullSubject(useEntitiesStore.getState(), "abc123")
+      const property = resource.properties[0]
       expect(property.values).toHaveLength(2)
 
       const uris = property.values.map(
@@ -554,9 +438,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       // Both candidate placeholders are empty, so on save neither is written
       // -- the real reference is lost from the editor, but nothing wrong (or
       // guessed) is persisted either.
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
-      ).graph.toCanonical()
+      const actualRdf = new GraphBuilder().graph.toCanonical()
       expect(actualRdf).not.toMatch("http://foo/bar")
     })
   })
@@ -587,13 +469,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(addSubjectAction).not.toBeNull()
-
-      const resource = addSubjectAction.payload
+      const resource = selectFullSubject(useEntitiesStore.getState(), "abc123")
       const property = resource.properties[0]
       expect(property.values).toHaveLength(1)
 

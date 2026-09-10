@@ -1,5 +1,5 @@
 import React, { useMemo } from "react"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import { selectNormSubject } from "selectors/resources"
 import useAuthenticateStore from "stores/authenticateStore"
@@ -12,7 +12,9 @@ import _ from "lodash"
 
 const TransferButtons = ({ resourceKey }) => {
   const errorKey = useAlerts()
-  const resource = useSelector((state) => selectNormSubject(state, resourceKey))
+  const resource = useEntitiesStore((state) =>
+    selectNormSubject(state, resourceKey)
+  )
   const userGroups = useAuthenticateStore((state) => state.user?.groups)
 
   const transferTargets = useMemo(() => {

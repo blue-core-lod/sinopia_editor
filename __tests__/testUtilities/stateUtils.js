@@ -1,9 +1,10 @@
-// Copyright 2019 Stanford University see LICENSE for licenseimport React from 'react'
+// Copyright 2019 Stanford University see LICENSE for license
 import { initialState } from "store"
 import StateResourceBuilder from "./stateResourceBuilderUtils"
 import _ from "lodash"
 import useAuthenticateStore from "stores/authenticateStore"
 import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 
 const build = new StateResourceBuilder()
 
@@ -49,6 +50,9 @@ export const createState = (options = {}) => {
   buildLookups(state, options)
   buildSearchResults(state, options)
   buildCurrentDiff(state, options)
+
+  // Seed the Zustand entities store with the built entities state
+  useEntitiesStore.setState(state.entities)
 
   return state
 }

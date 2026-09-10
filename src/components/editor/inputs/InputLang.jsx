@@ -2,9 +2,8 @@
 
 import React, { useState, useEffect } from "react"
 import { Typeahead } from "react-bootstrap-typeahead"
-import { useSelector, useDispatch } from "react-redux"
 import useEditorStore from "stores/editorStore"
-import { languageSelected, setDefaultLang } from "actions/languages"
+import useEntitiesStore from "stores/entitiesStore"
 import ModalWrapper from "components/ModalWrapper"
 import {
   selectLanguages,
@@ -20,17 +19,16 @@ import { useKeycloak } from "KeycloakContext"
 import _ from "lodash"
 
 const InputLang = () => {
-  const dispatch = useDispatch()
   const { keycloak } = useKeycloak()
   const valueKey = useEditorStore((state) => state.currentLangModalValue)
-  const value = useSelector((state) => selectNormValue(state, valueKey))
-  const langOptions = useSelector((state) => selectLanguages(state))
-  const scriptOptions = useSelector((state) => selectScripts(state))
-  const transliterationOptions = useSelector((state) =>
+  const value = useEntitiesStore((state) => selectNormValue(state, valueKey))
+  const langOptions = useEntitiesStore((state) => selectLanguages(state))
+  const scriptOptions = useEntitiesStore((state) => selectScripts(state))
+  const transliterationOptions = useEntitiesStore((state) =>
     selectTransliterations(state)
   )
-  const langLabels = useSelector((state) => selectLanguageLabels(state))
-  const resourceDefaultLang = useSelector((state) =>
+  const langLabels = useEntitiesStore((state) => selectLanguageLabels(state))
+  const resourceDefaultLang = useEntitiesStore((state) =>
     selectDefaultLang(state, value?.rootSubjectKey)
   )
   const textValue = value?.literal || value?.label || ""
@@ -124,8 +122,9 @@ const InputLang = () => {
 
   const handleLangSubmit = (event) => {
     close(event)
-    dispatch(languageSelected(value.key, newTag))
-    if (isDefaultLang) dispatch(setDefaultLang(value.rootSubjectKey, newTag))
+    useEntitiesStore.getState().setLanguage(value.key, newTag)
+    if (isDefaultLang)
+      useEntitiesStore.getState().setDefaultLang(value.rootSubjectKey, newTag)
   }
 
   const handleDefaultLangClick = () => {

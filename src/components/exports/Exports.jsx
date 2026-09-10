@@ -3,7 +3,7 @@
 import React, { useMemo } from "react"
 import PropTypes from "prop-types"
 import Header from "../Header"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import Config from "Config"
 import { selectExports } from "selectors/exports"
 import AlertsContextProvider from "components/alerts/AlertsContextProvider"
@@ -11,7 +11,7 @@ import ContextAlert from "components/alerts/ContextAlert"
 import { exportsErrorKey } from "utilities/errorKeyFactory"
 
 const Exports = (props) => {
-  const exportFiles = useSelector((state) => selectExports(state))
+  const exportFiles = useEntitiesStore((state) => selectExports(state))
 
   const sortedExportFiles = useMemo(
     () => exportFiles.sort((a, b) => a.localeCompare(b)),

@@ -1,7 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import { selectUri } from "selectors/resources"
 import useEditorStore from "stores/editorStore"
 import { hasValidationErrors as hasValidationErrorsSelector } from "selectors/errors"
@@ -9,9 +9,9 @@ import { hasValidationErrors as hasValidationErrorsSelector } from "selectors/er
 // Renders the permissions link for saved resource
 const PermissionsAction = () => {
   const resourceKey = useEditorStore((state) => state.currentResource)
-  const uri = useSelector((state) => selectUri(state, resourceKey))
+  const uri = useEntitiesStore((state) => selectUri(state, resourceKey))
 
-  const hasValidationErrors = useSelector((state) =>
+  const hasValidationErrors = useEntitiesStore((state) =>
     hasValidationErrorsSelector(state, resourceKey)
   )
   const validationErrorsAreShowing = useEditorStore(

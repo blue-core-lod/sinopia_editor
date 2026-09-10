@@ -1,4 +1,5 @@
 import { createState } from "stateUtils"
+import useEntitiesStore from "stores/entitiesStore"
 import {
   selectSubject,
   selectProperty,
@@ -11,52 +12,56 @@ import {
   selectMainTitleValue,
 } from "selectors/resources"
 
+const entitiesState = () => useEntitiesStore.getState()
+
 describe("selectSubject()", () => {
   it("returns null when no match", () => {
-    const state = createState()
-    expect(selectSubject(state, "abc123")).toBeNull()
+    createState()
+    expect(selectSubject(entitiesState(), "abc123")).toBeNull()
   })
 
   it("returns subject", () => {
-    const state = createState({ hasResourceWithNestedResource: true })
-    expect(selectSubject(state, "ljAblGiBW")).toBeSubject("ljAblGiBW")
+    createState({ hasResourceWithNestedResource: true })
+    expect(selectSubject(entitiesState(), "ljAblGiBW")).toBeSubject("ljAblGiBW")
   })
 })
 
 describe("selectProperty()", () => {
   it("returns null when no match", () => {
-    const state = createState()
-    expect(selectProperty(state, "abc123")).toBeNull()
+    createState()
+    expect(selectProperty(entitiesState(), "abc123")).toBeNull()
   })
 
   it("returns property", () => {
-    const state = createState({ hasResourceWithNestedResource: true })
-    expect(selectProperty(state, "v1o90QO1Qx")).toBeProperty("v1o90QO1Qx")
+    createState({ hasResourceWithNestedResource: true })
+    expect(selectProperty(entitiesState(), "v1o90QO1Qx")).toBeProperty(
+      "v1o90QO1Qx"
+    )
   })
 })
 
 describe("selectValue()", () => {
   it("returns null when no match", () => {
-    const state = createState()
-    expect(selectValue(state, "abc123")).toBeNull()
+    createState()
+    expect(selectValue(entitiesState(), "abc123")).toBeNull()
   })
 
   it("returns value", () => {
-    const state = createState({ hasResourceWithNestedResource: true })
-    const value = selectValue(state, "VDOeQCnFA8")
+    createState({ hasResourceWithNestedResource: true })
+    const value = selectValue(entitiesState(), "VDOeQCnFA8")
     expect(value).toBeValue("VDOeQCnFA8")
   })
 })
 
 describe("selectFullSubject()", () => {
   it("returns null when no match", () => {
-    const state = createState()
-    expect(selectFullSubject(state, "abc123")).toBeNull()
+    createState()
+    expect(selectFullSubject(entitiesState(), "abc123")).toBeNull()
   })
 
   it("returns subject and all descendants", () => {
-    const state = createState({ hasResourceWithNestedResource: true })
-    const subject = selectFullSubject(state, "ljAblGiBW")
+    createState({ hasResourceWithNestedResource: true })
+    const subject = selectFullSubject(entitiesState(), "ljAblGiBW")
     expect(subject).toBeSubject("ljAblGiBW")
     expect(subject.properties).toHaveLength(1)
     const property = subject.properties[0]
@@ -77,25 +82,46 @@ describe("selectFullSubject()", () => {
 
 describe("resourceHasChangesSinceLastSave", () => {
   it("returns changed for currentResource if key not provided", () => {
-    const state = createState({ hasResourceWithNestedResource: true })
-    state.entities.subjects.ljAblGiBW.changed = true
-    expect(resourceHasChangesSinceLastSave(state)).toBe(true)
+    createState({ hasResourceWithNestedResource: true })
+    useEntitiesStore.setState({
+      subjects: {
+        ...entitiesState().subjects,
+        ljAblGiBW: { ...entitiesState().subjects.ljAblGiBW, changed: true },
+      },
+    })
+    expect(resourceHasChangesSinceLastSave(entitiesState())).toBe(true)
   })
   it("returns changed for provided resource", () => {
-    const state = createState({ hasResourceWithNestedResource: true })
-    state.entities.subjects.ljAblGiBW.changed = true
-    expect(resourceHasChangesSinceLastSave(state, "ljAblGiBW")).toBe(true)
+    createState({ hasResourceWithNestedResource: true })
+    useEntitiesStore.setState({
+      subjects: {
+        ...entitiesState().subjects,
+        ljAblGiBW: { ...entitiesState().subjects.ljAblGiBW, changed: true },
+      },
+    })
+    expect(resourceHasChangesSinceLastSave(entitiesState(), "ljAblGiBW")).toBe(
+      true
+    )
   })
 })
 
 describe("selectResourceUriMap", () => {
   it("returns map of URIs to keys", () => {
-    const state = createState({ hasTwoLiteralResources: true })
-    state.entities.subjects.t9zVwg2zO.uri =
-      "http://localhost:3000/resource/f383bfff-5364-47a3-a081-8c9e2d79f43f"
-    state.entities.subjects.u0aWxh3a1.uri =
-      "http://localhost:3000/resource/g493bfff-5364-47a3-a081-8c9e2d79f5fg"
-    expect(selectResourceUriMap(state)).toEqual({
+    createState({ hasTwoLiteralResources: true })
+    useEntitiesStore.setState({
+      subjects: {
+        ...entitiesState().subjects,
+        t9zVwg2zO: {
+          ...entitiesState().subjects.t9zVwg2zO,
+          uri: "http://localhost:3000/resource/f383bfff-5364-47a3-a081-8c9e2d79f43f",
+        },
+        u0aWxh3a1: {
+          ...entitiesState().subjects.u0aWxh3a1,
+          uri: "http://localhost:3000/resource/g493bfff-5364-47a3-a081-8c9e2d79f5fg",
+        },
+      },
+    })
+    expect(selectResourceUriMap(entitiesState())).toEqual({
       "http://localhost:3000/resource/f383bfff-5364-47a3-a081-8c9e2d79f43f":
         "t9zVwg2zO",
       "http://localhost:3000/resource/g493bfff-5364-47a3-a081-8c9e2d79f5fg":
@@ -106,8 +132,8 @@ describe("selectResourceUriMap", () => {
 
 describe("selectResourceGroup", () => {
   it("returns groups", () => {
-    const state = createState({ hasResourceWithNestedResource: true })
-    expect(selectResourceGroup(state, "ljAblGiBW")).toEqual({
+    createState({ hasResourceWithNestedResource: true })
+    expect(selectResourceGroup(entitiesState(), "ljAblGiBW")).toEqual({
       group: "stanford",
       editGroups: ["cornell"],
     })
@@ -116,18 +142,18 @@ describe("selectResourceGroup", () => {
 
 describe("selectMainTitleProperty", () => {
   it("returns property", () => {
-    const state = createState({ hasResourceWithMainTitle: true })
-    expect(selectMainTitleProperty(state, "cqxLskA9kjAfMFDeuvzGq").key).toEqual(
-      "PZg9YbCZyx4AoJs2eL2zm"
-    )
+    createState({ hasResourceWithMainTitle: true })
+    expect(
+      selectMainTitleProperty(entitiesState(), "cqxLskA9kjAfMFDeuvzGq").key
+    ).toEqual("PZg9YbCZyx4AoJs2eL2zm")
   })
 })
 
 describe("selectMainTitleValue", () => {
   it("returns property", () => {
-    const state = createState({ hasResourceWithMainTitle: true })
-    expect(selectMainTitleValue(state, "cqxLskA9kjAfMFDeuvzGq").key).toEqual(
-      "JjUhYxaBo9nuIh8GKd9k5"
-    )
+    createState({ hasResourceWithMainTitle: true })
+    expect(
+      selectMainTitleValue(entitiesState(), "cqxLskA9kjAfMFDeuvzGq").key
+    ).toEqual("JjUhYxaBo9nuIh8GKd9k5")
   })
 })

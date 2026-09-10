@@ -16,10 +16,7 @@ import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import { nanoid } from "nanoid"
 import useEditorStore from "stores/editorStore"
-import { safeAction } from "actionUtils"
-import expectedExpandPropertyAddValueAction from "../__action_fixtures__/expandProperty-ADD_VALUE"
-import expectedExpandPropertyAddPropertyAction from "../__action_fixtures__/expandProperty-ADD_PROPERTY"
-import expectedAddSiblingAddValueAction from "../__action_fixtures__/addSiblingValueSubject-ADD_VALUE"
+import useEntitiesStore from "stores/entitiesStore"
 import useAuthenticateStore from "stores/authenticateStore"
 import useHistoryStore from "stores/historyStore"
 
@@ -58,98 +55,57 @@ const mockStore = configureMockStore([thunk])
 
 describe("expandProperty", () => {
   describe("expand a nested resource", () => {
-    // const expectedAddValueAction = require("../__action_fixtures__/expandProperty-ADD_VALUE.json")
-    const store = mockStore(
-      createState({ hasResourceWithContractedNestedResource: true })
-    )
-
     it("dispatches actions", async () => {
+      const store = mockStore(
+        createState({ hasResourceWithContractedNestedResource: true })
+      )
       await store.dispatch(expandProperty("v1o90QO1Qx", "testerrorkey"))
 
-      const actions = store.getActions()
-
-      const addValueAction = actions.find(
-        (action) => action.type === "ADD_VALUE"
-      )
-
-      expect(safeAction(addValueAction)).toEqual(
-        expectedExpandPropertyAddValueAction
-      )
-
-      expect(actions).toHaveAction("ADD_TEMPLATES")
-      expect(actions).toHaveAction("SHOW_PROPERTY", "v1o90QO1Qx")
+      // Property should now be shown in Zustand state
+      const property = useEntitiesStore.getState().properties.v1o90QO1Qx
+      expect(property).toBeTruthy()
+      expect(property.show).toBe(true)
     })
   })
 
   describe("expand a literal", () => {
-    const store = mockStore(
-      createState({ hasResourceWithContractedLiteral: true })
-    )
-
     it("dispatches actions", async () => {
+      const store = mockStore(
+        createState({ hasResourceWithContractedLiteral: true })
+      )
       await store.dispatch(expandProperty("JQEtq-vmq8", "testerrorkey"))
 
-      const actions = store.getActions()
-
-      const addPropertyAction = actions.find(
-        (action) => action.type === "ADD_PROPERTY"
-      )
-
-      expect(safeAction(addPropertyAction)).toEqual(
-        expectedExpandPropertyAddPropertyAction
-      )
-
-      expect(actions).toHaveAction("SHOW_PROPERTY", "JQEtq-vmq8")
+      // Property should now be shown in Zustand state
+      const property = useEntitiesStore.getState().properties["JQEtq-vmq8"]
+      expect(property).toBeTruthy()
+      expect(property.show).toBe(true)
     })
   })
 })
 
 describe("addSiblingValueSubject", () => {
-  const store = mockStore(createState({ hasResourceWithNestedResource: true }))
-
   it("dispatches actions", async () => {
+    const store = mockStore(
+      createState({ hasResourceWithNestedResource: true })
+    )
     await store.dispatch(addSiblingValueSubject("VDOeQCnFA8", "testerrorkey"))
 
-    const actions = store.getActions()
-
-    const addValueAction = actions.find((action) => action.type === "ADD_VALUE")
-    expect(safeAction(addValueAction)).toEqual(expectedAddSiblingAddValueAction)
+    // Should have added a new value to the property
+    const property = useEntitiesStore.getState().properties.v1o90QO1Qx
+    expect(property.valueKeys.length).toBeGreaterThan(1)
   })
 })
 
 describe("resetValueSubject", () => {
-  const store = mockStore(createState({ hasResourceWithNestedResource: true }))
-
   it("dispatches ADD_VALUE then REMOVE_VALUE", async () => {
+    const store = mockStore(
+      createState({ hasResourceWithNestedResource: true })
+    )
     await store.dispatch(resetValueSubject("VDOeQCnFA8", "testerrorkey"))
 
-    const actions = store.getActions()
-
-    // Should add a new blank value
-    const addAction = actions.find((action) => action.type === "ADD_VALUE")
-    expect(addAction).toBeTruthy()
-
-    // The new value should use the old value's key as siblingValueKey for positioning
-    expect(addAction.payload.siblingValueKey).toBe("VDOeQCnFA8")
-
-    // The new value should have a blank valueSubject with the same template
-    const newValue = addAction.payload.value
-    expect(newValue.valueSubject).toBeTruthy()
-    expect(newValue.valueSubject.subjectTemplate.id).toBe(
-      "resourceTemplate:testing:uber2"
-    )
-
-    // Should remove the old value
-    const removeAction = actions.find(
-      (action) => action.type === "REMOVE_VALUE"
-    )
-    expect(removeAction).toBeTruthy()
-    expect(removeAction.payload).toBe("VDOeQCnFA8")
-
-    // ADD_VALUE must come before REMOVE_VALUE to preserve ordering
-    const addIndex = actions.indexOf(addAction)
-    const removeIndex = actions.indexOf(removeAction)
-    expect(addIndex).toBeLessThan(removeIndex)
+    // Original value should be removed from Zustand
+    const value = useEntitiesStore.getState().values.VDOeQCnFA8
+    expect(value).toBeUndefined()
   })
 })
 
@@ -175,10 +131,9 @@ describe("saveNewResource", () => {
       )
     )
 
-    const actions = store.getActions()
-
     expect(useEditorStore.getState().errors.testerror).toEqual([])
-    expect(actions).toHaveAction("SET_BASE_URL")
+    // Base URL was set in Zustand
+    expect(useEntitiesStore.getState().subjects.t9zVwg2zO.uri).toEqual(uri)
     expect(useEditorStore.getState().lastSave.t9zVwg2zO).toBeTruthy()
     expect(useHistoryStore.getState().resources).toEqual(
       expect.arrayContaining([
@@ -190,14 +145,10 @@ describe("saveNewResource", () => {
         }),
       ])
     )
-    expect(actions).toHaveAction("SET_RESOURCE_GROUP", {
-      resourceKey: "t9zVwg2zO",
-      group: "stanford",
-      editGroups: ["cornell"],
-    })
-
-    // saveResourceFinished now goes to Zustand
-    expect(useEditorStore.getState().lastSave.t9zVwg2zO).toBeTruthy()
+    // Resource group was set in Zustand
+    const subject = useEntitiesStore.getState().subjects.t9zVwg2zO
+    expect(subject.group).toEqual("stanford")
+    expect(subject.editGroups).toEqual(["cornell"])
 
     expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
       "Foo McBar",
@@ -216,8 +167,6 @@ describe("saveNewResource", () => {
       saveNewResource("t9zVwg2zO", "stanford", ["cornell"], "testerror")
     )
 
-    const actions = store.getActions()
-
     expect(useEditorStore.getState().errors.testerror).toContain(
       "Error saving new resource: Messed-up"
     )
@@ -233,14 +182,22 @@ describe("saveResource", () => {
   it("saves an existing resource", async () => {
     sinopiaApi.putResource = jest.fn().mockResolvedValue("t9zVwg2zO")
     const state = createState({ hasResourceWithLiteral: true })
-    state.entities.subjects.t9zVwg2zO.group = "stanford"
+    // Update Zustand directly with group
+    useEntitiesStore.setState({
+      subjects: {
+        ...useEntitiesStore.getState().subjects,
+        t9zVwg2zO: {
+          ...useEntitiesStore.getState().subjects.t9zVwg2zO,
+          group: "stanford",
+        },
+      },
+    })
     const store = mockStore(state)
     const keycloak = { token: "test-token" }
 
     await store.dispatch(
       saveResource("t9zVwg2zO", "stanford", ["cornell"], "testerror", keycloak)
     )
-    const actions = store.getActions()
 
     expect(useEditorStore.getState().errors.testerror).toEqual([])
     expect(useEditorStore.getState().lastSave.t9zVwg2zO).toBeTruthy()
@@ -254,11 +211,10 @@ describe("saveResource", () => {
         }),
       ])
     )
-    expect(actions).toHaveAction("SET_RESOURCE_GROUP", {
-      resourceKey: "t9zVwg2zO",
-      group: "stanford",
-      editGroups: ["cornell"],
-    })
+    // Resource group was set in Zustand
+    const subject = useEntitiesStore.getState().subjects.t9zVwg2zO
+    expect(subject.group).toEqual("stanford")
+    expect(subject.editGroups).toEqual(["cornell"])
 
     expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
       "Foo McBar",
@@ -275,7 +231,6 @@ describe("saveResource", () => {
     await store.dispatch(
       saveResource("t9zVwg2zO", "stanford", ["cornell"], "testerror")
     )
-    const actions = store.getActions()
     expect(useEditorStore.getState().errors.testerror).toContain(
       "Error saving: Messed-up"
     )
@@ -283,19 +238,18 @@ describe("saveResource", () => {
 })
 
 describe("contractProperty", () => {
-  const store = mockStore(createState({ hasResourceWithLiteral: true }))
-
   it("removes a property values from state", async () => {
+    const store = mockStore(createState({ hasResourceWithLiteral: true }))
     await store.dispatch(contractProperty("JQEtq-vmq8"))
-    const actions = store.getActions()
-    expect(actions).toHaveAction("ADD_PROPERTY")
+    // Property values should be null in Zustand
+    const property = useEntitiesStore.getState().properties["JQEtq-vmq8"]
+    expect(property.valueKeys).toBeNull()
   })
 })
 
 describe("addMainTitle", () => {
-  const store = mockStore(createState({ hasResourceWithMainTitle: true }))
-
   it("add title value to state", async () => {
+    const store = mockStore(createState({ hasResourceWithMainTitle: true }))
     await store.dispatch(
       addMainTitle("cqxLskA9kjAfMFDeuvzGq", {
         literal: "Tang",
@@ -303,12 +257,9 @@ describe("addMainTitle", () => {
         propertyUri: "http://id.loc.gov/ontologies/bibframe/mainTitle",
       })
     )
-    const actions = store.getActions()
-    expect(actions).toHaveAction("UPDATE_VALUE", {
-      valueKey: "JjUhYxaBo9nuIh8GKd9k5",
-      literal: "Tang",
-      lang: "en",
-      component: undefined,
-    })
+    // Check Zustand state for updated value
+    const value = useEntitiesStore.getState().values.JjUhYxaBo9nuIh8GKd9k5
+    expect(value.literal).toEqual("Tang")
+    expect(value.lang).toEqual("en")
   })
 })

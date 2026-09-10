@@ -1,7 +1,9 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector, useDispatch, shallowEqual } from "react-redux"
+import { useDispatch } from "react-redux"
+import { shallow } from "zustand/shallow"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import { saveResource as saveResourceAction } from "actionCreators/resources"
 import {
@@ -20,16 +22,16 @@ const SaveAndPublishButton = (props) => {
   const { keycloak } = useKeycloak()
 
   const resourceKey = useEditorStore((state) => state.currentResource)
-  // selectPickSubject and shallowEqual prevents rerender from unrelated changed.
-  const resource = useSelector(
+  // selectPickSubject and shallow prevents rerender from unrelated changed.
+  const resource = useEntitiesStore(
     (state) =>
       selectPickSubject(state, resourceKey, ["group", "editGroups", "uri"]),
-    shallowEqual
+    shallow
   )
-  const resourceHasChanged = useSelector((state) =>
+  const resourceHasChanged = useEntitiesStore((state) =>
     resourceHasChangesSinceLastSave(state)
   )
-  const hasValidationErrors = useSelector((state) =>
+  const hasValidationErrors = useEntitiesStore((state) =>
     hasValidationErrorsSelector(state, resourceKey)
   )
   const validationErrorsAreShowing = useEditorStore(

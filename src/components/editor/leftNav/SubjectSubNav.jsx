@@ -1,6 +1,6 @@
 import React from "react"
 import PropTypes from "prop-types"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import useEditorStore from "stores/editorStore"
 import { selectNormSubject } from "selectors/resources"
 import { selectSubjectTemplate } from "selectors/templates"
@@ -12,10 +12,10 @@ import _ from "lodash"
 import useNavLink from "hooks/useNavLink"
 
 const SubjectSubNav = (props) => {
-  const subject = useSelector((state) =>
+  const subject = useEntitiesStore((state) =>
     selectNormSubject(state, props.subjectKey)
   )
-  const subjectTemplate = useSelector((state) =>
+  const subjectTemplate = useEntitiesStore((state) =>
     selectSubjectTemplate(state, subject?.subjectTemplateKey)
   )
 

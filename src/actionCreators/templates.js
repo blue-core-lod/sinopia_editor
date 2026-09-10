@@ -2,7 +2,7 @@
 import useEditorStore from "stores/editorStore"
 import { validateTemplates } from "./templateValidationHelpers"
 import Config from "Config"
-import { addTemplates } from "actions/templates"
+import useEntitiesStore from "stores/entitiesStore"
 import { selectSubjectAndPropertyTemplates } from "selectors/templates"
 import TemplatesBuilder from "TemplatesBuilder"
 import { fetchResource } from "sinopiaApi"
@@ -45,7 +45,7 @@ export const loadResourceTemplate =
  * @throws when error occurs retrieving the resource template.
  */
 export const loadResourceTemplateWithoutValidation =
-  (resourceTemplateId, resourceTemplatePromises) => (dispatch, getState) => {
+  (resourceTemplateId, resourceTemplatePromises) => (_dispatch) => {
     // Try to get it from resourceTemplatePromises.
     // Using this cache since in some cases, adding to state to too slow.
     const resourceTemplatePromise =
@@ -55,7 +55,7 @@ export const loadResourceTemplateWithoutValidation =
     }
     // Try to get it from state.
     const subjectTemplate = selectSubjectAndPropertyTemplates(
-      getState(),
+      useEntitiesStore.getState(),
       resourceTemplateId
     )
     if (subjectTemplate) {
@@ -128,7 +128,7 @@ export const loadResourceTemplateWithoutValidation =
           throw error
         }
 
-        dispatch(addTemplates(subjectTemplate))
+        useEntitiesStore.getState().addTemplates(subjectTemplate)
         return subjectTemplate
       })
     )

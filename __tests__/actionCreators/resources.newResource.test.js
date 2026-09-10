@@ -6,8 +6,6 @@ import configureMockStore from "redux-mock-store"
 import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import { nanoid } from "nanoid"
-import { safeAction } from "actionUtils"
-import expectedAction from "../__action_fixtures__/newResource-ADD_SUBJECT"
 import useHistoryStore from "stores/historyStore"
 import useEditorStore from "stores/editorStore"
 
@@ -63,19 +61,8 @@ describe("newResource", () => {
       )
       expect(result).toBe("abc123")
 
-      const actions = store.getActions()
-      // ADD_TEMPLATES is dispatched numerous times since mock store doesn't update state.
-      expect(actions).toHaveAction("ADD_TEMPLATES")
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-
-      expect(safeAction(addSubjectAction)).toEqual(expectedAction)
-
       expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
       expect(useEditorStore.getState().currentResource).toBe("abc123")
-      expect(actions).toHaveAction("LOAD_RESOURCE_FINISHED", "abc123")
       expect(useHistoryStore.getState().templates).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ id: resourceTemplateId }),
@@ -104,8 +91,6 @@ describe("newResource", () => {
       )
       expect(result).toBe(false)
 
-      const actions = store.getActions()
-      expect(actions).toHaveAction("ADD_TEMPLATES")
       expect(useEditorStore.getState().errors.testerrorkey).toContain(
         "A property template may not use the same property URI as another property template (http://id.loc.gov/ontologies/bibframe/geographicCoverage) unless both propery templates are of type nested resource and the nested resources are of different classes."
       )

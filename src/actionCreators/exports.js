@@ -1,11 +1,11 @@
 import Config from "Config"
 import useEditorStore from "stores/editorStore"
-import { exportsReceived } from "actions/exports"
+import useEntitiesStore from "stores/entitiesStore"
 import { hasExports } from "selectors/exports"
 
-export const fetchExports = (errorKey) => (dispatch, getState) => {
+export const fetchExports = (errorKey) => () => {
   // Return if already loaded.
-  if (hasExports(getState())) return
+  if (hasExports(useEntitiesStore.getState())) return
 
   useEditorStore.getState().clearErrors(errorKey)
   // Not using AWS SDK because requires credentials, which is way too much overhead.
@@ -18,7 +18,7 @@ export const fetchExports = (errorKey) => (dispatch, getState) => {
       for (let i = 0; i < elems.length; i++) {
         keys.push(elems.item(i).innerHTML)
       }
-      dispatch(exportsReceived(keys))
+      useEntitiesStore.getState().exportsReceived(keys)
     })
     .catch((err) =>
       useEditorStore

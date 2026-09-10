@@ -1,11 +1,10 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useDispatch, useSelector } from "react-redux"
 import ModalWrapper from "components/ModalWrapper"
 import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 import { selectNormSubject } from "selectors/resources"
-import { clearResource } from "actions/resources"
 import ResourceDisplay from "./ResourceDisplay"
 import usePermissions from "hooks/usePermissions"
 import MarcButton from "../actions/MarcButton"
@@ -17,7 +16,6 @@ import EditButton from "../../buttons/EditButton"
 import useAlerts from "hooks/useAlerts"
 
 const PreviewModal = () => {
-  const dispatch = useDispatch()
   const errorKey = useAlerts()
   const { canEdit, canCreate } = usePermissions()
 
@@ -25,7 +23,7 @@ const PreviewModal = () => {
   const currentResourceKey = useEditorStore(
     (state) => state.currentPreviewResource
   )
-  const currentResource = useSelector((state) =>
+  const currentResource = useEntitiesStore((state) =>
     selectNormSubject(state, currentResourceKey)
   )
 
@@ -54,7 +52,7 @@ const PreviewModal = () => {
     close(event)
     if (currentResourceKey) {
       useEditorStore.getState().clearResource(currentResourceKey)
-      dispatch(clearResource(currentResourceKey))
+      useEntitiesStore.getState().clearResource(currentResourceKey)
     }
   }
 

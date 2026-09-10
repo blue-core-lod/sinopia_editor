@@ -6,6 +6,7 @@ import thunk from "redux-thunk"
 import { nanoid } from "nanoid"
 import "isomorphic-fetch"
 import { createState } from "stateUtils"
+import useEntitiesStore from "stores/entitiesStore"
 
 const mockStore = configureMockStore([thunk])
 
@@ -80,8 +81,7 @@ describe("fetchLookup", () => {
     const store = mockStore(createState())
     await store.dispatch(fetchLookup(uri))
 
-    const actions = store.getActions()
-    const lookup = [
+    const expectedLookup = [
       {
         id: "abc123",
         label: "flipchart",
@@ -93,12 +93,7 @@ describe("fetchLookup", () => {
         uri: "http://id.loc.gov/vocabulary/carriers/nz",
       },
     ]
-    expect(actions).toEqual([
-      {
-        type: "LOOKUP_OPTIONS_RETRIEVED",
-        payload: { uri, lookup },
-      },
-    ])
+    expect(useEntitiesStore.getState().lookups[uri]).toEqual(expectedLookup)
   })
 
   it("handles fetch error and adds to state", async () => {
@@ -109,17 +104,11 @@ describe("fetchLookup", () => {
     const store = mockStore(createState())
     await store.dispatch(fetchLookup(uri))
 
-    const actions = store.getActions()
-    const lookup = [
+    const expectedLookup = [
       {
         isError: true,
       },
     ]
-    expect(actions).toEqual([
-      {
-        type: "LOOKUP_OPTIONS_RETRIEVED",
-        payload: { uri, lookup },
-      },
-    ])
+    expect(useEntitiesStore.getState().lookups[uri]).toEqual(expectedLookup)
   })
 })

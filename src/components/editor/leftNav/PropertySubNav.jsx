@@ -1,6 +1,7 @@
 import React from "react"
 import PropTypes from "prop-types"
-import { useSelector, shallowEqual } from "react-redux"
+import { shallow } from "zustand/shallow"
+import useEntitiesStore from "stores/entitiesStore"
 import useEditorStore from "stores/editorStore"
 import { selectNormProperty, selectNormValues } from "selectors/resources"
 import { selectPropertyTemplate } from "selectors/templates"
@@ -10,15 +11,15 @@ import _ from "lodash"
 import useNavLink from "hooks/useNavLink"
 
 const PropertySubNav = (props) => {
-  const property = useSelector((state) =>
+  const property = useEntitiesStore((state) =>
     selectNormProperty(state, props.propertyKey)
   )
-  const propertyTemplate = useSelector((state) =>
+  const propertyTemplate = useEntitiesStore((state) =>
     selectPropertyTemplate(state, property?.propertyTemplateKey)
   )
-  const values = useSelector(
+  const values = useEntitiesStore(
     (state) => selectNormValues(state, property?.valueKeys),
-    shallowEqual
+    shallow
   )
 
   const { navLinkId, handleNavLinkClick } = useNavLink(property)

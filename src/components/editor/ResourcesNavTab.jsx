@@ -1,7 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import CloseButton from "./actions/CloseButton"
 import { selectPickSubject } from "selectors/resources"
@@ -9,7 +9,7 @@ import useEditorStore from "stores/editorStore"
 import ResourceTitle from "./ResourceTitle"
 
 const ResourcesNavTab = ({ resourceKey, active }) => {
-  const resource = useSelector((state) =>
+  const resource = useEntitiesStore((state) =>
     selectPickSubject(state, resourceKey, ["label", "classes"])
   )
 

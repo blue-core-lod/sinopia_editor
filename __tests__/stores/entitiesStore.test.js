@@ -49,7 +49,9 @@ describe("entitiesStore", () => {
 
   describe("exportsReceived", () => {
     it("sets exports", () => {
-      useEntitiesStore.getState().exportsReceived(["export1.zip", "export2.zip"])
+      useEntitiesStore
+        .getState()
+        .exportsReceived(["export1.zip", "export2.zip"])
       expect(useEntitiesStore.getState().exports).toEqual([
         "export1.zip",
         "export2.zip",

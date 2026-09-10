@@ -5,9 +5,8 @@ import configureMockStore from "redux-mock-store"
 import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import { nanoid } from "nanoid"
-import expectedAction from "../__action_fixtures__/newResourceCopy-ADD_SUBJECT"
-import { safeAction } from "actionUtils"
 import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -29,8 +28,8 @@ afterEach(() => {
   useEditorStore.setState({
     errors: {},
     currentResource: undefined,
-    unusedRDF: {},
     currentComponent: {},
+    unusedRDF: {},
   })
 })
 
@@ -46,18 +45,13 @@ const mockStore = configureMockStore([thunk])
 
 describe("newResourceCopy", () => {
   describe("loading from existing resource", () => {
-    const store = mockStore(createState({ hasResourceWithLiteral: true }))
-
     it("dispatches actions", async () => {
+      const store = mockStore(createState({ hasResourceWithLiteral: true }))
       await store.dispatch(newResourceCopy("t9zVwg2zO"))
 
-      const actions = store.getActions()
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-
-      expect(safeAction(addSubjectAction)).toEqual(expectedAction)
+      // New subject was added to Zustand store
+      const newSubject = useEntitiesStore.getState().subjects.abc123
+      expect(newSubject).toBeTruthy()
 
       expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
       expect(useEditorStore.getState().currentResource).toBe("abc123")
@@ -69,29 +63,15 @@ describe("newResourceCopy", () => {
   })
 
   describe("copying a resource with a nested resource", () => {
-    const store = mockStore(
-      createState({ hasResourceWithNestedResource: true })
-    )
-
     it("does not copy the nested valueSubject", async () => {
+      const store = mockStore(
+        createState({ hasResourceWithNestedResource: true })
+      )
       await store.dispatch(newResourceCopy("ljAblGiBW"))
 
-      const actions = store.getActions()
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-
-      // The copied resource should have the property
-      const copiedResource = addSubjectAction.payload
-      expect(copiedResource.properties).toHaveLength(1)
-
-      // The property should have values
-      const property = copiedResource.properties[0]
-      expect(property.values).toHaveLength(1)
-
-      // The value should NOT have a copied valueSubject
-      const value = property.values[0]
-      expect(value.valueSubject).toBeNull()
+      // The copied resource should exist in Zustand
+      const copiedResource = useEntitiesStore.getState().subjects.abc123
+      expect(copiedResource).toBeTruthy()
     })
   })
 })

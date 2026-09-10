@@ -1,12 +1,14 @@
 import React from "react"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import { selectProperty } from "selectors/resources"
 import { isHttp } from "utilities/Utilities"
 import _ from "lodash"
 
 const ReadOnlyInputLiteralOrURI = ({ propertyKey }) => {
-  const property = useSelector((state) => selectProperty(state, propertyKey))
+  const property = useEntitiesStore((state) =>
+    selectProperty(state, propertyKey)
+  )
 
   const filteredValues = property.values.filter(
     (value) => value.literal || value.uri

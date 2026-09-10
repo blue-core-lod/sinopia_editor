@@ -4,11 +4,13 @@ import { fetchExports } from "actionCreators/exports"
 import configureMockStore from "redux-mock-store"
 import thunk from "redux-thunk"
 import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 
 const mockStore = configureMockStore([thunk])
 
 afterEach(() => {
   useEditorStore.setState({ errors: {}, successes: {} })
+  useEntitiesStore.setState({ exports: [] })
 })
 
 describe("export", () => {
@@ -26,30 +28,26 @@ describe("export", () => {
     )
 
     it("dispatches actions", async () => {
+      useEntitiesStore.setState({ exports: [] })
       const store = mockStore({ entities: { exports: [] } })
       await store.dispatch(fetchExports("testerrorkey"))
       expect(useEditorStore.getState().errors.testerrorkey).toEqual([])
-      expect(store.getActions()).toEqual([
-        {
-          type: "EXPORTS_RECEIVED",
-          payload: [
-            "alberta_2019-10-28T16:44:08.978Z.zip",
-            "boulder_2019-10-28T16:44:10.116Z.zip",
-          ],
-        },
+      expect(useEntitiesStore.getState().exports).toEqual([
+        "alberta_2019-10-28T16:44:08.978Z.zip",
+        "boulder_2019-10-28T16:44:10.116Z.zip",
       ])
     })
   })
 
   describe("when error", () => {
-    const mockFetchPromise = Promise.reject(new Error("S3 fail"))
-
-    beforeEach(
-      () =>
-        (global.fetch = jest.fn().mockImplementation(() => mockFetchPromise))
-    )
+    beforeEach(() => {
+      global.fetch = jest
+        .fn()
+        .mockImplementation(() => Promise.reject(new Error("S3 fail")))
+    })
 
     it("dispatches actions", async () => {
+      useEntitiesStore.setState({ exports: [] })
       const store = mockStore({ entities: { exports: [] } })
       await store.dispatch(fetchExports("testerrorkey"))
       expect(useEditorStore.getState().errors.testerrorkey).toContain(

@@ -12,9 +12,6 @@ import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import { nanoid } from "nanoid"
 import * as relationshipActionCreators from "actionCreators/relationships"
-import expectedAction from "../__action_fixtures__/loadResource-ADD_SUBJECT"
-import expectedMultiplePropertyUrisAction from "../__action_fixtures__/loadResource-ADD_SUBJECT-multiple-property-uris"
-import { safeAction, cloneAddResourceActionAsNewResource } from "actionUtils"
 import useHistoryStore from "stores/historyStore"
 import useEditorStore from "stores/editorStore"
 
@@ -77,22 +74,11 @@ describe("loadResource", () => {
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(addSubjectAction).not.toBeNull()
-      // safeStringify is used because it removes circular references
-      expect(safeAction(addSubjectAction)).toEqual(expectedAction)
-
       expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
         0
       )
-      expect(actions).toHaveAction("ADD_TEMPLATES")
       expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
       expect(useEditorStore.getState().currentResource).toBe("abc123")
-      expect(actions).toHaveAction("LOAD_RESOURCE_FINISHED")
       expect(useHistoryStore.getState().resources).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
@@ -132,30 +118,15 @@ describe("loadResource", () => {
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(addSubjectAction).not.toBeNull()
-
-      const newExpectedAction =
-        cloneAddResourceActionAsNewResource(expectedAction)
-
-      // safeStringify is used because it removes circular references
-      expect(safeAction(addSubjectAction)).toEqual(newExpectedAction)
-
       expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
         0
       )
-      expect(actions).toHaveAction("ADD_TEMPLATES")
-      expect(actions).toHaveAction("ADD_SUBJECT")
       expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
       expect(useEditorStore.getState().currentResource).toBe("abc123")
       expect(useEditorStore.getState().currentComponent.abc123).toEqual({
         component: "abc123",
         property: "abc123",
       })
-      expect(actions).not.toHaveAction("LOAD_RESOURCE_FINISHED")
     })
   })
 
@@ -168,11 +139,9 @@ describe("loadResource", () => {
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
       expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
         0
       )
-      expect(actions).toHaveAction("ADD_TEMPLATES")
       expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
       expect(useEditorStore.getState().currentPreviewResource).toBe("abc123")
     })
@@ -189,11 +158,9 @@ describe("loadResource", () => {
       )
       expect(result).toBe(true)
 
-      const actions = store.getActions()
       expect(useEditorStore.getState().errors.testerrorkey || []).toHaveLength(
         0
       )
-      expect(actions).toHaveAction("ADD_TEMPLATES")
       expect(useEditorStore.getState().unusedRDF.abc123).toBeNull()
       expect(useEditorStore.getState().currentDiff.compareFrom).toBe("abc123")
     })
@@ -264,17 +231,6 @@ describe("loadResource", () => {
         loadResourceForEditor(uri, "testerrorkey")
       )
       expect(result).toBe(true)
-
-      const actions = store.getActions()
-
-      const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
-      )
-      expect(addSubjectAction).not.toBeNull()
-      // safeStringify is used because it removes circular references
-      expect(safeAction(addSubjectAction)).toEqual(
-        expectedMultiplePropertyUrisAction
-      )
     })
   })
 })

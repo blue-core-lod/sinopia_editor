@@ -4,6 +4,7 @@ import { Provider } from "react-redux"
 import configureMockStore from "redux-mock-store"
 import thunk from "redux-thunk"
 import { createState } from "stateUtils"
+import useEntitiesStore from "stores/entitiesStore"
 
 import InputLiteralValue from "components/editor/inputs/InputLiteralValue"
 import LcshTypeahead from "components/editor/inputs/LcshTypeahead"
@@ -26,16 +27,17 @@ const PROPERTY_KEY = "prop-key-1"
 const SUBJECT_KEY = "subj-key-1"
 const SUBJECT_URI = "http://id.loc.gov/authorities/subjects/sh85002058"
 
-const makeState = ({ subjectKey = SUBJECT_KEY } = {}) => ({
-  ...createState(),
-  entities: {
-    ...createState().entities,
+const makeState = ({ subjectKey = SUBJECT_KEY } = {}) => {
+  const state = createState()
+  // Seed Zustand entities store with test-specific data
+  useEntitiesStore.setState({
     properties: {
       [PROPERTY_KEY]: { subjectKey },
     },
     values: {},
-  },
-})
+  })
+  return state
+}
 
 const value = {
   key: VALUE_KEY,
@@ -83,6 +85,7 @@ describe("InputLiteralValue handleLcshSelect", () => {
   })
 
   it("dispatches updateLiteralValue with the selected label", () => {
+    const spy = jest.spyOn(useEntitiesStore.getState(), "updateValue")
     const store = mockStore(makeState())
     renderComponent(store)
 
@@ -90,20 +93,21 @@ describe("InputLiteralValue handleLcshSelect", () => {
       capturedOnSelect({ label: "Agricultural economics", uri: SUBJECT_URI })
     })
 
-    const actions = store.getActions()
-    expect(actions).toContainEqual(
+    expect(spy).toHaveBeenCalledWith(
       expect.objectContaining({
-        type: "UPDATE_VALUE",
-        payload: expect.objectContaining({
-          valueKey: VALUE_KEY,
-          literal: "Agricultural economics",
-          lang: "en",
-        }),
+        valueKey: VALUE_KEY,
+        literal: "Agricultural economics",
+        lang: "en",
       })
     )
+    spy.mockRestore()
   })
 
   it("dispatches setSubjectComponentList when uri and subjectKey are present", () => {
+    const spy = jest.spyOn(
+      useEntitiesStore.getState(),
+      "setSubjectComponentList"
+    )
     const store = mockStore(makeState())
     renderComponent(store)
 
@@ -111,14 +115,15 @@ describe("InputLiteralValue handleLcshSelect", () => {
       capturedOnSelect({ label: "Agricultural economics", uri: SUBJECT_URI })
     })
 
-    const actions = store.getActions()
-    expect(actions).toContainEqual({
-      type: "SET_SUBJECT_COMPONENT_LIST",
-      payload: { subjectKey: SUBJECT_KEY, uri: SUBJECT_URI },
-    })
+    expect(spy).toHaveBeenCalledWith(SUBJECT_KEY, SUBJECT_URI)
+    spy.mockRestore()
   })
 
   it("does not dispatch setSubjectComponentList when uri is absent", () => {
+    const spy = jest.spyOn(
+      useEntitiesStore.getState(),
+      "setSubjectComponentList"
+    )
     const store = mockStore(makeState())
     renderComponent(store)
 
@@ -126,13 +131,15 @@ describe("InputLiteralValue handleLcshSelect", () => {
       capturedOnSelect({ label: "Agricultural economics", uri: "" })
     })
 
-    const actions = store.getActions()
-    expect(actions).not.toContainEqual(
-      expect.objectContaining({ type: "SET_SUBJECT_COMPONENT_LIST" })
-    )
+    expect(spy).not.toHaveBeenCalled()
+    spy.mockRestore()
   })
 
   it("does not dispatch setSubjectComponentList when subjectKey is absent", () => {
+    const spy = jest.spyOn(
+      useEntitiesStore.getState(),
+      "setSubjectComponentList"
+    )
     const store = mockStore(makeState({ subjectKey: null }))
     renderComponent(store)
 
@@ -140,10 +147,8 @@ describe("InputLiteralValue handleLcshSelect", () => {
       capturedOnSelect({ label: "Agricultural economics", uri: SUBJECT_URI })
     })
 
-    const actions = store.getActions()
-    expect(actions).not.toContainEqual(
-      expect.objectContaining({ type: "SET_SUBJECT_COMPONENT_LIST" })
-    )
+    expect(spy).not.toHaveBeenCalled()
+    spy.mockRestore()
   })
 
   it("renders LcshTypeahead when propertyUri is the MADS authoritative label URI", () => {

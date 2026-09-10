@@ -1,4 +1,5 @@
 import { createState } from "stateUtils"
+import useEntitiesStore from "stores/entitiesStore"
 import {
   selectRelationships,
   hasRelationships,
@@ -7,36 +8,46 @@ import {
 } from "selectors/relationships"
 import useSearchStore from "stores/searchStore"
 
+const entitiesState = () => useEntitiesStore.getState()
+
 afterEach(() => {
   useSearchStore.setState({ resource: null, template: null })
 })
 
 describe("selectRelationships()", () => {
   it("merges relationships from resource and API (inferred)", () => {
-    const state = createState({ hasTemplateWithLiteral: true })
-    const subject = state.entities.subjects["8VrbxGPeF"]
-    subject.bfAdminMetadataRefs = [
-      "http://localhost:3000/resource/922b24cb-0b5f-4df6-88d2-cb9efdf3f373",
-    ]
-    subject.bfItemRefs = [
-      "http://localhost:3000/resource/032b24cb-0b5f-4df6-88d2-cb9efdf3f374",
-    ]
-    subject.bfInstanceRefs = []
-    subject.bfWorkRefs = []
-    state.entities.relationships["8VrbxGPeF"] = {
+    createState({ hasTemplateWithLiteral: true })
+    const subjects = { ...entitiesState().subjects }
+    subjects["8VrbxGPeF"] = {
+      ...subjects["8VrbxGPeF"],
       bfAdminMetadataRefs: [
-        "http://localhost:3000/resource/142b24cb-0b5f-4df6-88d2-cb9efdf3f375",
+        "http://localhost:3000/resource/922b24cb-0b5f-4df6-88d2-cb9efdf3f373",
       ],
       bfItemRefs: [
         "http://localhost:3000/resource/032b24cb-0b5f-4df6-88d2-cb9efdf3f374",
       ],
-      bfInstanceRefs: [
-        "http://localhost:3000/resource/252b24cb-0b5f-4df6-88d2-cb9efdf3f376",
-      ],
+      bfInstanceRefs: [],
       bfWorkRefs: [],
     }
+    useEntitiesStore.setState({
+      subjects,
+      relationships: {
+        "8VrbxGPeF": {
+          bfAdminMetadataRefs: [
+            "http://localhost:3000/resource/142b24cb-0b5f-4df6-88d2-cb9efdf3f375",
+          ],
+          bfItemRefs: [
+            "http://localhost:3000/resource/032b24cb-0b5f-4df6-88d2-cb9efdf3f374",
+          ],
+          bfInstanceRefs: [
+            "http://localhost:3000/resource/252b24cb-0b5f-4df6-88d2-cb9efdf3f376",
+          ],
+          bfWorkRefs: [],
+        },
+      },
+    })
 
-    expect(selectRelationships(state, "8VrbxGPeF")).toStrictEqual({
+    expect(selectRelationships(entitiesState(), "8VrbxGPeF")).toStrictEqual({
       bfAdminMetadataRefs: [
         "http://localhost:3000/resource/922b24cb-0b5f-4df6-88d2-cb9efdf3f373",
         "http://localhost:3000/resource/142b24cb-0b5f-4df6-88d2-cb9efdf3f375",
@@ -54,18 +65,23 @@ describe("selectRelationships()", () => {
 
 describe("hasRelationships()", () => {
   it("returns true when relationships", () => {
-    const state = createState({ hasTemplateWithLiteral: true })
-    state.entities.subjects["8VrbxGPeF"].bfAdminMetadataRefs = [
-      "http://localhost:3000/resource/922b24cb-0b5f-4df6-88d2-cb9efdf3f373",
-    ]
+    createState({ hasTemplateWithLiteral: true })
+    const subjects = { ...entitiesState().subjects }
+    subjects["8VrbxGPeF"] = {
+      ...subjects["8VrbxGPeF"],
+      bfAdminMetadataRefs: [
+        "http://localhost:3000/resource/922b24cb-0b5f-4df6-88d2-cb9efdf3f373",
+      ],
+    }
+    useEntitiesStore.setState({ subjects })
 
-    expect(hasRelationships(state, "8VrbxGPeF")).toBe(true)
+    expect(hasRelationships(entitiesState(), "8VrbxGPeF")).toBe(true)
   })
 
   it("returns false when no relationships", () => {
-    const state = createState({ hasTemplateWithLiteral: true })
+    createState({ hasTemplateWithLiteral: true })
 
-    expect(hasRelationships(state, "8VrbxGPeF")).toBe(false)
+    expect(hasRelationships(entitiesState(), "8VrbxGPeF")).toBe(false)
   })
 })
 

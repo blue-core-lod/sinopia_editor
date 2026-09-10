@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import { useDispatch } from "react-redux"
 import {
   newResource,
   loadResourceForEditor,
@@ -7,6 +7,7 @@ import {
 } from "actionCreators/resources"
 import { selectResourceUriMap } from "selectors/resources"
 import useEditorStore from "stores/editorStore"
+import useEntitiesStore from "stores/entitiesStore"
 import _ from "lodash"
 import { useHistory } from "react-router-dom"
 import { useKeycloak } from "../KeycloakContext"
@@ -21,7 +22,9 @@ const useResource = (
   const errors = useEditorStore((state) => state.errors[errorKey])
   const resourceKey = useEditorStore((state) => state.currentResource)
   // These are resources that are already loaded
-  const resourceUriMap = useSelector((state) => selectResourceUriMap(state))
+  const resourceUriMap = useEntitiesStore((state) =>
+    selectResourceUriMap(state)
+  )
 
   const [navigateEditor, setNavigateEditor] = useState(false)
   const [status, setStatus] = useState("ready")

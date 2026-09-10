@@ -1,7 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import { useSelector } from "react-redux"
+import useEntitiesStore from "stores/entitiesStore"
 import PropTypes from "prop-types"
 import NestedProperty from "./NestedProperty"
 import NestedResourceActionButtons from "./NestedResourceActionButtons"
@@ -17,14 +17,14 @@ import _ from "lodash"
 
 // AKA a value subject.
 const NestedResource = ({ valueKey, readOnly }) => {
-  const value = useSelector((state) => selectNormValue(state, valueKey))
-  const valueSubject = useSelector((state) =>
+  const value = useEntitiesStore((state) => selectNormValue(state, valueKey))
+  const valueSubject = useEntitiesStore((state) =>
     selectNormSubject(state, value?.valueSubjectKey)
   )
-  const subjectTemplate = useSelector((state) =>
+  const subjectTemplate = useEntitiesStore((state) =>
     selectSubjectTemplate(state, valueSubject?.subjectTemplateKey)
   )
-  const propertyTemplate = useSelector((state) =>
+  const propertyTemplate = useEntitiesStore((state) =>
     selectPropertyTemplateForProperty(state, value.propertyKey)
   )
 

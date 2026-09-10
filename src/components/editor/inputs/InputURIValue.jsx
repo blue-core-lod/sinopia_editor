@@ -1,14 +1,9 @@
 import React, { useRef, useEffect, useState } from "react"
-import { useDispatch } from "react-redux"
 import PropTypes from "prop-types"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons"
 import TextareaAutosize from "react-textarea-autosize"
-import {
-  updateURIValue as updateURIValueAction,
-  removeValue,
-  addValue,
-} from "actions/resources"
+import useEntitiesStore from "stores/entitiesStore"
 import { newLiteralValue } from "utilities/valueFactory"
 import LanguageButton from "./LanguageButton"
 import DiacriticsButton from "./DiacriticsButton"
@@ -27,7 +22,6 @@ const InputURIValue = ({
   displayValidations,
   shouldFocus,
 }) => {
-  const dispatch = useDispatch()
   const inputURIRef = useRef(null)
   const inputLabelRef = useRef(null)
   const [focusHasBeenSet, setFocusHasBeenSet] = useState(false)
@@ -61,14 +55,12 @@ const InputURIValue = ({
 
   const updateURIValue = () => {
     setShowLink(isHttp(currentURIContent))
-    dispatch(
-      updateURIValueAction(
-        value.key,
-        currentURIContent,
-        currentLabelContent,
-        value.lang
-      )
-    )
+    useEntitiesStore.getState().updateValue({
+      valueKey: value.key,
+      uri: currentURIContent || null,
+      label: currentLabelContent || null,
+      lang: value.lang || null,
+    })
   }
 
   useEffect(() => {
@@ -102,8 +94,9 @@ const InputURIValue = ({
   }
 
   const handleTranslate = (translatedText, marcCode) => {
-    dispatch(
-      addValue(
+    useEntitiesStore
+      .getState()
+      .addValue(
         newLiteralValue(
           value.property,
           value.propertyUri,
@@ -112,11 +105,10 @@ const InputURIValue = ({
         ),
         value.key
       )
-    )
   }
 
   const handleRemoveClick = (event) => {
-    dispatch(removeValue(value.key))
+    useEntitiesStore.getState().removeValue(value.key)
     event.preventDefault()
   }
 

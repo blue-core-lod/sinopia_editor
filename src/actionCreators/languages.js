@@ -1,19 +1,19 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
-import { languagesReceived } from "actions/languages"
+import useEntitiesStore from "stores/entitiesStore"
 import { hasLanguages } from "selectors/languages"
 import _ from "lodash"
 import isoMapping from "../../static/iso639toBCP47.json"
 import Config from "../Config"
 
-export const fetchLanguages = () => (dispatch, getState) => {
-  if (hasLanguages(getState())) {
+export const fetchLanguages = () => () => {
+  if (hasLanguages(useEntitiesStore.getState())) {
     return // Languages already loaded
   }
 
   // This speeds up tests.
   if (Config.useLanguageFixtures) {
-    return fetchFixtureLanguages(dispatch)
+    return fetchFixtureLanguages()
   }
 
   return import("language-subtag-registry/data/json/registry.json").then(
@@ -49,16 +49,14 @@ export const fetchLanguages = () => (dispatch, getState) => {
       Object.values(typeMap).forEach((typeValue) => {
         typeValue.options = _.sortBy(typeValue.options, ["label"])
       })
-      dispatch(
-        languagesReceived(
-          typeMap.language.map,
-          typeMap.language.options,
-          typeMap.script.map,
-          typeMap.script.options,
-          typeMap.transliteration.map,
-          typeMap.transliteration.options
-        )
-      )
+      useEntitiesStore.getState().languagesReceived({
+        languages: typeMap.language.map,
+        languageLookup: typeMap.language.options,
+        scripts: typeMap.script.map,
+        scriptLookup: typeMap.script.options,
+        transliterations: typeMap.transliteration.map,
+        transliterationLookup: typeMap.transliteration.options,
+      })
     }
   )
 }
@@ -80,7 +78,7 @@ const transliterationOptions = () =>
     label: `${description} (${subtag})`,
   }))
 
-const fetchFixtureLanguages = (dispatch) => {
+const fetchFixtureLanguages = () => {
   const languageLookup = [
     { id: "taw", label: "Tai (taw)" },
     { id: "en", label: "English (en)" },
@@ -115,16 +113,14 @@ const fetchFixtureLanguages = (dispatch) => {
     buckwalt: "Buckwalter Arabic transliteration system",
   }
 
-  return dispatch(
-    languagesReceived(
-      languages,
-      languageLookup,
-      scripts,
-      scriptLookup,
-      transliterations,
-      transliterationLookup
-    )
-  )
+  useEntitiesStore.getState().languagesReceived({
+    languages,
+    languageLookup,
+    scripts,
+    scriptLookup,
+    transliterations,
+    transliterationLookup,
+  })
 }
 
 export const noop = () => {}

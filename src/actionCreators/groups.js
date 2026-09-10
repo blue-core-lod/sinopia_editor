@@ -1,18 +1,18 @@
 // Copyright 2021 Stanford University see LICENSE for license
 
-import { groupsReceived } from "actions/groups"
+import useEntitiesStore from "stores/entitiesStore"
 import { hasGroups } from "selectors/groups"
 
 import { getGroups } from "sinopiaApi"
 
-export const fetchGroups = () => (dispatch, getState) => {
-  if (hasGroups(getState())) {
+export const fetchGroups = () => () => {
+  if (hasGroups(useEntitiesStore.getState())) {
     return // Groups already loaded
   }
 
   return getGroups()
     .then((json) => {
-      dispatch(groupsReceived(json))
+      useEntitiesStore.getState().groupsReceived(json)
     })
     .catch(() => false)
 }

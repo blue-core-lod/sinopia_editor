@@ -1,49 +1,58 @@
 import { createState } from "stateUtils"
+import useEntitiesStore from "stores/entitiesStore"
 import { selectLanguageLabel } from "selectors/languages"
+
+const entitiesState = () => useEntitiesStore.getState()
 
 describe("selectLanguageLabel()", () => {
   it("returns No Language Specified when no tag", () => {
-    const state = createState()
-    expect(selectLanguageLabel(state, null)).toEqual("No language specified")
+    createState()
+    expect(selectLanguageLabel(entitiesState(), null)).toEqual(
+      "No language specified"
+    )
   })
 
   it("returns English for en", () => {
-    const state = createState()
-    expect(selectLanguageLabel(state, "en")).toEqual("English")
+    createState()
+    expect(selectLanguageLabel(entitiesState(), "en")).toEqual("English")
   })
 
   it("returns language label for language", () => {
-    const state = createState()
-    expect(selectLanguageLabel(state, "taw")).toEqual("Tai")
+    createState()
+    expect(selectLanguageLabel(entitiesState(), "taw")).toEqual("Tai")
   })
 
   it("returns Unknown language for unknown language", () => {
-    const state = createState()
-    expect(selectLanguageLabel(state, "foo")).toEqual("Unknown language (foo)")
+    createState()
+    expect(selectLanguageLabel(entitiesState(), "foo")).toEqual(
+      "Unknown language (foo)"
+    )
   })
 
   it("returns script label for script", () => {
-    const state = createState()
-    expect(selectLanguageLabel(state, "en-Latn")).toEqual("English - Latin")
+    createState()
+    expect(selectLanguageLabel(entitiesState(), "en-Latn")).toEqual(
+      "English - Latin"
+    )
   })
 
   it("returns Unknown script for unknown script", () => {
-    const state = createState()
-    expect(selectLanguageLabel(state, "en-Foo")).toEqual(
+    createState()
+    expect(selectLanguageLabel(entitiesState(), "en-Foo")).toEqual(
       "English - Unknown script (Foo)"
     )
   })
 
   it("returns transliteration label for transliteration", () => {
-    const state = createState()
-    expect(selectLanguageLabel(state, "en-t-en-m0-alaloc")).toEqual(
+    createState()
+    expect(selectLanguageLabel(entitiesState(), "en-t-en-m0-alaloc")).toEqual(
       "English - American Library Association-Library of Congress"
     )
   })
 
   it("returns Unknown script for unknown transliteration", () => {
-    const state = createState()
-    expect(selectLanguageLabel(state, "en-t-en-m0-foo")).toEqual(
+    createState()
+    expect(selectLanguageLabel(entitiesState(), "en-t-en-m0-foo")).toEqual(
       "English - Unknown transliteration (foo)"
     )
   })
