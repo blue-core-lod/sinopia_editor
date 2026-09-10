@@ -180,16 +180,12 @@ const LoadByRDFForm = () => {
         if (resourceTemplateId) {
           setResourceTemplateId(resourceTemplateId)
         } else {
-          useEditorStore
-            .getState()
-            .showModal("ResourceTemplateChoiceModal")
+          useEditorStore.getState().showModal("ResourceTemplateChoiceModal")
         }
         setDataset(newDataset)
       })
       .catch((err) => {
-        useEditorStore
-          .getState()
-          .addError(errorKey, `Error parsing: ${err}`)
+        useEditorStore.getState().addError(errorKey, `Error parsing: ${err}`)
       })
   }
 

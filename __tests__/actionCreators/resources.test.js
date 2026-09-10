@@ -177,9 +177,9 @@ describe("saveNewResource", () => {
 
     const actions = store.getActions()
 
-    expect(useEditorStore.getState().errors["testerror"]).toEqual([])
+    expect(useEditorStore.getState().errors.testerror).toEqual([])
     expect(actions).toHaveAction("SET_BASE_URL")
-    expect(useEditorStore.getState().lastSave["t9zVwg2zO"]).toBeTruthy()
+    expect(useEditorStore.getState().lastSave.t9zVwg2zO).toBeTruthy()
     expect(useHistoryStore.getState().resources).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -197,7 +197,7 @@ describe("saveNewResource", () => {
     })
 
     // saveResourceFinished now goes to Zustand
-    expect(useEditorStore.getState().lastSave["t9zVwg2zO"]).toBeTruthy()
+    expect(useEditorStore.getState().lastSave.t9zVwg2zO).toBeTruthy()
 
     expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
       "Foo McBar",
@@ -218,7 +218,7 @@ describe("saveNewResource", () => {
 
     const actions = store.getActions()
 
-    expect(useEditorStore.getState().errors["testerror"]).toContain(
+    expect(useEditorStore.getState().errors.testerror).toContain(
       "Error saving new resource: Messed-up"
     )
   })
@@ -242,8 +242,8 @@ describe("saveResource", () => {
     )
     const actions = store.getActions()
 
-    expect(useEditorStore.getState().errors["testerror"]).toEqual([])
-    expect(useEditorStore.getState().lastSave["t9zVwg2zO"]).toBeTruthy()
+    expect(useEditorStore.getState().errors.testerror).toEqual([])
+    expect(useEditorStore.getState().lastSave.t9zVwg2zO).toBeTruthy()
     expect(useHistoryStore.getState().resources).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -276,7 +276,7 @@ describe("saveResource", () => {
       saveResource("t9zVwg2zO", "stanford", ["cornell"], "testerror")
     )
     const actions = store.getActions()
-    expect(useEditorStore.getState().errors["testerror"]).toContain(
+    expect(useEditorStore.getState().errors.testerror).toContain(
       "Error saving: Messed-up"
     )
   })

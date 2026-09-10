@@ -28,7 +28,7 @@ describe("export", () => {
     it("dispatches actions", async () => {
       const store = mockStore({ entities: { exports: [] } })
       await store.dispatch(fetchExports("testerrorkey"))
-      expect(useEditorStore.getState().errors["testerrorkey"]).toEqual([])
+      expect(useEditorStore.getState().errors.testerrorkey).toEqual([])
       expect(store.getActions()).toEqual([
         {
           type: "EXPORTS_RECEIVED",
@@ -52,7 +52,7 @@ describe("export", () => {
     it("dispatches actions", async () => {
       const store = mockStore({ entities: { exports: [] } })
       await store.dispatch(fetchExports("testerrorkey"))
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         "Error retrieving list of exports: S3 fail"
       )
     })

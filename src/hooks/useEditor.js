@@ -7,9 +7,7 @@ const useEditor = (resourceKey) => {
   const dispatch = useDispatch()
   const history = useHistory()
 
-  const resourceKeyCount = useEditorStore(
-    (state) => state.resources.length
-  )
+  const resourceKeyCount = useEditorStore((state) => state.resources.length)
 
   const handleCloseResource = (event) => {
     if (event) event.preventDefault()

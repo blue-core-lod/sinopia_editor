@@ -91,7 +91,7 @@ describe("signIn", () => {
         updateToken: jest.fn(),
       }
       await store.dispatch(signIn(mockKeycloak, "testerrorkey"))
-      expect(useEditorStore.getState().errors["testerrorkey"]).toEqual([])
+      expect(useEditorStore.getState().errors.testerrorkey).toEqual([])
 
       // Simulate redirect back — keycloak now authenticated
       mockKeycloak.authenticated = true
@@ -114,7 +114,7 @@ describe("signIn", () => {
         login: jest.fn(() => Promise.resolve(false)),
       }
       await store.dispatch(signIn(mockKeycloak, "testerrorkey"))
-      expect(useEditorStore.getState().errors["testerrorkey"]).toEqual([])
+      expect(useEditorStore.getState().errors.testerrorkey).toEqual([])
 
       // Simulate user refreshing Sinopia — not authenticated
       await store.dispatch(authenticate(mockKeycloak))

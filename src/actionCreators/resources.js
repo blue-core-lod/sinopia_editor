@@ -159,8 +159,7 @@ export const dispatchResourceForEditor =
  */
 export const completeResourceLoadingWithTemplate =
   (resourceTemplateId) => (dispatch) => {
-    const pending =
-      useEditorStore.getState().pendingResourceTemplateSelection
+    const pending = useEditorStore.getState().pendingResourceTemplateSelection
     if (!pending) {
       console.error("No pending resource template selection found")
       return Promise.resolve(false)
@@ -378,9 +377,7 @@ export const saveNewResource =
       .then((resourceUrl) => {
         dispatch(setBaseURL(resourceKey, resourceUrl))
         dispatch(setResourceGroup(resourceKey, group, editGroups))
-        useEditorStore
-          .getState()
-          .saveResourceFinished(resourceKey, Date.now())
+        useEditorStore.getState().saveResourceFinished(resourceKey, Date.now())
         dispatch(addUserResourceHistory(resourceUrl, keycloak))
         dispatch(
           addResourceHistory(resourceUrl, resource.subjectTemplate.class, group)
@@ -419,9 +416,7 @@ export const saveResource =
     )
       .then(() => {
         dispatch(setResourceGroup(resourceKey, group, editGroups))
-        useEditorStore
-          .getState()
-          .saveResourceFinished(resourceKey, Date.now())
+        useEditorStore.getState().saveResourceFinished(resourceKey, Date.now())
         dispatch(addUserResourceHistory(resource.uri, keycloak))
         dispatch(
           addResourceHistory(

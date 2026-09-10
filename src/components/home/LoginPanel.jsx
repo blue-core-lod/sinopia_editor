@@ -16,9 +16,7 @@ const LoginPanel = () => {
 
   const { keycloak } = useKeycloak()
 
-  const error = _.first(
-    useEditorStore((state) => state.errors[signInErrorKey])
-  )
+  const error = _.first(useEditorStore((state) => state.errors[signInErrorKey]))
 
   const handleSubmit = (event) => {
     event.preventDefault()

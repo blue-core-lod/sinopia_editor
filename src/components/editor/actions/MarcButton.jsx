@@ -94,9 +94,7 @@ const MarcButton = ({ resourceKey }) => {
   }
 
   const handleViewMarc = (event) => {
-    useEditorStore
-      .getState()
-      .showMarcModal(marcs.current[resourceKey].marc)
+    useEditorStore.getState().showMarcModal(marcs.current[resourceKey].marc)
     event.preventDefault()
   }
 

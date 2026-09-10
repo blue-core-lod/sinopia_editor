@@ -17,9 +17,7 @@ import { useHistory } from "react-router-dom"
 const useRdfResource = (dataset, baseURI, resourceTemplateId, errorKey) => {
   const dispatch = useDispatch()
   const history = useHistory()
-  const hasResource = useEditorStore(
-    (state) => !!state.currentResource
-  )
+  const hasResource = useEditorStore((state) => !!state.currentResource)
 
   // Indicates that would like to change to editor once resource is in state
   const [navigateEditor, setNavigateEditor] = useState(false)

@@ -56,9 +56,7 @@ const App = (props) => {
   const [isFirstMountWithUser, setFirstMountWithUser] = useState(true)
   const { keycloak } = useKeycloak()
   const hasUser = useAuthenticateStore((state) => !!state.user)
-  const isModalOpen = useEditorStore(
-    (state) => state.currentModal.length > 0
-  )
+  const isModalOpen = useEditorStore((state) => state.currentModal.length > 0)
 
   useEffect(() => {
     dispatch(fetchLanguages())

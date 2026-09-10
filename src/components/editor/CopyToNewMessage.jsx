@@ -6,9 +6,7 @@ import ExpiringMessage from "./ExpiringMessage"
 
 const CopyToNewMessage = () => {
   const oldUri = useEditorStore((state) => state.copyToNewMessage.oldUri)
-  const timestamp = useEditorStore(
-    (state) => state.copyToNewMessage.timestamp
-  )
+  const timestamp = useEditorStore((state) => state.copyToNewMessage.timestamp)
 
   return (
     <ExpiringMessage timestamp={timestamp}>

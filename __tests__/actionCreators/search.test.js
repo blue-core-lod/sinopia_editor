@@ -75,7 +75,7 @@ describe("fetchSinopiaSearchResults", () => {
     const actions = store.getActions()
 
     expect(actions).toHaveLength(0)
-    expect(useEditorStore.getState().errors["testerrorkey"]).toEqual([])
+    expect(useEditorStore.getState().errors.testerrorkey).toEqual([])
     expect(useSearchStore.getState().resource).toMatchObject({
       error: undefined,
       uri: "urn:ld4p:sinopia",
@@ -190,7 +190,7 @@ describe("fetchQASearchResults", () => {
       const actions = store.getActions()
 
       expect(actions).toHaveLength(0)
-      expect(useEditorStore.getState().errors["testerrorkey"]).toEqual([])
+      expect(useEditorStore.getState().errors.testerrorkey).toEqual([])
       expect(useSearchStore.getState().resource).toMatchObject({
         uri,
         query,
@@ -238,7 +238,7 @@ describe("fetchQASearchResults", () => {
         facetResults: {},
         error: "Ooops...",
       })
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         "An error occurred while searching: Ooops..."
       )
     })
@@ -324,7 +324,7 @@ describe("fetchTemplateGuessSearchResults", () => {
           startOfRange: 0,
         }),
       })
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         "Error searching for templates: Ooops"
       )
     })

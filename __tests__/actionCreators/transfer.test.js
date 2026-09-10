@@ -33,9 +33,7 @@ describe("transfer", () => {
           { instance_uri: resourceUri },
           undefined
         )
-        expect(
-          useEditorStore.getState().successes["testerrorkey"]
-        ).toContain(
+        expect(useEditorStore.getState().successes.testerrorkey).toContain(
           `Export of ${resourceUri} requested. You will be notified by email once processed.`
         )
       })
@@ -48,9 +46,9 @@ describe("transfer", () => {
           transfer(resourceUri, null, undefined, "testerrorkey")
         )
 
-        expect(
-          useEditorStore.getState().errors["testerrorkey"]
-        ).toContain("Error requesting transfer: Ooops!")
+        expect(useEditorStore.getState().errors.testerrorkey).toContain(
+          "Error requesting transfer: Ooops!"
+        )
       })
     })
   })
@@ -70,9 +68,7 @@ describe("transfer", () => {
           { instance_uri: resourceUri, local_id: localId },
           undefined
         )
-        expect(
-          useEditorStore.getState().successes["testerrorkey"]
-        ).toContain(
+        expect(useEditorStore.getState().successes.testerrorkey).toContain(
           `Export of ${resourceUri} using identifier ${localId} requested. You will be notified by email once processed.`
         )
       })
@@ -85,9 +81,9 @@ describe("transfer", () => {
           transfer(resourceUri, localId, undefined, "testerrorkey")
         )
 
-        expect(
-          useEditorStore.getState().errors["testerrorkey"]
-        ).toContain("Error requesting transfer: Ooops!")
+        expect(useEditorStore.getState().errors.testerrorkey).toContain(
+          "Error requesting transfer: Ooops!"
+        )
       })
     })
   })

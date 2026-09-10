@@ -86,7 +86,7 @@ describe("loadResourceTemplate()", () => {
           ),
         },
       ])
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         "A property template may not use the same property URI as another property template (http://id.loc.gov/ontologies/bibframe/geographicCoverage) unless both propery templates are of type nested resource and the nested resources are of different classes."
       )
     })
@@ -102,7 +102,7 @@ describe("loadResourceTemplate()", () => {
       expect(subjectTemplate).toBeNull()
 
       expect(store.getActions()).toEqual([])
-      expect(useEditorStore.getState().errors["testerrorkey"]).toContain(
+      expect(useEditorStore.getState().errors.testerrorkey).toContain(
         "Error retrieving ld4p:RT:bf2:xxx: Error parsing resource: Error retrieving resource: Not Found"
       )
     })

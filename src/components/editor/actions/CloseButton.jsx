@@ -21,9 +21,7 @@ const CloseButton = (props) => {
 
   const handleClick = (event) => {
     if (resourceHasChanged) {
-      useEditorStore
-        .getState()
-        .showModal(`CloseResourceModal-${resourceKey}`)
+      useEditorStore.getState().showModal(`CloseResourceModal-${resourceKey}`)
     } else {
       handleCloseResource()
     }

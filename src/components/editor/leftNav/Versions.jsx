@@ -69,9 +69,7 @@ const Versions = ({ resource }) => {
 
     const loadPromises = []
     if (compareFrom === "current") {
-      useEditorStore
-        .getState()
-        .setCurrentDiffResources(resource.key, undefined)
+      useEditorStore.getState().setCurrentDiffResources(resource.key, undefined)
     } else {
       loadPromises.push(
         dispatch(
@@ -86,9 +84,7 @@ const Versions = ({ resource }) => {
     }
 
     if (compareTo === "current") {
-      useEditorStore
-        .getState()
-        .setCurrentDiffResources(undefined, resource.key)
+      useEditorStore.getState().setCurrentDiffResources(undefined, resource.key)
     } else {
       loadPromises.push(
         dispatch(

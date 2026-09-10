@@ -27,7 +27,10 @@ describe("editorStore", () => {
       const { addError, clearErrors } = useEditorStore.getState()
       addError("key1", "error1")
       addError("key1", "error2")
-      expect(useEditorStore.getState().errors.key1).toEqual(["error1", "error2"])
+      expect(useEditorStore.getState().errors.key1).toEqual([
+        "error1",
+        "error2",
+      ])
       clearErrors("key1")
       expect(useEditorStore.getState().errors.key1).toEqual([])
     })
@@ -38,7 +41,10 @@ describe("editorStore", () => {
       const { showModal, hideModal } = useEditorStore.getState()
       showModal("Modal1")
       showModal("Modal2")
-      expect(useEditorStore.getState().currentModal).toEqual(["Modal1", "Modal2"])
+      expect(useEditorStore.getState().currentModal).toEqual([
+        "Modal1",
+        "Modal2",
+      ])
       hideModal()
       expect(useEditorStore.getState().currentModal).toEqual(["Modal1"])
     })
