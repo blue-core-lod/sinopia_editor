@@ -3,35 +3,8 @@
 import { createStore, applyMiddleware, compose } from "redux"
 import thunk from "redux-thunk"
 import reducer from "./reducers/index"
-import { sinopiaSearchUri } from "utilities/authorityConfig"
 
 export const initialState = {
-  editor: {
-    // The state of the editor
-    copyToNewMessage: {
-      oldUri: null,
-      timestamp: null,
-    },
-    currentResource: undefined,
-    currentPreviewResource: undefined,
-    currentComponent: {},
-    currentModal: [], // a stack of modal names. This allows a modal to be opened from a modal, but only one displays at a time.
-    currentLangModalValue: undefined, // the value key of the value to be displayed in the InputLang modal.
-    currentDiff: {
-      compareFrom: undefined,
-      compareTo: undefined,
-    },
-    errors: {}, // {<error key>: [errors...]} or {<error key>: {<resourceKey>: [errors...]}}
-    lastSave: {}, // {<resourceKey>: date}
-    resources: [], // Subject keys for open resources
-    resourceValidation: {}, // Show validation {<resourceKey>: boolean}
-    unusedRDF: {}, // {<resourceKey>: rdf}
-    marc: null, // marc record for display
-    currentHeaderSearch: {
-      query: null,
-      uri: sinopiaSearchUri,
-    },
-  },
   entities: {
     languageLookup: [],
     languages: {},

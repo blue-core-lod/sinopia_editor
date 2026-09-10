@@ -3,7 +3,7 @@ import mockConsole from "jest-mock-console"
 import Config from "Config"
 import { createStore } from "testUtils"
 import { datasetFromN3, datasetFromJsonld } from "utilities/Utilities"
-import { selectCurrentResourceKey } from "selectors/resources"
+import useEditorStore from "stores/editorStore"
 import { nanoid } from "nanoid"
 
 jest.mock("KeycloakContext", () => ({
@@ -54,7 +54,7 @@ describe("saveResource with triples not covered by the template", () => {
     )
     expect(loaded).toBe(true)
 
-    const resourceKey = selectCurrentResourceKey(store.getState())
+    const resourceKey = useEditorStore.getState().currentResource
 
     // Capture the body PUT to the resource uri. Do not mock putResource, since
     // the real GraphBuilder / serialization path is what we are exercising.

@@ -4,10 +4,8 @@ import { render, screen } from "@testing-library/react"
 import RDFDisplay from "components/editor/preview/RDFDisplay"
 import GraphBuilder from "GraphBuilder"
 import { createState } from "stateUtils"
-import {
-  selectFullSubject,
-  selectCurrentResourceKey,
-} from "selectors/resources"
+import { selectFullSubject } from "selectors/resources"
+import useEditorStore from "stores/editorStore"
 import * as dataSetUtils from "utilities/Utilities"
 import { featureSetup } from "featureUtils"
 
@@ -35,7 +33,7 @@ featureSetup()
 describe("<RDFDisplay />", () => {
   const state = createState({ hasTwoLiteralResources: true })
   const dataset = new GraphBuilder(
-    selectFullSubject(state, selectCurrentResourceKey(state))
+    selectFullSubject(state, useEditorStore.getState().currentResource)
   ).graph
 
   it("renders as a table", async () => {

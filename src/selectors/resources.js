@@ -75,15 +75,6 @@ export const selectNormProperty = (state, key) => state.entities.properties[key]
 
 export const selectNormValue = (state, key) => state.entities.values[key]
 
-export const selectCurrentResourceKey = () =>
-  useEditorStore.getState().currentResource
-
-export const selectCurrentPreviewResourceKey = () =>
-  useEditorStore.getState().currentPreviewResource
-
-export const selectCurrentDiffResourceKeys = () =>
-  useEditorStore.getState().currentDiff
-
 export const selectFullSubject = (state, key) => {
   const subject = selectNormSubject(state, key)
   if (_.isEmpty(subject)) return null
@@ -139,10 +130,8 @@ export const resourceHasChangesSinceLastSave = (state, resourceKey) => {
   return state.entities.subjects[thisResourceKey].changed
 }
 
-export const selectResourceKeys = () => useEditorStore.getState().resources
-
 export const selectResourceUriMap = (state) => {
-  const resourceKeys = selectResourceKeys()
+  const resourceKeys = useEditorStore.getState().resources
   const resourceUriMap = {}
   resourceKeys.forEach((resourceKey) => {
     const subject = selectNormSubject(state, resourceKey)
@@ -150,9 +139,6 @@ export const selectResourceUriMap = (state) => {
   })
   return resourceUriMap
 }
-
-export const selectLastSave = (state, resourceKey) =>
-  useEditorStore.getState().lastSave[resourceKey]
 
 export const selectNormValues = (state, valueKeys) => {
   if (!valueKeys) return null

@@ -7,8 +7,29 @@ import useEditorStore from "stores/editorStore"
 
 const build = new StateResourceBuilder()
 
+// Matches the original initialState.editor fields (excluding successes, which tests set independently)
+const editorInitialState = {
+  copyToNewMessage: { oldUri: null, timestamp: null },
+  currentResource: undefined,
+  currentPreviewResource: undefined,
+  currentComponent: {},
+  currentModal: [],
+  currentLangModalValue: undefined,
+  currentDiff: { compareFrom: undefined, compareTo: undefined },
+  errors: {},
+  lastSave: {},
+  resources: [],
+  resourceValidation: {},
+  unusedRDF: {},
+  marc: null,
+  pendingResourceTemplateSelection: null,
+  currentHeaderSearch: { query: null, uri: "urn:ld4p:sinopia" },
+}
+
 export const createState = (options = {}) => {
   const state = _.cloneDeep(initialState)
+  // Reset editor Zustand store to defaults before building test state
+  useEditorStore.setState(editorInitialState)
   buildAuthenticate(state, options)
   buildLanguages(state, options)
   buildGroups(state, options)
@@ -28,13 +49,6 @@ export const createState = (options = {}) => {
   buildLookups(state, options)
   buildSearchResults(state, options)
   buildCurrentDiff(state, options)
-
-  // Sync editor state to Zustand store for tests
-  if (state.editor) {
-    useEditorStore.setState({
-      ...state.editor,
-    })
-  }
 
   return state
 }
@@ -119,7 +133,7 @@ const buildLanguages = (state, options) => {
 const buildResourceWithError = (state, options) => {
   if (!options.hasResourceWithError) return
 
-  state.editor = {
+  useEditorStore.setState({
     resourceValidation: {
       "3h4Fp8ANu": true,
     },
@@ -130,13 +144,13 @@ const buildResourceWithError = (state, options) => {
         fQMouMqB0: ["error 4"],
       },
     },
-  }
+  })
 }
 
 const buildTemplateWithLiteral = (state, options) => {
   if (!options.hasTemplateWithLiteral) return
 
-  state.editor.currentResource = "8VrbxGPeF"
+  useEditorStore.setState({ currentResource: "8VrbxGPeF" })
   state.entities.subjectTemplates = {
     "sinopia:template:resource": build.subjectTemplate({
       uri: "http://localhost:3000/resource/sinopia:template:resource",
@@ -195,10 +209,11 @@ const buildTemplateWithLiteral = (state, options) => {
 const buildResourceWithLiteral = (state, options) => {
   if (!options.hasResourceWithLiteral) return
 
-  if (options.readOnlyResource) state.editor.currentResourceIsReadOnly = true
-
-  state.editor.currentResource = "t9zVwg2zO"
-  state.editor.resources = ["t9zVwg2zO"]
+  useEditorStore.setState({
+    currentResource: "t9zVwg2zO",
+    resources: ["t9zVwg2zO"],
+    ...(options.readOnlyResource ? { currentResourceIsReadOnly: true } : {}),
+  })
   state.entities.subjectTemplates = {
     "ld4p:RT:bf2:Title:AbbrTitle": build.subjectTemplate({
       id: "ld4p:RT:bf2:Title:AbbrTitle",
@@ -281,8 +296,10 @@ const buildResourceWithLiteral = (state, options) => {
 const buildTwoLiteralResources = (state, options) => {
   if (!options.hasTwoLiteralResources) return
 
-  state.editor.currentResource = "t9zVwg2zO"
-  state.editor.resources = ["t9zVwg2zO", "u0aWxh3a1"]
+  useEditorStore.setState({
+    currentResource: "t9zVwg2zO",
+    resources: ["t9zVwg2zO", "u0aWxh3a1"],
+  })
   state.entities.subjectTemplates = {
     "ld4p:RT:bf2:Title:AbbrTitle": build.subjectTemplate({
       id: "ld4p:RT:bf2:Title:AbbrTitle",
@@ -391,8 +408,10 @@ const buildTwoLiteralResources = (state, options) => {
 const buildResourceWithUri = (state, options) => {
   if (!options.hasResourceWithUri) return
 
-  state.editor.currentResource = "wihOjn-0Z"
-  state.editor.resources = ["wihOjn-0Z"]
+  useEditorStore.setState({
+    currentResource: "wihOjn-0Z",
+    resources: ["wihOjn-0Z"],
+  })
   state.entities.subjectTemplates = {
     "resourceTemplate:testing:uber5": build.subjectTemplate({
       uri: "http://localhost:3000/resource/resourceTemplate:testing:uber5",
@@ -460,8 +479,10 @@ const buildResourceWithUri = (state, options) => {
 const buildResourceWithList = (state, options) => {
   if (!options.hasResourceWithList) return
 
-  state.editor.currentResource = "wihOjn-0Z"
-  state.editor.resources = ["wihOjn-0Z"]
+  useEditorStore.setState({
+    currentResource: "wihOjn-0Z",
+    resources: ["wihOjn-0Z"],
+  })
   state.entities.subjectTemplates = {
     "resourceTemplate:testing:uber5": build.subjectTemplate({
       uri: "http://localhost:3000/resource/resourceTemplate:testing:uber5",
@@ -535,8 +556,10 @@ const buildResourceWithList = (state, options) => {
 const buildResourceWithLookup = (state, options) => {
   if (!options.hasResourceWithLookup) return
 
-  state.editor.currentResource = "wihOjn-0Z"
-  state.editor.resources = ["wihOjn-0Z"]
+  useEditorStore.setState({
+    currentResource: "wihOjn-0Z",
+    resources: ["wihOjn-0Z"],
+  })
   state.entities.subjectTemplates = {
     "test:resource:SinopiaLookup": build.subjectTemplate({
       id: "test:resource:SinopiaLookup",
@@ -618,8 +641,10 @@ const buildResourceWithLookup = (state, options) => {
 const buildResourceWithContractedLiteral = (state, options) => {
   if (!options.hasResourceWithContractedLiteral) return
 
-  state.editor.currentResource = "t9zVwg2zO"
-  state.editor.resources = ["t9zVwg2zO"]
+  useEditorStore.setState({
+    currentResource: "t9zVwg2zO",
+    resources: ["t9zVwg2zO"],
+  })
   state.entities.subjectTemplates = {
     "ld4p:RT:bf2:Title:AbbrTitle": build.subjectTemplate({
       id: "ld4p:RT:bf2:Title:AbbrTitle",
@@ -673,8 +698,10 @@ const buildResourceWithContractedLiteral = (state, options) => {
 const buildResourceWithNestedResource = (state, options) => {
   if (!options.hasResourceWithNestedResource) return
 
-  state.editor.currentResource = "ljAblGiBW"
-  state.editor.resources = ["ljAblGiBW"]
+  useEditorStore.setState({
+    currentResource: "ljAblGiBW",
+    resources: ["ljAblGiBW"],
+  })
   state.entities.subjectTemplates = {
     "resourceTemplate:testing:uber1": build.subjectTemplate({
       id: "resourceTemplate:testing:uber1",
@@ -805,8 +832,10 @@ const buildResourceWithNestedResource = (state, options) => {
 const buildResourceWithContractedNestedResource = (state, options) => {
   if (!options.hasResourceWithContractedNestedResource) return
 
-  state.editor.currentResource = "ljAblGiBW"
-  state.editor.resources = ["ljAblGiBW"]
+  useEditorStore.setState({
+    currentResource: "ljAblGiBW",
+    resources: ["ljAblGiBW"],
+  })
   state.entities.subjectTemplates = {
     "resourceTemplate:testing:uber1": build.subjectTemplate({
       id: "resourceTemplate:testing:uber1",
@@ -861,8 +890,10 @@ const buildResourceWithContractedNestedResource = (state, options) => {
 const buildResourceWithMainTitle = (state, options) => {
   if (!options.hasResourceWithMainTitle) return
 
-  state.editor.currentResource = "cqxLskA9kjAfMFDeuvzGq"
-  state.editor.resources = ["cqxLskA9kjAfMFDeuvzGq"]
+  useEditorStore.setState({
+    currentResource: "cqxLskA9kjAfMFDeuvzGq",
+    resources: ["cqxLskA9kjAfMFDeuvzGq"],
+  })
   state.entities.subjectTemplates = {
     "resourceTemplate:bf2:Instance": build.subjectTemplate({
       id: "resourceTemplate:bf2:Instance",
@@ -1017,8 +1048,10 @@ const buildLookups = (state, options) => {
 const buildResourceWithTwoNestedResources = (state, options) => {
   if (!options.hasResourceWithTwoNestedResources) return
 
-  state.editor.currentResource = "ljAblGiBW"
-  state.editor.resources = ["ljAblGiBW"]
+  useEditorStore.setState({
+    currentResource: "ljAblGiBW",
+    resources: ["ljAblGiBW"],
+  })
   state.entities.subjectTemplates = {
     "resourceTemplate:testing:uber1": build.subjectTemplate({
       id: "resourceTemplate:testing:uber1",
@@ -1165,10 +1198,12 @@ const buildSearchResults = (_state, _options) => {}
 const buildCurrentDiff = (state, options) => {
   if (!options.hasCurrentDiff) return
 
-  state.editor.currentDiff = {
-    compareFrom: "7caLbfwwlf",
-    compareTo: "ljAblGiBW",
-  }
+  useEditorStore.setState({
+    currentDiff: {
+      compareFrom: "7caLbfwwlf",
+      compareTo: "ljAblGiBW",
+    },
+  })
 }
 
 export const noop = () => {}
