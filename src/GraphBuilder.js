@@ -167,9 +167,14 @@ export default class GraphBuilder {
     if (value.valueSubject.subjectTemplate.suppressible) {
       this.buildSuppressedValueSubject(value, subjectTerm, propertyTerm)
     } else {
-      const bnode = rdf.blankNode()
-      this.dataset.add(rdf.quad(subjectTerm, propertyTerm, bnode))
-      this.buildSubject(value.valueSubject, bnode)
+      // Preserve a real URI identity (e.g. loaded from a NamedNode value
+      // that carries its own properties) rather than always minting a
+      // fresh blank node -- otherwise that identity is lost on save.
+      const objTerm = value.valueSubject.uri
+        ? rdf.namedNode(value.valueSubject.uri)
+        : rdf.blankNode()
+      this.dataset.add(rdf.quad(subjectTerm, propertyTerm, objTerm))
+      this.buildSubject(value.valueSubject, objTerm)
     }
   }
 

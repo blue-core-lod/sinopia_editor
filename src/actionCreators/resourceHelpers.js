@@ -472,53 +472,108 @@ const newNestedResourceFromObject =
         )
       )
     ).then((childRtIds) => {
-      const compactChildRtIds = _.compact(_.flatten(childRtIds))
+      const compactChildRtIds = _.uniq(_.compact(_.flatten(childRtIds)))
 
-      // Don't know which to pick, so error.
-      if (compactChildRtIds.length > 1) {
-        throw `More than one resource template matches: ${compactChildRtIds}`
-      }
-
-      if (!_.isEmpty(compactChildRtIds)) {
-        context.usedDataset.addAll(typeQuads)
-
-        // One resource template
-        const suppress = obj.termType === "NamedNode"
-        return dispatch(
-          recursiveResourceFromDataset(
-            obj,
-            null,
-            compactChildRtIds[0],
-            suppress,
-            context
-          )
-        ).then((subject) => newValueSubject(property, propertyUri, subject))
-      }
-
-      // No local rdf:type triple matched a candidate template -- e.g. the
-      // object is a bare reference to an external, shared vocabulary term or
-      // resource, which has no reason to restate its own type locally. If the
-      // object is a plain URI and exactly one candidate template is marked
-      // suppressible (i.e., designed to round-trip as a flat URI with no
-      // local type assertion), use that template directly rather than
-      // discarding real data.
-      if (obj.termType !== "NamedNode") {
-        return null
-      }
       return dispatch(
-        selectSuppressibleResourceTemplateId(property.propertyTemplate, context)
-      ).then((suppressibleRtId) => {
-        if (!suppressibleRtId) return null
+        resolveAmbiguousChildRtIds(compactChildRtIds, context)
+      ).then((childRtId) => {
+        if (childRtId) {
+          context.usedDataset.addAll(typeQuads)
+
+          // One resource template
+          return dispatch(
+            loadResourceTemplate(
+              childRtId,
+              context.resourceTemplatePromises,
+              context.errorKey
+            )
+          ).then((subjectTemplate) => {
+            // Suppression only makes sense when the matched template is
+            // itself suppressible (a single URI/lookup property) -- a
+            // NamedNode matching a template with more properties describes
+            // itself via its own real triples, not a single substituted
+            // value. When not suppressing, preserve the object's own URI as
+            // the new subject's identity so it round-trips as itself rather
+            // than a fresh blank node.
+            const suppress =
+              obj.termType === "NamedNode" && !!subjectTemplate?.suppressible
+            const uri =
+              !suppress && obj.termType === "NamedNode" ? obj.value : null
+            return dispatch(
+              recursiveResourceFromDataset(
+                obj,
+                uri,
+                childRtId,
+                suppress,
+                context
+              )
+            ).then((subject) => newValueSubject(property, propertyUri, subject))
+          })
+        }
+
+        // No local rdf:type triple matched a candidate template -- e.g. the
+        // object is a bare reference to an external, shared vocabulary term or
+        // resource, which has no reason to restate its own type locally. If the
+        // object is a plain URI and exactly one candidate template is marked
+        // suppressible (i.e., designed to round-trip as a flat URI with no
+        // local type assertion), use that template directly rather than
+        // discarding real data.
+        if (obj.termType !== "NamedNode") {
+          return null
+        }
         return dispatch(
-          recursiveResourceFromDataset(
-            obj,
-            null,
-            suppressibleRtId,
-            true,
+          selectSuppressibleResourceTemplateId(
+            property.propertyTemplate,
             context
           )
-        ).then((subject) => newValueSubject(property, propertyUri, subject))
+        ).then((suppressibleRtId) => {
+          if (!suppressibleRtId) return null
+          return dispatch(
+            recursiveResourceFromDataset(
+              obj,
+              null,
+              suppressibleRtId,
+              true,
+              context
+            )
+          ).then((subject) => newValueSubject(property, propertyUri, subject))
+        })
       })
+    })
+  }
+
+// When a value's local rdf:type matches more than one candidate template,
+// prefer a non-suppressible match: a suppressible template exists only to
+// catch values with no local type at all, so if a value's asserted type
+// also happens to match one, a non-suppressible candidate is always the
+// more correct choice. Only throw if more than one non-suppressible
+// candidate matches -- that's a genuinely ambiguous profile.
+const resolveAmbiguousChildRtIds =
+  (compactChildRtIds, { resourceTemplatePromises, errorKey }) =>
+  (dispatch) => {
+    if (compactChildRtIds.length <= 1)
+      return Promise.resolve(compactChildRtIds[0])
+
+    return Promise.all(
+      compactChildRtIds.map((resourceTemplateId) =>
+        dispatch(
+          loadResourceTemplate(
+            resourceTemplateId,
+            resourceTemplatePromises,
+            errorKey
+          )
+        ).then((subjectTemplate) => ({
+          resourceTemplateId,
+          suppressible: subjectTemplate?.suppressible,
+        }))
+      )
+    ).then((candidates) => {
+      const nonSuppressible = candidates.filter(
+        (candidate) => !candidate.suppressible
+      )
+      if (nonSuppressible.length === 1)
+        return nonSuppressible[0].resourceTemplateId
+      throw `More than one resource template matches: ${compactChildRtIds}`
     })
   }
 

@@ -51,6 +51,12 @@ const templateFilenames = {
   "resourceTemplate:testing:suppressible": "testing_suppressible.json",
   "resourceTemplate:testing:suppressibleAmbiguous":
     "testing_suppressible_ambiguous.json",
+  "resourceTemplate:testing:richUri": "testing_rich_uri.json",
+  "resourceTemplate:testing:richUri2": "testing_rich_uri2.json",
+  "resourceTemplate:testing:ambiguousClassNonSuppressible":
+    "testing_ambiguous_class_non_suppressible.json",
+  "resourceTemplate:testing:ambiguousClassMultipleNonSuppressible":
+    "testing_ambiguous_class_multiple_non_suppressible.json",
   "resourceTemplate:testing:multiplePropertyUris":
     "testing_multiple_property_uris.json",
   "resourceTemplate:testing:suppressLanguage": "testing_suppress_language.json",
@@ -70,6 +76,12 @@ const templateFilenames = {
     "testing_merge_defaults_sibling.json",
   "resourceTemplate:testing:requiredSingleDefaultHost":
     "testing_required_single_default_host.json",
+  "resourceTemplate:testing:namedNodeMultiProp":
+    "testing_named_node_multi_prop.json",
+  "resourceTemplate:testing:sharedOptionalClass":
+    "testing_shared_optional_class.json",
+  "resourceTemplate:testing:namedNodeMultiPropHost":
+    "testing_named_node_multi_prop_host.json",
 }
 
 export const hasFixtureResource = (uri) => {
