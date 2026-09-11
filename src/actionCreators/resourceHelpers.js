@@ -305,14 +305,27 @@ const newValuesFromDatasetByPropertyUri =
 
     if (property.propertyTemplate.type === "resource") {
       // Get the values based on the template and the dataset then merge.
-      const objPromises = _.compact(
-        objects.map((obj) =>
-          dispatch(
-            newNestedResourceFromObject(obj, property, propertyUri, context)
-          )
+      // Deliberately not compacted: the results are zipped back against
+      // objects below, so the two arrays must stay index-aligned.
+      const objPromises = objects.map((obj) =>
+        dispatch(
+          newNestedResourceFromObject(obj, property, propertyUri, context)
         )
       )
       return Promise.all(objPromises).then((valuesFromObjs) => {
+        // An object that produced no value leaves its triples unaccounted
+        // for. unorderedObjects() marked the link quad used before that was
+        // known, so put it back -- otherwise the dropped data is neither
+        // shown in the editor nor reported as unused RDF, and disappears
+        // silently on save.
+        if (!suppress && !property.propertyTemplate.ordered) {
+          objects.forEach((obj, index) => {
+            if (valuesFromObjs[index]) return
+            context.usedDataset.delete(
+              rdf.quad(subjectTerm, rdf.namedNode(propertyUri), obj)
+            )
+          })
+        }
         if (_.isEmpty(valuesFromObjs)) return []
         const templatePromises = templatePromisesFor(
           property,
@@ -448,6 +461,11 @@ const unorderedObjects = (subjectTerm, propertyUri, context) => {
   return quads.map((quad) => quad.object)
 }
 
+// True when the dataset actually supplied a value for any of the subject's
+// properties. A subject with none renders as an empty nested form.
+const subjectHasValues = (subject) =>
+  subject.properties.some((property) => !_.isEmpty(property.values))
+
 const newNestedResourceFromObject =
   (obj, property, propertyUri, context) => (dispatch) => {
     // Only build this embedded resource if can find the resource template.
@@ -507,7 +525,51 @@ const newNestedResourceFromObject =
                 suppress,
                 context
               )
-            ).then((subject) => newValueSubject(property, propertyUri, subject))
+            ).then((subject) => {
+              if (suppress || subjectHasValues(subject))
+                return newValueSubject(property, propertyUri, subject)
+
+              // The object carries nothing beyond its own rdf:type -- a bare
+              // reference that happens to state its class, which is common in
+              // LC data. The matched non-suppressible template has nothing to
+              // put in any of its fields, so it would render as an empty
+              // nested form with the reference invisible to the cataloger.
+              if (obj.termType !== "NamedNode") {
+                // A blank node with only a type has nothing to preserve: no
+                // URI to fall back on and no values to show. Drop the value
+                // and release its type quads so they are reported as unused
+                // RDF rather than silently discarded on save.
+                typeQuads.forEach((typeQuad) =>
+                  context.usedDataset.delete(typeQuad)
+                )
+                return null
+              }
+              // Prefer the suppressible sibling when the property offers one:
+              // it shows the reference in a single lookup field, which is all
+              // the data actually says.
+              return dispatch(
+                selectSuppressibleResourceTemplateId(
+                  property.propertyTemplate,
+                  context
+                )
+              ).then((suppressibleRtId) => {
+                // Without a suppressible sibling, keep the subject as it is.
+                // Its URI is its identity, so it still round-trips.
+                if (!suppressibleRtId)
+                  return newValueSubject(property, propertyUri, subject)
+                return dispatch(
+                  recursiveResourceFromDataset(
+                    obj,
+                    null,
+                    suppressibleRtId,
+                    true,
+                    context
+                  )
+                ).then((suppressedSubject) =>
+                  newValueSubject(property, propertyUri, suppressedSubject)
+                )
+              })
+            })
           })
         }
 

@@ -764,4 +764,162 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       expect(actualRdf).not.toMatch("Sibling default value")
     })
   })
+  describe("loading a NamedNode value whose only local triple is its rdf:type", () => {
+    // resourceTemplate:testing:ambiguousClassNonSuppressible offers both
+    // :suppressedUri (suppressible) and :richUri (not suppressible) for
+    // http://sinopia.io/testing/Uri. The value below asserts that type and
+    // nothing else -- a bare reference that happens to state its class,
+    // which is the common shape in LC data. Matching the non-suppressible
+    // template leaves every field empty, so the suppressible sibling is
+    // preferred and the reference stays visible in a lookup field.
+    const bareUri = "http://foo/bare-typed-ref"
+    const n3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:ambiguousClassNonSuppressible" .
+    <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/AmbiguousClassNonSuppressible> .
+    <> <http://sinopia.io/testing/AmbiguousClassNonSuppressible/property1> <${bareUri}> .
+    <${bareUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Uri> .
+    `
+
+    it("falls back to the suppressible template and keeps the reference", async () => {
+      const store = mockStore(createState())
+      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      expect(
+        await store.dispatch(
+          newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        )
+      ).toBe(true)
+
+      const actions = store.getActions()
+      const addSubjectAction = actions.find((a) => a.type === "ADD_SUBJECT")
+      // Every offered template contributes a value: an empty placeholder for
+      // the one with no data, plus the real value for the matched one. What
+      // matters is that the reference landed on the suppressible template
+      // rather than being stranded in the empty rich one.
+      const values = addSubjectAction.payload.properties[0].values
+      const valueForTemplate = (id) =>
+        values.find((value) => value.valueSubject.subjectTemplate.id === id)
+
+      const suppressedValue = valueForTemplate(
+        "resourceTemplate:testing:suppressedUri"
+      )
+      expect(suppressedValue.valueSubject.properties[0].values[0].uri).toBe(
+        bareUri
+      )
+
+      const richValue = valueForTemplate("resourceTemplate:testing:richUri")
+      expect(
+        richValue.valueSubject.properties.every(
+          (property) => !property.values || property.values.length === 0
+        )
+      ).toBe(true)
+
+      // Nothing dropped and nothing left over.
+      expect(actions).toHaveAction("SET_UNUSED_RDF", {
+        resourceKey: "abc123",
+        rdf: null,
+      })
+
+      // The reference survives the round trip. Asserted triple by triple
+      // rather than as a whole graph because saving also re-emits an
+      // rdfs:label holding the URI itself: newUriFromObject defaults a URI
+      // value's label to the URI unless the property sets labelSuppressed.
+      // That behaviour predates this fix and applies to every bare URI loaded
+      // through a suppressible template -- it deserves its own issue.
+      const actualRdf = new GraphBuilder(
+        addSubjectAction.payload
+      ).graph.toCanonical()
+      expect(actualRdf).toMatch(
+        `<${uri}> <http://sinopia.io/testing/AmbiguousClassNonSuppressible/property1> <${bareUri}> .`
+      )
+      expect(actualRdf).toMatch(
+        `<${bareUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Uri> .`
+      )
+      expect(actualRdf).toMatch(
+        `<${bareUri}> <http://www.w3.org/2000/01/rdf-schema#label> "${bareUri}" .`
+      )
+    })
+  })
+
+  describe("loading a type-only NamedNode value with no suppressible sibling", () => {
+    // resourceTemplate:testing:namedNodeMultiPropHost offers only
+    // :namedNodeMultiProp (not suppressible), so there is no suppressible
+    // template to fall back to. The value has no properties to show, but its
+    // URI is its identity and must survive the round trip rather than being
+    // silently discarded on save.
+    const bareUri = "http://foo/bare-typed-no-sibling"
+    const n3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:namedNodeMultiPropHost" .
+    <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/NamedNodeMultiPropHost> .
+    <> <http://sinopia.io/testing/NamedNodeMultiPropHost/property1> <${bareUri}> .
+    <${bareUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/NamedNodeMultiProp> .
+    `
+
+    it("keeps the value and round-trips its URI", async () => {
+      const store = mockStore(createState())
+      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      expect(
+        await store.dispatch(
+          newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        )
+      ).toBe(true)
+
+      const actions = store.getActions()
+      const addSubjectAction = actions.find((a) => a.type === "ADD_SUBJECT")
+      const valueSubject =
+        addSubjectAction.payload.properties[0].values[0].valueSubject
+
+      expect(valueSubject.uri).toBe(bareUri)
+      expect(actions).toHaveAction("SET_UNUSED_RDF", {
+        resourceKey: "abc123",
+        rdf: null,
+      })
+
+      const actualRdf = new GraphBuilder(
+        addSubjectAction.payload
+      ).graph.toCanonical()
+      const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      expect(actualRdf).toMatch(expectedGraph.toCanonical())
+    })
+  })
+
+  describe("loading a type-only blank node value with no suppressible sibling", () => {
+    // A blank node asserting only its type has nothing to preserve: no URI
+    // to fall back on and no values to show. Dropping it is correct, but it
+    // must be reported as unused RDF rather than disappearing silently.
+    const n3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:namedNodeMultiPropHost" .
+    <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/NamedNodeMultiPropHost> .
+    <> <http://sinopia.io/testing/NamedNodeMultiPropHost/property1> _:b1 .
+    _:b1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/NamedNodeMultiProp> .
+    `
+
+    it("drops the value but reports it as unused RDF", async () => {
+      const store = mockStore(createState())
+      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      expect(
+        await store.dispatch(
+          newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        )
+      ).toBe(true)
+
+      const actions = store.getActions()
+      const addSubjectAction = actions.find((a) => a.type === "ADD_SUBJECT")
+      // mergeValues leaves the template's empty placeholder where the dropped
+      // value would have been, so the cataloger still gets a blank form.
+      const values = addSubjectAction.payload.properties[0].values
+      expect(values).toHaveLength(1)
+      expect(values[0].valueSubject.uri).toBeNull()
+      expect(
+        values[0].valueSubject.properties.every(
+          (property) => !property.values || property.values.length === 0
+        )
+      ).toBe(true)
+
+      const unusedAction = actions.find((a) => a.type === "SET_UNUSED_RDF")
+      expect(unusedAction.payload.rdf).not.toBeNull()
+      expect(unusedAction.payload.rdf).toMatch(
+        "http://sinopia.io/testing/NamedNodeMultiPropHost/property1"
+      )
+      expect(unusedAction.payload.rdf).toMatch(
+        "http://sinopia.io/testing/NamedNodeMultiProp"
+      )
+    })
+  })
 })
