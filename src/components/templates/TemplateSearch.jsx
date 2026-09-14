@@ -40,6 +40,8 @@ const TemplateSearch = (props) => {
 
   const [queryString, setQueryString] = useState(lastQueryString || "")
   const [startOfRange, setStartOfRange] = useState(0)
+  // Streamlines the list by hiding nested templates by default
+  const [excludeNested, setExcludeNested] = useState(true)
 
   const clearSearchResults = useCallback(
     () => dispatch(clearSearchResultsAction("template")),
@@ -59,7 +61,10 @@ const TemplateSearch = (props) => {
     // Create a token for this set of searches
     const token = { cancel: false }
     tokens.current.push(token)
-    getTemplateSearchResults(queryString, { startOfRange }).then((response) => {
+    getTemplateSearchResults(queryString, {
+      startOfRange,
+      excludeNested,
+    }).then((response) => {
       if (!token.cancel) {
         if (queryString !== "") dispatch(clearErrors(errorKey))
         dispatch(
@@ -70,7 +75,7 @@ const TemplateSearch = (props) => {
             response.totalHits,
             {},
             queryString,
-            { startOfRange },
+            { startOfRange, excludeNested },
             response.error
           )
         )
@@ -84,7 +89,7 @@ const TemplateSearch = (props) => {
         }
       }
     })
-  }, [dispatch, queryString, startOfRange, errorKey])
+  }, [dispatch, queryString, startOfRange, excludeNested, errorKey])
 
   const changePage = (startOfRange) => {
     setStartOfRange(startOfRange)
@@ -135,6 +140,25 @@ const TemplateSearch = (props) => {
                 </span>
               </div>
             </form>
+            <div className="form-check mb-2">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                id="excludeNestedTemplates"
+                data-testid="Exclude nested templates"
+                checked={excludeNested}
+                onChange={(event) => {
+                  setStartOfRange(0)
+                  setExcludeNested(event.target.checked)
+                }}
+              />
+              <label
+                className="form-check-label"
+                htmlFor="excludeNestedTemplates"
+              >
+                Hide nested templates
+              </label>
+            </div>
           </div>
           <div className="col-md-2">
             <NewResourceTemplateButton history={props.history} />
