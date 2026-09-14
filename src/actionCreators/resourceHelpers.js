@@ -97,6 +97,11 @@ export const addResourceFromDataset =
       dataset,
       errorKey,
       resourceTemplatePromises: {},
+      // Terms already being expanded on the current path, so that data which
+      // links back on itself does not recurse forever. Replaced with a copy
+      // at each level rather than mutated, so it tracks the path rather than
+      // everything ever seen.
+      ancestors: new Set(),
     }
     context.usedDataset.addAll(
       context.dataset.match(
@@ -182,8 +187,17 @@ const expandProperty = (property, errorKey) => (dispatch) => {
 }
 
 export const recursiveResourceFromDataset =
-  (subjectTerm, uri, resourceTemplateId, suppress, context) => (dispatch) =>
-    dispatch(
+  (subjectTerm, uri, resourceTemplateId, suppress, context) => (dispatch) => {
+    // Everything below this subject is expanded with this subject recorded as
+    // an ancestor. usedDataset and the template cache stay shared by
+    // reference; only the ancestor set is per-branch.
+    const childContext = {
+      ...context,
+      ancestors: new Set(context.ancestors).add(
+        ancestorKeyFor(subjectTerm, resourceTemplateId)
+      ),
+    }
+    return dispatch(
       newSubjectFromDataset(subjectTerm, uri, resourceTemplateId, context)
     ).then((subject) =>
       dispatch(
@@ -196,7 +210,7 @@ export const recursiveResourceFromDataset =
                 subjectTerm,
                 property,
                 suppress,
-                context
+                childContext
               )
             ).then((values) => {
               const compactValues = _.compact(_.flatten(values))
@@ -215,6 +229,28 @@ export const recursiveResourceFromDataset =
           return subject
         })
       )
+    )
+  }
+
+// Keyed on the template as well as the term: the same node can legitimately
+// expand differently under two different templates, and including the
+// template still bounds the traversal.
+const ancestorKeyFor = (subjectTerm, resourceTemplateId) =>
+  `${subjectTerm.value} ${resourceTemplateId}`
+
+// A value subject that identifies the object without expanding any of its
+// properties. Used where descending further would re-enter a node already
+// being expanded on the current path.
+const newReferenceSubjectFromObject =
+  (obj, uri, resourceTemplateId, context) => (dispatch) =>
+    dispatch(newSubjectFromDataset(obj, uri, resourceTemplateId, context)).then(
+      (subject) =>
+        dispatch(
+          newPropertiesFromTemplates(subject, true, context.errorKey)
+        ).then((properties) => {
+          subject.properties = properties
+          return subject
+        })
     )
 
 const newSubjectFromDataset =
@@ -517,6 +553,33 @@ const newNestedResourceFromObject =
               obj.termType === "NamedNode" && !!subjectTemplate?.suppressible
             const uri =
               !suppress && obj.termType === "NamedNode" ? obj.value : null
+
+            // Stop before re-entering a node already being expanded higher up
+            // the current path. Data legitimately links back on itself -- a
+            // work pointing at its instance, which points back at the work --
+            // and following that indefinitely exhausts the heap and kills the
+            // browser tab with no error. A suppressed value cannot recurse at
+            // all (its template has a single URI property), so it is exempt.
+            if (
+              !suppress &&
+              context.ancestors?.has(ancestorKeyFor(obj, childRtId))
+            ) {
+              // A blank node has no stable identifier, so there is nothing to
+              // reference and the looping link cannot be kept. Drop the value;
+              // newValuesFromDatasetByPropertyUri releases the link quad so it
+              // is reported as unused RDF rather than vanishing. The type
+              // quads stay marked used -- the outer expansion of this same
+              // node does emit them.
+              if (obj.termType !== "NamedNode") return null
+              // A named node keeps its URI, so the link still round-trips as a
+              // bare reference.
+              return dispatch(
+                newReferenceSubjectFromObject(obj, uri, childRtId, context)
+              ).then((subject) =>
+                newValueSubject(property, propertyUri, subject)
+              )
+            }
+
             return dispatch(
               recursiveResourceFromDataset(
                 obj,

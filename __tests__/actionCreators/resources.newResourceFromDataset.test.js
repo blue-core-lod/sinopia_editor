@@ -922,4 +922,160 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       )
     })
   })
+  describe("loading data whose linked parts point back at each other", () => {
+    // resourceTemplate:testing:cycleA has a nested property pointing at
+    // :cycleB, which has a nested property pointing back at :cycleA. Before
+    // the guard, following that loop allocated a subject per hop until the
+    // heap was exhausted -- the tab died with no error.
+    const bUri = "http://foo/cycle-b"
+    const propertyFor = (subject, uri) =>
+      subject.properties.find((property) =>
+        Object.keys(property.propertyTemplate.uris).includes(uri)
+      )
+
+    const n3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:cycleA" .
+    <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/CycleA> .
+    <> <http://sinopia.io/testing/CycleA/toB> <${bUri}> .
+    <${bUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/CycleB> .
+    <${bUri}> <http://sinopia.io/testing/CycleB/toA> <> .
+    `
+
+    it("stops at the loop and keeps the link as a bare reference", async () => {
+      const store = mockStore(createState())
+      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      expect(
+        await store.dispatch(
+          newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        )
+      ).toBe(true)
+
+      const actions = store.getActions()
+      const resource = actions.find((a) => a.type === "ADD_SUBJECT").payload
+
+      // A expanded into B ...
+      const bSubject = propertyFor(
+        resource,
+        "http://sinopia.io/testing/CycleA/toB"
+      ).values[0].valueSubject
+      expect(bSubject.subjectTemplate.id).toBe(
+        "resourceTemplate:testing:cycleB"
+      )
+      expect(bSubject.uri).toBe(bUri)
+
+      // ... and B's link back to A stopped there, keeping A's URI but not
+      // expanding it a second time.
+      const backSubject = propertyFor(
+        bSubject,
+        "http://sinopia.io/testing/CycleB/toA"
+      ).values[0].valueSubject
+      expect(backSubject.uri).toBe(uri)
+      expect(
+        propertyFor(backSubject, "http://sinopia.io/testing/CycleA/toB").values
+      ).toBeNull()
+
+      expect(actions).toHaveAction("SET_UNUSED_RDF", {
+        resourceKey: "abc123",
+        rdf: null,
+      })
+
+      // The loop round-trips exactly, in both directions.
+      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
+      const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      expect(actualRdf).toMatch(expectedGraph.toCanonical())
+    })
+  })
+
+  describe("loading data where a node links to itself", () => {
+    // The shortest possible loop: one node, one nested property, pointing at
+    // itself.
+    const n3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:selfCycle" .
+    <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/SelfCycle> .
+    <> <http://sinopia.io/testing/SelfCycle/toSelf> <> .
+    `
+
+    it("stops at the self-reference and round-trips it", async () => {
+      const store = mockStore(createState())
+      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      expect(
+        await store.dispatch(
+          newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        )
+      ).toBe(true)
+
+      const actions = store.getActions()
+      const resource = actions.find((a) => a.type === "ADD_SUBJECT").payload
+      expect(resource.properties[0].values[0].valueSubject.uri).toBe(uri)
+
+      expect(actions).toHaveAction("SET_UNUSED_RDF", {
+        resourceKey: "abc123",
+        rdf: null,
+      })
+
+      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
+      const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      expect(actualRdf).toMatch(expectedGraph.toCanonical())
+    })
+  })
+
+  describe("loading data where one node is referenced from two branches", () => {
+    // Not a loop: <a3> is reached twice, but by two separate paths, so it is
+    // never its own ancestor. Both branches must expand it in full -- this is
+    // what distinguishes a path-scoped guard from a global "already seen"
+    // memo, which would leave the second branch empty.
+    const b1 = "http://foo/branch-1"
+    const b2 = "http://foo/branch-2"
+    const shared = "http://foo/shared-a3"
+
+    const n3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:cycleA" .
+    <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/CycleA> .
+    <> <http://sinopia.io/testing/CycleA/toB> <${b1}> .
+    <> <http://sinopia.io/testing/CycleA/toB> <${b2}> .
+    <${b1}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/CycleB> .
+    <${b1}> <http://sinopia.io/testing/CycleB/toA> <${shared}> .
+    <${b2}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/CycleB> .
+    <${b2}> <http://sinopia.io/testing/CycleB/toA> <${shared}> .
+    <${shared}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/CycleA> .
+    <${shared}> <http://www.w3.org/2000/01/rdf-schema#label> "shared node"@en .
+    `
+
+    it("expands the shared node in both branches", async () => {
+      const store = mockStore(createState())
+      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      expect(
+        await store.dispatch(
+          newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        )
+      ).toBe(true)
+
+      const actions = store.getActions()
+      const resource = actions.find((a) => a.type === "ADD_SUBJECT").payload
+      const branches = resource.properties.find((property) =>
+        Object.keys(property.propertyTemplate.uris).includes(
+          "http://sinopia.io/testing/CycleA/toB"
+        )
+      ).values
+      expect(branches).toHaveLength(2)
+
+      branches.forEach((branch) => {
+        const sharedSubject = branch.valueSubject.properties.find((property) =>
+          Object.keys(property.propertyTemplate.uris).includes(
+            "http://sinopia.io/testing/CycleB/toA"
+          )
+        ).values[0].valueSubject
+        expect(sharedSubject.uri).toBe(shared)
+        // Fully expanded, not stopped short: its label came through.
+        const labelProperty = sharedSubject.properties.find((property) =>
+          Object.keys(property.propertyTemplate.uris).includes(
+            "http://www.w3.org/2000/01/rdf-schema#label"
+          )
+        )
+        expect(labelProperty.values[0].literal).toBe("shared node")
+      })
+
+      expect(actions).toHaveAction("SET_UNUSED_RDF", {
+        resourceKey: "abc123",
+        rdf: null,
+      })
+    })
+  })
 })
