@@ -10,3 +10,7 @@ global.clearImmediate = clearImmediate
 global.TextEncoder = TextEncoder
 global.TextDecoder = TextDecoder
 global.crypto = nodeCrypto.webcrypto
+
+// Provide the window._env_ object that Config.js reads at runtime.
+// In the browser this is populated by the /env-config.js endpoint.
+window._env_ = {}

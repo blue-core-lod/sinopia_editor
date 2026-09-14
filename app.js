@@ -49,6 +49,18 @@ app.use(
 // answer this with the SPA's index.html.
 registerHealthRoute(app)
 
+// WARNING: This exposes the the configured environment variables at the
+// /enf-config.js endpoint to be readable so is inappropriate for
+// keys or other values that should not be made public.
+app.get('/env-config.js', (req, res) => {
+  res.type('application/javascript');
+  res.send(`window._env_ = ${JSON.stringify({
+    KEYCLOAK_URL: process.env.KEYCLOAK_URL,
+    SINOPIA_URI: process.env.SINOPIA_URI,
+    SINOPIA_API_BASE_URL: process.env.SINOPIA_API_BASE_URL
+  })};`);
+});
+
 app.get("/", (req, res) => {
   res.sendFile(`${__dirname}/dist/index.html`)
 })
