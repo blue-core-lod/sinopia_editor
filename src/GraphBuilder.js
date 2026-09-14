@@ -213,6 +213,11 @@ export default class GraphBuilder {
   }
 
   checkSubjectHasValue(subject) {
+    // A value subject that has its own URI is worth serializing even when
+    // none of its properties were filled in. The URI is the identity of a
+    // real referenced resource -- dropping the subject would silently
+    // discard the link to it.
+    if (subject.uri) return true
     return subject.properties.some((property) =>
       this.checkPropertyHasValue(property)
     )
