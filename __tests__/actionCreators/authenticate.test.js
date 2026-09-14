@@ -49,10 +49,36 @@ describe("authenticate", () => {
       expect(store.getActions()).toHaveAction("SET_USER", {
         username: "havram",
         groups: ["blue core"],
+        roles: [],
       })
       expect(sinopiaApi.fetchUser).toHaveBeenCalledWith("havram")
     })
   })
+
+  describe("when the token has realm roles", () => {
+    sinopiaApi.fetchUser = jest.fn().mockResolvedValue(userData)
+    it("dispatches actions to add user with those roles", async () => {
+      const mockKeycloak = {
+        authenticated: true,
+        isTokenExpired: jest.fn(),
+        updateToken: jest.fn(),
+        tokenParsed: {
+          preferred_username: "havram",
+          realm_access: { roles: ["template_edit", "offline_access"] },
+        },
+      }
+
+      const store = mockStore({ authenticate: { user: undefined } })
+      await store.dispatch(authenticate(mockKeycloak))
+
+      expect(store.getActions()).toHaveAction("SET_USER", {
+        username: "havram",
+        groups: ["blue core"],
+        roles: ["template_edit", "offline_access"],
+      })
+    })
+  })
+
   describe("failure", () => {
     it("dispatches actions to remove user", async () => {
       const mockKeycloak = { authenticated: false }
@@ -89,6 +115,7 @@ describe("signIn", () => {
       expect(store.getActions()).toHaveAction("SET_USER", {
         username: "havram",
         groups: ["blue core"],
+        roles: [],
       })
       expect(sinopiaApi.fetchUser).toHaveBeenCalledWith("havram")
     })

@@ -12,6 +12,8 @@ export const fetchGroups = () => (dispatch, getState) => {
 
   return getGroups()
     .then((json) => {
+      console.log("getGroups JSON: ")
+      console.log(json)
       dispatch(groupsReceived(json))
     })
     .catch(() => false)

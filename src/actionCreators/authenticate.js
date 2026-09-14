@@ -15,6 +15,8 @@ export const authenticate = (keycloak) => async (dispatch, getState) => {
       await keycloak.updateToken(30)
     }
     const userInfo = keycloak.tokenParsed
+    console.log("userInfo:")
+    console.log(userInfo)
     dispatch(setUser(toUser(userInfo)))
     dispatch(loadUserData(userInfo.preferred_username, keycloak))
     return Promise.resolve(true)
@@ -40,4 +42,5 @@ export const signOut = (keycloak) => (dispatch) => {
 const toUser = (keycloakUser) => ({
   username: keycloakUser.preferred_username,
   groups: [Config.defaultGroup], // This needs to be a separate call to the api
+  roles: keycloakUser.realm_access?.roles ?? [],
 })
