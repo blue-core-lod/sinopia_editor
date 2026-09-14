@@ -10,6 +10,7 @@ export const createState = (options = {}) => {
   buildAuthenticate(state, options)
   buildLanguages(state, options)
   buildGroups(state, options)
+  buildRoles(state, options)
   buildResourceWithLiteral(state, options)
   buildTwoLiteralResources(state, options)
   buildResourceWithUri(state, options)
@@ -41,6 +42,12 @@ const buildGroups = (state, options) => {
     princeton: "Princeton University",
     duke: "Duke University",
   }
+}
+
+const buildRoles = (state, options) => {
+  if (options.noRoles) return
+
+  state.entities.roles = ["template manager"]
 }
 
 const buildExports = (state, options) => {
