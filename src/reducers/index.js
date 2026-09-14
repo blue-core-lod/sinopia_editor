@@ -4,6 +4,7 @@ import { combineReducers } from "redux"
 import { setUser, removeUser } from "./authenticate"
 import { setLanguage, languagesReceived, setDefaultLang } from "./languages"
 import { groupsReceived } from "./groups"
+import { rolesReceived } from "./roles"
 import {
   setBaseURL,
   hideProperty,
@@ -145,6 +146,7 @@ const entityHandlers = {
   HIDE_NAV_SUBJECT: hideNavSubject,
   HIDE_PROPERTY: hideProperty,
   GROUPS_RECEIVED: groupsReceived,
+  ROLES_RECEIVED: rolesReceived,
   LANGUAGES_RECEIVED: languagesReceived,
   LANGUAGE_SELECTED: setLanguage,
   LOAD_RESOURCE_FINISHED: loadResourceFinished,

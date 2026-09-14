@@ -6,6 +6,7 @@ import { NavLink, useLocation } from "react-router-dom"
 import Config from "Config"
 import { connect } from "react-redux"
 import { selectUser } from "selectors/authenticate"
+import { selectRoles } from "selectors/roles"
 import { signOut } from "actionCreators/authenticate"
 import { bindActionCreators } from "redux"
 import { selectCurrentResourceKey } from "selectors/resources"
@@ -93,11 +94,13 @@ const Header = (props) => {
               </NavLink>
             </li>
           )}
-          <li className="nav-item">
-            <NavLink className="nav-link" to="/templates">
-              Resource Templates
-            </NavLink>
-          </li>
+          {props.currentRoles?.includes("template manager") && (
+            <li className="nav-item">
+              <NavLink className="nav-link" to="/templates">
+                Resource Templates
+              </NavLink>
+            </li>
+          )}
           <li className="nav-item dropdown">
             <a
               className={`nav-link dropdown-toggle ${
@@ -154,11 +157,13 @@ Header.propTypes = {
   triggerEditorMenu: PropTypes.func,
   hasResource: PropTypes.bool,
   currentUser: PropTypes.object,
+  currentRoles: PropTypes.array,
   signOut: PropTypes.func,
 }
 
 const mapStateToProps = (state) => ({
   currentUser: selectUser(state),
+  currentRoles: selectRoles(state),
   hasResource: !!selectCurrentResourceKey(state),
 })
 
