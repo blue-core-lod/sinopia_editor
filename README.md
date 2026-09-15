@@ -74,6 +74,15 @@ templates list page and fixture resources can be searched on by entering the res
 
 `SINOPIA_URI=http://localhost:8888 SINOPIA_API_BASE_URL=http://localhost/api KEYCLOAK_URL=http://localhost:8888/keycloak npm run dev-start`
 
+## Versions and Tags
+The Blue Core Sinopia repository uses a Github action to generate a Docker image and save the image to the Github 
+container registry. To keep the version in the `package.json` in sync with the tagged version, follow these steps:
+
+1. Update the version to `package.json` to match the new tagged version
+2. Run `npm install` to update the `package-lock.json`
+3. Create a new pull request (or do steps 1 and 2 in an existing PR)
+4. After PR is merged, create the new tag in https://github.com/blue-core-lod/sinopia_editor/tags.
+
 ## Developers
 
 ### Linters for JavaScript
