@@ -91,13 +91,27 @@ module.exports = {
     historyApiFallback: true,
     hot: true,
     port: 8888,
-    // Unshifted so /health answers with JSON before historyApiFallback can
-    // serve index.html for it.
+    // Unshifted so /health and /env-config.js answer before
+    // historyApiFallback can serve index.html for them.
     setupMiddlewares: (middlewares) => {
       middlewares.unshift({
         name: "health-check",
         path: "/health",
         middleware: healthHandler,
+      })
+      middlewares.unshift({
+        name: "env-config",
+        path: "/env-config.js",
+        middleware: (_req, res) => {
+          res.set("Content-Type", "application/javascript")
+          res.send(
+            `window._env_ = ${JSON.stringify({
+              KEYCLOAK_URL: process.env.KEYCLOAK_URL,
+              SINOPIA_URI: process.env.SINOPIA_URI,
+              SINOPIA_API_BASE_URL: process.env.SINOPIA_API_BASE_URL,
+            })};`
+          )
+        },
       })
       return middlewares
     },

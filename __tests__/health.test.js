@@ -36,17 +36,20 @@ describe("registerHealthRoute", () => {
 
 describe("dev server health middleware", () => {
   const setupMiddlewares = () => {
-    const existing = [{ name: "existing-middleware" }]
-    return {
-      middlewares: webpackConfig.devServer.setupMiddlewares(existing, {}),
-      existing,
-    }
+    const existingEntry = { name: "existing-middleware" }
+    const middlewares = webpackConfig.devServer.setupMiddlewares(
+      [existingEntry],
+      {}
+    )
+    return { middlewares, existingEntry }
   }
 
   it("runs ahead of the other dev server middlewares", () => {
-    const { middlewares } = setupMiddlewares()
+    const { middlewares, existingEntry } = setupMiddlewares()
+    const healthIndex = middlewares.findIndex((m) => m.path === "/health")
 
-    expect(middlewares[0].path).toBe("/health")
+    expect(healthIndex).toBeGreaterThanOrEqual(0)
+    expect(healthIndex).toBeLessThan(middlewares.indexOf(existingEntry))
   })
 
   it("keeps the existing dev server middlewares", () => {
@@ -59,8 +62,9 @@ describe("dev server health middleware", () => {
 
   it("responds with JSON rather than index.html", async () => {
     const { middlewares } = setupMiddlewares()
+    const healthMiddleware = middlewares.find((m) => m.path === "/health")
     const app = express()
-    app.use(middlewares[0].path, middlewares[0].middleware)
+    app.use(healthMiddleware.path, healthMiddleware.middleware)
 
     const response = await request(app).get("/health")
 
