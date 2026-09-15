@@ -7,7 +7,7 @@
       }
     ],
     "@type": [
-      "http://sinopia.io/vocabulary/ResourceTemplate"
+      "http://www.w3.org/ns/shacl#NodeShape"
     ],
     "http://sinopia.io/vocabulary/hasResourceId": [
       {
@@ -15,66 +15,74 @@
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasClass": [
+    "http://www.w3.org/ns/shacl#targetClass": [
       {
         "@id": "http://sinopia.io/testing/Lookups"
       }
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Lookups",
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasRemark": [
+    "http://www.w3.org/ns/shacl#description": [
       {
         "@value": "A template that contains multiple lookups.",
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyTemplate": [
+    "http://www.w3.org/ns/shacl#property": [
       {
-        "@list": [
-          {
-            "@id": "_:b12"
-          },
-          {
-            "@id": "_:b15"
-          },
-          {
-            "@id": "_:b17"
-          },
-          {
-            "@id": "_:b19"
-          }
-        ]
+        "@id": "_:b12"
+      },
+      {
+        "@id": "_:b15"
+      },
+      {
+        "@id": "_:b17"
+      },
+      {
+        "@id": "_:b19"
       }
     ]
   },
   {
     "@id": "_:b12",
     "@type": [
-      "http://sinopia.io/vocabulary/PropertyTemplate"
+      "http://www.w3.org/ns/shacl#PropertyShape"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Single authority (AGROVOC)",
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyUri": [
+    "http://www.w3.org/ns/shacl#path": [
       {
         "@id": "http://sinopia.io/testing/Lookups/property1"
-      }
-    ],
-    "http://sinopia.io/vocabulary/hasPropertyType": [
-      {
-        "@id": "http://sinopia.io/vocabulary/propertyType/uri"
       }
     ],
     "http://sinopia.io/vocabulary/hasLookupAttributes": [
       {
         "@id": "_:b13"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#nodeKind": [
+      {
+        "@id": "http://www.w3.org/ns/shacl#IRI"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#maxCount": [
+      {
+        "@value": "1",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#order": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },
@@ -92,27 +100,39 @@
   {
     "@id": "_:b15",
     "@type": [
-      "http://sinopia.io/vocabulary/PropertyTemplate"
+      "http://www.w3.org/ns/shacl#PropertyShape"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Multiple authorities (AGROVOC and Geonames All)",
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyUri": [
+    "http://www.w3.org/ns/shacl#path": [
       {
         "@id": "http://sinopia.io/testing/Lookups/property2"
-      }
-    ],
-    "http://sinopia.io/vocabulary/hasPropertyType": [
-      {
-        "@id": "http://sinopia.io/vocabulary/propertyType/uri"
       }
     ],
     "http://sinopia.io/vocabulary/hasLookupAttributes": [
       {
         "@id": "_:b16"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#nodeKind": [
+      {
+        "@id": "http://www.w3.org/ns/shacl#IRI"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#maxCount": [
+      {
+        "@value": "1",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#order": [
+      {
+        "@value": "1",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },
@@ -133,33 +153,45 @@
   {
     "@id": "_:b17",
     "@type": [
-      "http://sinopia.io/vocabulary/PropertyTemplate"
+      "http://www.w3.org/ns/shacl#PropertyShape"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Single authority (Publisher Cities)",
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasRemark": [
+    "http://www.w3.org/ns/shacl#description": [
       {
         "@value": "Publisher Cities is a QA local authority.",
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyUri": [
+    "http://www.w3.org/ns/shacl#path": [
       {
         "@id": "http://sinopia.io/testing/Lookups/property3"
-      }
-    ],
-    "http://sinopia.io/vocabulary/hasPropertyType": [
-      {
-        "@id": "http://sinopia.io/vocabulary/propertyType/uri"
       }
     ],
     "http://sinopia.io/vocabulary/hasLookupAttributes": [
       {
         "@id": "_:b18"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#nodeKind": [
+      {
+        "@id": "http://www.w3.org/ns/shacl#IRI"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#maxCount": [
+      {
+        "@value": "1",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#order": [
+      {
+        "@value": "2",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },
@@ -177,27 +209,39 @@
   {
     "@id": "_:b19",
     "@type": [
-      "http://sinopia.io/vocabulary/PropertyTemplate"
+      "http://www.w3.org/ns/shacl#PropertyShape"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Single authority (LOC All names)",
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyUri": [
+    "http://www.w3.org/ns/shacl#path": [
       {
         "@id": "http://sinopia.io/testing/Lookups/property4"
-      }
-    ],
-    "http://sinopia.io/vocabulary/hasPropertyType": [
-      {
-        "@id": "http://sinopia.io/vocabulary/propertyType/uri"
       }
     ],
     "http://sinopia.io/vocabulary/hasLookupAttributes": [
       {
         "@id": "_:b20"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#nodeKind": [
+      {
+        "@id": "http://www.w3.org/ns/shacl#IRI"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#maxCount": [
+      {
+        "@value": "1",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#order": [
+      {
+        "@value": "3",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },

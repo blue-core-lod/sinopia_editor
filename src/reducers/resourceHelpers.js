@@ -98,15 +98,16 @@ const cleanObj = (obj) => {
 export const setSubjectChanged = (state, subjectKey, changed) =>
   mergeSubjectPropsToNewState(state, subjectKey, { changed })
 
-// add rdfs:label to root resource if it's present
+// Update root resource label when sh:name (or legacy rdfs:label) is set
 export const updateResourceLabel = (state, value) => {
   const possibleLabelProperty = state.properties[value.propertyKey]
   const propertyTemplate =
     state.propertyTemplates[possibleLabelProperty.propertyTemplateKey]
   const rootSubjectKey = possibleLabelProperty.rootSubjectKey
   if (
-    propertyTemplate.defaultUri ===
-      "http://www.w3.org/2000/01/rdf-schema#label" &&
+    (propertyTemplate.defaultUri === "http://www.w3.org/ns/shacl#name" ||
+      propertyTemplate.defaultUri ===
+        "http://www.w3.org/2000/01/rdf-schema#label") &&
     possibleLabelProperty.subjectKey === rootSubjectKey
   ) {
     const labelValue = value.literal || possibleLabelProperty.labels[0]

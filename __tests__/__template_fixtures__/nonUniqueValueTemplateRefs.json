@@ -2,31 +2,27 @@
   {
     "@id": "_:b2",
     "@type": [
-      "http://sinopia.io/vocabulary/PropertyTemplate"
+      "http://www.w3.org/ns/shacl#PropertyShape"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Form of Instance"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyUri": [
+    "http://www.w3.org/ns/shacl#path": [
       {
         "@id": "http://id.loc.gov/ontologies/bibframe/genreForm"
-      }
-    ],
-    "http://sinopia.io/vocabulary/hasPropertyAttribute": [
-      {
-        "@id": "http://sinopia.io/vocabulary/propertyAttribute/repeatable"
-      }
-    ],
-    "http://sinopia.io/vocabulary/hasPropertyType": [
-      {
-        "@id": "http://sinopia.io/vocabulary/propertyType/resource"
       }
     ],
     "http://sinopia.io/vocabulary/hasResourceAttributes": [
       {
         "@id": "_:b3"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#order": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },
@@ -35,7 +31,7 @@
     "@type": [
       "http://sinopia.io/vocabulary/ResourcePropertyTemplate"
     ],
-    "http://sinopia.io/vocabulary/hasResourceTemplateId": [
+    "http://www.w3.org/ns/shacl#node": [
       {
         "@id": "ld4p:RT:bf2:Form"
       },
@@ -52,19 +48,19 @@
       }
     ],
     "@type": [
-      "http://sinopia.io/vocabulary/ResourceTemplate"
+      "http://www.w3.org/ns/shacl#NodeShape"
     ],
     "http://sinopia.io/vocabulary/hasResourceId": [
       {
         "@value": "test:RT:bf2:RareMat:Instance"
       }
     ],
-    "http://sinopia.io/vocabulary/hasClass": [
+    "http://www.w3.org/ns/shacl#targetClass": [
       {
         "@id": "http://id.loc.gov/ontologies/bibframe/Instance"
       }
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Value template refs with non-unique resource URIs"
       }
@@ -74,7 +70,7 @@
         "@value": "LD4P"
       }
     ],
-    "http://sinopia.io/vocabulary/hasRemark": [
+    "http://www.w3.org/ns/shacl#description": [
       {
         "@value": "based on LC template ld4p:RT:bf2:RareMat:Instance"
       }
@@ -84,13 +80,9 @@
         "@value": "2019-08-19"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyTemplate": [
+    "http://www.w3.org/ns/shacl#property": [
       {
-        "@list": [
-          {
-            "@id": "_:b2"
-          }
-        ]
+        "@id": "_:b2"
       }
     ]
   }

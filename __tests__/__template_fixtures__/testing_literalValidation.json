@@ -7,7 +7,7 @@
       }
     ],
     "@type": [
-      "http://sinopia.io/vocabulary/ResourceTemplate"
+      "http://www.w3.org/ns/shacl#NodeShape"
     ],
     "http://sinopia.io/vocabulary/hasResourceId": [
       {
@@ -15,99 +15,120 @@
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasClass": [
+    "http://www.w3.org/ns/shacl#targetClass": [
       {
         "@id": "http://sinopia.io/testing/LiteralValidation"
       }
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Literal validation",
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasRemark": [
+    "http://www.w3.org/ns/shacl#description": [
       {
         "@value": "A template that contains a literal inputs with validation.",
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyTemplate": [
+    "http://www.w3.org/ns/shacl#property": [
       {
-        "@list": [
-          {
-            "@id": "_:b39"
-          },
-          {
-            "@id": "_:b41"
-          },
-          {
-            "@id": "_:b44"
-          },
-          {
-            "@id": "_:b47"
-          },
-          {
-            "@id": "_:b49"
-          },
-          {
-            "@id": "_:b51"
-          }
-        ]
+        "@id": "_:b39"
+      },
+      {
+        "@id": "_:b41"
+      },
+      {
+        "@id": "_:b44"
+      },
+      {
+        "@id": "_:b47"
+      },
+      {
+        "@id": "_:b49"
+      },
+      {
+        "@id": "_:b51"
       }
     ]
   },
   {
     "@id": "_:b39",
     "@type": [
-      "http://sinopia.io/vocabulary/PropertyTemplate"
+      "http://www.w3.org/ns/shacl#PropertyShape"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Required literal input",
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyUri": [
+    "http://www.w3.org/ns/shacl#path": [
       {
         "@id": "http://sinopia.io/testing/LiteralValidation/property1"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyAttribute": [
+    "http://www.w3.org/ns/shacl#nodeKind": [
       {
-        "@id": "http://sinopia.io/vocabulary/propertyAttribute/required"
+        "@id": "http://www.w3.org/ns/shacl#Literal"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyType": [
+    "http://www.w3.org/ns/shacl#minCount": [
       {
-        "@id": "http://sinopia.io/vocabulary/propertyType/literal"
+        "@value": "1",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#maxCount": [
+      {
+        "@value": "1",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#order": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },
   {
     "@id": "_:b41",
     "@type": [
-      "http://sinopia.io/vocabulary/PropertyTemplate"
+      "http://www.w3.org/ns/shacl#PropertyShape"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Regex literal input (ISBN13)",
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyUri": [
+    "http://www.w3.org/ns/shacl#path": [
       {
         "@id": "http://sinopia.io/testing/LiteralValidation/property2"
-      }
-    ],
-    "http://sinopia.io/vocabulary/hasPropertyType": [
-      {
-        "@id": "http://sinopia.io/vocabulary/propertyType/literal"
       }
     ],
     "http://sinopia.io/vocabulary/hasLiteralAttributes": [
       {
         "@id": "_:b42"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#nodeKind": [
+      {
+        "@id": "http://www.w3.org/ns/shacl#Literal"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#maxCount": [
+      {
+        "@value": "1",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#order": [
+      {
+        "@value": "1",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },
@@ -116,7 +137,7 @@
     "@type": [
       "http://sinopia.io/vocabulary/LiteralPropertyTemplate"
     ],
-    "http://sinopia.io/vocabulary/hasValidationRegex": [
+    "http://www.w3.org/ns/shacl#pattern": [
       {
         "@value": "^\\d{12}[0-9X]$",
         "@language": "en"
@@ -126,27 +147,39 @@
   {
     "@id": "_:b44",
     "@type": [
-      "http://sinopia.io/vocabulary/PropertyTemplate"
+      "http://www.w3.org/ns/shacl#PropertyShape"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "xsd:integer literal input",
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyUri": [
+    "http://www.w3.org/ns/shacl#path": [
       {
         "@id": "http://sinopia.io/testing/LiteralValidation/property3"
-      }
-    ],
-    "http://sinopia.io/vocabulary/hasPropertyType": [
-      {
-        "@id": "http://sinopia.io/vocabulary/propertyType/literal"
       }
     ],
     "http://sinopia.io/vocabulary/hasLiteralAttributes": [
       {
         "@id": "_:b45"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#nodeKind": [
+      {
+        "@id": "http://www.w3.org/ns/shacl#Literal"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#maxCount": [
+      {
+        "@value": "1",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#order": [
+      {
+        "@value": "2",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },
@@ -155,7 +188,7 @@
     "@type": [
       "http://sinopia.io/vocabulary/LiteralPropertyTemplate"
     ],
-    "http://sinopia.io/vocabulary/hasValidationDataType": [
+    "http://www.w3.org/ns/shacl#datatype": [
       {
         "@id": "http://www.w3.org/2001/XMLSchema#integer"
       }
@@ -164,27 +197,39 @@
   {
     "@id": "_:b47",
     "@type": [
-      "http://sinopia.io/vocabulary/PropertyTemplate"
+      "http://www.w3.org/ns/shacl#PropertyShape"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "xsd:dateTime literal input",
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyUri": [
+    "http://www.w3.org/ns/shacl#path": [
       {
         "@id": "http://sinopia.io/testing/LiteralValidation/property4"
-      }
-    ],
-    "http://sinopia.io/vocabulary/hasPropertyType": [
-      {
-        "@id": "http://sinopia.io/vocabulary/propertyType/literal"
       }
     ],
     "http://sinopia.io/vocabulary/hasLiteralAttributes": [
       {
         "@id": "_:b48"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#nodeKind": [
+      {
+        "@id": "http://www.w3.org/ns/shacl#Literal"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#maxCount": [
+      {
+        "@value": "1",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#order": [
+      {
+        "@value": "3",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },
@@ -193,7 +238,7 @@
     "@type": [
       "http://sinopia.io/vocabulary/LiteralPropertyTemplate"
     ],
-    "http://sinopia.io/vocabulary/hasValidationDataType": [
+    "http://www.w3.org/ns/shacl#datatype": [
       {
         "@id": "http://www.w3.org/2001/XMLSchema#dateTime"
       }
@@ -202,27 +247,39 @@
   {
     "@id": "_:b49",
     "@type": [
-      "http://sinopia.io/vocabulary/PropertyTemplate"
+      "http://www.w3.org/ns/shacl#PropertyShape"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "xsd:dateTimeStamp literal input",
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyUri": [
+    "http://www.w3.org/ns/shacl#path": [
       {
         "@id": "http://sinopia.io/testing/LiteralValidation/property5"
-      }
-    ],
-    "http://sinopia.io/vocabulary/hasPropertyType": [
-      {
-        "@id": "http://sinopia.io/vocabulary/propertyType/literal"
       }
     ],
     "http://sinopia.io/vocabulary/hasLiteralAttributes": [
       {
         "@id": "_:b50"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#nodeKind": [
+      {
+        "@id": "http://www.w3.org/ns/shacl#Literal"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#maxCount": [
+      {
+        "@value": "1",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#order": [
+      {
+        "@value": "4",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },
@@ -231,7 +288,7 @@
     "@type": [
       "http://sinopia.io/vocabulary/LiteralPropertyTemplate"
     ],
-    "http://sinopia.io/vocabulary/hasValidationDataType": [
+    "http://www.w3.org/ns/shacl#datatype": [
       {
         "@id": "http://www.w3.org/2001/XMLSchema#dateTimeStamp"
       }
@@ -240,27 +297,39 @@
   {
     "@id": "_:b51",
     "@type": [
-      "http://sinopia.io/vocabulary/PropertyTemplate"
+      "http://www.w3.org/ns/shacl#PropertyShape"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "EDTF literal input",
         "@language": "eng"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyUri": [
+    "http://www.w3.org/ns/shacl#path": [
       {
         "@id": "http://sinopia.io/testing/LiteralValidation/edtf"
-      }
-    ],
-    "http://sinopia.io/vocabulary/hasPropertyType": [
-      {
-        "@id": "http://sinopia.io/vocabulary/propertyType/literal"
       }
     ],
     "http://sinopia.io/vocabulary/hasLiteralAttributes": [
       {
         "@id": "_:b52"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#nodeKind": [
+      {
+        "@id": "http://www.w3.org/ns/shacl#Literal"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#maxCount": [
+      {
+        "@value": "1",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#order": [
+      {
+        "@value": "5",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },
@@ -269,7 +338,7 @@
     "@type": [
       "http://sinopia.io/vocabulary/LiteralPropertyTemplate"
     ],
-    "http://sinopia.io/vocabulary/hasValidationDataType": [
+    "http://www.w3.org/ns/shacl#datatype": [
       {
         "@id": "http://id.loc.gov/datatypes/edtf"
       }

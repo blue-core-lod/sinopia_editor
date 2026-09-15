@@ -2,27 +2,34 @@
   {
     "@id": "_:b8",
     "@type": [
-      "http://sinopia.io/vocabulary/PropertyTemplate"
+      "http://www.w3.org/ns/shacl#PropertyShape"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Nested resource",
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyUri": [
+    "http://www.w3.org/ns/shacl#path": [
       {
         "@id": "http://sinopia.io/testing/MergeDefaultsHost/property1"
-      }
-    ],
-    "http://sinopia.io/vocabulary/hasPropertyType": [
-      {
-        "@id": "http://sinopia.io/vocabulary/propertyType/resource"
       }
     ],
     "http://sinopia.io/vocabulary/hasResourceAttributes": [
       {
         "@id": "_:b9"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#maxCount": [
+      {
+        "@value": "1",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#order": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },
@@ -31,7 +38,7 @@
     "@type": [
       "http://sinopia.io/vocabulary/ResourcePropertyTemplate"
     ],
-    "http://sinopia.io/vocabulary/hasResourceTemplateId": [
+    "http://www.w3.org/ns/shacl#node": [
       {
         "@id": "resourceTemplate:testing:mergeDefaultsMatch"
       },
@@ -48,7 +55,7 @@
       }
     ],
     "@type": [
-      "http://sinopia.io/vocabulary/ResourceTemplate"
+      "http://www.w3.org/ns/shacl#NodeShape"
     ],
     "http://sinopia.io/vocabulary/hasResourceId": [
       {
@@ -56,30 +63,26 @@
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasClass": [
+    "http://www.w3.org/ns/shacl#targetClass": [
       {
         "@id": "http://sinopia.io/testing/MergeDefaultsHost"
       }
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Merge Defaults Host",
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasRemark": [
+    "http://www.w3.org/ns/shacl#description": [
       {
         "@value": "A template with a nested resource property that has multiple valueSubjectTemplateKeys, used to test that unmatched sibling templates do not have their defaults applied when loading from a dataset.",
         "@language": "en"
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyTemplate": [
+    "http://www.w3.org/ns/shacl#property": [
       {
-        "@list": [
-          {
-            "@id": "_:b8"
-          }
-        ]
+        "@id": "_:b8"
       }
     ]
   },

@@ -1,38 +1,42 @@
 [
   {
     "@id": "_:b2",
-    "@type": ["http://sinopia.io/vocabulary/PropertyTemplate"],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "@type": ["http://www.w3.org/ns/shacl#PropertyShape"],
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Resource Template IDs"
       }
     ],
-    "http://sinopia.io/vocabulary/hasRemark": [
+    "http://www.w3.org/ns/shacl#description": [
       {
         "@value": "Resource Template IDs, e.g., ld4p:RT:bf2:Title:AbbrTitle."
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyUri": [
+    "http://www.w3.org/ns/shacl#path": [
       {
         "@id": "http://sinopia.io/vocabulary/hasResourceTemplateId"
-      }
-    ],
-    "http://sinopia.io/vocabulary/hasPropertyAttribute": [
-      {
-        "@id": "http://sinopia.io/vocabulary/propertyAttribute/required"
-      },
-      {
-        "@id": "http://sinopia.io/vocabulary/propertyAttribute/repeatable"
-      }
-    ],
-    "http://sinopia.io/vocabulary/hasPropertyType": [
-      {
-        "@id": "http://sinopia.io/vocabulary/propertyType/uri"
       }
     ],
     "http://sinopia.io/vocabulary/hasLookupAttributes": [
       {
         "@id": "_:b3"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#nodeKind": [
+      {
+        "@id": "http://www.w3.org/ns/shacl#IRI"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#minCount": [
+      {
+        "@value": "1",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#order": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },
@@ -52,34 +56,30 @@
         "@value": "sinopia:template:resource"
       }
     ],
-    "@type": ["http://sinopia.io/vocabulary/ResourceTemplate"],
+    "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
     "http://sinopia.io/vocabulary/hasResourceId": [
       {
         "@value": "sinopia:template:property:resource"
       }
     ],
-    "http://sinopia.io/vocabulary/hasClass": [
+    "http://www.w3.org/ns/shacl#targetClass": [
       {
         "@id": "http://sinopia.io/vocabulary/ResourcePropertyTemplate"
       }
     ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
+    "http://www.w3.org/ns/shacl#name": [
       {
         "@value": "Resource attributes"
       }
     ],
-    "http://sinopia.io/vocabulary/hasRemark": [
+    "http://www.w3.org/ns/shacl#description": [
       {
         "@value": "Attributes for a nested resource."
       }
     ],
-    "http://sinopia.io/vocabulary/hasPropertyTemplate": [
+    "http://www.w3.org/ns/shacl#property": [
       {
-        "@list": [
-          {
-            "@id": "_:b2"
-          }
-        ]
+        "@id": "_:b2"
       }
     ]
   }
