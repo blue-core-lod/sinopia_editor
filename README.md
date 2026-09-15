@@ -135,13 +135,80 @@ While there are a large number of possible causes for this error (see Google), i
 
 #### Changes to environment variables
 
-If you add environment variables to which the Editor needs to pay attention (e.g. for configuring connections to external services on a per-instance basis), you'll need to make sure they're added to lists in three places besides e.g. the `Config.js` function that uses the environment variable.
-* the list given to `new webpack.EnvironmentPlugin()` in the `plugins` section of `webpack.config.js`
-  * e.g. https://github.com/LD4P/sinopia_editor/commit/aadd9d6170b08ff9261392d5b2ec2c6f56470e20#diff-11e9f7f953edc64ba14b0cc350ae7b9dR58
-* the build-time arguments section of `Dockerfile`
-  * e.g. https://github.com/LD4P/sinopia_editor/commit/aadd9d6170b08ff9261392d5b2ec2c6f56470e20#diff-3254677a7917c6c01f55212f86c57fbfR10
-* the env specific `docker build` commands in the `register_image` section of `.circleci/config.yml`
-  * e.g. https://github.com/LD4P/sinopia_editor/commit/1d3e381cb0f937300242cf896f62c2508e4a57e2#diff-1d37e48f9ceff6d8030570cd36286a61R63
+All configuration is read through `src/Config.js`, but there are **two different mechanisms** behind it, and
+picking the wrong one means your value silently falls back to its default in the browser.
+
+##### 1. Runtime config the browser needs (`window._env_`)
+
+Anything the React app itself must know (API base URL, Keycloak URL, etc.) is injected at *runtime*, not baked
+into the bundle. The server serves a tiny script at `/env-config.js` that sets `window._env_`, and `index.html`
+loads it before the bundle:
+
+```html
+<script src="env-config.js"></script>
+```
+
+```js
+static get sinopiaApiBase() {
+  return window._env_.SINOPIA_API_BASE_URL || "http://localhost:3000"
+}
+```
+
+This means the same built image can be pointed at any environment by changing environment variables on the
+container — no rebuild required. Currently served this way: `KEYCLOAK_URL`, `SINOPIA_URI`, `SINOPIA_API_BASE_URL`.
+
+To add one, update **all four** places:
+
+1. A getter in `src/Config.js` that reads `window._env_.YOUR_VAR` (with a sensible local default).
+2. The JSON payload of the `/env-config.js` route in `app.js` (production / `npm start`).
+3. The `env-config` middleware in `devServer.setupMiddlewares` in `webpack.config.js` (`npm run dev-start`).
+   The dev server and the Express server intentionally serve the same shape; keep the two lists in sync.
+4. Wherever the value is supplied at runtime: an `ENV` default in `Dockerfile`, and/or the `environment:`
+   block for the editor service in the [Blue Core stack](https://github.com/blue-core-lod/bluecore-stack)
+   `compose-dev.yaml`.
+
+> **WARNING:** `/env-config.js` is publicly readable by anyone who can load the app. Never put secrets,
+> API keys, or credentials in `window._env_`.
+
+##### 2. Server-side and test-only config (`process.env`)
+
+The remaining `Config.js` getters read `process.env` directly (`USE_FIXTURES`, `INDEX_URL`, `QA_UPSTREAM_URL`,
+`KEYCLOAK_REALM`, `DEFAULT_GROUP`, `LOC_SUGGEST_BASE_URL`, …). These work in Node — `app.js`/`server.js` use
+`Config.indexUrl` and `Config.qaUpstreamUrl` to set up the `/api/search` and `/api/qa` proxies — and in Jest,
+where tests can `jest.spyOn(Config, "…")` or set the variable directly.
+
+There is **no** `webpack.EnvironmentPlugin`/`DefinePlugin` in `webpack.config.js` anymore. In the browser
+bundle `process` is the `process/browser` shim, whose `env` is an empty object, so a `process.env`-backed
+getter always returns its default in the browser. If a new variable has to affect the UI at runtime, it must
+go through `window._env_` (mechanism 1 above).
+
+##### 3. Setting variables locally
+
+`.env` is gitignored (see `backup.env` for a committed placeholder). Docker Compose auto-loads it for
+`${VAR}` interpolation in `docker-compose.yml` — that is how `DOCKER_AWS_ACCESS_KEY_ID` /
+`DOCKER_AWS_SECRET_ACCESS_KEY` reach the `api` service.
+
+Note that **npm scripts do not read `.env`** — nothing in this repo calls `dotenv.config()`. For
+`npm run dev-start` either prefix the variables inline:
+
+```
+SINOPIA_URI=http://localhost:8888 SINOPIA_API_BASE_URL=http://localhost/api KEYCLOAK_URL=http://localhost:8888/keycloak npm run dev-start
+```
+
+or export them into your shell from the file first:
+
+```
+set -a; source .env; set +a
+npm run dev-start
+```
+
+##### 4. Image builds
+
+`.github/workflows/publish.yml` builds and pushes the image. Note that it still passes
+`--build-arg KEYCLOAK_URL=… --build-arg SINOPIA_URI=… --build-arg SINOPIA_API_BASE_URL=… --build-arg SEARCH_HOST=…`,
+but `Dockerfile` no longer declares matching `ARG`s — those build args are currently no-ops, and the image's
+defaults come from the `ENV` lines in `Dockerfile`, overridden at runtime by the deploying compose file. Prefer
+runtime `environment:` values over build args so one image works across environments.
 
 ### Proxying to a different environment
 Proxying allows using the Sinopia API and search from a different environment, rather than local instances.
