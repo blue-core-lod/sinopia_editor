@@ -31,11 +31,22 @@ const Versions = ({ resource }) => {
   TimeAgo.addLocale(en)
   const timeAgo = new TimeAgo()
 
+  // A version snapshot is the resource's stored JSON-LD, which names a resource
+  // template only if an editor save wrote one. Batch-ingested resources carry
+  // no sinopia:hasResourceTemplate triple, and neither do snapshots taken
+  // before a resource's first editor save, so supply the template the open
+  // resource is already using as the fallback. A snapshot that names its own
+  // template still wins; see loadResource.
+  const defaultResourceTemplateId = resource.subjectTemplateKey
+
   const handleView = (event, timestamp) => {
     event.preventDefault()
     setLoadingView(timestamp)
     dispatch(
-      loadResourceForPreview(resource.uri, errorKey, { version: timestamp })
+      loadResourceForPreview(resource.uri, errorKey, {
+        version: timestamp,
+        defaultResourceTemplateId,
+      })
     ).then((result) => {
       setLoadingView(false)
       if (result) dispatch(showModal("VersionPreviewModal"))
@@ -77,7 +88,7 @@ const Versions = ({ resource }) => {
             resource.uri,
             errorKey,
             "compareFromResourceKey",
-            { version: compareFrom }
+            { version: compareFrom, defaultResourceTemplateId }
           )
         )
       )
@@ -90,6 +101,7 @@ const Versions = ({ resource }) => {
         dispatch(
           loadResourceForDiff(resource.uri, errorKey, "compareToResourceKey", {
             version: compareTo,
+            defaultResourceTemplateId,
           })
         )
       )
