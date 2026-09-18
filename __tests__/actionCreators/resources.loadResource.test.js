@@ -174,11 +174,12 @@ describe("loadResource", () => {
   })
 
   describe("loading a version for diff when the payload names no template", () => {
-    // Blue Core stores no sinopia:hasResourceTemplate triple on Works,
-    // Instances, or Hubs, so every version snapshot the Compare button fetches
-    // arrives without one. Without a fallback template the load dead-ends in
-    // the ResourceTemplateChoiceModal, returns false, and Versions.jsx never
-    // opens the DiffModal -- the Compare button looks inert.
+    // An editor save writes a sinopia:hasResourceTemplate triple, so snapshots
+    // of editor-saved resources name their own template. Batch-ingested Works,
+    // Instances, and Hubs do not, and neither do snapshots written before a
+    // resource's first editor save. Without a fallback template those loads
+    // dead-end in the ResourceTemplateChoiceModal, return false, and
+    // Versions.jsx never opens the DiffModal -- Compare looks inert.
     const noTemplateUri =
       "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f-invalid-template"
 

@@ -63,10 +63,12 @@ export const loadResource =
       version = null,
       keycloak = null,
       // Template to parse the payload with when the payload does not name one
-      // itself. Blue Core stores no sinopia:hasResourceTemplate triple on
-      // Works, Instances, or Hubs, so a version snapshot fetched for a diff or
-      // a preview never names a template and would otherwise dead-end in the
-      // ResourceTemplateChoiceModal with this thunk returning false.
+      // itself. A save from this editor writes a sinopia:hasResourceTemplate
+      // triple (GraphBuilder.addGeneratedByTriple) and the API preserves it,
+      // but a Work, Instance, or Hub that arrived through batch ingest has
+      // none -- nor do any version snapshots predating its first editor save.
+      // Fetching one of those for a diff or a preview would otherwise
+      // dead-end in the ResourceTemplateChoiceModal, returning false.
       defaultResourceTemplateId = null,
     } = {}
   ) =>

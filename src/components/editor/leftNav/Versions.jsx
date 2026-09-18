@@ -31,12 +31,12 @@ const Versions = ({ resource }) => {
   TimeAgo.addLocale(en)
   const timeAgo = new TimeAgo()
 
-  // A version snapshot is the resource's stored JSON-LD, which in Blue Core
-  // carries no sinopia:hasResourceTemplate triple. Read it with the template
-  // the open resource is already using, both so the load does not dead-end in
-  // the template-choice modal and because ResourceDiffer matches properties by
-  // propertyTemplateKey -- a diff across two different templates lines nothing
-  // up and reports every property as added and removed.
+  // A version snapshot is the resource's stored JSON-LD, which names a resource
+  // template only if an editor save wrote one. Batch-ingested resources carry
+  // no sinopia:hasResourceTemplate triple, and neither do snapshots taken
+  // before a resource's first editor save, so supply the template the open
+  // resource is already using as the fallback. A snapshot that names its own
+  // template still wins; see loadResource.
   const defaultResourceTemplateId = resource.subjectTemplateKey
 
   const handleView = (event, timestamp) => {
