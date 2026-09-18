@@ -173,6 +173,59 @@ describe("loadResource", () => {
     })
   })
 
+  describe("loading a version for diff when the payload names no template", () => {
+    // Blue Core stores no sinopia:hasResourceTemplate triple on Works,
+    // Instances, or Hubs, so every version snapshot the Compare button fetches
+    // arrives without one. Without a fallback template the load dead-ends in
+    // the ResourceTemplateChoiceModal, returns false, and Versions.jsx never
+    // opens the DiffModal -- the Compare button looks inert.
+    const noTemplateUri =
+      "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f-invalid-template"
+
+    it("dead-ends in the template choice modal with no fallback", async () => {
+      const store = mockStore(createState())
+      const result = await store.dispatch(
+        loadResourceForDiff(
+          noTemplateUri,
+          "testerrorkey",
+          "compareFromResourceKey",
+          { version: "2019-10-16T17:13:45.084Z" }
+        )
+      )
+
+      expect(result).toBe(false)
+      expect(store.getActions()).toHaveAction(
+        "SHOW_MODAL",
+        "ResourceTemplateChoiceModal"
+      )
+    })
+
+    it("loads with the open resource's template as a fallback", async () => {
+      const store = mockStore(createState())
+      const result = await store.dispatch(
+        loadResourceForDiff(
+          noTemplateUri,
+          "testerrorkey",
+          "compareFromResourceKey",
+          {
+            version: "2019-10-16T17:13:45.084Z",
+            defaultResourceTemplateId: "resourceTemplate:bf2:Instance",
+          }
+        )
+      )
+
+      expect(result).toBe(true)
+      const actions = store.getActions()
+      expect(actions).not.toHaveAction(
+        "SHOW_MODAL",
+        "ResourceTemplateChoiceModal"
+      )
+      expect(actions).toHaveAction("SET_CURRENT_DIFF_RESOURCES", {
+        compareFromResourceKey: "abc123",
+      })
+    })
+  })
+
   describe("loading an invalid resource", () => {
     const store = mockStore(createState())
 

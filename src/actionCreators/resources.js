@@ -58,14 +58,26 @@ export const loadResource =
   (
     uri,
     errorKey,
-    { asNewResource = false, version = null, keycloak = null } = {}
+    {
+      asNewResource = false,
+      version = null,
+      keycloak = null,
+      // Template to parse the payload with when the payload does not name one
+      // itself. Blue Core stores no sinopia:hasResourceTemplate triple on
+      // Works, Instances, or Hubs, so a version snapshot fetched for a diff or
+      // a preview never names a template and would otherwise dead-end in the
+      // ResourceTemplateChoiceModal with this thunk returning false.
+      defaultResourceTemplateId = null,
+    } = {}
   ) =>
   (dispatch) => {
     dispatch(clearErrors(errorKey))
     return fetchResource(uri, { version })
       .then(([dataset, response]) => {
         if (!dataset) return false
-        const resourceTemplateId = resourceTemplateIdFromDataset(uri, dataset)
+        const resourceTemplateId =
+          resourceTemplateIdFromDataset(uri, dataset) ||
+          defaultResourceTemplateId
 
         // If no resource template ID, store pending data and show modal
         if (!resourceTemplateId) {
@@ -222,11 +234,11 @@ export const completeResourceLoadingWithTemplate =
   }
 
 export const loadResourceForPreview =
-  (uri, errorKey, { version = null } = {}) =>
+  (uri, errorKey, { version = null, defaultResourceTemplateId = null } = {}) =>
   (dispatch) =>
-    dispatch(loadResource(uri, errorKey, { version })).then((result) =>
-      dispatch(dispatchResourceForPreview(result))
-    )
+    dispatch(
+      loadResource(uri, errorKey, { version, defaultResourceTemplateId })
+    ).then((result) => dispatch(dispatchResourceForPreview(result)))
 
 export const dispatchResourceForPreview = (result) => (dispatch) => {
   if (!result) return false
@@ -236,9 +248,16 @@ export const dispatchResourceForPreview = (result) => (dispatch) => {
 }
 
 export const loadResourceForDiff =
-  (uri, errorKey, diffType, { version = null } = {}) =>
+  (
+    uri,
+    errorKey,
+    diffType,
+    { version = null, defaultResourceTemplateId = null } = {}
+  ) =>
   (dispatch) =>
-    dispatch(loadResource(uri, errorKey, { version })).then((result) => {
+    dispatch(
+      loadResource(uri, errorKey, { version, defaultResourceTemplateId })
+    ).then((result) => {
       if (!result) return false
       const [, resource] = result
       // diffType: compareFromResourceKey or compareToResourceKey

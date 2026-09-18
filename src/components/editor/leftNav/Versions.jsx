@@ -31,11 +31,22 @@ const Versions = ({ resource }) => {
   TimeAgo.addLocale(en)
   const timeAgo = new TimeAgo()
 
+  // A version snapshot is the resource's stored JSON-LD, which in Blue Core
+  // carries no sinopia:hasResourceTemplate triple. Read it with the template
+  // the open resource is already using, both so the load does not dead-end in
+  // the template-choice modal and because ResourceDiffer matches properties by
+  // propertyTemplateKey -- a diff across two different templates lines nothing
+  // up and reports every property as added and removed.
+  const defaultResourceTemplateId = resource.subjectTemplateKey
+
   const handleView = (event, timestamp) => {
     event.preventDefault()
     setLoadingView(timestamp)
     dispatch(
-      loadResourceForPreview(resource.uri, errorKey, { version: timestamp })
+      loadResourceForPreview(resource.uri, errorKey, {
+        version: timestamp,
+        defaultResourceTemplateId,
+      })
     ).then((result) => {
       setLoadingView(false)
       if (result) dispatch(showModal("VersionPreviewModal"))
@@ -77,7 +88,7 @@ const Versions = ({ resource }) => {
             resource.uri,
             errorKey,
             "compareFromResourceKey",
-            { version: compareFrom }
+            { version: compareFrom, defaultResourceTemplateId }
           )
         )
       )
@@ -90,6 +101,7 @@ const Versions = ({ resource }) => {
         dispatch(
           loadResourceForDiff(resource.uri, errorKey, "compareToResourceKey", {
             version: compareTo,
+            defaultResourceTemplateId,
           })
         )
       )
