@@ -46,7 +46,10 @@ export const fetchResource = (
   uri,
   { isTemplate = false, version = null } = {}
 ) => {
-  const fetchUri = encodeURI(version ? `${uri}/version/${version}` : uri)
+  const resourceUri = version ? `${uri}/version/${version}` : uri
+  // Set expand=true to include sub-graphs of referenced resources that include
+  // labels
+  const fetchUri = `${encodeURI(resourceUri)}?expand=true`
 
   let fetchPromise
   // Templates have special handling when using fixtures.
