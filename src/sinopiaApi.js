@@ -47,8 +47,8 @@ export const fetchResource = (
   { isTemplate = false, version = null } = {}
 ) => {
   const resourceUri = version ? `${uri}/version/${version}` : uri
-  // Set expand=true to include sub-graphs of referenced resources that include
-  // labels
+  // Set expand=true to include sub-graphs of referenced resources with
+  // label triples
   const fetchUri = `${encodeURI(resourceUri)}?expand=true`
 
   let fetchPromise
