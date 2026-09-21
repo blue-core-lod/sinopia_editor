@@ -5,7 +5,6 @@ import { useSelector, useDispatch } from "react-redux"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faSearch, faInfoCircle } from "@fortawesome/free-solid-svg-icons"
 import { Popover } from "bootstrap"
-import searchConfig from "../../../static/searchConfig.json"
 import { sinopiaSearchUri } from "utilities/authorityConfig"
 import useSearch from "hooks/useSearch"
 import { useKeycloak } from "../../KeycloakContext"
@@ -26,12 +25,6 @@ const HeaderSearch = () => {
     fetchTemplateGuessSearchResults,
     clearTemplateGuessSearchResults,
   } = useSearch(errorKey)
-
-  const options = searchConfig.map((config) => (
-    <option key={config.uri} value={config.uri}>
-      {config.label}
-    </option>
-  ))
 
   useEffect(() => {
     const popover = new Popover(popoverRef.current, {
@@ -124,8 +117,6 @@ const HeaderSearch = () => {
           <option value={`${sinopiaSearchUri}/Item`}>
             Sinopia BIBFRAME item resources
           </option>
-
-          {options}
         </select>
         <input
           className="flex-grow-1 form-control"
