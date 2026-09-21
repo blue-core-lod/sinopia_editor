@@ -167,7 +167,7 @@ describe("<App />", () => {
 
       const resourceUri =
         "https://bcld.info/works/4b8c1e1a-1111-4222-8333-000000000001"
-      fetchMock.mock(resourceUri, {
+      fetchMock.mock(`${resourceUri}?expand=true`, {
         id: 1,
         type: "works",
         uri: resourceUri,
