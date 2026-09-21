@@ -200,6 +200,7 @@ export const resourceSearchResults = (
 export const getFixtureResourceVersions = () => {
   return [
     {
+      id: 1,
       timestamp: "2021-10-22T13:26:35.238Z",
       user: "jlittman",
       group: "other",
@@ -207,6 +208,7 @@ export const getFixtureResourceVersions = () => {
       templateId: "resourceTemplate:testing:uber1",
     },
     {
+      id: 2,
       timestamp: "2021-10-22T22:25:58.305Z",
       user: "jlittman",
       group: "other",
@@ -214,6 +216,7 @@ export const getFixtureResourceVersions = () => {
       templateId: "resourceTemplate:testing:uber1",
     },
     {
+      id: 3,
       timestamp: "2021-10-22T22:30:19.732Z",
       user: "jlittman",
       group: "other",

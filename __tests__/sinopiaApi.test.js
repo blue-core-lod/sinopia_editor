@@ -131,12 +131,12 @@ describe("fetchResource", () => {
 
       const result = await fetchResource(
         "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f",
-        { version: "2019-10-16T17:13:45.084Z" }
+        { version: "42" }
       )
       expect(result[1].id).toBe("yale/61f2f457-31f5-432c-8acf-b4037f77541f")
       expect(result[1].user).toBe("tat2")
       expect(global.fetch).toHaveBeenCalledWith(
-        "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f/version/2019-10-16T17:13:45.084Z",
+        "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f/version/42",
         { headers: { Accept: "application/vnd.sinopia+json" } }
       )
     })
@@ -655,6 +655,7 @@ describe("fetchResourceVersions", () => {
       id: "61f2f457-31f5-432c-8acf-b4037f77541f",
       versions: [
         {
+          id: 1,
           timestamp: "2021-10-22T13:26:35.238Z",
           user: "jlittman",
           group: "other",
