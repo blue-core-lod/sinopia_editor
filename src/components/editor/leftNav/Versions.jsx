@@ -57,7 +57,7 @@ const Versions = ({ resource }) => {
     if (!_.isEmpty(versions)) return
     fetchResourceVersions(resource.uri).then((newVersions) => {
       dispatch(setVersions(resource.key, newVersions.reverse()))
-      setCompareFrom(_.first(newVersions).timestamp)
+      setCompareFrom(String(_.first(newVersions).id))
     })
   }, [resource.uri, resource.key, versions, dispatch])
 
@@ -161,7 +161,11 @@ const Versions = ({ resource }) => {
   const versionRows = versions.map((version, index) => {
     const versionIndex = versions.length - index
     return createRow(
-      version.timestamp,
+      // Stringify: this identifier becomes a radio button's `value`, and the
+      // DOM always hands it back from event.target.value as a string. As a
+      // number it would stop matching compareFrom/compareTo, which are
+      // compared with ===, the moment the user clicks a row.
+      String(version.id),
       `version ${versionIndex}`,
       `Version ${versionIndex} from ${timeAgo.format(
         new Date(version.timestamp)
