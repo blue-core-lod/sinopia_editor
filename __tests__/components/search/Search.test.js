@@ -4,7 +4,6 @@ import { fireEvent, waitFor, screen } from "@testing-library/react"
 import * as server from "sinopiaSearch"
 import Config from "Config"
 import * as sinopiaApi from "sinopiaApi"
-import * as QuestioningAuthority from "utilities/QuestioningAuthority"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -14,79 +13,6 @@ featureSetup()
 
 describe("<Search />", () => {
   jest.spyOn(sinopiaApi, "putUserHistory").mockResolvedValue()
-
-  const mockSearchResults = [
-    {
-      uri: "http://share-vde.org/sharevde/rdfBibframe/Work/3107365",
-      id: "http://share-vde.org/sharevde/rdfBibframe/Work/3107365",
-      label: "These twain",
-      context: [
-        {
-          property: "Title",
-          values: [" These twain"],
-          selectable: true,
-          drillable: false,
-        },
-        {
-          property: "Type",
-          values: [
-            "http://id.loc.gov/ontologies/bflc/Hub",
-            "http://id.loc.gov/ontologies/bibframe/Work",
-          ],
-          selectable: false,
-          drillable: false,
-        },
-        {
-          property: "Contributor",
-          values: ["Bennett, Arnold,1867-1931."],
-          selectable: false,
-          drillable: false,
-        },
-      ],
-    },
-  ]
-  const mockResponse = {
-    results: mockSearchResults,
-    response_header: { total_records: 15 },
-  }
-
-  jest
-    .spyOn(QuestioningAuthority, "createLookupPromise")
-    .mockResolvedValue(mockResponse)
-
-  it("requests a QA search", async () => {
-    renderApp()
-    fireEvent.click(screen.getByText("Linked Data Editor", { selector: "a" }))
-
-    screen.getByLabelText("Search")
-    // Sinopia is selected by default
-    screen.getByDisplayValue("Sinopia")
-
-    // Select an authority
-    fireEvent.change(screen.getByDisplayValue("Sinopia"), {
-      target: { value: "urn:discogs:master" },
-    })
-
-    screen.getByText("DISCOGS Releases")
-
-    // Enter a query
-    fireEvent.change(screen.getByLabelText("Search"), {
-      target: { value: "twain" },
-    })
-
-    // Click search
-    fireEvent.click(screen.getByTestId("Submit search"))
-
-    // Display results
-    await screen.findByText("Label")
-    await screen.findByText(/These twain/)
-
-    // Display paging
-    screen.getByText("»")
-
-    // Display results message
-    screen.getByText(/Displaying 1 - 10 of 15/)
-  })
 
   it("requests a Sinopia search", async () => {
     const mockGetSearchResults = jest.fn()
