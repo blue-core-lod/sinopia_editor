@@ -10,7 +10,10 @@ import {
   getSearchResultsByUris,
 } from "sinopiaSearch"
 import _ from "lodash"
-import { findAuthorityConfig } from "utilities/authorityConfig"
+import {
+  findAuthorityConfig,
+  sinopiaSearchUri,
+} from "utilities/authorityConfig"
 
 export const loadTemplateHistory = (templateIds) => (dispatch) => {
   if (_.isEmpty(templateIds)) return
@@ -36,6 +39,9 @@ export const loadTemplateHistory = (templateIds) => (dispatch) => {
 export const loadSearchHistory = (searches, keycloak) => (dispatch) => {
   if (_.isEmpty(searches)) return
   searches.reverse().forEach((search) => {
+    // Only Sinopia searches can be replayed; skip history saved against
+    // external (QA) authorities, which are no longer searchable.
+    if (search.authorityUri !== sinopiaSearchUri) return
     const authorityConfig = findAuthorityConfig(search.authorityUri)
     if (!authorityConfig) return
 

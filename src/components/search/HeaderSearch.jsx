@@ -59,16 +59,12 @@ const HeaderSearch = () => {
     if (query === "") return
 
     const options = {}
-    let searchUri = uri
     // The URI may have a /{className} suffix, which we translate into a filter for the search
-    if (uri.startsWith(sinopiaSearchUri)) {
-      const [baseUri, filter] = uri.split("/")
-      if (filter) {
-        options.typeFilter = `http://id.loc.gov/ontologies/bibframe/${filter}`
-        searchUri = baseUri
-      }
+    const [, filter] = uri.split("/")
+    if (filter) {
+      options.typeFilter = `http://id.loc.gov/ontologies/bibframe/${filter}`
     }
-    fetchNewSearchResults(query, searchUri, options, keycloak)
+    fetchNewSearchResults(query, options, keycloak)
     if (uri === "urn:ld4p:sinopia" && query !== "*") {
       fetchTemplateGuessSearchResults(query)
     } else {

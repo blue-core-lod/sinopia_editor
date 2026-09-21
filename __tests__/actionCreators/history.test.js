@@ -55,7 +55,7 @@ describe("loadSearchHistory()", () => {
     await store.dispatch(
       loadSearchHistory([
         {
-          authorityUri: "urn:ld4p:qa:oclc_fast:topic",
+          authorityUri: "urn:ld4p:sinopia",
           query: "leland",
         },
       ])
@@ -65,9 +65,37 @@ describe("loadSearchHistory()", () => {
       {
         type: "ADD_SEARCH_HISTORY",
         payload: {
-          authorityLabel: "OCLCFAST Topic (QA) - direct",
+          authorityLabel: "Sinopia resources",
+          authorityUri: "urn:ld4p:sinopia",
+          query: "leland",
+        },
+      },
+    ])
+  })
+
+  it("skips searches saved against external authorities", async () => {
+    const store = mockStore(createState())
+
+    await store.dispatch(
+      loadSearchHistory([
+        {
           authorityUri: "urn:ld4p:qa:oclc_fast:topic",
           query: "leland",
+        },
+        {
+          authorityUri: "urn:ld4p:sinopia",
+          query: "twain",
+        },
+      ])
+    )
+
+    expect(store.getActions()).toEqual([
+      {
+        type: "ADD_SEARCH_HISTORY",
+        payload: {
+          authorityLabel: "Sinopia resources",
+          authorityUri: "urn:ld4p:sinopia",
+          query: "twain",
         },
       },
     ])

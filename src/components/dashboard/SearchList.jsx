@@ -22,9 +22,9 @@ const SearchList = (props) => {
     if (navigateSearch && query) history.push("/search")
   }, [navigateSearch, query, history])
 
-  const handleSearch = (queryString, uri, event) => {
+  const handleSearch = (queryString, event) => {
     event.preventDefault()
-    fetchNewSearchResults(queryString, uri)
+    fetchNewSearchResults(queryString)
     setNavigateSearch(true)
   }
 

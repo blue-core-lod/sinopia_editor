@@ -1,7 +1,6 @@
 // Copyright 2019 Stanford University see LICENSE for license
 import {
   fetchSinopiaSearchResults,
-  fetchQASearchResults,
   fetchTemplateGuessSearchResults,
 } from "actionCreators/search"
 import * as server from "sinopiaSearch"
@@ -9,7 +8,6 @@ import configureMockStore from "redux-mock-store"
 import thunk from "redux-thunk"
 import { createState } from "stateUtils"
 import * as sinopiaApi from "sinopiaApi"
-import * as QuestioningAuthority from "utilities/QuestioningAuthority"
 import rdf from "rdf-ext"
 
 jest.mock("KeycloakContext", () => ({
@@ -96,145 +94,6 @@ describe("fetchSinopiaSearchResults", () => {
       '{"authorityUri":"urn:ld4p:sinopia","query":"*"}',
       keycloak
     )
-  })
-})
-
-describe("fetchQASearchResults", () => {
-  const query = "*"
-  const uri = "urn:ld4p:qa:oclc_fast:topic"
-
-  describe("when happy path", () => {
-    const mockSearchResults = [
-      {
-        uri: "http://share-vde.org/sharevde/rdfBibframe/Work/3107365",
-        id: "http://share-vde.org/sharevde/rdfBibframe/Work/3107365",
-        label: "These twain",
-        context: [
-          {
-            property: "Title",
-            values: [" These twain"],
-            selectable: true,
-            drillable: false,
-          },
-          {
-            property: "Type",
-            values: [
-              "http://id.loc.gov/ontologies/bflc/Hub",
-              "http://id.loc.gov/ontologies/bibframe/Work",
-            ],
-            selectable: false,
-            drillable: false,
-          },
-          {
-            property: "Contributor",
-            values: ["Bennett, Arnold,1867-1931."],
-            selectable: false,
-            drillable: false,
-          },
-        ],
-      },
-      {
-        uri: "http://share-vde.org/sharevde/rdfBibframe/Work/3107365-1",
-        id: "http://share-vde.org/sharevde/rdfBibframe/Work/3107365-1",
-        label: "These twain",
-        context: [
-          {
-            property: "Title",
-            values: [" These twain"],
-            selectable: true,
-            drillable: false,
-          },
-          {
-            property: "Type",
-            values: [
-              "http://id.loc.gov/ontologies/bibframe/Text",
-              "http://id.loc.gov/ontologies/bibframe/Work",
-            ],
-            selectable: false,
-            drillable: false,
-          },
-          {
-            property: "Contributor",
-            values: ["Bennett, Arnold,1867-1931."],
-            selectable: false,
-            drillable: false,
-          },
-        ],
-      },
-    ]
-    const mockResponse = {
-      results: mockSearchResults,
-      response_header: { total_records: 15 },
-    }
-
-    beforeEach(() => {
-      jest
-        .spyOn(QuestioningAuthority, "createLookupPromise")
-        .mockResolvedValue(mockResponse)
-    })
-
-    it("dispatches action", async () => {
-      const store = mockStore(createState())
-      await store.dispatch(fetchQASearchResults(query, uri, "testerrorkey"))
-
-      const actions = store.getActions()
-
-      expect(actions).toHaveLength(3)
-      expect(actions).toHaveAction("CLEAR_ERRORS")
-      expect(actions).toHaveAction("SET_SEARCH_RESULTS", {
-        searchType: "resource",
-        uri,
-        query,
-        results: mockSearchResults,
-        totalResults: 15,
-        options: {},
-        error: undefined,
-        facetResults: {},
-        links: undefined,
-      })
-      expect(actions).toHaveAction("ADD_SEARCH_HISTORY", {
-        authorityUri: uri,
-        authorityLabel: "OCLCFAST Topic (QA) - direct",
-        query,
-        keycloak: undefined,
-      })
-    })
-  })
-
-  describe("when error occurs", () => {
-    beforeEach(() => {
-      jest
-        .spyOn(QuestioningAuthority, "createLookupPromise")
-        .mockResolvedValue({
-          isError: true,
-          errorObject: new Error("Ooops..."),
-        })
-    })
-
-    it("dispatches action when error", async () => {
-      const store = mockStore(createState())
-      await store.dispatch(fetchQASearchResults(query, uri, "testerrorkey"))
-
-      const actions = store.getActions()
-
-      expect(actions).toHaveLength(3)
-      expect(actions).toHaveAction("CLEAR_ERRORS")
-      expect(actions).toHaveAction("SET_SEARCH_RESULTS", {
-        searchType: "resource",
-        uri,
-        query,
-        results: [],
-        totalResults: 0,
-        options: {},
-        facetResults: {},
-        error: "Ooops...",
-        links: undefined,
-      })
-      expect(actions).toHaveAction("ADD_ERROR", {
-        errorKey: "testerrorkey",
-        error: "An error occurred while searching: Ooops...",
-      })
-    })
   })
 })
 
