@@ -823,7 +823,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       // rdfs:label holding the URI itself: newUriFromObject defaults a URI
       // value's label to the URI unless the property sets labelSuppressed.
       // That behaviour predates this fix and applies to every bare URI loaded
-      // through a suppressible template -- it deserves its own issue.
+      // through a suppressible template
       const actualRdf = new GraphBuilder(
         addSubjectAction.payload
       ).graph.toCanonical()

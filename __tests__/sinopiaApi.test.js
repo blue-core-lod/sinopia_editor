@@ -117,7 +117,7 @@ describe("fetchResource", () => {
       expect(result[1].id).toBe("yale/61f2f457-31f5-432c-8acf-b4037f77541f")
       expect(result[1].user).toBe("tat2")
       expect(global.fetch).toHaveBeenCalledWith(
-        "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f",
+        "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f?expand=true",
         { headers: { Accept: "application/vnd.sinopia+json" } }
       )
     })
@@ -136,7 +136,7 @@ describe("fetchResource", () => {
       expect(result[1].id).toBe("yale/61f2f457-31f5-432c-8acf-b4037f77541f")
       expect(result[1].user).toBe("tat2")
       expect(global.fetch).toHaveBeenCalledWith(
-        "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f/version/42",
+        "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f/version/42?expand=true",
         { headers: { Accept: "application/vnd.sinopia+json" } }
       )
     })
