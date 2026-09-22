@@ -818,12 +818,10 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
         rdf: null,
       })
 
-      // The reference survives the round trip. Asserted triple by triple
-      // rather than as a whole graph because saving also re-emits an
-      // rdfs:label holding the URI itself: newUriFromObject defaults a URI
-      // value's label to the URI unless the property sets labelSuppressed.
-      // That behaviour predates this fix and applies to every bare URI loaded
-      // through a suppressible template
+      // The reference survives the round trip unchanged. It used to gain an
+      // rdfs:label holding the URI itself, because newUriFromObject defaulted
+      // a URI value's label to the URI. Issue #183 removed that fallback, so
+      // saving a bare reference now adds nothing the dataset did not supply.
       const actualRdf = new GraphBuilder(
         addSubjectAction.payload
       ).graph.toCanonical()
@@ -833,8 +831,62 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       expect(actualRdf).toMatch(
         `<${bareUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Uri> .`
       )
-      expect(actualRdf).toMatch(
-        `<${bareUri}> <http://www.w3.org/2000/01/rdf-schema#label> "${bareUri}" .`
+      expect(actualRdf).not.toMatch(
+        "http://www.w3.org/2000/01/rdf-schema#label"
+      )
+    })
+  })
+
+  describe("loading a uri value that the dataset gives no label", () => {
+    // Issue #183: the editor used to invent a label holding the uri itself,
+    // then write it back on save as though a cataloger had supplied it.
+    const bareUri = "http://id.loc.gov/authorities/genreForms/gf2014026113"
+    const RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label"
+
+    const loadUriValue = async (n3) => {
+      const store = mockStore(createState())
+      const dataset = await datasetFromN3(n3)
+      await store.dispatch(
+        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      )
+      const addSubjectAction = store
+        .getActions()
+        .find((action) => action.type === "ADD_SUBJECT")
+      return {
+        value: addSubjectAction?.payload?.properties?.[0]?.values?.[0],
+        rdf: new GraphBuilder(addSubjectAction.payload).graph.toCanonical(),
+      }
+    }
+
+    const bareN3 = `<${uri}> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:uri" .
+    <${uri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Uri> .
+    <${uri}> <http://sinopia.io/testing/Uri/property1> <${bareUri}> .
+    `
+
+    it("leaves the label unset rather than defaulting it to the uri", async () => {
+      const { value } = await loadUriValue(bareN3)
+
+      expect(value.uri).toEqual(bareUri)
+      expect(value.label).toBeNull()
+    })
+
+    it("does not write a made-up rdfs:label on save", async () => {
+      const { rdf } = await loadUriValue(bareN3)
+
+      expect(rdf).toMatch(
+        `<${uri}> <http://sinopia.io/testing/Uri/property1> <${bareUri}> .`
+      )
+      expect(rdf).not.toMatch(RDFS_LABEL)
+    })
+
+    it("still keeps a label the dataset does supply", async () => {
+      const labelledN3 = `${bareN3}<${bareUri}> <${RDFS_LABEL}> "Bird's-eye view prints"@en .
+      `
+      const { value, rdf } = await loadUriValue(labelledN3)
+
+      expect(value.label).toEqual("Bird's-eye view prints")
+      expect(rdf).toMatch(
+        `<${bareUri}> <${RDFS_LABEL}> "Bird's-eye view prints"@en .`
       )
     })
   })
