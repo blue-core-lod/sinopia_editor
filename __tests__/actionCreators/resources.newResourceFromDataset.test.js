@@ -1,3 +1,4 @@
+import rdf from "rdf-ext"
 import { newResourceFromDataset } from "actionCreators/resources"
 import mockConsole from "jest-mock-console"
 import Config from "Config"
@@ -391,6 +392,147 @@ describe("newResourceFromDataset", () => {
         rdf: `_:c14n0 <http://sinopia.io/testing/Literal/property1> "literal1"@en .
 _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Literal> .
 `,
+      })
+    })
+  })
+
+  describe("loading a resource with an ordered uri property", () => {
+    const dressUri = "http://id.loc.gov/authorities/subjects/sh85039410"
+    const patternsUri = "http://id.loc.gov/authorities/subjects/sh99001366"
+
+    const orderedUriN3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:orderedUri" .
+    <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/OrderedUri> .
+    <> <http://sinopia.io/testing/OrderedUri/property1> _:b9 .
+    _:b9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <${dressUri}> .
+    _:b9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:b10 .
+    _:b10 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <${patternsUri}> .
+    _:b10 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+    <${dressUri}> <http://www.w3.org/2000/01/rdf-schema#label> "Dress accessories" .
+    <${patternsUri}> <http://www.w3.org/2000/01/rdf-schema#label> "Patterns" .
+    `
+
+    const loadOrderedUri = async (n3) => {
+      const store = mockStore(createState())
+      const dataset = await datasetFromN3(n3)
+      const result = await store.dispatch(
+        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+      )
+      const actions = store.getActions()
+      const addSubjectAction = actions.find(
+        (action) => action.type === "ADD_SUBJECT"
+      )
+      const unusedAction = actions.find(
+        (action) => action.type === "SET_UNUSED_RDF"
+      )
+      return {
+        result,
+        subject: addSubjectAction?.payload,
+        values: addSubjectAction?.payload?.properties?.[0]?.values || [],
+        unusedRDF: unusedAction?.payload?.rdf,
+      }
+    }
+
+    it("reads the list members back in order", async () => {
+      const { result, values } = await loadOrderedUri(orderedUriN3)
+
+      expect(result).toBe(true)
+      expect(values.map((value) => value.uri)).toEqual([dressUri, patternsUri])
+    })
+
+    it("reads back the labels rather than falling back to the uri", async () => {
+      // newUriFromObject() defaults label to the uri when it finds no
+      // rdfs:label, so a value can round-trip with the right uri and still
+      // show a URL in the Label box.
+      const { values } = await loadOrderedUri(orderedUriN3)
+
+      expect(values.map((value) => value.label)).toEqual([
+        "Dress accessories",
+        "Patterns",
+      ])
+    })
+
+    it("claims every quad, leaving no unused RDF", async () => {
+      // Quads the load path does not claim are round-tripped separately on
+      // save, which silently duplicates the list.
+      const { unusedRDF } = await loadOrderedUri(orderedUriN3)
+
+      expect(unusedRDF).toBeNull()
+    })
+
+    it("re-serializes to the same list after a load", async () => {
+      // Load then save is the migration-relevant path: anything the load
+      // dropped either vanishes here or comes back doubled via unused RDF.
+      const { subject } = await loadOrderedUri(orderedUriN3)
+      const dataset = new GraphBuilder(subject).graph
+
+      const headQuad = dataset
+        .match(
+          null,
+          rdf.namedNode("http://sinopia.io/testing/OrderedUri/property1")
+        )
+        .toArray()
+      expect(headQuad).toHaveLength(1)
+
+      const members = []
+      let node = headQuad[0].object
+      while (node.value !== "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil") {
+        const first = dataset
+          .match(
+            node,
+            rdf.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#first")
+          )
+          .toArray()[0]
+        const rest = dataset
+          .match(
+            node,
+            rdf.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest")
+          )
+          .toArray()[0]
+        members.push(first.object.value)
+        node = rest.object
+      }
+
+      expect(members).toEqual([dressUri, patternsUri])
+    })
+
+    describe("a list written by the current buildComponentList", () => {
+      // GraphBuilder.buildComponentList writes a well-formed single-member
+      // list but no rdfs:label, so this is the shape of already-saved records.
+      const legacyN3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:orderedUri" .
+      <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/OrderedUri> .
+      <> <http://sinopia.io/testing/OrderedUri/property1> _:b9 .
+      _:b9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <${dressUri}> .
+      _:b9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+      `
+
+      it("loads the uri and leaves no unused RDF", async () => {
+        const { values, unusedRDF } = await loadOrderedUri(legacyN3)
+
+        expect(values.map((value) => value.uri)).toEqual([dressUri])
+        expect(unusedRDF).toBeNull()
+      })
+
+      it("leaves the label unset, since none was written", async () => {
+        // Pre-#183 this fell back to the uri, so existing records showed a url
+        // where the heading belongs. They now load with an empty label until
+        // something supplies a real one.
+        const { values } = await loadOrderedUri(legacyN3)
+
+        expect(values[0].label).toBeNull()
+      })
+    })
+
+    describe("when the list members are bare triples rather than a list", () => {
+      const badN3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:orderedUri" .
+      <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/OrderedUri> .
+      <> <http://sinopia.io/testing/OrderedUri/property1> <${dressUri}> .
+      <${dressUri}> <http://www.w3.org/2000/01/rdf-schema#label> "Dress accessories" .
+      `
+
+      it("reports the values as unused rather than dropping them", async () => {
+        const { unusedRDF } = await loadOrderedUri(badN3)
+
+        expect(unusedRDF).toContain(dressUri)
       })
     })
   })

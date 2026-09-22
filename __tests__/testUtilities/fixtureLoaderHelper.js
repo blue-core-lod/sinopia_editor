@@ -48,6 +48,7 @@ const templateFilenames = {
   "resourceTemplate:testing:suppressedUri2": "testing_suppressed_uri2.json",
   "resourceTemplate:testing:inputs": "testing_inputs.json",
   "resourceTemplate:testing:ordered": "testing_ordered.json",
+  "resourceTemplate:testing:orderedUri": "testing_ordered_uri.json",
   "resourceTemplate:testing:suppressible": "testing_suppressible.json",
   "resourceTemplate:testing:suppressibleAmbiguous":
     "testing_suppressible_ambiguous.json",
