@@ -16,8 +16,9 @@ const renderProbe = (role, roles) => {
     return <div data-testid="has-role">{hasRole(role) ? "true" : "false"}</div>
   }
 
-  const state = createState()
-  if (roles !== undefined) state.authenticate.user.roles = roles
+  const state = createState({ roles })
+  // `undefined` models a user stored before roles existed, so drop the key.
+  if (roles === undefined) delete state.authenticate.user.roles
   renderComponent(<HasRoleProbe />, createStore(state))
   return screen.getByTestId("has-role").textContent
 }

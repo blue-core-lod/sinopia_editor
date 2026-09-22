@@ -62,10 +62,15 @@ const buildAuthenticate = (state, options) => {
   if (options.otherGroups) groups = ["loc"]
   if (options.editGroups) groups = ["cornell"]
 
+  // Keycloak realm roles. The default user is a template manager; pass
+  // `roles` to model a user with a narrower set.
+  const roles = options.roles ?? ["template_create", "template_edit"]
+
   state.authenticate = {
     user: {
       username: "Foo McBar",
       groups,
+      roles,
     },
   }
 }

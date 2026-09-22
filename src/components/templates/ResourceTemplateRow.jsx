@@ -17,7 +17,12 @@ import useAlerts from "hooks/useAlerts"
  * This is the list view of all the templates
  */
 const ResourceTemplateRow = ({ row }) => {
-  const { canCreate, canEdit } = usePermissions()
+  const { canCreate, canEdit, hasRole } = usePermissions()
+  // Templates are managed by role: anyone may view, but creating/copying and
+  // editing are each gated on a Keycloak realm role in addition to the
+  // existing group checks.
+  const canCreateTemplate = canCreate && hasRole("template_create")
+  const canEditTemplate = canEdit(row) && hasRole("template_edit")
   const errorKey = useAlerts()
   const groupMap = useSelector((state) => selectGroupMap(state))
 
@@ -53,7 +58,7 @@ const ResourceTemplateRow = ({ row }) => {
       <td style={{ wordBreak: "break-all" }}>{row.remark}</td>
       <td>
         <div className="btn-group" role="group" aria-label="Result Actions">
-          {canCreate && (
+          {canCreateTemplate && (
             <NewButton
               label={row.resourceLabel}
               handleClick={handleNew}
@@ -65,14 +70,14 @@ const ResourceTemplateRow = ({ row }) => {
             handleClick={handleView}
             isLoading={isLoadingView}
           />
-          {canEdit(row) && (
+          {canEditTemplate && (
             <EditButton
               label={row.resourceLabel}
               handleClick={handleEdit}
               isLoading={isLoadingEdit}
             />
           )}
-          {canCreate && (
+          {canCreateTemplate && (
             <CopyButton
               label={row.resourceLabel}
               handleClick={handleCopy}
