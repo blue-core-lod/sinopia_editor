@@ -1,31 +1,16 @@
 import { useDispatch } from "react-redux"
 import {
   fetchSinopiaSearchResults as fetchSinopiaSearchResultsCreator,
-  fetchQASearchResults as fetchQASearchResultsCreator,
   fetchTemplateGuessSearchResults as fetchTemplateGuessSearchResultsCreator,
 } from "actionCreators/search"
 import { clearSearchResults } from "actions/search"
-import { sinopiaSearchUri } from "utilities/authorityConfig"
 import { useHistory } from "react-router-dom"
 
 const useSearch = (errorKey) => {
   const dispatch = useDispatch()
   const history = useHistory()
 
-  const fetchQASearchResults = (
-    queryString,
-    uri,
-    searchOptions,
-    startOfRange
-  ) =>
-    dispatch(
-      fetchQASearchResultsCreator(queryString, uri, errorKey, {
-        ...searchOptions,
-        startOfRange,
-      })
-    )
-
-  const fetchSinopiaSearchResults = (
+  const fetchSearchResults = (
     queryString,
     searchOptions,
     startOfRange,
@@ -43,31 +28,8 @@ const useSearch = (errorKey) => {
       )
     )
 
-  const fetchSearchResults = (
-    queryString,
-    uri,
-    searchOptions,
-    startOfRange,
-    keycloak
-  ) => {
-    if (uri === sinopiaSearchUri) {
-      return fetchSinopiaSearchResults(
-        queryString,
-        searchOptions,
-        startOfRange,
-        keycloak
-      )
-    }
-    return fetchQASearchResults(queryString, uri, searchOptions, startOfRange)
-  }
-
-  const fetchNewSearchResults = (
-    queryString,
-    uri,
-    searchOptions = {},
-    keycloak
-  ) => {
-    fetchSearchResults(queryString, uri, searchOptions, 0, keycloak).then(
+  const fetchNewSearchResults = (queryString, searchOptions = {}, keycloak) => {
+    fetchSearchResults(queryString, searchOptions, 0, keycloak).then(
       (result) => {
         if (result) history.push("/search")
       }

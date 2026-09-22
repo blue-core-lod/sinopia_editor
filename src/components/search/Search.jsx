@@ -5,17 +5,14 @@ import { useSelector } from "react-redux"
 import PropTypes from "prop-types"
 import Header from "../Header"
 import SinopiaSearchResults from "./SinopiaSearchResults"
-import QASearchResults from "./QASearchResults"
 import SearchResultsPaging from "./SearchResultsPaging"
 import SearchResultsMessage from "./SearchResultsMessage"
 import {
   selectSearchQuery,
-  selectSearchUri,
   selectSearchOptions,
   selectSearchTotalResults,
   selectSearchLinks,
 } from "selectors/search"
-import { sinopiaSearchUri } from "utilities/authorityConfig"
 import useSearch from "hooks/useSearch"
 import AlertsContextProvider from "components/alerts/AlertsContextProvider"
 import ContextAlert from "components/alerts/ContextAlert"
@@ -32,7 +29,6 @@ const Search = (props) => {
   const searchOptions = useSelector((state) =>
     selectSearchOptions(state, "resource")
   )
-  const uri = useSelector((state) => selectSearchUri(state, "resource"))
   const queryString = useSelector((state) =>
     selectSearchQuery(state, "resource")
   )
@@ -43,15 +39,9 @@ const Search = (props) => {
 
   const changeSearchPage = (linkOrOffset) => {
     if (typeof linkOrOffset === "number") {
-      fetchSearchResults(
-        queryString,
-        uri,
-        searchOptions,
-        linkOrOffset,
-        keycloak
-      )
+      fetchSearchResults(queryString, searchOptions, linkOrOffset, keycloak)
     } else {
-      fetchSearchResults(linkOrOffset, uri, searchOptions, null, keycloak)
+      fetchSearchResults(linkOrOffset, searchOptions, null, keycloak)
     }
   }
 
@@ -62,11 +52,7 @@ const Search = (props) => {
         <ContextAlert />
         <PreviewModal />
         <TemplateGuessSearchResults />
-        {uri === sinopiaSearchUri ? (
-          <SinopiaSearchResults />
-        ) : (
-          <QASearchResults />
-        )}
+        <SinopiaSearchResults />
         <SearchResultsPaging
           resultsPerPage={searchOptions.resultsPerPage}
           startOfRange={searchOptions.startOfRange}
