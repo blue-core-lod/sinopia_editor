@@ -3,6 +3,7 @@
 import Config from "../Config"
 
 import { setUser, removeUser } from "actions/authenticate"
+import { rolesReceived } from "actions/roles"
 import { addError, clearErrors } from "actions/errors"
 import { hasUser } from "selectors/authenticate"
 import { loadUserData } from "actionCreators/user"
@@ -15,7 +16,10 @@ export const authenticate = (keycloak) => async (dispatch, getState) => {
       await keycloak.updateToken(30)
     }
     const userInfo = keycloak.tokenParsed
+    console.log("keycloakUser:")
+    console.log(userInfo)
     dispatch(setUser(toUser(userInfo)))
+    dispatch(rolesReceived(userInfo?.realm_access?.roles || []))
     dispatch(loadUserData(userInfo.preferred_username, keycloak))
     return Promise.resolve(true)
   }
