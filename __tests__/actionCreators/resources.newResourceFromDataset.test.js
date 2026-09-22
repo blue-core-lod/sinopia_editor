@@ -820,8 +820,8 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
       // The reference survives the round trip unchanged. It used to gain an
       // rdfs:label holding the URI itself, because newUriFromObject defaulted
-      // a URI value's label to the URI. Issue #183 removed that fallback, so
-      // saving a bare reference now adds nothing the dataset did not supply.
+      // a URI value's label to the URI. Removed that fallback, so saving
+      // a bare reference now adds nothing the dataset did not supply.
       const actualRdf = new GraphBuilder(
         addSubjectAction.payload
       ).graph.toCanonical()
@@ -838,7 +838,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
   })
 
   describe("loading a uri value that the dataset gives no label", () => {
-    // Issue #183: the editor used to invent a label holding the uri itself,
+    // The editor used to invent a label holding the uri itself,
     // then write it back on save as though a cataloger had supplied it.
     const bareUri = "http://id.loc.gov/authorities/genreForms/gf2014026113"
     const RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label"
