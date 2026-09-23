@@ -8,7 +8,7 @@ import {
 import { createLookupPromise } from "utilities/QuestioningAuthority"
 import {
   findAuthorityConfig,
-  locSearchUri,
+  locSearchType,
   sinopiaSearchUri,
 } from "utilities/authorityConfig"
 import { addSearchHistory as addApiSearchHistory } from "actionCreators/user"
@@ -94,35 +94,37 @@ export const fetchSinopiaSearchResults =
   }
 
 export const fetchLocSearchResults =
-  (query, options, errorKey) => (dispatch) => {
+  (query, uri, options, errorKey) => (dispatch) => {
     dispatch(clearErrors(errorKey))
-    return getLocSearchResults(query, options).then(([response]) => {
-      dispatch(
-        setSearchResults(
-          "resource",
-          locSearchUri,
-          response.results,
-          response.totalHits,
-          {},
-          query,
-          response.options || options,
-          response.error,
-          response.links
-        )
-      )
-      // Deliberately no loadSearchRelationships: /relationships only knows
-      // about Blue Core URIs and would 404 for every row.
-      if (response.error) {
+    return getLocSearchResults(query, options, locSearchType(uri)).then(
+      ([response]) => {
         dispatch(
-          addError(
-            errorKey,
-            `An error occurred while searching the Library of Congress: ${response.error}`
+          setSearchResults(
+            "resource",
+            uri,
+            response.results,
+            response.totalHits,
+            {},
+            query,
+            response.options || options,
+            response.error,
+            response.links
           )
         )
-        return false
+        // Deliberately no loadSearchRelationships: /relationships only knows
+        // about Blue Core URIs and would 404 for every row.
+        if (response.error) {
+          dispatch(
+            addError(
+              errorKey,
+              `An error occurred while searching the Library of Congress: ${response.error}`
+            )
+          )
+          return false
+        }
+        return true
       }
-      return true
-    })
+    )
   }
 
 export const fetchQASearchResults =

@@ -4,6 +4,10 @@
     "uri": "urn:bluecore:loc"
   },
   {
+    "label": "Library of Congress instances (live)",
+    "uri": "urn:bluecore:loc/instances"
+  },
+  {
     "label": "DISCOGS Masters",
     "uri": "urn:discogs:master"
   },

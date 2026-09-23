@@ -6,17 +6,23 @@ import {
   fetchTemplateGuessSearchResults as fetchTemplateGuessSearchResultsCreator,
 } from "actionCreators/search"
 import { clearSearchResults } from "actions/search"
-import { locSearchUri, sinopiaSearchUri } from "utilities/authorityConfig"
+import { isLocSearchUri, sinopiaSearchUri } from "utilities/authorityConfig"
 import { useHistory } from "react-router-dom"
 
 const useSearch = (errorKey) => {
   const dispatch = useDispatch()
   const history = useHistory()
 
-  const fetchLocSearchResults = (queryString, searchOptions, startOfRange) =>
+  const fetchLocSearchResults = (
+    queryString,
+    uri,
+    searchOptions,
+    startOfRange
+  ) =>
     dispatch(
       fetchLocSearchResultsCreator(
         queryString,
+        uri,
         { ...searchOptions, startOfRange },
         errorKey
       )
@@ -68,8 +74,13 @@ const useSearch = (errorKey) => {
         keycloak
       )
     }
-    if (uri === locSearchUri) {
-      return fetchLocSearchResults(queryString, searchOptions, startOfRange)
+    if (isLocSearchUri(uri)) {
+      return fetchLocSearchResults(
+        queryString,
+        uri,
+        searchOptions,
+        startOfRange
+      )
     }
     return fetchQASearchResults(queryString, uri, searchOptions, startOfRange)
   }

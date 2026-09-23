@@ -15,3 +15,13 @@ export const sinopiaSearchUri = "urn:ld4p:sinopia"
 // authority, so it is dispatched separately from the entries in
 // authorityConfig.json.
 export const locSearchUri = "urn:bluecore:loc"
+
+// Suffix picks the BIBFRAME class, mirroring how the Sinopia entries above use
+// "urn:ld4p:sinopia/Work".
+export const locSearchUriPrefix = "urn:bluecore:loc"
+
+export const isLocSearchUri = (uri) =>
+  typeof uri === "string" && uri.startsWith(locSearchUriPrefix)
+
+export const locSearchType = (uri) =>
+  uri === locSearchUri ? "works" : uri.slice(locSearchUriPrefix.length + 1)

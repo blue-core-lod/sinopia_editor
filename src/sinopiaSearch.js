@@ -125,11 +125,15 @@ export const getSearchResultsWithFacets = async (
  * results use, because the API deliberately shapes external results like its
  * own. Nothing is loaded into Blue Core by searching.
  */
-export const getLocSearchResults = async (query, options = {}) => {
+export const getLocSearchResults = async (
+  query,
+  options = {},
+  type = "works"
+) => {
   const startOfRange = options.startOfRange || 0
   const params = new URLSearchParams({
     q: query,
-    type: "works",
+    type,
     sources: "loc",
     limit: options.resultsPerPage || Config.searchResultsPerPage,
     offset: startOfRange,
