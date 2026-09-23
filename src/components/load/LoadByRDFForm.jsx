@@ -8,8 +8,9 @@ import {
   hasQuadsForRootResourceTemplateId,
 } from "utilities/Utilities"
 import useRdfResource from "hooks/useRdfResource"
-import { clearErrors, addError } from "actions/errors"
+import { clearErrors, addError, addSuccess } from "actions/errors"
 import { showModal } from "actions/modals"
+import { dashboardErrorKey } from "utilities/errorKeyFactory"
 import ResourceTemplateChoiceModal from "../ResourceTemplateChoiceModal"
 import useAlerts from "hooks/useAlerts"
 import { useHistory } from "react-router-dom"
@@ -153,8 +154,17 @@ const LoadByRDFForm = () => {
             throw new Error(`Error creating work: ${resp.statusText}`)
           return resp.json()
         })
-        .then((json) => {
-          history.push(`/editor/${json.uuid}`)
+        .then(() => {
+          // The new work isn't in redux, so sending the user to /editor/<uuid>
+          // would strand them on the editor's "Loading ..." state. Send them to
+          // the dashboard, where the imported work will surface.
+          dispatch(
+            addSuccess(
+              dashboardErrorKey,
+              "Your MARC record was submitted and is being processed. The new work will appear here once it is ready."
+            )
+          )
+          history.push("/dashboard")
         })
         .catch((err) =>
           dispatch(
