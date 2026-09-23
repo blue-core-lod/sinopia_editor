@@ -23,5 +23,7 @@ export const locSearchUriPrefix = "urn:bluecore:loc"
 export const isLocSearchUri = (uri) =>
   typeof uri === "string" && uri.startsWith(locSearchUriPrefix)
 
+// Bare id searches every BIBFRAME class, matching what the Blue Core entries
+// above do; a suffix narrows it.
 export const locSearchType = (uri) =>
-  uri === locSearchUri ? "works" : uri.slice(locSearchUriPrefix.length + 1)
+  uri === locSearchUri ? "all" : uri.slice(locSearchUriPrefix.length + 1)
