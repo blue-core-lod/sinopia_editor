@@ -495,9 +495,10 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       expect(members).toEqual([dressUri, patternsUri])
     })
 
-    describe("a list written by the current buildComponentList", () => {
-      // GraphBuilder.buildComponentList writes a well-formed single-member
-      // list but no rdfs:label, so this is the shape of already-saved records.
+    describe("a single-member list carrying no label", () => {
+      // The shape Sinopia wrote before the componentList property replaced the
+      // bespoke LCSH typeahead: a well-formed list, but no rdfs:label for the
+      // member. Records saved then still load through this path.
       const legacyN3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:orderedUri" .
       <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/OrderedUri> .
       <> <http://sinopia.io/testing/OrderedUri/property1> _:b9 .
