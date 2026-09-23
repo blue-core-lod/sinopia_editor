@@ -3,6 +3,8 @@
 import {
   datasetFromJsonld,
   datasetFromN3,
+  isBlueCoreUri,
+  isFederatedSourceUri,
   jsonldFromDataset,
 } from "utilities/Utilities"
 import Config from "Config"
@@ -65,6 +67,18 @@ export const fetchResource = (
     fetchPromise = loadBaseTemplate(uri)
   } else if (Config.useResourceTemplateFixtures && isTemplate) {
     fetchPromise = Promise.reject(new Error("Not found"))
+  } else if (!isBlueCoreUri(resourceUri) && isFederatedSourceUri(resourceUri)) {
+    // An external record, from a federated search result. The API fetches it
+    // from its source and frames it the way it frames its own, so everything
+    // downstream is unchanged. Dereferencing it here instead would depend on
+    // the source honouring our Accept header and CORS, and would give us
+    // nowhere to cache, rate limit, or notice that we already hold a copy.
+    const externalUri = `${
+      Config.sinopiaApiBase
+    }/external/resources?uri=${encodeURIComponent(resourceUri)}`
+    fetchPromise = fetch(externalUri, {
+      headers: { Accept: "application/vnd.sinopia+json" },
+    }).then((resp) => checkResp(resp).then(() => resp.json()))
   } else {
     fetchPromise = fetch(fetchUri, {
       headers: { Accept: "application/vnd.sinopia+json" },

@@ -58,6 +58,25 @@ export const isBlueCoreUri = (uri) => {
 }
 
 /**
+ * Whether a URI belongs to an external source the Blue Core API will fetch
+ * on our behalf.
+ *
+ * Deliberately an allow-list rather than "anything that is not ours". A record
+ * can carry URIs from all over -- vocabularies, agents, a legacy Sinopia
+ * instance -- and none of those should be routed to the resource proxy, which
+ * keeps its own allow-list and would reject them anyway.
+ * @param {string} uri to test
+ * @return {boolean} true if the API can fetch this URI for us
+ */
+export const isFederatedSourceUri = (uri) => {
+  try {
+    return Config.federatedSourceHosts.includes(new URL(uri).hostname)
+  } catch (e) {
+    return false
+  }
+}
+
+/**
  * Loads N3 into a dataset.
  * @param {string} data that is the N3
  * @return {Promise<rdf.Dataset>} a promise that resolves to the loaded dataset

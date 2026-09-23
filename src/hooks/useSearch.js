@@ -1,16 +1,26 @@
 import { useDispatch } from "react-redux"
 import {
   fetchSinopiaSearchResults as fetchSinopiaSearchResultsCreator,
+  fetchLocSearchResults as fetchLocSearchResultsCreator,
   fetchQASearchResults as fetchQASearchResultsCreator,
   fetchTemplateGuessSearchResults as fetchTemplateGuessSearchResultsCreator,
 } from "actionCreators/search"
 import { clearSearchResults } from "actions/search"
-import { sinopiaSearchUri } from "utilities/authorityConfig"
+import { locSearchUri, sinopiaSearchUri } from "utilities/authorityConfig"
 import { useHistory } from "react-router-dom"
 
 const useSearch = (errorKey) => {
   const dispatch = useDispatch()
   const history = useHistory()
+
+  const fetchLocSearchResults = (queryString, searchOptions, startOfRange) =>
+    dispatch(
+      fetchLocSearchResultsCreator(
+        queryString,
+        { ...searchOptions, startOfRange },
+        errorKey
+      )
+    )
 
   const fetchQASearchResults = (
     queryString,
@@ -57,6 +67,9 @@ const useSearch = (errorKey) => {
         startOfRange,
         keycloak
       )
+    }
+    if (uri === locSearchUri) {
+      return fetchLocSearchResults(queryString, searchOptions, startOfRange)
     }
     return fetchQASearchResults(queryString, uri, searchOptions, startOfRange)
   }

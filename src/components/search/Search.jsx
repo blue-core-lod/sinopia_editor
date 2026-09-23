@@ -15,7 +15,7 @@ import {
   selectSearchTotalResults,
   selectSearchLinks,
 } from "selectors/search"
-import { sinopiaSearchUri } from "utilities/authorityConfig"
+import { locSearchUri, sinopiaSearchUri } from "utilities/authorityConfig"
 import useSearch from "hooks/useSearch"
 import AlertsContextProvider from "components/alerts/AlertsContextProvider"
 import ContextAlert from "components/alerts/ContextAlert"
@@ -62,7 +62,9 @@ const Search = (props) => {
         <ContextAlert />
         <PreviewModal />
         <TemplateGuessSearchResults />
-        {uri === sinopiaSearchUri ? (
+        {/* Library of Congress results come back from the Blue Core API in
+            the same shape as its own, so the same table renders both. */}
+        {uri === sinopiaSearchUri || uri === locSearchUri ? (
           <SinopiaSearchResults />
         ) : (
           <QASearchResults />

@@ -1,5 +1,9 @@
 [
   {
+    "label": "Library of Congress (live)",
+    "uri": "urn:bluecore:loc"
+  },
+  {
     "label": "DISCOGS Masters",
     "uri": "urn:discogs:master"
   },

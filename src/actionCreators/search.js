@@ -1,12 +1,14 @@
 // Copyright 2019 Stanford University see LICENSE for license
 import { setSearchResults } from "actions/search"
 import {
+  getLocSearchResults,
   getSearchResultsWithFacets,
   getTemplateSearchResults,
 } from "sinopiaSearch"
 import { createLookupPromise } from "utilities/QuestioningAuthority"
 import {
   findAuthorityConfig,
+  locSearchUri,
   sinopiaSearchUri,
 } from "utilities/authorityConfig"
 import { addSearchHistory as addApiSearchHistory } from "actionCreators/user"
@@ -89,6 +91,38 @@ export const fetchSinopiaSearchResults =
         return true
       }
     )
+  }
+
+export const fetchLocSearchResults =
+  (query, options, errorKey) => (dispatch) => {
+    dispatch(clearErrors(errorKey))
+    return getLocSearchResults(query, options).then(([response]) => {
+      dispatch(
+        setSearchResults(
+          "resource",
+          locSearchUri,
+          response.results,
+          response.totalHits,
+          {},
+          query,
+          response.options || options,
+          response.error,
+          response.links
+        )
+      )
+      // Deliberately no loadSearchRelationships: /relationships only knows
+      // about Blue Core URIs and would 404 for every row.
+      if (response.error) {
+        dispatch(
+          addError(
+            errorKey,
+            `An error occurred while searching the Library of Congress: ${response.error}`
+          )
+        )
+        return false
+      }
+      return true
+    })
   }
 
 export const fetchQASearchResults =

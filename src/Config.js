@@ -49,6 +49,15 @@ class Config {
     return 10
   }
 
+  // Hosts whose records the Blue Core API will fetch on our behalf, via
+  // /external/resources. Must be a subset of what the API itself allows.
+  static get federatedSourceHosts() {
+    return (process.env.FEDERATED_SOURCE_HOSTS || "id.loc.gov")
+      .split(",")
+      .map((host) => host.trim())
+      .filter(Boolean)
+  }
+
   static get templateSearchResultsPerPage() {
     return 10
   }

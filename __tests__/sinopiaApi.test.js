@@ -122,6 +122,39 @@ describe("fetchResource", () => {
       )
     })
 
+    it("fetches an external record through the API proxy", async () => {
+      // A federated search result. The API fetches it from its source and
+      // frames it the way it frames its own, so nothing downstream changes --
+      // and nothing is stored in Blue Core until the cataloger saves.
+      global.fetch = jest.fn().mockResolvedValue({
+        json: jest.fn().mockResolvedValue(resource),
+        ok: true,
+      })
+
+      await fetchResource("http://id.loc.gov/resources/works/23118629")
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        "http://localhost:3000/external/resources?uri=http%3A%2F%2Fid.loc.gov%2Fresources%2Fworks%2F23118629",
+        { headers: { Accept: "application/vnd.sinopia+json" } }
+      )
+    })
+
+    it("does not proxy a URI from an unfederated host", async () => {
+      // Records cite URIs from all over. Only hosts we actually federate go to
+      // the proxy; everything else keeps its existing behaviour.
+      global.fetch = jest.fn().mockResolvedValue({
+        json: jest.fn().mockResolvedValue(resource),
+        ok: true,
+      })
+
+      await fetchResource("https://example.org/resources/works/1")
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        "https://example.org/resources/works/1?expand=true",
+        { headers: { Accept: "application/vnd.sinopia+json" } }
+      )
+    })
+
     it("retrieves resource version", async () => {
       // mocks call to Sinopia API for a resource
       global.fetch = jest.fn().mockResolvedValue({

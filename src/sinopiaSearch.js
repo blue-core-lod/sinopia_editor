@@ -117,6 +117,65 @@ export const getSearchResultsWithFacets = async (
   return fetchSearchResultsFromUrl(url, keycloak, extractedOptions)
 }
 
+/**
+ * Search the Library of Congress live, through the Blue Core API.
+ *
+ * Hits /search/federated, which answers with one group per source; we ask for
+ * the LC group alone and then hand it to the same hit mapper the Blue Core
+ * results use, because the API deliberately shapes external results like its
+ * own. Nothing is loaded into Blue Core by searching.
+ */
+export const getLocSearchResults = async (query, options = {}) => {
+  const startOfRange = options.startOfRange || 0
+  const params = new URLSearchParams({
+    q: query,
+    type: "works",
+    sources: "loc",
+    limit: options.resultsPerPage || Config.searchResultsPerPage,
+    offset: startOfRange,
+  })
+  const url = `${Config.sinopiaApiBase}/search/federated?${params}`
+
+  try {
+    const response = await fetch(url, { method: "GET" })
+    const json = await response.json()
+    const group = (json.sources || []).find((source) => source.id === "loc")
+
+    if (!group) {
+      return [
+        {
+          totalHits: 0,
+          results: [],
+          error: "No Library of Congress results returned.",
+          options,
+        },
+      ]
+    }
+    // A source that failed must not look like a source with no matches: that is
+    // how a timeout becomes a hand-catalogued duplicate.
+    if (group.status !== "ok") {
+      return [
+        {
+          totalHits: 0,
+          results: [],
+          error: group.error || `Library of Congress is ${group.status}.`,
+          options,
+        },
+      ]
+    }
+
+    const result = hitsToResult({
+      results: group.results,
+      total: group.total,
+      links: group.links,
+    })
+    result.options = { ...options, startOfRange }
+    return [result]
+  } catch (err) {
+    return [{ totalHits: 0, results: [], error: err.toString(), options }]
+  }
+}
+
 export const getSearchResultsByUris = (resourceUris) => {
   if (
     Config.useResourceTemplateFixtures &&

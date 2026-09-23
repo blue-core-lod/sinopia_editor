@@ -10,3 +10,8 @@ authorityConfig.forEach(
 export const findAuthorityConfig = (searchUri) => authorityConfigMap[searchUri]
 
 export const sinopiaSearchUri = "urn:ld4p:sinopia"
+
+// Searched live through the Blue Core API rather than loaded into it. Not a QA
+// authority, so it is dispatched separately from the entries in
+// authorityConfig.json.
+export const locSearchUri = "urn:bluecore:loc"
