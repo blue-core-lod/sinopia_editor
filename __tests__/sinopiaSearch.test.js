@@ -536,6 +536,60 @@ describe("getTemplateSearchResults", () => {
       error: "504: Gateway Timeout",
     })
   })
+
+  it("falls back to defaults for a template missing optional fields", async () => {
+    // A profile created outside Sinopia's own template editor can lack any of
+    // these. Reading one unguarded used to throw and take out the entire
+    // result set rather than just degrading the one row.
+    const uri = "http://localhost:3000/profiles/eab93bdb-f057-412d-9624-ffb9f9"
+    const sparse = {
+      total: 1,
+      links: null,
+      results: [
+        {
+          id: 202,
+          uuid: "eab93bdb-f057-412d-9624-ffb9f9",
+          uri,
+          data: [
+            {
+              "@id": uri,
+              "@type": ["http://sinopia.io/vocabulary/ResourceTemplate"],
+              // no hasDate, no hasRemark
+              "http://sinopia.io/vocabulary/hasAuthor": [
+                { "@value": "jgreben" },
+              ],
+              "http://www.w3.org/2000/01/rdf-schema#label": [
+                { "@value": "LCSH Subject--Reference" },
+              ],
+              "http://sinopia.io/vocabulary/hasResourceId": [
+                { "@value": "bluecore:bf2:madsrdf:Topic:Reference" },
+              ],
+              "http://sinopia.io/vocabulary/hasClass": [
+                { "@id": "http://id.loc.gov/ontologies/bibframe/Topic" },
+              ],
+            },
+          ],
+        },
+      ],
+    }
+    global.fetch = jest
+      .fn()
+      .mockImplementation(() => Promise.resolve({ json: () => sparse }))
+
+    const results = await getTemplateSearchResults("Topic:Reference")
+
+    expect(results.totalHits).toEqual(1)
+    expect(results.results[0]).toEqual(
+      expect.objectContaining({
+        author: "jgreben",
+        date: "Unknown",
+        remark: "",
+        id: "bluecore:bf2:madsrdf:Topic:Reference",
+        resourceLabel: "LCSH Subject--Reference",
+        resourceURI: "http://id.loc.gov/ontologies/bibframe/Topic",
+      })
+    )
+  })
 })
 
 describe("getTemplateSearchResultsByIds", () => {
