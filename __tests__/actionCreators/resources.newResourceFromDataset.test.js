@@ -893,6 +893,64 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     })
   })
 
+  describe("loading a blank node as the object of a uri property", () => {
+    // Ingested BIBFRAME does this: bf:source is sometimes a reference to a
+    // scheme URI and sometimes an inline bf:Source node carrying its own code.
+    // A uri-typed property cannot hold the inline form, and a blank node is
+    // neither a NamedNode nor a Literal -- so it must not be coerced into one.
+    // A blank node's value is the label the parser invented for it ("b0_src"
+    // here, "df_153_102" in a JSON-LD parsed record), so writing it back as a
+    // literal puts a parser artifact into the record as cataloged data.
+    const n3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:uri" .
+    <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Uri> .
+    <> <http://sinopia.io/testing/Uri/property1> _:src .
+    _:src <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Source> .
+    _:src <http://id.loc.gov/ontologies/bibframe/code> "thema" .
+    `
+
+    const load = async () => {
+      const store = mockStore(createState())
+      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      expect(
+        await store.dispatch(
+          newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        )
+      ).toBe(true)
+      const actions = store.getActions()
+      const subject = actions.find((a) => a.type === "ADD_SUBJECT").payload
+      return {
+        values: subject.properties.flatMap((property) => property.values || []),
+        unusedRDF: actions.find((a) => a.type === "SET_UNUSED_RDF")?.payload
+          ?.rdf,
+      }
+    }
+
+    it("does not turn the blank node's label into a literal value", async () => {
+      const { values } = await load()
+
+      expect(values.map((value) => value.literal).filter(Boolean)).toEqual([])
+    })
+
+    it("reports the link triple as unused so it is not lost on save", async () => {
+      // unorderedObjects() marks the link quad used before it is known whether
+      // the object yields a value. Dropping the value without releasing it
+      // would strip bf:source from the record on the next save.
+      const { unusedRDF } = await load()
+
+      expect(unusedRDF ?? "").toContain(
+        "http://sinopia.io/testing/Uri/property1"
+      )
+    })
+
+    it("reports the blank node's triples as unused rather than inventing a value", async () => {
+      const { unusedRDF } = await load()
+
+      expect(unusedRDF ?? "").toContain(
+        "http://id.loc.gov/ontologies/bibframe/code"
+      )
+    })
+  })
+
   describe("loading a uri value that the dataset gives no label", () => {
     // The editor used to invent a label holding the uri itself,
     // then write it back on save as though a cataloger had supplied it.

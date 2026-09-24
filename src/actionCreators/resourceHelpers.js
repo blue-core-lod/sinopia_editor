@@ -381,10 +381,33 @@ const newValuesFromDatasetByPropertyUri =
             newUriFromObject(obj, property, propertyUri, context)
           )
         }
-        // Literal
-        return Promise.resolve(newLiteralFromObject(obj, property, propertyUri))
+        if (obj.termType === "Literal") {
+          return Promise.resolve(
+            newLiteralFromObject(obj, property, propertyUri)
+          )
+        }
+        // A blank node on a literal or uri property: only a resource property
+        // can hold one. Its value is the label the parser invented for it, so
+        // treating it as a literal would write a parser artifact into the
+        // record. Drop the value instead and let the triples be reported as
+        // unused RDF, which is what they are until a template can hold them.
+        return Promise.resolve(null)
       })
-    )
+    ).then((values) => {
+      // Same reasoning as the resource branch above: unorderedObjects() marked
+      // each link quad used before it was known whether the object would yield
+      // a value, so release the ones that did not. Otherwise the dropped
+      // triple is neither shown nor reported, and disappears on save.
+      if (!suppress && !property.propertyTemplate.ordered) {
+        objects.forEach((obj, index) => {
+          if (values[index]) return
+          context.usedDataset.delete(
+            rdf.quad(subjectTerm, rdf.namedNode(propertyUri), obj)
+          )
+        })
+      }
+      return values
+    })
   }
 
 // Promises that return values based on template
