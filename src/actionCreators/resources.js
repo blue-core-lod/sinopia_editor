@@ -518,8 +518,11 @@ export const contractProperty = (propertyKey) => (dispatch, getState) => {
 export const addSiblingValueSubject =
   (valueKey, errorKey) => (dispatch, getState) => {
     const value = selectValue(getState(), valueKey)
+    // key, not id: the key is the ref the parent pinned, so the sibling is
+    // built against the same version as the value it sits beside. The id
+    // resolves to whatever the profile says today.
     return dispatch(
-      newSubject(null, value.valueSubject.subjectTemplate.id, {}, errorKey)
+      newSubject(null, value.valueSubject.subjectTemplate.key, {}, errorKey)
     ).then((subject) =>
       dispatch(newPropertiesFromTemplates(subject, false, errorKey)).then(
         (properties) => {
@@ -541,8 +544,10 @@ export const addSiblingValueSubject =
 export const resetValueSubject =
   (valueKey, errorKey) => (dispatch, getState) => {
     const value = selectValue(getState(), valueKey)
-    const templateId = value.valueSubject.subjectTemplate.id
-    return dispatch(newSubject(null, templateId, {}, errorKey)).then(
+    // key, not id: reset means "a fresh one of exactly this", including the
+    // version it was pinned to. See addSiblingValueSubject.
+    const templateRef = value.valueSubject.subjectTemplate.key
+    return dispatch(newSubject(null, templateRef, {}, errorKey)).then(
       (subject) =>
         dispatch(newPropertiesFromTemplates(subject, false, errorKey)).then(
           (properties) => {

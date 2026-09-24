@@ -1037,6 +1037,67 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     })
   })
 
+  describe("loading data whose templates reference each other by version URI", () => {
+    // Same loop as above, but every nested reference is a profile version URI
+    // rather than a bare template id. The cycle guard keys on the reference,
+    // so its key changes shape here; it still has to terminate.
+    const profiles = "http://localhost:3000/profiles"
+    const cycleAVersionUri = `${profiles}/11111111-1111-4111-8111-111111111111/version/1`
+    const bUri = "http://foo/versioned-cycle-b"
+
+    const n3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "${cycleAVersionUri}" .
+    <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/VersionedCycleA> .
+    <> <http://sinopia.io/testing/VersionedCycleA/toVersionedCycleB> <${bUri}> .
+    <${bUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/VersionedCycleB> .
+    <${bUri}> <http://sinopia.io/testing/VersionedCycleB/toVersionedCycleA> <> .
+    `
+
+    const propertyFor = (subject, propertyUri) =>
+      subject.properties.find((property) =>
+        Object.keys(property.propertyTemplate.uris).includes(propertyUri)
+      )
+
+    it("stops at the loop and keeps the link as a bare reference", async () => {
+      const store = mockStore(createState())
+      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+
+      expect(
+        await store.dispatch(
+          newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        )
+      ).toBe(true)
+
+      const resource = store
+        .getActions()
+        .find((a) => a.type === "ADD_SUBJECT").payload
+
+      // The root expanded against the pinned version...
+      expect(resource.subjectTemplate.key).toBe(cycleAVersionUri)
+      expect(resource.subjectTemplate.version).toBe(1)
+
+      // ...into B, also pinned...
+      const bSubject = propertyFor(
+        resource,
+        "http://sinopia.io/testing/VersionedCycleA/toVersionedCycleB"
+      ).values[0].valueSubject
+      expect(bSubject.subjectTemplate.version).toBe(1)
+      expect(bSubject.uri).toBe(bUri)
+
+      // ...and B's link back to A stopped there rather than recursing.
+      const backSubject = propertyFor(
+        bSubject,
+        "http://sinopia.io/testing/VersionedCycleB/toVersionedCycleA"
+      ).values[0].valueSubject
+      expect(backSubject.uri).toBe(uri)
+      expect(
+        propertyFor(
+          backSubject,
+          "http://sinopia.io/testing/VersionedCycleA/toVersionedCycleB"
+        ).values
+      ).toBeNull()
+    })
+  })
+
   describe("loading data where a node links to itself", () => {
     // The shortest possible loop: one node, one nested property, pointing at
     // itself.

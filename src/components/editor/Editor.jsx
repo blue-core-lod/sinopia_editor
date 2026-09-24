@@ -40,7 +40,11 @@ const Editor = (props) => {
   const subjectTemplate = useSelector((state) =>
     selectSubjectTemplateForSubject(state, resourceKey)
   )
-  const subjectTemplateKey = subjectTemplate?.key
+  // id, not key: /editor/:templateId matches a single path segment and means
+  // "create a new resource from this template", for which the latest version
+  // is the right target. A version-pinned template keys on a URI, which the
+  // route could not match.
+  const subjectTemplateId = subjectTemplate?.id
 
   const displayErrors = useSelector((state) =>
     displayResourceValidations(state, resourceKey)
@@ -61,15 +65,15 @@ const Editor = (props) => {
       }
     } else if (
       !editorTemplateMatch ||
-      editorTemplateMatch.params.templateId !== subjectTemplateKey
+      editorTemplateMatch.params.templateId !== subjectTemplateId
     ) {
-      history.replace(`/editor/${subjectTemplateKey}`)
+      history.replace(`/editor/${subjectTemplateId}`)
     }
   }, [
     resourceKey,
     editorTemplateMatch,
     editorResourceMatch,
-    subjectTemplateKey,
+    subjectTemplateId,
     resourceId,
     history,
   ])
