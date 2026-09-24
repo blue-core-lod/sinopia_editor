@@ -764,6 +764,62 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       expect(actualRdf).not.toMatch("Sibling default value")
     })
   })
+  describe("loading a typed NamedNode value whose sibling template declares rdf:type", () => {
+    // The shape of an LC authority reference in an expanded Blue Core record:
+    // the value asserts its class and carries a label, nothing more. Both
+    // candidate templates claim that class, so the non-suppressible one wins.
+    // It declares an rdf:type property of its own, which consumes the value's
+    // type quad -- so the "captured nothing" fallback to the suppressible
+    // sibling has to ignore a type-only match or the label is silently lost.
+    const bareUri = "http://id.loc.gov/authorities/subjects/sh85023027"
+    const RDFS = "http://www.w3.org/2000/01/rdf-schema#label"
+    const n3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:ambiguousClassTypedSibling" .
+    <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/AmbiguousClassTypedSibling> .
+    <> <http://sinopia.io/testing/AmbiguousClassTypedSibling/property1> <${bareUri}> .
+    <${bareUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Uri> .
+    <${bareUri}> <${RDFS}> "Chemistry, Physical and theoretical"@en .
+    `
+
+    const load = async () => {
+      const store = mockStore(createState())
+      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      expect(
+        await store.dispatch(
+          newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        )
+      ).toBe(true)
+      const actions = store.getActions()
+      return {
+        values: actions.find((a) => a.type === "ADD_SUBJECT").payload
+          .properties[0].values,
+        unusedRDF: actions.find((a) => a.type === "SET_UNUSED_RDF")?.payload
+          ?.rdf,
+      }
+    }
+
+    const forTemplate = (values, id) =>
+      values.find((value) => value.valueSubject.subjectTemplate.id === id)
+
+    it("falls back to the suppressible sibling rather than the type-only match", async () => {
+      const { values } = await load()
+      const suppressed = forTemplate(
+        values,
+        "resourceTemplate:testing:suppressedUri"
+      )
+
+      expect(suppressed).toBeDefined()
+      expect(suppressed.valueSubject.properties[0].values[0].uri).toBe(bareUri)
+    })
+
+    it("keeps the label instead of dropping it into unused RDF", async () => {
+      const { unusedRDF } = await load()
+
+      expect(unusedRDF ?? "").not.toContain(
+        "Chemistry, Physical and theoretical"
+      )
+    })
+  })
+
   describe("loading a NamedNode value whose only local triple is its rdf:type", () => {
     // resourceTemplate:testing:ambiguousClassNonSuppressible offers both
     // :suppressedUri (suppressible) and :richUri (not suppressible) for
@@ -833,6 +889,64 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       )
       expect(actualRdf).not.toMatch(
         "http://www.w3.org/2000/01/rdf-schema#label"
+      )
+    })
+  })
+
+  describe("loading a blank node as the object of a uri property", () => {
+    // Ingested BIBFRAME does this: bf:source is sometimes a reference to a
+    // scheme URI and sometimes an inline bf:Source node carrying its own code.
+    // A uri-typed property cannot hold the inline form, and a blank node is
+    // neither a NamedNode nor a Literal -- so it must not be coerced into one.
+    // A blank node's value is the label the parser invented for it ("b0_src"
+    // here, "df_153_102" in a JSON-LD parsed record), so writing it back as a
+    // literal puts a parser artifact into the record as cataloged data.
+    const n3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:uri" .
+    <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Uri> .
+    <> <http://sinopia.io/testing/Uri/property1> _:src .
+    _:src <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Source> .
+    _:src <http://id.loc.gov/ontologies/bibframe/code> "thema" .
+    `
+
+    const load = async () => {
+      const store = mockStore(createState())
+      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      expect(
+        await store.dispatch(
+          newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        )
+      ).toBe(true)
+      const actions = store.getActions()
+      const subject = actions.find((a) => a.type === "ADD_SUBJECT").payload
+      return {
+        values: subject.properties.flatMap((property) => property.values || []),
+        unusedRDF: actions.find((a) => a.type === "SET_UNUSED_RDF")?.payload
+          ?.rdf,
+      }
+    }
+
+    it("does not turn the blank node's label into a literal value", async () => {
+      const { values } = await load()
+
+      expect(values.map((value) => value.literal).filter(Boolean)).toEqual([])
+    })
+
+    it("reports the link triple as unused so it is not lost on save", async () => {
+      // unorderedObjects() marks the link quad used before it is known whether
+      // the object yields a value. Dropping the value without releasing it
+      // would strip bf:source from the record on the next save.
+      const { unusedRDF } = await load()
+
+      expect(unusedRDF ?? "").toContain(
+        "http://sinopia.io/testing/Uri/property1"
+      )
+    })
+
+    it("reports the blank node's triples as unused rather than inventing a value", async () => {
+      const { unusedRDF } = await load()
+
+      expect(unusedRDF ?? "").toContain(
+        "http://id.loc.gov/ontologies/bibframe/code"
       )
     })
   })

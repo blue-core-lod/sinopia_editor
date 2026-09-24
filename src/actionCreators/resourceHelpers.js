@@ -381,10 +381,33 @@ const newValuesFromDatasetByPropertyUri =
             newUriFromObject(obj, property, propertyUri, context)
           )
         }
-        // Literal
-        return Promise.resolve(newLiteralFromObject(obj, property, propertyUri))
+        if (obj.termType === "Literal") {
+          return Promise.resolve(
+            newLiteralFromObject(obj, property, propertyUri)
+          )
+        }
+        // A blank node on a literal or uri property: only a resource property
+        // can hold one. Its value is the label the parser invented for it, so
+        // treating it as a literal would write a parser artifact into the
+        // record. Drop the value instead and let the triples be reported as
+        // unused RDF, which is what they are until a template can hold them.
+        return Promise.resolve(null)
       })
-    )
+    ).then((values) => {
+      // Same reasoning as the resource branch above: unorderedObjects() marked
+      // each link quad used before it was known whether the object would yield
+      // a value, so release the ones that did not. Otherwise the dropped
+      // triple is neither shown nor reported, and disappears on save.
+      if (!suppress && !property.propertyTemplate.ordered) {
+        objects.forEach((obj, index) => {
+          if (values[index]) return
+          context.usedDataset.delete(
+            rdf.quad(subjectTerm, rdf.namedNode(propertyUri), obj)
+          )
+        })
+      }
+      return values
+    })
   }
 
 // Promises that return values based on template
@@ -497,10 +520,22 @@ const unorderedObjects = (subjectTerm, propertyUri, context) => {
   return quads.map((quad) => quad.object)
 }
 
+const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+
+// A property that captures nothing but the value's own rdf:type. That type is
+// what matched the value to this template in the first place, so echoing it
+// back is not data the template captured.
+const isTypeOnlyProperty = (property) => {
+  const uris = Object.keys(property.propertyTemplate?.uris || {})
+  return !_.isEmpty(uris) && uris.every((uri) => uri === RDF_TYPE)
+}
+
 // True when the dataset actually supplied a value for any of the subject's
 // properties. A subject with none renders as an empty nested form.
 const subjectHasValues = (subject) =>
-  subject.properties.some((property) => !_.isEmpty(property.values))
+  subject.properties.some(
+    (property) => !_.isEmpty(property.values) && !isTypeOnlyProperty(property)
+  )
 
 const newNestedResourceFromObject =
   (obj, property, propertyUri, context) => (dispatch) => {

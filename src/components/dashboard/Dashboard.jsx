@@ -1,6 +1,6 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
-import React from "react"
+import React, { useEffect } from "react"
 import PropTypes from "prop-types"
 import { useSelector, useDispatch } from "react-redux"
 import {
@@ -16,6 +16,8 @@ import _ from "lodash"
 import PreviewModal from "../editor/preview/PreviewModal"
 import AlertsContextProvider from "components/alerts/AlertsContextProvider"
 import ContextAlert from "components/alerts/ContextAlert"
+import ContextSuccess from "components/alerts/ContextSuccess"
+import { clearSuccesses } from "actions/errors"
 import { dashboardErrorKey } from "utilities/errorKeyFactory"
 import MarcModal from "../editor/actions/MarcModal"
 import ResourceTemplateChoiceModal from "../ResourceTemplateChoiceModal"
@@ -33,6 +35,15 @@ const Dashboard = (props) => {
   )
   const historicalResources = useSelector((state) =>
     selectHistoricalResources(state)
+  )
+
+  // Success messages here are flashes (e.g. "your import is processing"), so
+  // drop them once the user leaves rather than letting them stack up.
+  useEffect(
+    () => () => {
+      dispatch(clearSuccesses(dashboardErrorKey))
+    },
+    [dispatch]
   )
 
   const chooseResourceTemplate = (resourceTemplateId) => {
@@ -53,6 +64,7 @@ const Dashboard = (props) => {
       <section id="dashboard">
         <Header triggerEditorMenu={props.triggerHandleOffsetMenu} />
         <ContextAlert />
+        <ContextSuccess />
         <PreviewModal />
         <MarcModal />
         <ResourceTemplateChoiceModal choose={chooseResourceTemplate} />
