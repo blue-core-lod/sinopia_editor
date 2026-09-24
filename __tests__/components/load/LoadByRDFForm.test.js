@@ -7,6 +7,7 @@ import {
   createHistory,
 } from "../../testUtilities/testUtils"
 import { createState } from "stateUtils"
+import { dashboardErrorKey } from "utilities/errorKeyFactory"
 
 // Mock KeycloakContext with a token so getJwt works
 jest.mock("KeycloakContext", () => ({
@@ -234,7 +235,7 @@ describe("LoadByRDFForm", () => {
     }
 
     it("submits to /api/works when RDF came from MARC conversion", async () => {
-      const { history } = await setupMarcConversion()
+      await setupMarcConversion()
 
       // Now mock the /api/works call
       global.fetch = jest.fn().mockResolvedValueOnce({
@@ -256,9 +257,39 @@ describe("LoadByRDFForm", () => {
           })
         )
       })
+    })
+
+    it("redirects to the dashboard after creating the work", async () => {
+      const { history } = await setupMarcConversion()
+
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        json: jest.fn().mockResolvedValue({ uuid: "abc-123" }),
+      })
+
+      fireEvent.click(screen.getByText("Submit"))
+
+      // Previously pushed /editor/<uuid>, which left the user on the editor's
+      // "Loading ..." state because the new work was never loaded into redux.
+      await waitFor(() => {
+        expect(history.location.pathname).toBe("/dashboard")
+      })
+    })
+
+    it("adds a dashboard success message saying the import is processing", async () => {
+      const { store } = await setupMarcConversion()
+
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        json: jest.fn().mockResolvedValue({ uuid: "abc-123" }),
+      })
+
+      fireEvent.click(screen.getByText("Submit"))
 
       await waitFor(() => {
-        expect(history.location.pathname).toBe("/editor/abc-123")
+        const messages = store.getState().editor.successes[dashboardErrorKey]
+        expect(messages).toHaveLength(1)
+        expect(messages[0]).toMatch(/being processed/)
       })
     })
 

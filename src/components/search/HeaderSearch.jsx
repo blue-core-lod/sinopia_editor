@@ -118,6 +118,10 @@ const HeaderSearch = () => {
           className="flex-grow-1 form-control"
           type="search"
           id="search"
+          name="search"
+          // Without this the browser treats the lone unnamed text input on the
+          // page as a fillable field and drops the current page URL into it.
+          autoComplete="off"
           onChange={handleQueryChange}
           onBlur={handleQueryBlur}
           onKeyPress={handleKeyPress}
