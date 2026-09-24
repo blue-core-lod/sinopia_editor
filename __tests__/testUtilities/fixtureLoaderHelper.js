@@ -55,6 +55,9 @@ const templateFilenames = {
   "resourceTemplate:testing:richUri2": "testing_rich_uri2.json",
   "resourceTemplate:testing:ambiguousClassNonSuppressible":
     "testing_ambiguous_class_non_suppressible.json",
+  "resourceTemplate:testing:typedRichUri": "testing_typed_rich_uri.json",
+  "resourceTemplate:testing:ambiguousClassTypedSibling":
+    "testing_ambiguous_class_typed_sibling.json",
   "resourceTemplate:testing:ambiguousClassMultipleNonSuppressible":
     "testing_ambiguous_class_multiple_non_suppressible.json",
   "resourceTemplate:testing:multiplePropertyUris":

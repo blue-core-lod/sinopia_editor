@@ -764,6 +764,62 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       expect(actualRdf).not.toMatch("Sibling default value")
     })
   })
+  describe("loading a typed NamedNode value whose sibling template declares rdf:type", () => {
+    // The shape of an LC authority reference in an expanded Blue Core record:
+    // the value asserts its class and carries a label, nothing more. Both
+    // candidate templates claim that class, so the non-suppressible one wins.
+    // It declares an rdf:type property of its own, which consumes the value's
+    // type quad -- so the "captured nothing" fallback to the suppressible
+    // sibling has to ignore a type-only match or the label is silently lost.
+    const bareUri = "http://id.loc.gov/authorities/subjects/sh85023027"
+    const RDFS = "http://www.w3.org/2000/01/rdf-schema#label"
+    const n3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:ambiguousClassTypedSibling" .
+    <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/AmbiguousClassTypedSibling> .
+    <> <http://sinopia.io/testing/AmbiguousClassTypedSibling/property1> <${bareUri}> .
+    <${bareUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Uri> .
+    <${bareUri}> <${RDFS}> "Chemistry, Physical and theoretical"@en .
+    `
+
+    const load = async () => {
+      const store = mockStore(createState())
+      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      expect(
+        await store.dispatch(
+          newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        )
+      ).toBe(true)
+      const actions = store.getActions()
+      return {
+        values: actions.find((a) => a.type === "ADD_SUBJECT").payload
+          .properties[0].values,
+        unusedRDF: actions.find((a) => a.type === "SET_UNUSED_RDF")?.payload
+          ?.rdf,
+      }
+    }
+
+    const forTemplate = (values, id) =>
+      values.find((value) => value.valueSubject.subjectTemplate.id === id)
+
+    it("falls back to the suppressible sibling rather than the type-only match", async () => {
+      const { values } = await load()
+      const suppressed = forTemplate(
+        values,
+        "resourceTemplate:testing:suppressedUri"
+      )
+
+      expect(suppressed).toBeDefined()
+      expect(suppressed.valueSubject.properties[0].values[0].uri).toBe(bareUri)
+    })
+
+    it("keeps the label instead of dropping it into unused RDF", async () => {
+      const { unusedRDF } = await load()
+
+      expect(unusedRDF ?? "").not.toContain(
+        "Chemistry, Physical and theoretical"
+      )
+    })
+  })
+
   describe("loading a NamedNode value whose only local triple is its rdf:type", () => {
     // resourceTemplate:testing:ambiguousClassNonSuppressible offers both
     // :suppressedUri (suppressible) and :richUri (not suppressible) for
