@@ -40,4 +40,5 @@ export const signOut = (keycloak) => (dispatch) => {
 const toUser = (keycloakUser) => ({
   username: keycloakUser.preferred_username,
   groups: [Config.defaultGroup], // This needs to be a separate call to the api
+  roles: keycloakUser.realm_access?.roles ?? [],
 })
