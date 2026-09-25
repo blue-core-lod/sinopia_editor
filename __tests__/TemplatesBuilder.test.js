@@ -405,4 +405,72 @@ _:b3_c14n0 <http://www.w3.org/2000/01/rdf-schema#label> "Uber template1, propert
       uriTemplate.key,
     ])
   })
+
+  describe("version-aware keying", () => {
+    // Minimal resource template: the builder only needs the type quad, an id,
+    // and a class to produce a subject template.
+    const templateRdf = `<> <http://sinopia.io/vocabulary/hasClass> <http://id.loc.gov/ontologies/bibframe/Title> .
+<> <http://sinopia.io/vocabulary/hasResourceId> "bluecore:bf2:Title:WorkTitle" .
+<> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/vocabulary/ResourceTemplate> .
+<> <http://www.w3.org/2000/01/rdf-schema#label> "Work Title"@en .`
+
+    const profileUri =
+      "https://bluecore-dev.stanford.edu/profiles/3db30d3a-7a3e-4762-a28c-1a0efc244345"
+    const versionUri = `${profileUri}/version/48213`
+
+    const buildWith = async (uri, ref) => {
+      const dataset = await datasetFromN3(templateRdf)
+      return new TemplatesBuilder(dataset, uri, "", "stanford", [], ref).build()
+    }
+
+    it("keys on the ref the parent wrote when it is a version URI", async () => {
+      const subjectTemplate = await buildWith(versionUri, versionUri)
+
+      expect(subjectTemplate.key).toEqual(versionUri)
+      expect(subjectTemplate.id).toEqual("bluecore:bf2:Title:WorkTitle")
+    })
+
+    it("keys on the ref the parent wrote when it is a bare template id", async () => {
+      const subjectTemplate = await buildWith(
+        profileUri,
+        "bluecore:bf2:Title:WorkTitle"
+      )
+
+      expect(subjectTemplate.key).toEqual("bluecore:bf2:Title:WorkTitle")
+    })
+
+    it("falls back to the template id when no ref is supplied", async () => {
+      const subjectTemplate = await buildWith("", null)
+
+      expect(subjectTemplate.key).toEqual("bluecore:bf2:Title:WorkTitle")
+    })
+
+    it("derives version, versionUri and profileUri from a version URI", async () => {
+      const subjectTemplate = await buildWith(versionUri, versionUri)
+
+      expect(subjectTemplate.version).toEqual(48213)
+      expect(subjectTemplate.versionUri).toEqual(versionUri)
+      expect(subjectTemplate.profileUri).toEqual(profileUri)
+    })
+
+    it("has no version but does have a profileUri for an unversioned profile URI", async () => {
+      const subjectTemplate = await buildWith(profileUri, profileUri)
+
+      expect(subjectTemplate.version).toBeNull()
+      expect(subjectTemplate.versionUri).toBeNull()
+      expect(subjectTemplate.profileUri).toEqual(profileUri)
+    })
+
+    it("has no version and no profileUri for a base template", async () => {
+      // Base templates are served from static/templates and have no profile.
+      const subjectTemplate = await buildWith(
+        "http://localhost:3000/resource/sinopia:template:resource",
+        "sinopia:template:resource"
+      )
+
+      expect(subjectTemplate.version).toBeNull()
+      expect(subjectTemplate.versionUri).toBeNull()
+      expect(subjectTemplate.profileUri).toBeNull()
+    })
+  })
 })

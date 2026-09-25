@@ -10,6 +10,17 @@ import { resourceToName } from "../utilities/Utilities"
 import { selectUser } from "selectors/authenticate"
 import { getTemplateSearchResultsByIds } from "sinopiaSearch"
 
+// True when a reference names a host other than the configured API's. These
+// resolve, and must keep resolving, but reaching into another environment for
+// a child template is worth saying out loud.
+const isForeignHost = (uri) => {
+  try {
+    return new URL(uri).origin !== new URL(Config.sinopiaApiBase).origin
+  } catch {
+    return false
+  }
+}
+
 /**
  * A thunk that gets a resource template from state or the server.
  * @return [Object] subject template
@@ -67,6 +78,13 @@ export const loadResourceTemplateWithoutValidation =
       resourceTemplateId.startsWith("http://") ||
       resourceTemplateId.startsWith("https://")
 
+    if (isFullUri && isForeignHost(resourceTemplateId))
+      // eslint-disable-next-line no-console
+      console.warn(
+        "Nested resource template reference points at a different environment; it will be followed across environments:",
+        resourceTemplateId
+      )
+
     const templateUriPromise = isFullUri
       ? Promise.resolve(resourceTemplateId)
       : getTemplateSearchResultsByIds([resourceTemplateId]).then(
@@ -111,18 +129,46 @@ export const loadResourceTemplateWithoutValidation =
         isTemplate: true,
       }).then(([dataset, response]) => {
         const user = selectUser(getState())
-        const subjectTemplate = new TemplatesBuilder(
+        // resourceTemplateId, not templateUri, is the ref: it is what the
+        // parent wrote and what both the promise cache and state are addressed
+        // by, so the built template has to key on it.
+        const builder = new TemplatesBuilder(
           dataset,
           templateUri,
           user.username,
           response.group,
-          response.editGroups
-        ).build()
+          response.editGroups,
+          resourceTemplateId
+        )
+        // A URI reference carries no expected id to compare against, but a
+        // payload that is not a resource template at all is detectable. Catch
+        // it here so a mis-pinned reference is a nameable error rather than an
+        // unopenable resource.
+        if (!builder.isResourceTemplate) {
+          const error = new Error(
+            `${resourceTemplateId} is not a resource template: ${templateUri} is not typed sinopia:ResourceTemplate.`
+          )
+          console.error(error.message)
+          throw error
+        }
+        const subjectTemplate = builder.build()
         // Validate that the loaded template matches the requested ID
         // Only check when we used search (not a full URI), to work around Blue Core search
         if (!isFullUri && subjectTemplate.id !== resourceTemplateId) {
           const error = new Error(
             `Search returned wrong template: requested ${resourceTemplateId} but got ${subjectTemplate.id} from ${templateUri}. This indicates the Blue Core API search index is misconfigured.`
+          )
+          console.error(error.message)
+          throw error
+        }
+
+        // A URI reference carries no expected id to compare against, but a
+        // payload with no hasResourceId is not a resource template at all.
+        // Without this the builder yields a template of nulls, which fails
+        // later as an opaque crash rather than a nameable bad reference.
+        if (!subjectTemplate.id) {
+          const error = new Error(
+            `${resourceTemplateId} is not a resource template: ${templateUri} has no sinopia:hasResourceId.`
           )
           console.error(error.message)
           throw error

@@ -5,14 +5,28 @@ import { resourceToName, formatLocalDate } from "utilities/Utilities"
 
 const rdfsLabel = "http://www.w3.org/2000/01/rdf-schema#label"
 
+// A profile version URL, e.g.
+// https://bluecore-dev.stanford.edu/profiles/{uuid}/version/48213
+// Note the version identifier is the API's global Version.id, not a per-profile
+// counter, so it is not an ordinal and must not be rendered as "v{n}".
+const versionUriRegex = /^(.+\/profiles\/[^/]+)\/version\/(\d+)$/
+// The same URL without a version suffix.
+const profileUriRegex = /^(.+\/profiles\/[^/]+)$/
+
 export default class TemplatesBuilder {
-  constructor(dataset, uri, userId, group = null, editGroups = []) {
+  constructor(dataset, uri, userId, group = null, editGroups = [], ref = null) {
     this.dataset = dataset
     this.uri = uri
     this.subjectTemplate = null
     this.group = group
     this.editGroups = editGroups
     this.userId = userId
+    // The identifier the caller used to request this template: a bare template
+    // id, an unversioned profile URI, or a version URI. State and the template
+    // promise cache are both addressed by it, so the built template must key on
+    // it too -- otherwise a URI-form ref is stored under its human id and every
+    // subsequent request misses both.
+    this.ref = ref
 
     // Use the type triple to find the actual subject URI rather than assuming
     // the fetch URL matches the @id in the JSON-LD (they can differ via proxies).
@@ -25,6 +39,10 @@ export default class TemplatesBuilder {
       .toArray()
     this.resourceTerm =
       typeQuads.length > 0 ? typeQuads[0].subject : rdf.namedNode(uri)
+    // Whether the payload actually describes a resource template. Building one
+    // anyway yields a subject template of nulls that fails much later as an
+    // opaque crash, so callers that fetched by reference should check first.
+    this.isResourceTemplate = typeQuads.length > 0
   }
 
   /**
@@ -41,17 +59,19 @@ export default class TemplatesBuilder {
       this.resourceTerm,
       "http://sinopia.io/vocabulary/hasResourceAttribute"
     )
+    const id = this.valueFor(
+      this.resourceTerm,
+      "http://sinopia.io/vocabulary/hasResourceId"
+    )
     this.subjectTemplate = {
-      // This key will be unique for resource templates
-      key: this.valueFor(
-        this.resourceTerm,
-        "http://sinopia.io/vocabulary/hasResourceId"
-      ),
+      // Unique per referenced template: the ref as the parent wrote it, so two
+      // versions of one profile do not collide on a single key. Falls back to
+      // the human id when nothing requested this template by ref (base
+      // templates, and tests that build a dataset directly).
+      key: this.ref || id,
       uri: _.isEmpty(this.uri) ? null : this.uri,
-      id: this.valueFor(
-        this.resourceTerm,
-        "http://sinopia.io/vocabulary/hasResourceId"
-      ),
+      id,
+      ...this.versionFields(),
       class: this.valueFor(
         this.resourceTerm,
         "http://sinopia.io/vocabulary/hasClass"
@@ -77,6 +97,27 @@ export default class TemplatesBuilder {
       propertyTemplates: [],
       group: this.group,
       editGroups: this.editGroups,
+    }
+  }
+
+  // Describes what was actually fetched, which for a version URI is a frozen
+  // snapshot and for everything else is whatever the profile says today.
+  // Derived from the fetch uri rather than the ref: for a version ref the two
+  // are identical, and for the other forms neither carries a version.
+  versionFields() {
+    const versionMatch = versionUriRegex.exec(this.uri || "")
+    if (versionMatch)
+      return {
+        version: Number(versionMatch[2]),
+        versionUri: this.uri,
+        profileUri: versionMatch[1],
+      }
+
+    const profileMatch = profileUriRegex.exec(this.uri || "")
+    return {
+      version: null,
+      versionUri: null,
+      profileUri: profileMatch ? profileMatch[1] : null,
     }
   }
 

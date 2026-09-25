@@ -17,11 +17,20 @@ export default class StateResourceBuilder {
     suppressible = false,
     group = "stanford",
     editGroups = ["cornell"],
+    // Defaults match a template built with no ref and no profile URI, which is
+    // what most state fixtures are. See TemplatesBuilder.versionFields().
+    key = id,
+    version = null,
+    versionUri = null,
+    profileUri = null,
   }) {
     assertProps({ id, clazz, label, propertyTemplateKeys })
     return {
-      key: id,
+      key,
       id,
+      version,
+      versionUri,
+      profileUri,
       class: clazz,
       classes: classes || { [clazz]: clazz },
       uri,

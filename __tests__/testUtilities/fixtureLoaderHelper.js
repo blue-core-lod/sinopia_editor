@@ -88,10 +88,37 @@ const templateFilenames = {
   "resourceTemplate:testing:selfCycle": "testing_self_cycle.json",
   "resourceTemplate:testing:namedNodeMultiPropHost":
     "testing_named_node_multi_prop_host.json",
+  // The bare id resolves to whatever the profile says today, which is v2.
+  // Its version URIs are registered in profileTemplateFilenames below.
+  "bluecore:bf2:Title:VersionedTitle": "versioned_title_v2.json",
+}
+
+// Template fixtures addressed the way Blue Core addresses profiles, for
+// version-pinning coverage. resourceToName() cannot reach these: it returns the
+// last path segment, so ".../profiles/{uuid}/version/2" would name itself "2".
+// Keyed by everything after "/profiles/". The unversioned key resolves to the
+// latest version, which is what an unversioned profile URI means.
+const profileTemplateFilenames = {
+  "3db30d3a-7a3e-4762-a28c-1a0efc244345": "versioned_title_v2.json",
+  "3db30d3a-7a3e-4762-a28c-1a0efc244345/version/1": "versioned_title_v1.json",
+  "3db30d3a-7a3e-4762-a28c-1a0efc244345/version/2": "versioned_title_v2.json",
+  // A mutual cycle expressed entirely in version URIs.
+  "11111111-1111-4111-8111-111111111111/version/1": "versioned_cycle_a.json",
+  "22222222-2222-4222-8222-222222222222/version/1": "versioned_cycle_b.json",
+  // Typed as a resource template but carrying no hasResourceId.
+  "44444444-4444-4444-8444-444444444444": "untyped_id_template.json",
+}
+
+const profileFixtureKey = (uri) => {
+  if (!_.isString(uri)) return undefined
+  const index = uri.indexOf("/profiles/")
+  if (index === -1) return undefined
+  return uri.slice(index + "/profiles/".length)
 }
 
 export const hasFixtureResource = (uri) => {
   return (
+    !!profileTemplateFilenames[profileFixtureKey(uri)] ||
     !!resourceFilenames[resourceToName(uri)] ||
     !!templateFilenames[resourceToName(uri)] ||
     ["http://error", "http://localhost:3000/resource/ld4p:RT:bf2:xxx"].includes(
@@ -106,9 +133,13 @@ export const getFixtureResource = (uri) => {
   if (uri === "http://localhost:3000/resource/ld4p:RT:bf2:xxx")
     throw new Error("Error retrieving resource: Not Found")
   const id = resourceToName(uri)
+  const profileFilename = profileTemplateFilenames[profileFixtureKey(uri)]
   // For some reason, require must have __xxx__ and cannot be provided in variable.
   let resource
-  if (resourceFilenames[id]) {
+  if (profileFilename) {
+    /* eslint security/detect-non-literal-require: 'off' */
+    resource = require(`../__template_fixtures__/${profileFilename}`)
+  } else if (resourceFilenames[id]) {
     /* eslint security/detect-non-literal-require: 'off' */
     resource = require(`../__resource_fixtures__/${resourceFilenames[id]}`)
   } else {
