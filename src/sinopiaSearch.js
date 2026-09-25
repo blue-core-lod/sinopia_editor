@@ -352,19 +352,29 @@ const templateModFromBlueCore = (hit) => {
   let resourceLabel = "Unknown"
   let resourceRemark = ""
   let resourceURI = "Unknown"
-  hit.data.map((row) => {
+  // Every field is optional: a profile created outside Sinopia's own template
+  // editor may omit any of them. Fall back to the defaults above rather than
+  // throwing -- an unguarded read here takes out the whole result set, not
+  // just the offending row.
+  hit.data.forEach((row) => {
     if (row["@id"] === hit.uri) {
       resourceAuthor =
-        row["http://sinopia.io/vocabulary/hasAuthor"][0]["@value"]
-      resourceDate = row["http://sinopia.io/vocabulary/hasDate"][0]["@value"]
+        row["http://sinopia.io/vocabulary/hasAuthor"]?.[0]?.["@value"] ??
+        resourceAuthor
+      resourceDate =
+        row["http://sinopia.io/vocabulary/hasDate"]?.[0]?.["@value"] ??
+        resourceDate
       resourceLabel =
-        row["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"]
+        row["http://www.w3.org/2000/01/rdf-schema#label"]?.[0]?.["@value"] ??
+        resourceLabel
       resourceId =
-        row["http://sinopia.io/vocabulary/hasResourceId"][0]["@value"]
-      resourceURI = row["http://sinopia.io/vocabulary/hasClass"][0]["@id"]
-      resourceRemark = row["http://sinopia.io/vocabulary/hasRemark"]
-        ? row["http://sinopia.io/vocabulary/hasRemark"][0]["@value"]
-        : ""
+        row["http://sinopia.io/vocabulary/hasResourceId"]?.[0]?.["@value"] ??
+        resourceId
+      resourceURI =
+        row["http://sinopia.io/vocabulary/hasClass"]?.[0]?.["@id"] ??
+        resourceURI
+      resourceRemark =
+        row["http://sinopia.io/vocabulary/hasRemark"]?.[0]?.["@value"] ?? ""
     }
   })
   // The Profile's own uri is the fetchable URL -- the same one the edit path
