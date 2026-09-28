@@ -1,0 +1,19 @@
+[
+  {
+    "@id": "http://localhost:3000/works/d4e1b2a3-5c6f-4a7b-8c9d-0e1f2a3b4c5d",
+    "http://sinopia.io/vocabulary/hasResourceTemplate": [
+      {
+        "@value": "resourceTemplate:bf2:Work"
+      }
+    ],
+    "@type": [
+      "http://id.loc.gov/ontologies/bibframe/Work"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Blue Core Work1",
+        "@language": "en"
+      }
+    ]
+  }
+]
