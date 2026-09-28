@@ -16,7 +16,7 @@ describe("requesting MARC", () => {
 
   describe("when processing occurs without error", () => {
     const history = createHistory([
-      "/editor/resource/a5c5f4c0-e7cd-4ca5-a20f-2a37fe1080d5",
+      "/editor/resource/resource/a5c5f4c0-e7cd-4ca5-a20f-2a37fe1080d5",
     ])
 
     beforeEach(() => {
@@ -45,7 +45,7 @@ describe("requesting MARC", () => {
 
   describe("when processing occurs with an error", () => {
     const history = createHistory([
-      "/editor/resource/a5c5f4c0-e7cd-4ca5-a20f-2a37fe1080d5",
+      "/editor/resource/resource/a5c5f4c0-e7cd-4ca5-a20f-2a37fe1080d5",
     ])
 
     beforeEach(() => {

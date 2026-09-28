@@ -67,9 +67,11 @@ describe("routing in editor", () => {
     })
   })
 
-  describe("/editor/resource/:resourceId when user has edit permissions", () => {
+  // The fixture resource URI is http://localhost:3000/resource/<uuid>, so its
+  // collection is "resource"; a Blue Core work would be /editor/resource/works/<uuid>.
+  describe("/editor/resource/:collection/:id when user has edit permissions", () => {
     const history = createHistory([
-      "/editor/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
+      "/editor/resource/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
     ])
 
     it("opens existing resource in editor", async () => {
@@ -77,7 +79,7 @@ describe("routing in editor", () => {
 
       await waitFor(() =>
         expect(history.location.pathname).toEqual(
-          "/editor/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f"
+          "/editor/resource/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f"
         )
       )
 
@@ -87,9 +89,9 @@ describe("routing in editor", () => {
     }, 10000)
   })
 
-  describe("/editor/resource/:resourceId when user does not have edit permissions", () => {
+  describe("/editor/resource/:collection/:id when user does not have edit permissions", () => {
     const history = createHistory([
-      "/editor/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
+      "/editor/resource/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
     ])
     const state = createState()
     state.authenticate.user.groups = []
@@ -106,8 +108,8 @@ describe("routing in editor", () => {
     }, 15000)
   })
 
-  describe("/editor/resource/:resourceId when an error", () => {
-    const history = createHistory(["/editor/resource/ld4p:RT:bf2:xxx"])
+  describe("/editor/resource/:collection/:id when an error", () => {
+    const history = createHistory(["/editor/resource/resource/ld4p:RT:bf2:xxx"])
 
     it("redirects to dashboard and displays error", async () => {
       renderApp(null, history)

@@ -4,7 +4,7 @@ import {
   selectSubjectTemplate,
   selectPropertyTemplate,
 } from "selectors/templates"
-import Config from "Config"
+import { resourceIdFromUri } from "utilities/Utilities"
 
 // Always use selectNormSubject/Property/Value in components.
 // selectSubject/Property/Value can be used in actionCreators.
@@ -165,7 +165,7 @@ export const selectResourceId = (state, resourceKey) => {
   const uri = selectUri(state, resourceKey)
   if (!uri) return null
 
-  return uri.substr(`${Config.sinopiaApiBase}/resource/`.length)
+  return resourceIdFromUri(uri)
 }
 
 export const selectSiblingValues = (state, valueKey) => {

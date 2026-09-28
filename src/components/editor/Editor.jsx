@@ -30,7 +30,7 @@ const Editor = (props) => {
     path: "/editor/:templateId",
     exact: true,
   })
-  const editorResourceMatch = useRouteMatch("/editor/resource/:resourceId")
+  const editorResourceMatch = useRouteMatch("/editor/resource/:collection/:id")
 
   const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
   // Resource ID is extracted from the URI. Presence indicates the resource has been saved.
@@ -55,7 +55,8 @@ const Editor = (props) => {
     if (resourceId) {
       if (
         !editorResourceMatch ||
-        editorResourceMatch.params.resourceId !== resourceId
+        `${editorResourceMatch.params.collection}/${editorResourceMatch.params.id}` !==
+          resourceId
       ) {
         history.replace(`/editor/resource/${resourceId}`)
       }
