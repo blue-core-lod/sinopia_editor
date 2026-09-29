@@ -1,0 +1,31 @@
+[
+  {
+    "@id": "http://localhost:3000/resource/f2a3b4c5-6d7e-4f8a-9b0c-1d2e3f4a5b6c",
+    "http://sinopia.io/vocabulary/hasResourceTemplate": [
+      {
+        "@value": "resourceTemplate:testing:suppressLanguage"
+      }
+    ],
+    "@type": [
+      "http://sinopia.io/testing/SuppressLanguage"
+    ],
+    "http://sinopia.io/testing/SuppressLanguage/property1": [
+      {
+        "@value": "A suppressed literal value"
+      }
+    ],
+    "http://sinopia.io/testing/SuppressLanguage/property2": [
+      {
+        "@id": "http://id.loc.gov/entities/relationships/printversion"
+      }
+    ]
+  },
+  {
+    "@id": "http://id.loc.gov/entities/relationships/printversion",
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Print version"
+      }
+    ]
+  }
+]

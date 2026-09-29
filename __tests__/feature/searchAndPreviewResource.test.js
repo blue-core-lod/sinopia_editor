@@ -88,18 +88,18 @@ describe("searching and preview a resource", () => {
       screen.getByText("http://example.edu/ubertemplate1:property5", {
         selector: "a",
       })
-      screen.getByText("ubertemplate1:property6: ubertemplate1:property6", {
+      screen.getByText(/ubertemplate1:property6 \[en\]:/, {
         selector: "p",
       })
 
       // Lookups are rendered
-      screen.getByText("corn sheller:", { selector: "p" })
+      screen.getByText(/corn sheller \[en\]:/, { selector: "p" })
       screen.getByText("http://aims.fao.org/aos/agrovoc/c_331388", {
         selector: "a",
       })
 
       // Lists are rendered
-      screen.getByText("analog:", { selector: "p" })
+      screen.getByText(/analog \[en\]:/, { selector: "p" })
       screen.getByText("http://id.loc.gov/vocabulary/mrectype/analog", {
         selector: "a",
       })

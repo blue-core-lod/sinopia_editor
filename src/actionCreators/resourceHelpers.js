@@ -14,6 +14,8 @@ import {
 import { clearErrors, addError } from "actions/errors"
 import { fetchResource } from "sinopiaApi"
 import { findRootResourceTemplateId } from "utilities/Utilities"
+import { chooseLang } from "utilities/Language"
+import Config from "Config"
 
 // Work-Instance relationship property URIs to exclude when copying resources
 const skipPropertyUris = [
@@ -783,8 +785,35 @@ const selectSuppressibleResourceTemplateId =
       return compactIds.length === 1 ? compactIds[0] : undefined
     })
 
-const newLiteralFromObject = (obj, property, propertyUri) =>
-  newLiteralValue(property, propertyUri, obj.value, obj.language)
+// Literals ingested from outside Blue Core (LC, for example) frequently carry
+// no language tag, which left every value in the editor reading "No language
+// specified" until a cataloger opened the language modal on each one. Fall back
+// to the same default that newBlankLiteralValue/newBlankUriValue already give a
+// value the cataloger creates by hand, so loaded and new values behave alike.
+// See https://github.com/blue-core-lod/sinopia_editor/issues/191
+//
+// Read the default from Config rather than the root subject: the subject is not
+// in the store yet while its values are being built. reducers/resources seeds
+// subject.defaultLang from this same constant.
+const defaultLangFor = (property) =>
+  chooseLang(
+    property.propertyTemplate.languageSuppressed,
+    Config.defaultLanguageId
+  )
+
+// Only a plain string literal may carry a language tag. A typed literal
+// (xsd:date, xsd:integer, ...) must not, so it keeps whatever it arrived with.
+// TemplatesBuilder already suppresses language for templates that declare a
+// validationDataType; this guards data whose literal type disagrees with its
+// template.
+const isTaggable = (term) =>
+  term.datatype?.value === "http://www.w3.org/2001/XMLSchema#string"
+
+const newLiteralFromObject = (obj, property, propertyUri) => {
+  const lang =
+    obj.language || (isTaggable(obj) ? defaultLangFor(property) : null)
+  return newLiteralValue(property, propertyUri, obj.value, lang)
+}
 
 const newUriFromObject = (obj, property, propertyUri, context) => {
   const uri = obj.value
@@ -804,7 +833,9 @@ const newUriFromObject = (obj, property, propertyUri, context) => {
         (labelQuad) => !labelQuad.object.value.startsWith("http")
       ) || labelQuads[0]
     label = labelQuad.object.value
-    lang = labelQuad.object.language || null
+    lang =
+      labelQuad.object.language ||
+      (isTaggable(labelQuad.object) ? defaultLangFor(property) : null)
     // Adding all to usedData, even though only using first. This is to avoid user confusion over extra triples, e.g., https://github.com/LD4P/sinopia_editor/issues/2634
     context.usedDataset.addAll(labelQuads)
   }

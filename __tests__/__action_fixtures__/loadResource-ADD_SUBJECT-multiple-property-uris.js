@@ -53,6 +53,7 @@ const expectedAction = {
               "http://sinopia.io/testing/MultiplePropertyUris/property4b",
             uri: "http://id.loc.gov/vocabulary/carriers/sq",
             label: "audio roll",
+            lang: "en",
             component: "InputURIValue",
           }),
         ],

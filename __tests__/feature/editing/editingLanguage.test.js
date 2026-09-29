@@ -148,6 +148,61 @@ describe("editing a language", () => {
     ).toHaveLength(3)
   }, 15000)
 
+  // The InputLang modal is a singleton mounted once in Editor.jsx, so its local
+  // state outlives any one opening. Opening it on an untagged value used to show
+  // whichever language was selected for the previously opened value, and Submit
+  // then applied that carried-over language.
+  // See https://github.com/blue-core-lod/sinopia_editor/issues/191
+  it("does not carry a language over between values", async () => {
+    jest.spyOn(sinopiaApi, "detectLanguage").mockResolvedValue([])
+    const history = createHistory(["/editor/resourceTemplate:testing:inputs"])
+    renderApp(null, history)
+
+    await screen.findByText("Inputs", {
+      selector: resourceHeaderSelector,
+    })
+
+    // Two literal values, both defaulting to en.
+    const input = screen.getByPlaceholderText("Literal input")
+    fireEvent.change(input, { target: { value: "foo" } })
+    fireEvent.keyDown(input, { key: "Enter", code: 13, charCode: 13 })
+
+    fireEvent.click(screen.getByTestId("Add Literal input"))
+    await waitFor(() =>
+      expect(screen.getAllByPlaceholderText("Literal input")).toHaveLength(2)
+    )
+    const newInput = screen
+      .getAllByPlaceholderText("Literal input")
+      .find((elem) => elem.value === "")
+    fireEvent.change(newInput, { target: { value: "bar" } })
+    fireEvent.keyDown(newInput, { key: "Enter", code: 13, charCode: 13 })
+
+    // Clear the language on bar.
+    fireEvent.click(screen.getByTestId("Change language for bar"))
+    fireEvent.click(screen.getByTestId("Clear language for bar"))
+    fireEvent.click(screen.getByTestId("Select language for bar"))
+    await waitFor(() =>
+      expect(screen.getByTestId("Change language for bar")).toHaveTextContent(
+        "No language specified"
+      )
+    )
+
+    // Visit foo, which is still tagged en.
+    fireEvent.click(screen.getByTestId("Change language for foo"))
+    within(screen.getByTestId("new tag row")).getByText("en")
+    fireEvent.click(screen.getByText("Cancel"))
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("heading", { name: "Select language tag for foo" })
+      ).not.toBeInTheDocument()
+    )
+
+    // Back to bar: it has no language, so neither should the modal.
+    fireEvent.click(screen.getByTestId("Change language for bar"))
+    screen.getByRole("heading", { name: "Select language tag for bar" })
+    within(screen.getByTestId("new tag row")).getByText("None specified")
+  }, 15000)
+
   it("suggests a language", async () => {
     jest
       .spyOn(sinopiaApi, "detectLanguage")
