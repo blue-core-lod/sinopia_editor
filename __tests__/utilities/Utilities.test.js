@@ -184,7 +184,7 @@ describe("Utilities", () => {
     it("returns collection/uuid for a Blue Core resource URI", () => {
       expect(
         resourceIdFromUri(
-          "https://bluecore-dev.stanford.edu/works/e3764c9a-26aa-49e4-a892-7f2ac2961234"
+          "https://dev.bcld.info/works/e3764c9a-26aa-49e4-a892-7f2ac2961234"
         )
       ).toEqual("works/e3764c9a-26aa-49e4-a892-7f2ac2961234")
     })
@@ -195,6 +195,12 @@ describe("Utilities", () => {
       expect(
         resourceIdFromUri("https://stage.bcld.info/instances/abc123")
       ).toEqual("instances/abc123")
+    })
+
+    it("returns collection/uuid for a production resource URI", () => {
+      expect(resourceIdFromUri("https://bcld.info/works/abc124")).toEqual(
+        "works/abc124"
+      )
     })
 
     it("returns null when there is no collection/id path", () => {
