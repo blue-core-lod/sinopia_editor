@@ -58,6 +58,36 @@ export const isBlueCoreUri = (uri) => {
 }
 
 /**
+ * Derives the editor route ID for a resource from its URI. Blue Core resource
+ * URIs are <origin>/<collection>/<uuid> (e.g. .../works/<uuid>), and the
+ * collection is needed to fetch the resource again, so the ID is
+ * "<collection>/<uuid>".
+ * @param {string} uri of the resource
+ * @return {string|null} "<collection>/<uuid>", or null if the URI has no such path
+ */
+export const resourceIdFromUri = (uri) => {
+  let segments
+  try {
+    segments = new URL(uri).pathname.split("/").filter(Boolean)
+  } catch (e) {
+    return null
+  }
+  if (segments.length < 2) return null
+  return segments.slice(-2).join("/")
+}
+
+/**
+ * Inverse of resourceIdFromUri: rebuilds a Blue Core resource URI from its
+ * collection and uuid. Like isBlueCoreUri, assumes resources share an origin
+ * with the Blue Core API.
+ * @param {string} collection e.g. "works"
+ * @param {string} id the resource uuid
+ * @return {string} the resource URI
+ */
+export const uriFromResourceId = (collection, id) =>
+  `${new URL(Config.sinopiaApiBase).origin}/${collection}/${id}`
+
+/**
  * Loads N3 into a dataset.
  * @param {string} data that is the N3
  * @return {Promise<rdf.Dataset>} a promise that resolves to the loaded dataset

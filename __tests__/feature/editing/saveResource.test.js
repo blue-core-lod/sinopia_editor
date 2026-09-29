@@ -57,7 +57,7 @@ describe("saving a resource", () => {
       // URL changes
       await waitFor(() =>
         expect(history.location.pathname).toEqual(
-          "/editor/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f"
+          "/editor/resource/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f"
         )
       )
 

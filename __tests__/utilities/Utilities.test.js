@@ -6,6 +6,8 @@ import {
   formatISODate,
   formatLocalDate,
   isBlueCoreUri,
+  resourceIdFromUri,
+  uriFromResourceId,
 } from "utilities/Utilities"
 import timezoneMock from "timezone-mock"
 
@@ -175,6 +177,44 @@ describe("Utilities", () => {
     it("is false for a non-URI value", () => {
       expect(isBlueCoreUri("not a uri")).toBe(false)
       expect(isBlueCoreUri("")).toBe(false)
+    })
+  })
+
+  describe("resourceIdFromUri()", () => {
+    it("returns collection/uuid for a Blue Core resource URI", () => {
+      expect(
+        resourceIdFromUri(
+          "https://dev.bcld.info/works/e3764c9a-26aa-49e4-a892-7f2ac2961234"
+        )
+      ).toEqual("works/e3764c9a-26aa-49e4-a892-7f2ac2961234")
+    })
+
+    it("does not depend on the API base URL", () => {
+      // Regression: the ID used to be sliced off at the length of
+      // `${sinopiaApiBase}/resource/`, yielding e.g. "orks/<uuid>".
+      expect(
+        resourceIdFromUri("https://stage.bcld.info/instances/abc123")
+      ).toEqual("instances/abc123")
+    })
+
+    it("returns collection/uuid for a production resource URI", () => {
+      expect(resourceIdFromUri("https://bcld.info/works/abc124")).toEqual(
+        "works/abc124"
+      )
+    })
+
+    it("returns null when there is no collection/id path", () => {
+      expect(resourceIdFromUri("https://stage.bcld.info/abc123")).toBeNull()
+      expect(resourceIdFromUri("not a uri")).toBeNull()
+    })
+  })
+
+  describe("uriFromResourceId()", () => {
+    // Config.sinopiaApiBase defaults to http://localhost:3000 in tests.
+    it("rebuilds the URI on the Blue Core API origin", () => {
+      expect(uriFromResourceId("works", "abc123")).toEqual(
+        "http://localhost:3000/works/abc123"
+      )
     })
   })
 })

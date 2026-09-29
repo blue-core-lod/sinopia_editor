@@ -16,6 +16,8 @@ const resourceFilenames = {
   "f6ee6410-5206-492b-8e48-3b6333010c33": "work_with_refs.json",
   "b6c5f4c0-e7cd-4ca5-a20f-2a37fe1080d6": "test-inputs.json",
   "c7c5f4c0-e7cd-4ca5-a20f-2a37fe1080d7": "test-multiple_property_uris.json",
+  // Blue Core-shaped URI: http://localhost:3000/works/<uuid>
+  "d4e1b2a3-5c6f-4a7b-8c9d-0e1f2a3b4c5d": "blue_core_work.json",
 }
 
 const templateFilenames = {

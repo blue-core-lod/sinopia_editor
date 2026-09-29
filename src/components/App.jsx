@@ -44,6 +44,7 @@ import {
   templateErrorKey,
   exportsErrorKey,
 } from "utilities/errorKeyFactory"
+import { uriFromResourceId } from "utilities/Utilities"
 import TemplateMetrics from "./metrics/TemplateMetrics"
 import ResourceMetrics from "./metrics/ResourceMetrics"
 import UserMetrics from "./metrics/UserMetrics"
@@ -73,7 +74,7 @@ const App = (props) => {
     exact: true,
   })
   const editorExactMatch = useRouteMatch({ path: "/editor", exact: true })
-  const editorResourceMatch = useRouteMatch("/editor/resource/:resourceId")
+  const editorResourceMatch = useRouteMatch("/editor/resource/:collection/:id")
 
   useEffect(() => {
     if (isFirstMountWithUser && hasUser) {
@@ -114,7 +115,10 @@ const App = (props) => {
       } else if (editorExactMatch) {
         history.push("/dashboard")
       } else if (editorResourceMatch) {
-        const uri = `${Config.sinopiaApiBase}/resource/${editorResourceMatch.params.resourceId}`
+        const uri = uriFromResourceId(
+          editorResourceMatch.params.collection,
+          editorResourceMatch.params.id
+        )
         dispatch(loadResource(uri, dashboardErrorKey)).then((result) => {
           if (!result) {
             history.push("/dashboard")

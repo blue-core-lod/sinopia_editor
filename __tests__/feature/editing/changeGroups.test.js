@@ -11,7 +11,7 @@ jest.mock("KeycloakContext", () => ({
 featureSetup()
 
 const history = createHistory([
-  "/editor/resource/b6c5f4c0-e7cd-4ca5-a20f-2a37fe1080d6",
+  "/editor/resource/resource/b6c5f4c0-e7cd-4ca5-a20f-2a37fe1080d6",
 ])
 
 jest.spyOn(sinopiaApi, "putResource").mockResolvedValue(true)
