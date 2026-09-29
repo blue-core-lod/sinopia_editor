@@ -1,9 +1,12 @@
 import { createLookupPromise } from "utilities/QuestioningAuthority"
 import { getLookupResult as getSinopiaSearchLookupResult } from "sinopiaSearch"
+import getLocSuggestLookupResult from "utilities/LocSuggestLookup"
 
 export const getLookupResult = (query, authorityConfig, startOfRange) => {
   if (authorityConfig.uri.startsWith("urn:ld4p:sinopia"))
     return getSinopiaLookupResult(query, authorityConfig, { startOfRange })
+  if (authorityConfig.uri.startsWith("urn:ld4p:locsuggest"))
+    return getLocSuggestLookupResult(query, authorityConfig, { startOfRange })
   return getQALookupResult(query, authorityConfig, { startOfRange })
 }
 

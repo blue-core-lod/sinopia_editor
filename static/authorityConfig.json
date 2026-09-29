@@ -1844,5 +1844,41 @@
     "label": "literalPropertyAttribute",
     "uri": "file:/literalPropertyAttribute.json",
     "component": "list"
+  },
+  {
+    "label": "LCSH all",
+    "uri": "urn:ld4p:locsuggest:subjects:simple",
+    "rdftype": "SimpleType",
+    "component": "lookup"
+  },
+  {
+    "label": "LCSH topical",
+    "uri": "urn:ld4p:locsuggest:subjects:topic",
+    "rdftype": "Topic",
+    "component": "lookup"
+  },
+  {
+    "label": "LCSH geographic",
+    "uri": "urn:ld4p:locsuggest:subjects:geographic",
+    "rdftype": "Geographic",
+    "component": "lookup"
+  },
+  {
+    "label": "LCSH chronological",
+    "uri": "urn:ld4p:locsuggest:subjects:temporal",
+    "rdftype": "Temporal",
+    "component": "lookup"
+  },
+  {
+    "label": "LCSH form",
+    "uri": "urn:ld4p:locsuggest:subjects:genreform",
+    "rdftype": "GenreForm",
+    "component": "lookup"
+  },
+  {
+    "label": "LCSH complex",
+    "uri": "urn:ld4p:locsuggest:subjects:complex",
+    "rdftype": "ComplexSubject",
+    "component": "lookup"
   }
 ]
