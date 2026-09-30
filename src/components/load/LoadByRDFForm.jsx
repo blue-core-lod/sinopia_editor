@@ -8,7 +8,12 @@ import {
   hasQuadsForRootResourceTemplateId,
 } from "utilities/Utilities"
 import useRdfResource from "hooks/useRdfResource"
-import { clearErrors, addError, addSuccess } from "actions/errors"
+import {
+  clearErrors,
+  addError,
+  addSuccess,
+  clearSuccesses,
+} from "actions/errors"
 import { showModal } from "actions/modals"
 import { dashboardErrorKey } from "utilities/errorKeyFactory"
 import ResourceTemplateChoiceModal from "../ResourceTemplateChoiceModal"
@@ -141,6 +146,16 @@ const LoadByRDFForm = () => {
     dispatch(clearErrors(errorKey))
 
     if (isMarcBibframe) {
+      // Saving a large record can take a while, so send the user to the
+      // dashboard now and report the outcome there when the API responds.
+      dispatch(clearSuccesses(dashboardErrorKey))
+      dispatch(
+        addSuccess(
+          dashboardErrorKey,
+          "Your MARC record was submitted and is being processed. The new work will appear here once it is ready."
+        )
+      )
+      history.push("/dashboard")
       fetch(`${Config.sinopiaApiBase}/works`, {
         method: "POST",
         headers: {
@@ -154,21 +169,20 @@ const LoadByRDFForm = () => {
             throw new Error(`Error creating work: ${resp.statusText}`)
           return resp.json()
         })
-        .then(() => {
-          // The new work isn't in redux, so sending the user to /editor/<uuid>
-          // would strand them on the editor's "Loading ..." state. Send them to
-          // the dashboard, where the imported work will surface.
+        .then((work) => {
           dispatch(
-            addSuccess(
-              dashboardErrorKey,
-              "Your MARC record was submitted and is being processed. The new work will appear here once it is ready."
-            )
+            addSuccess(dashboardErrorKey, {
+              text: "The new work was created:",
+              resourceUri: work.uri,
+            })
           )
-          history.push("/dashboard")
         })
         .catch((err) =>
           dispatch(
-            addError(errorKey, `Error creating work: ${err.message || err}`)
+            addError(
+              dashboardErrorKey,
+              `Error creating work: ${err.message || err}`
+            )
           )
         )
       return

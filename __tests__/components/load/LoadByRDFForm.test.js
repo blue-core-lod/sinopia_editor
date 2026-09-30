@@ -257,29 +257,28 @@ describe("LoadByRDFForm", () => {
       })
     })
 
-    it("redirects to the dashboard after creating the work", async () => {
-      const { history } = await setupMarcConversion()
+    const workUri = "http://localhost:3000/works/abc-123"
 
-      global.fetch = jest.fn().mockResolvedValueOnce({
-        ok: true,
-        json: jest.fn().mockResolvedValue({ uuid: "abc-123" }),
-      })
+    it("redirects to the dashboard with a processing message before the work is created", async () => {
+      const { store, history } = await setupMarcConversion()
+
+      // Never resolves, so anything observed happened before the API responded.
+      global.fetch = jest.fn().mockReturnValueOnce(new Promise(() => {}))
 
       fireEvent.click(screen.getByText("Submit"))
 
-      // Previously pushed /editor/<uuid>, which left the user on the editor's
-      // "Loading ..." state because the new work was never loaded into redux.
-      await waitFor(() => {
-        expect(history.location.pathname).toBe("/dashboard")
-      })
+      expect(history.location.pathname).toBe("/dashboard")
+      const messages = store.getState().editor.successes[dashboardErrorKey]
+      expect(messages).toHaveLength(1)
+      expect(messages[0]).toMatch(/being processed/)
     })
 
-    it("adds a dashboard success message saying the import is processing", async () => {
+    it("adds a dashboard success message linking to the created work", async () => {
       const { store } = await setupMarcConversion()
 
       global.fetch = jest.fn().mockResolvedValueOnce({
         ok: true,
-        json: jest.fn().mockResolvedValue({ uuid: "abc-123" }),
+        json: jest.fn().mockResolvedValue({ uuid: "abc-123", uri: workUri }),
       })
 
       fireEvent.click(screen.getByText("Submit"))
@@ -289,12 +288,17 @@ describe("LoadByRDFForm", () => {
           store.getState().editor.successes[dashboardErrorKey]
         ).toHaveLength(1)
       })
+      expect(store.getState().editor.successes[dashboardErrorKey]).toEqual([
+          expect.stringMatching(/being processed/),
+          { text: "The new work was created:", resourceUri: workUri },
+        ])
+      })
       expect(store.getState().editor.successes[dashboardErrorKey][0]).toMatch(
         /being processed/
       )
     })
 
-    it("dispatches an error when /api/works fails", async () => {
+    it("dispatches a dashboard error when /api/works fails", async () => {
       const { store } = await setupMarcConversion()
 
       global.fetch = jest.fn().mockResolvedValueOnce({
@@ -305,8 +309,7 @@ describe("LoadByRDFForm", () => {
       fireEvent.click(screen.getByText("Submit"))
 
       await waitFor(() => {
-        const state = store.getState()
-        const errors = Object.values(state.editor.errors).flat()
+        const errors = store.getState().editor.errors[dashboardErrorKey]
         expect(errors.some((e) => /Error creating work/.test(e))).toBe(true)
       })
     })

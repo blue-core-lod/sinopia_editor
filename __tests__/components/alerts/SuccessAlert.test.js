@@ -4,6 +4,10 @@ import React from "react"
 import { render, screen } from "@testing-library/react"
 import SuccessAlert from "components/alerts/SuccessAlert"
 
+jest.mock("KeycloakContext", () => ({
+  useKeycloak: jest.fn().mockReturnValue({}),
+}))
+
 describe("<SuccessAlert />", () => {
   it("renders nothing when messages is empty", () => {
     render(<SuccessAlert messages={[]} />)
