@@ -150,8 +150,7 @@ describe("LoadByRDFForm", () => {
       uploadMarcFile()
 
       await waitFor(() => {
-        const rdfTextarea = document.getElementById("resourceTextArea")
-        expect(rdfTextarea.value).toBe(rdfText)
+        expect(screen.getByLabelText(/Accepts JSON-LD/)).toHaveValue(rdfText)
       })
     })
 
@@ -167,7 +166,6 @@ describe("LoadByRDFForm", () => {
       uploadMarcFile()
 
       await waitFor(() => {
-        const actions = store.getActions ? store.getActions() : []
         const state = store.getState()
         const errors = Object.values(state.editor.errors).flat()
         expect(errors.some((e) => /marc2xml/.test(e))).toBe(true)
@@ -219,7 +217,7 @@ describe("LoadByRDFForm", () => {
           text: jest.fn().mockResolvedValue(rdfText),
         })
 
-      const result = renderForm()
+      const { store, history } = renderForm()
       const fileInput = screen.getByLabelText("Choose MARC file")
       const file = new File(["data"], "record.mrc", {
         type: "application/marc",
@@ -231,7 +229,7 @@ describe("LoadByRDFForm", () => {
         expect(global.fetch).toHaveBeenCalledTimes(2)
       })
 
-      return result
+      return { store, history }
     }
 
     it("submits to /api/works when RDF came from MARC conversion", async () => {
@@ -287,10 +285,13 @@ describe("LoadByRDFForm", () => {
       fireEvent.click(screen.getByText("Submit"))
 
       await waitFor(() => {
-        const messages = store.getState().editor.successes[dashboardErrorKey]
-        expect(messages).toHaveLength(1)
-        expect(messages[0]).toMatch(/being processed/)
+        expect(
+          store.getState().editor.successes[dashboardErrorKey]
+        ).toHaveLength(1)
       })
+      expect(store.getState().editor.successes[dashboardErrorKey][0]).toMatch(
+        /being processed/
+      )
     })
 
     it("dispatches an error when /api/works fails", async () => {
@@ -314,7 +315,7 @@ describe("LoadByRDFForm", () => {
       await setupMarcConversion()
 
       // Manually edit the RDF textarea — this should clear the MARC flag
-      const rdfTextarea = document.getElementById("resourceTextArea")
+      const rdfTextarea = screen.getByLabelText(/Accepts JSON-LD/)
       fireEvent.change(rdfTextarea, { target: { value: "manual rdf" } })
 
       // Now submit should NOT call /api/works (it should go through normal RDF parsing)
@@ -347,7 +348,7 @@ describe("LoadByRDFForm", () => {
     it("enables the submit button when RDF is entered", () => {
       renderForm()
 
-      const rdfTextarea = document.getElementById("resourceTextArea")
+      const rdfTextarea = screen.getByLabelText(/Accepts JSON-LD/)
       fireEvent.change(rdfTextarea, { target: { value: "some rdf" } })
 
       expect(screen.getByText("Submit")).not.toBeDisabled()

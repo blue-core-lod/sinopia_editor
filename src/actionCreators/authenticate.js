@@ -3,7 +3,7 @@
 import Config from "../Config"
 
 import { setUser, removeUser } from "actions/authenticate"
-import { addError, clearErrors } from "actions/errors"
+import { clearErrors } from "actions/errors"
 import { hasUser } from "selectors/authenticate"
 import { loadUserData } from "actionCreators/user"
 

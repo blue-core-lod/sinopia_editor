@@ -32,6 +32,12 @@ module.exports = {
     node: {
       resolvePaths: ['src', '__tests__/testUtilities'],
       tryExtensions: ['.js', '.jsx', '.json', '.node'],
+      // keycloak-js@26 ships only an "exports" map with no top-level "main".
+      // The legacy resolvers used by eslint-plugin-node and
+      // eslint-plugin-import cannot read "exports", so they report the package
+      // as missing even though webpack and jest both resolve it. Allowlist it
+      // rather than changing working imports.
+      allowModules: ['keycloak-js'],
     },
     'import/resolver': {
       node: {
@@ -39,6 +45,8 @@ module.exports = {
         extensions: ['.js', '.jsx'],
       },
     },
+    // Same "exports"-map limitation as above, for import/no-unresolved.
+    'import/core-modules': ['keycloak-js'],
     react: {
       version: '16.6',
     },
@@ -96,7 +104,10 @@ module.exports = {
     'node/no-extraneous-import': 'off', // turning off because objects to our imports
     'no-alert': 'off',
     'no-await-in-loop': 'off',
-    'no-console': ['warn', { allow: ['error', 'info'] }], // we want to see errors in the console
+    // we want to see errors in the console; warn is allowed too, for
+    // recoverable conditions that fall back rather than fail (e.g. a template
+    // search that misses and uses a fallback URI)
+    'no-console': ['warn', { allow: ['error', 'info', 'warn'] }],
     'no-extra-semi': 'off', // Off for prettier
     'no-inline-comments': 'off',
     'no-invalid-this': 'off',

@@ -14,7 +14,7 @@ const ScriptShifterSelection = ({
   const [loading, setLoading] = useState(false)
   const [capitalize, setCapitalize] = useState(false)
   const [translating, setTranslating] = useState(null)
-  const [error, setError] = useState(null)
+  const [, setError] = useState(null)
 
   useEffect(() => {
     if (!show || langList.length > 0) return

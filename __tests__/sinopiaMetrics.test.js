@@ -15,7 +15,7 @@ jest.mock("keycloak-js", () => {
     token: "Secret-Token",
   }
 
-  return jest.fn().mockImplementation((config) => {
+  return jest.fn().mockImplementation(() => {
     return mockKeycloak
   })
 })

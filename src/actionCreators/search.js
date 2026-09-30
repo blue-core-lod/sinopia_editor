@@ -22,13 +22,16 @@ const computeSearchFacets = (results) => {
     if (group) groupCounts[group] = (groupCounts[group] || 0) + 1
   })
   return {
-    types: Object.entries(typeCounts).map(([key, doc_count]) => ({
+    // doc_count mirrors the Elasticsearch aggregation field name that
+    // SearchFilter and the search fixtures both read, so the key is snake_case
+    // even though the local binding is not.
+    types: Object.entries(typeCounts).map(([key, docCount]) => ({
       key,
-      doc_count,
+      doc_count: docCount,
     })),
-    groups: Object.entries(groupCounts).map(([key, doc_count]) => ({
+    groups: Object.entries(groupCounts).map(([key, docCount]) => ({
       key,
-      doc_count,
+      doc_count: docCount,
     })),
   }
 }

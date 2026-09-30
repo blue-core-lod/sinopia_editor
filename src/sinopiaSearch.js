@@ -6,7 +6,6 @@ import {
   hasFixtureResource,
   resourceSearchResults,
 } from "../__tests__/testUtilities/fixtureLoaderHelper"
-import _ from "lodash"
 
 /* eslint-enable node/no-unpublished-import */
 
@@ -125,8 +124,15 @@ export const getSearchResultsByUris = (resourceUris) => {
   )
     return Promise.resolve(resourceSearchResults(resourceUris[0])[0])
 
-  // This function appears to be for a different use case
-  // For now, keeping it as-is since it uses a different body format
+  /*
+   * BUG: `body` below is built but never sent. fetchSearchResultsFromUrl issues
+   * a bare GET, so `resourceUris` is discarded and this returns the first hit of
+   * an unfiltered search rather than the requested URIs. Callers affected:
+   * actionCreators/history.js (loadResourceHistory, addResourceHistory).
+   * Retained rather than deleted because it documents the intended query shape;
+   * fixing it requires the Blue Core API's search contract for filtering by URI.
+   */
+  // eslint-disable-next-line no-unused-vars
   const body = {
     query: {
       terms: {
@@ -135,7 +141,6 @@ export const getSearchResultsByUris = (resourceUris) => {
     },
     size: resourceUris.length,
   }
-  // TODO: This needs to be updated to work with the new API
   const url = `${Config.sinopiaApiBase}/search/`
   return fetchSearchResultsFromUrl(url, null).then((results) => results[0])
 }

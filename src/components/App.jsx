@@ -147,6 +147,9 @@ const App = (props) => {
     history,
     dispatch,
     isFirstMountWithUser,
+    // Stable for the life of KeycloakProvider (useState initializer), so
+    // including it satisfies exhaustive-deps without causing extra runs.
+    keycloak,
   ])
 
   // We do not use standard bootstrap modals (i.e. they are not triggered automatically)

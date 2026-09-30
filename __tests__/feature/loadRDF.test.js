@@ -1,6 +1,5 @@
 import { renderApp } from "testUtils"
 import { fireEvent, waitFor, screen } from "@testing-library/react"
-import * as sinopiaSearch from "sinopiaSearch"
 import { featureSetup, resourceHeaderSelector } from "featureUtils"
 
 jest.mock("KeycloakContext", () => ({

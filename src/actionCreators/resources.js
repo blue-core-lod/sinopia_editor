@@ -48,7 +48,6 @@ import { addResourceHistory } from "actionCreators/history"
 import _ from "lodash"
 import { setCurrentComponent } from "actions/index"
 import { loadRelationships } from "./relationships"
-import { useKeycloak } from "../KeycloakContext"
 
 /**
  * A thunk that loads an existing resource from Sinopia API and adds to state.
