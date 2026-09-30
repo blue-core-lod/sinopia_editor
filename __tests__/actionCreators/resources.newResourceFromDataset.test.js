@@ -57,6 +57,11 @@ describe("newResourceFromDataset", () => {
   _:b2 <http://sinopia.io/testing/Literal/property1> "A nested resource"@en .
   `
 
+  // The "audio roll" label arrives untagged, so the editor applies the resource
+  // default language on load and writes it back tagged.
+  // See https://github.com/blue-core-lod/sinopia_editor/issues/191
+  const expectedN3 = n3.replace('"audio roll" .', '"audio roll"@en .')
+
   describe("loading a resource", () => {
     const store = mockStore(createState())
 
@@ -84,7 +89,9 @@ describe("newResourceFromDataset", () => {
       const actualRdf = new GraphBuilder(
         addSubjectAction.payload
       ).graph.toCanonical()
-      const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const expectedGraph = await datasetFromN3(
+        expectedN3.replace(/<>/g, `<${uri}>`)
+      )
       const expectedRdf = expectedGraph.toCanonical()
       expect(actualRdf).toMatch(expectedRdf)
 

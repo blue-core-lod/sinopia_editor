@@ -54,8 +54,16 @@ const InputLang = () => {
   const showSuggestedLangSubtag =
     suggestedLangSubtag && newLangSubtag !== suggestedLangSubtag
 
+  // This modal is a singleton mounted once in Editor.jsx, so its state outlives
+  // any one opening. Reset the selections before prefilling -- otherwise
+  // opening the modal on a value with no language shows (and on Submit applies)
+  // whatever was selected for the value opened before it.
+  // See https://github.com/blue-core-lod/sinopia_editor/issues/191
   useEffect(() => {
     setIsDefaultLang(false)
+    setSelectedLanguageOptions([])
+    setSelectedScriptOptions([])
+    setSelectedTransliterationOptions([])
     if (!value?.lang) return
     const [langSubtag, scriptSubtag, transliterationSubtag] = parseLangTag(
       value.lang
