@@ -43,12 +43,35 @@ describe("addTemplateHistory", () => {
     ])
   })
 
+  // A version-pinned template's state key is its version URI, but history is
+  // deduplicated against addTemplateHistoryByResult, which identifies a
+  // template by its human id. Recording the key here would list one template
+  // twice and link the entry at a frozen snapshot.
+  it("identifies a version-pinned template by its id and living profile URI", () => {
+    const state = createState()
+    const profileUri =
+      "https://bluecore-dev.stanford.edu/profiles/3db30d3a-7a3e-4762-a28c-1a0efc244345"
+
+    const newState = addTemplateHistory(state.history, {
+      payload: {
+        ...template,
+        key: `${profileUri}/version/48213`,
+        uri: `${profileUri}/version/48213`,
+        profileUri,
+        version: 48213,
+      },
+    })
+
+    expect(newState.templates[0].id).toEqual("ld4p:RT:bf2:Identifiers:LCCN")
+    expect(newState.templates[0].uri).toEqual(profileUri)
+  })
+
   it("adds items uniquely", () => {
     let state = addTemplateHistory(createState().history, {
-      payload: { key: "template1" },
+      payload: { id: "template1" },
     })
-    state = addTemplateHistory(state, { payload: { key: "template2" } })
-    state = addTemplateHistory(state, { payload: { key: "template1" } })
+    state = addTemplateHistory(state, { payload: { id: "template2" } })
+    state = addTemplateHistory(state, { payload: { id: "template1" } })
 
     expect(state.templates.map((template) => template.id)).toEqual([
       "template1",
@@ -72,7 +95,7 @@ describe("addTemplateHistory", () => {
     ]
 
     const newState = addTemplateHistory(state.history, {
-      payload: { key: "template11" },
+      payload: { id: "template11" },
     })
 
     expect(newState.templates.map((template) => template.id)).toEqual([
@@ -92,7 +115,7 @@ describe("addTemplateHistory", () => {
   it("does not add root resource template to history", () => {
     const state = createState()
     const newState = addTemplateHistory(state.history, {
-      payload: { key: Config.rootResourceTemplateId },
+      payload: { id: Config.rootResourceTemplateId },
     })
 
     expect(newState.templates).toEqual([])

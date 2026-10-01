@@ -1,0 +1,57 @@
+[
+  {
+    "@id": "_:v1a",
+    "@type": ["http://sinopia.io/vocabulary/PropertyTemplate"],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Main title",
+        "@language": "en"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasPropertyUri": [
+      {
+        "@id": "http://id.loc.gov/ontologies/bibframe/mainTitle"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasPropertyType": [
+      {
+        "@id": "http://sinopia.io/vocabulary/propertyType/literal"
+      }
+    ]
+  },
+  {
+    "@id": "https://bluecore-dev.stanford.edu/profiles/3db30d3a-7a3e-4762-a28c-1a0efc244345",
+    "@type": ["http://sinopia.io/vocabulary/ResourceTemplate"],
+    "http://sinopia.io/vocabulary/hasResourceTemplate": [
+      {
+        "@value": "sinopia:template:resource"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasResourceId": [
+      {
+        "@value": "bluecore:bf2:Title:VersionedTitle",
+        "@language": "en"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasClass": [
+      {
+        "@id": "http://id.loc.gov/ontologies/bibframe/Title"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Versioned Title v1",
+        "@language": "en"
+      }
+    ],
+    "http://sinopia.io/vocabulary/hasPropertyTemplate": [
+      {
+        "@list": [
+          {
+            "@id": "_:v1a"
+          }
+        ]
+      }
+    ]
+  }
+]

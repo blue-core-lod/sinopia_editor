@@ -9,10 +9,15 @@ export const addTemplateHistoryByResult = (state, action) =>
 export const addTemplateHistory = (state, action) => {
   const template = action.payload
   const result = {
-    id: template.key,
+    // id, not key: a version-pinned template keys on its version URI, but
+    // addTemplateHistoryByResult identifies templates by their human id, and
+    // the two paths have to dedupe against each other.
+    id: template.id,
     resourceLabel: template.label,
     resourceURI: template.class,
-    uri: template.uri,
+    // Link the living template rather than the snapshot the user happened to
+    // open, so "recent templates" stays a way back to the template itself.
+    uri: template.profileUri || template.uri,
     author: template.author,
     remark: template.remark,
     date: template.date,

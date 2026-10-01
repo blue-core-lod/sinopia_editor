@@ -142,6 +142,47 @@ describe("resetValueSubject", () => {
   })
 })
 
+// A child pinned to a profile version must stay on that version when the user
+// adds another or resets it. Keying the rebuild on the human id would resolve
+// to whatever the profile says today, silently mixing two versions of one
+// template into a single parent.
+describe("a version-pinned nested resource", () => {
+  const pinnedVersionUri =
+    "https://bluecore-dev.stanford.edu/profiles/3db30d3a-7a3e-4762-a28c-1a0efc244345/version/1"
+
+  const newState = () =>
+    createState({
+      hasResourceWithNestedResource: true,
+      hasVersionPinnedNestedResource: true,
+    })
+
+  it("adds a sibling against the pinned version, not the latest", async () => {
+    const store = mockStore(newState())
+
+    await store.dispatch(addSiblingValueSubject("VDOeQCnFA8", "testerrorkey"))
+
+    const addAction = store
+      .getActions()
+      .find((action) => action.type === "ADD_VALUE")
+    const subjectTemplate = addAction.payload.value.valueSubject.subjectTemplate
+    expect(subjectTemplate.key).toBe(pinnedVersionUri)
+    expect(subjectTemplate.label).toBe("Versioned Title v1")
+  })
+
+  it("resets against the pinned version, not the latest", async () => {
+    const store = mockStore(newState())
+
+    await store.dispatch(resetValueSubject("VDOeQCnFA8", "testerrorkey"))
+
+    const addAction = store
+      .getActions()
+      .find((action) => action.type === "ADD_VALUE")
+    const subjectTemplate = addAction.payload.value.valueSubject.subjectTemplate
+    expect(subjectTemplate.key).toBe(pinnedVersionUri)
+    expect(subjectTemplate.label).toBe("Versioned Title v1")
+  })
+})
+
 describe("saveNewResource", () => {
   const uri = "http://localhost:3000/resource/abcdeghij23455"
   sinopiaApi.putUserHistory = jest.fn().mockResolvedValue()

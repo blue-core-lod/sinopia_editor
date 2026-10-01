@@ -665,8 +665,22 @@ const buildResourceWithContractedLiteral = (state, options) => {
   state.entities.values = {}
 }
 
+// A nested child pinned to a specific profile version: its state key is the
+// version URI while its id stays the human template id, which is the shape
+// that makes "add another" and "reset" drift to latest if they key on id.
+const pinnedChildProfileUri =
+  "https://bluecore-dev.stanford.edu/profiles/3db30d3a-7a3e-4762-a28c-1a0efc244345"
+const pinnedChildKey = `${pinnedChildProfileUri}/version/1`
+
 const buildResourceWithNestedResource = (state, options) => {
   if (!options.hasResourceWithNestedResource) return
+
+  const pinned = !!options.hasVersionPinnedNestedResource
+  const childKey = pinned ? pinnedChildKey : "resourceTemplate:testing:uber2"
+  const childId = pinned
+    ? "bluecore:bf2:Title:VersionedTitle"
+    : "resourceTemplate:testing:uber2"
+  const childPropertyTemplateKey = `${childKey} > http://id.loc.gov/ontologies/bibframe/uber/template2/property1 > literal`
 
   state.editor.currentResource = "ljAblGiBW"
   state.editor.resources = ["ljAblGiBW"]
@@ -680,15 +694,19 @@ const buildResourceWithNestedResource = (state, options) => {
         "resourceTemplate:testing:uber1 > http://id.loc.gov/ontologies/bibframe/uber/template1/property1",
       ],
     }),
-    "resourceTemplate:testing:uber2": build.subjectTemplate({
-      id: "resourceTemplate:testing:uber2",
+    [childKey]: build.subjectTemplate({
+      id: childId,
+      key: childKey,
+      version: pinned ? 1 : null,
+      versionUri: pinned ? pinnedChildKey : null,
+      profileUri: pinned ? pinnedChildProfileUri : null,
       clazz: "http://id.loc.gov/ontologies/bibframe/Uber2",
-      label: "Uber template2",
+      // Distinct when pinned, so a test can tell the pinned version apart from
+      // the latest (versioned_title_v2.json, "Versioned Title v2").
+      label: pinned ? "Versioned Title v1" : "Uber template2",
       remark:
         "Template for testing purposes with single repeatable literal with a link to Stanford at https://www.stanford.edu",
-      propertyTemplateKeys: [
-        "resourceTemplate:testing:uber2 > http://id.loc.gov/ontologies/bibframe/uber/template2/property1 > literal",
-      ],
+      propertyTemplateKeys: [childPropertyTemplateKey],
     }),
   }
   state.entities.propertyTemplates = {
@@ -705,22 +723,21 @@ const buildResourceWithNestedResource = (state, options) => {
         remark: "Nested, repeatable resource template.",
         type: "resource",
         component: "InputURI",
-        valueSubjectTemplateKeys: ["resourceTemplate:testing:uber2"],
+        valueSubjectTemplateKeys: [childKey],
       }),
-    "resourceTemplate:testing:uber2 > http://id.loc.gov/ontologies/bibframe/uber/template2/property1 > literal":
-      build.propertyTemplate({
-        key: "resourceTemplate:testing:uber2 > http://id.loc.gov/ontologies/bibframe/uber/template2/property1 > literal",
-        subjectTemplateKey: "resourceTemplate:testing:uber2",
-        label: "Uber template2, property1",
-        uris: {
-          "http://id.loc.gov/ontologies/bibframe/uber/template2/property1":
-            "Property1",
-        },
-        repeatable: true,
-        remark: "A repeatable literal",
-        type: "literal",
-        component: "InputLiteral",
-      }),
+    [childPropertyTemplateKey]: build.propertyTemplate({
+      key: childPropertyTemplateKey,
+      subjectTemplateKey: childKey,
+      label: "Uber template2, property1",
+      uris: {
+        "http://id.loc.gov/ontologies/bibframe/uber/template2/property1":
+          "Property1",
+      },
+      repeatable: true,
+      remark: "A repeatable literal",
+      type: "literal",
+      component: "InputLiteral",
+    }),
   }
   state.entities.subjects = {
     ljAblGiBW: build.resource({
@@ -734,7 +751,7 @@ const buildResourceWithNestedResource = (state, options) => {
     }),
     XPb8jaPWo: build.subject({
       key: "XPb8jaPWo",
-      subjectTemplateKey: "resourceTemplate:testing:uber2",
+      subjectTemplateKey: childKey,
       rootSubjectKey: "ljAblGiBW",
       rootPropertyKey: "v1o90QO1Qx",
       valueSubjectOfKey: "VDOeQCnFA8",
@@ -761,8 +778,7 @@ const buildResourceWithNestedResource = (state, options) => {
       subjectKey: "XPb8jaPWo",
       rootSubjectKey: "ljAblGiBW",
       rootPropertyKey: "v1o90QO1Qx",
-      propertyTemplateKey:
-        "resourceTemplate:testing:uber2 > http://id.loc.gov/ontologies/bibframe/uber/template2/property1 > literal",
+      propertyTemplateKey: childPropertyTemplateKey,
       valueKeys: ["pRJ0lO_mT-"],
       descUriOrLiteralValueKeys: ["pRJ0lO_mT-"],
       descWithErrorPropertyKeys: options.hasError ? ["7caLbfwwle"] : [],

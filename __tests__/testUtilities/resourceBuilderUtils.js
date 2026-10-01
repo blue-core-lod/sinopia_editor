@@ -33,11 +33,20 @@ export default class ResourceBuilder {
     suppressible = false,
     group = "stanford",
     editGroups = ["cornell"],
+    // Defaults match a template built with no ref and no profile URI, which is
+    // what most fixtures are. See TemplatesBuilder.versionFields().
+    key = id,
+    version = null,
+    versionUri = null,
+    profileUri = null,
   }) {
     assertProps({ id, clazz })
     const template = {
-      key: id,
+      key,
       id,
+      version,
+      versionUri,
+      profileUri,
       class: clazz,
       classes: classes || { [clazz]: clazz },
       uri,
