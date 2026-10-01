@@ -284,18 +284,11 @@ describe("LoadByRDFForm", () => {
       fireEvent.click(screen.getByText("Submit"))
 
       await waitFor(() => {
-        expect(
-          store.getState().editor.successes[dashboardErrorKey]
-        ).toHaveLength(1)
-      })
-      expect(store.getState().editor.successes[dashboardErrorKey]).toEqual([
+        expect(store.getState().editor.successes[dashboardErrorKey]).toEqual([
           expect.stringMatching(/being processed/),
           { text: "The new work was created:", resourceUri: workUri },
         ])
       })
-      expect(store.getState().editor.successes[dashboardErrorKey][0]).toMatch(
-        /being processed/
-      )
     })
 
     it("dispatches a dashboard error when /api/works fails", async () => {
