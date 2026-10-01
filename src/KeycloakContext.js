@@ -1,5 +1,6 @@
 // KeycloakContext.js
 import React, { createContext, useContext, useEffect, useState } from "react"
+import PropTypes from "prop-types"
 import Keycloak from "keycloak-js"
 import Config from "Config"
 
@@ -45,4 +46,8 @@ export const KeycloakProvider = ({ children }) => {
       {children}
     </KeycloakContext.Provider>
   )
+}
+
+KeycloakProvider.propTypes = {
+  children: PropTypes.node,
 }

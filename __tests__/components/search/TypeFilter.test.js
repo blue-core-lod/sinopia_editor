@@ -20,7 +20,7 @@ jest.mock("keycloak-js", () => {
     },
   }
 
-  return jest.fn().mockImplementation((config) => {
+  return jest.fn().mockImplementation(() => {
     return mockKeycloak
   })
 })

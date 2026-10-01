@@ -1,9 +1,8 @@
-import React, { useState } from "react"
+import React from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { hasUser as hasUserSelector } from "selectors/authenticate"
 import { signIn } from "actionCreators/authenticate"
 import { useKeycloak } from "../../KeycloakContext"
-import Config from "Config"
 import { selectErrors } from "selectors/errors"
 import _ from "lodash"
 import { signInErrorKey } from "utilities/errorKeyFactory"
@@ -11,9 +10,6 @@ import { signInErrorKey } from "utilities/errorKeyFactory"
 const LoginPanel = () => {
   const dispatch = useDispatch()
   const hasUser = useSelector((state) => hasUserSelector(state))
-
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
 
   const { keycloak } = useKeycloak()
 

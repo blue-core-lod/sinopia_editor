@@ -1,7 +1,7 @@
 import _ from "lodash"
 import { findAuthorityConfig } from "utilities/authorityConfig"
 import rdf from "rdf-ext"
-import { resourceToName, formatLocalDate } from "utilities/Utilities"
+import { formatLocalDate } from "utilities/Utilities"
 
 const rdfsLabel = "http://www.w3.org/2000/01/rdf-schema#label"
 

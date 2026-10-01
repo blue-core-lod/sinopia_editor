@@ -26,16 +26,16 @@ jest.mock("keycloak-js", () => {
 describe("<ContextSuccess />", () => {
   it("renders nothing when there are no success messages", () => {
     const store = createStore(createState())
-    const { container } = renderComponent(<ContextSuccess />, store)
-    expect(container.firstChild).toBeNull()
+    renderComponent(<ContextSuccess />, store)
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument()
   })
 
   it("renders nothing when the success list for the context key is empty", () => {
     const state = createState()
     state.editor.successes = { testErrorKey: [] }
     const store = createStore(state)
-    const { container } = renderComponent(<ContextSuccess />, store)
-    expect(container.firstChild).toBeNull()
+    renderComponent(<ContextSuccess />, store)
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument()
   })
 
   it("renders success messages for the context key", () => {
@@ -62,7 +62,8 @@ describe("<ContextSuccess />", () => {
     const state = createState()
     state.editor.successes = { otherKey: ["Should not appear"] }
     const store = createStore(state)
-    const { container } = renderComponent(<ContextSuccess />, store)
-    expect(container.firstChild).toBeNull()
+    renderComponent(<ContextSuccess />, store)
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument()
+    expect(screen.queryByText("Should not appear")).not.toBeInTheDocument()
   })
 })

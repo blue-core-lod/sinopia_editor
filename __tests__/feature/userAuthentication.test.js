@@ -1,10 +1,6 @@
 // Copyright 2018 Stanford University see LICENSE for license
 
-import {
-  fireEvent,
-  screen,
-  waitForElementToBeRemoved,
-} from "@testing-library/react"
+import { fireEvent, screen } from "@testing-library/react"
 import { createState } from "stateUtils"
 import { createStore, renderApp } from "testUtils"
 import * as sinopiaApi from "sinopiaApi"

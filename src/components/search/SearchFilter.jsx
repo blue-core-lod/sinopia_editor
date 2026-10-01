@@ -45,7 +45,17 @@ const SearchFilter = ({
       setSelectedFilters(facetResults.map((result) => result.key))
       setAllSelected(true)
     }
-  }, [facetResults])
+    /*
+     * `searchOptions` is deliberately excluded. selectSearchOptions returns a
+     * fresh object literal whenever state.search[type].options is absent, so
+     * depending on it would re-run this effect on every render, and the
+     * setSelectedFilters/setAllSelected calls above would then re-render and
+     * loop. This effect only needs to re-seed the selection when a new facet
+     * response arrives. Fix the selector's reference stability (see the
+     * `noRoles` pattern in selectors/authenticate.js) before adding it here.
+     */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [facetResults, filterSearchOption])
 
   const performFilter = (selectedFilters) => {
     dispatch(

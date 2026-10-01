@@ -52,7 +52,7 @@ const DescPanel = () => {
         ) LD4P&apos;s Sinopia was a preliminary step, a sketch of what&apos;s
         possible, on the way to a full-fledged linked open data production
         environment now underway with Blue Core. For more information, visit{" "}
-        <a href="https://bluecore.info/"></a> or email us at{" "}
+        <a href="https://bluecore.info/">bluecore.info</a> or email us at{" "}
         <a href="mailto:contact@bluecore.info">contact@bluecore.info</a>
       </p>
     </div>

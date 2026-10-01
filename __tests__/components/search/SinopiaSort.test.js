@@ -4,7 +4,6 @@ import * as server from "sinopiaSearch"
 import { fireEvent, screen } from "@testing-library/react"
 import { createStore, renderComponent } from "testUtils"
 import { createState } from "stateUtils"
-import { putUserHistory } from "../../../src/sinopiaApi"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -44,9 +43,6 @@ describe("<SinopiaSort />", () => {
 
   it("clicking changes the sort order", async () => {
     const mockGetSearchResults = jest.fn()
-    const keycloak = jest.fn().mockReturnValue({
-      token: "abcdefg12345",
-    })
 
     server.getSearchResultsWithFacets = mockGetSearchResults.mockResolvedValue([
       {
