@@ -65,7 +65,7 @@
     "buffer": "^6.0.3",
     "concat-stream": "^2.0.0",
     "cors": "^2.8.5",
-    "crypto-browserify": "3.12.0",
+    "crypto-browserify": "^3.3.0",
     "crypto-js": "^4.1.1",
     "date-and-time": "^2.0.1",
     "dotenv": "^8.6.0",
@@ -103,7 +103,7 @@
     "redux": "^4.1.1",
     "redux-thunk": "^2.3.0",
     "stream-browserify": "^3.0.0",
-    "uuid": "^8.3.1",
+    "uuid": "^14.0.2",
     "vm-browserify": "^1.1.2"
   },
   "devDependencies": {
@@ -145,7 +145,7 @@
     "jest-mock-console": "^1.1.0",
     "jest-prop-type-error": "^1.1.0",
     "jest-summarizing-reporter": "^1.1.4",
-    "jsdom": "^17.0.0",
+    "jsdom": "^30.1.1",
     "jsdom-global": "3.0.2",
     "postcss-loader": "^7.2.4",
     "prettier": "2.4.0",
@@ -158,7 +158,7 @@
     "timezone-mock": "1.2.2",
     "webpack": "^5.52.0",
     "webpack-cli": "^4.8.0",
-    "webpack-dev-server": "^4.10.1"
+    "webpack-dev-server": "^6.0.0"
   },
   "jest": {
     "automock": false,
