@@ -3,7 +3,7 @@
 import { fireEvent, waitFor, screen } from "@testing-library/react"
 import { createStore, renderApp, createHistory } from "testUtils"
 import { createState } from "stateUtils"
-import fetchMock from "fetch-mock-jest"
+import fetchMock from "@fetch-mock/jest"
 import { featureSetup, resourceHeaderSelector } from "featureUtils"
 import * as sinopiaApi from "sinopiaApi"
 
@@ -15,15 +15,19 @@ jest.mock("../../src/KeycloakContext", () => ({
 
 beforeEach(() => {
   fetchMock.mockReset()
-  fetchMock.mock(
+  // @fetch-mock/jest does not patch global fetch (fetch-mock-jest v1 did), so
+  // without this every route() registration is inert and requests escape to the
+  // real network.
+  fetchMock.mockGlobal()
+  fetchMock.route(
     "http://localhost:3000/groups",
     '{"data":[{"id":"cornell","label":"Cornell"},{"id":"ld4p","label":"LD4P"},{"id":"other","label":"other"},{"id":"pcc","label":"Program for Cooperative Cataloging"},{"id":"stanford","label":"Stanford"}]}'
   )
-  fetchMock.mock(
+  fetchMock.route(
     "https://sinopia-exports-development.s3-us-west-2.amazonaws.com",
     '<?xml version="1.0" encoding="UTF-8"?><ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Contents><Key>alberta_2020-09-06T00:01:18.798Z.zip</Key></Contents><Contents><Key>sinopia_export_all_2020-09-06T00:01:17.621Z.zip</Key></Contents></ListBucketResult>'
   )
-  fetchMock.mock(
+  fetchMock.route(
     "https://ld4p.github.io/sinopia/help_and_resources/menu_content.html",
     '<ul><li><a href="https://github.com/ld4p/sinopia/wiki" target="_blank" rel="noopener noreferrer" className="menu-item">Sinopia help site</a></li></ul>'
   )
@@ -167,7 +171,7 @@ describe("<App />", () => {
 
       const resourceUri =
         "https://bcld.info/works/4b8c1e1a-1111-4222-8333-000000000001"
-      fetchMock.mock(`${resourceUri}?expand=true`, {
+      fetchMock.route(`${resourceUri}?expand=true`, {
         id: 1,
         type: "works",
         uri: resourceUri,
@@ -184,7 +188,7 @@ describe("<App />", () => {
           },
         ],
       })
-      fetchMock.mock(`${resourceUri}/relationships`, {
+      fetchMock.route(`${resourceUri}/relationships`, {
         bfAdminMetadataRefs: [],
         bfItemRefs: [],
         bfInstanceRefs: [],
