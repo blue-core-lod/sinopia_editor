@@ -1,6 +1,6 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
-/* eslint node/no-unpublished-require: ["off"] */
+/* eslint n/no-unpublished-require: ["off"] */
 const path = require("path")
 const webpack = require("webpack")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
@@ -60,7 +60,7 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ["*", ".js", ".jsx"],
+    extensions: [".js", ".jsx"],
     fallback: {
       fs: false,
       stream: require.resolve("stream-browserify"),
@@ -77,7 +77,10 @@ module.exports = {
   plugins: [
     new webpack.ProvidePlugin({
       Buffer: ["buffer", "Buffer"],
-      process: "process/browser",
+      // Fully specified: webpack-dev-server 6 ships as "type": "module", and
+      // webpack resolves ESM requests with fullySpecified, so the extension
+      // cannot be inferred when this is injected into dev-server client code.
+      process: "process/browser.js",
     }),
     new HtmlWebpackPlugin({
       template: "index.html",
@@ -121,17 +124,24 @@ module.exports = {
       })
       return middlewares
     },
-    proxy: {
-      "/api/search": "http://localhost:8000",
-      "/api/qa": {
+    // webpack-dev-server 5+ dropped the object form of `proxy`; entries are
+    // now an array where the former key becomes `context`.
+    proxy: [
+      {
+        context: ["/api/search"],
+        target: "http://localhost:8000",
+      },
+      {
+        context: ["/api/qa"],
         target: "https://lookup.ld4l.org",
         changeOrigin: true,
         pathRewrite: { "^/api/qa": "" },
       },
-      "/keycloak": {
+      {
+        context: ["/keycloak"],
         target: "http://localhost",
         changeOrigin: true,
       },
-    },
+    ],
   },
 }

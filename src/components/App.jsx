@@ -12,10 +12,10 @@ import Footer from "./Footer"
 import Dashboard from "./dashboard/Dashboard"
 import {
   Route,
-  Switch,
-  useHistory,
+  Routes,
+  useNavigate,
   useLocation,
-  useRouteMatch,
+  useMatch,
 } from "react-router-dom"
 import ResourceTemplate from "./templates/ResourceTemplate"
 import LoadResource from "./load/LoadResource"
@@ -53,7 +53,7 @@ const FourOhFour = () => <h1>404</h1>
 
 const App = (props) => {
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const { canCreate, canEdit } = usePermissions()
   const [isFirstMountWithUser, setFirstMountWithUser] = useState(true)
   const { keycloak } = useKeycloak()
@@ -69,12 +69,10 @@ const App = (props) => {
   const location = useLocation()
   const resourceParam = new URLSearchParams(location.search).get("resource")
 
-  const editorTemplateMatch = useRouteMatch({
-    path: "/editor/:templateId",
-    exact: true,
-  })
-  const editorExactMatch = useRouteMatch({ path: "/editor", exact: true })
-  const editorResourceMatch = useRouteMatch("/editor/resource/:collection/:id")
+  // useMatch is exact by default, so the v5 `exact: true` flags are implied.
+  const editorTemplateMatch = useMatch("/editor/:templateId")
+  const editorExactMatch = useMatch("/editor")
+  const editorResourceMatch = useMatch("/editor/resource/:collection/:id")
 
   useEffect(() => {
     if (isFirstMountWithUser && hasUser) {
@@ -87,17 +85,17 @@ const App = (props) => {
               templateErrorKey
             )
           ).then((result) => {
-            if (!result) history.push("/templates")
+            if (!result) navigate("/templates")
           })
         } else {
-          history.push("/dashboard")
+          navigate("/dashboard")
         }
       } else if (resourceParam) {
         dispatch(
           loadResource(resourceParam, dashboardErrorKey, { keycloak })
         ).then((result) => {
           if (!result) {
-            history.push("/dashboard")
+            navigate("/dashboard")
             return
           }
           const [, resource] = result
@@ -105,15 +103,15 @@ const App = (props) => {
             dispatch(
               dispatchResourceForEditor(result, resourceParam, {}, keycloak)
             )
-            history.push("/editor")
+            navigate("/editor")
           } else {
             dispatch(dispatchResourceForPreview(result))
             dispatch(showModal("PreviewModal"))
-            history.push("/dashboard")
+            navigate("/dashboard")
           }
         })
       } else if (editorExactMatch) {
-        history.push("/dashboard")
+        navigate("/dashboard")
       } else if (editorResourceMatch) {
         const uri = uriFromResourceId(
           editorResourceMatch.params.collection,
@@ -121,7 +119,7 @@ const App = (props) => {
         )
         dispatch(loadResource(uri, dashboardErrorKey)).then((result) => {
           if (!result) {
-            history.push("/dashboard")
+            navigate("/dashboard")
             return
           }
           const [, resource] = result
@@ -130,7 +128,7 @@ const App = (props) => {
           } else {
             dispatch(dispatchResourceForPreview(result))
             dispatch(showModal("PreviewModal"))
-            history.push("/dashboard")
+            navigate("/dashboard")
           }
         })
       }
@@ -144,9 +142,9 @@ const App = (props) => {
     editorResourceMatch,
     canCreate,
     canEdit,
-    history,
     dispatch,
     isFirstMountWithUser,
+    navigate,
     // Stable for the life of KeycloakProvider (useState initializer), so
     // including it satisfies exhaustive-deps without causing extra runs.
     keycloak,
@@ -166,152 +164,60 @@ const App = (props) => {
     }
   }, [isModalOpen])
 
+  /*
+   * react-router v6 notes for the routes below:
+   *  - <Switch> became <Routes>, and render= became element=.
+   *  - `exact` is the default, so the v5 flags are dropped. The two routes that
+   *    were deliberately NOT exact in v5 ("/editor" and the "/vocabulary" set)
+   *    keep prefix matching via an explicit "/*".
+   *  - v5's path={[...]} arrays are not supported; each pattern is its own
+   *    <Route>. The :element and :element/:sub patterns stay explicit because
+   *    Vocab reads params.element/params.sub via useParams(); a splat route
+   *    would only expose params["*"].
+   *  - renderProps are gone; components that needed match/history now use hooks
+   *    (Vocab -> useParams, NewResourceTemplateButton -> useNavigate).
+   */
+  const menuProps = { triggerHandleOffsetMenu: props.handleOffsetMenu }
+
   const routesWithCurrentUser = (
-    <Switch>
+    <Routes>
+      <Route path="/" element={<HomePage {...menuProps} />} />
+      <Route path="/editor/*" element={<Editor {...menuProps} />} />
+      <Route path="/templates" element={<ResourceTemplate {...menuProps} />} />
+      <Route path="/search" element={<Search {...menuProps} />} />
+      <Route path="/load" element={<LoadResource {...menuProps} />} />
+      <Route path="/exports" element={<Exports {...menuProps} />} />
+      <Route path="/dashboard" element={<Dashboard {...menuProps} />} />
+      <Route path="/metrics/users" element={<UserMetrics {...menuProps} />} />
       <Route
-        exact
-        path="/"
-        render={(renderProps) => (
-          <HomePage
-            {...renderProps}
-            triggerHandleOffsetMenu={props.handleOffsetMenu}
-          />
-        )}
-      />
-      <Route
-        path="/editor"
-        render={(renderProps) => (
-          <Editor
-            {...renderProps}
-            triggerHandleOffsetMenu={props.handleOffsetMenu}
-          />
-        )}
-      />
-      <Route
-        exact
-        path="/templates"
-        render={(renderProps) => (
-          <ResourceTemplate
-            {...renderProps}
-            triggerHandleOffsetMenu={props.handleOffsetMenu}
-          />
-        )}
-      />
-      <Route
-        exact
-        path="/search"
-        render={(renderProps) => (
-          <Search
-            {...renderProps}
-            triggerHandleOffsetMenu={props.handleOffsetMenu}
-          />
-        )}
-      />
-      <Route
-        exact
-        path="/load"
-        render={(renderProps) => (
-          <LoadResource
-            {...renderProps}
-            triggerHandleOffsetMenu={props.handleOffsetMenu}
-          />
-        )}
-      />
-      <Route
-        exact
-        path="/exports"
-        render={(renderProps) => (
-          <Exports
-            {...renderProps}
-            triggerHandleOffsetMenu={props.handleOffsetMenu}
-          />
-        )}
-      />
-      <Route
-        exact
-        path="/dashboard"
-        render={(renderProps) => (
-          <Dashboard
-            {...renderProps}
-            triggerHandleOffsetMenu={props.handleOffsetMenu}
-          />
-        )}
-      />
-      <Route
-        exact
-        path="/metrics/users"
-        render={(renderProps) => (
-          <UserMetrics
-            {...renderProps}
-            triggerHandleOffsetMenu={props.handleOffsetMenu}
-          />
-        )}
-      />
-      <Route
-        exact
         path="/metrics/templates"
-        render={(renderProps) => (
-          <TemplateMetrics
-            {...renderProps}
-            triggerHandleOffsetMenu={props.handleOffsetMenu}
-          />
-        )}
+        element={<TemplateMetrics {...menuProps} />}
       />
       <Route
-        exact
         path="/metrics/resources"
-        render={(renderProps) => (
-          <ResourceMetrics
-            {...renderProps}
-            triggerHandleOffsetMenu={props.handleOffsetMenu}
-          />
-        )}
+        element={<ResourceMetrics {...menuProps} />}
       />
+      <Route path="/vocabulary" element={<Vocab {...menuProps} />} />
+      <Route path="/vocabulary/:element" element={<Vocab {...menuProps} />} />
       <Route
-        path={[
-          "/vocabulary/:element/:sub",
-          "/vocabulary/:element",
-          "/vocabulary",
-        ]}
-        render={(renderProps) => (
-          <Vocab
-            {...renderProps}
-            triggerHandleOffsetMenu={props.handleOffsetMenu}
-          />
-        )}
+        path="/vocabulary/:element/:sub"
+        element={<Vocab {...menuProps} />}
       />
-      <Route
-        path="/menu"
-        render={(renderProps) => <CanvasMenu {...renderProps} />}
-      />
-      <Route id="404" component={FourOhFour} />
-    </Switch>
+      <Route path="/menu" element={<CanvasMenu />} />
+      <Route path="*" element={<FourOhFour />} />
+    </Routes>
   )
 
   const routesWithOutCurrentUser = (
-    <Switch>
+    <Routes>
+      <Route path="/vocabulary" element={<Vocab {...menuProps} />} />
+      <Route path="/vocabulary/:element" element={<Vocab {...menuProps} />} />
       <Route
-        path={[
-          "/vocabulary/:element/:sub",
-          "/vocabulary/:element",
-          "/vocabulary",
-        ]}
-        render={(renderProps) => (
-          <Vocab
-            {...renderProps}
-            triggerHandleOffsetMenu={props.handleOffsetMenu}
-          />
-        )}
+        path="/vocabulary/:element/:sub"
+        element={<Vocab {...menuProps} />}
       />
-      <Route
-        render={(renderProps) => (
-          <HomePage
-            {...renderProps}
-            triggerHandleOffsetMenu={props.handleOffsetMenu}
-          />
-        )}
-      />
-    </Switch>
+      <Route path="*" element={<HomePage {...menuProps} />} />
+    </Routes>
   )
 
   return (

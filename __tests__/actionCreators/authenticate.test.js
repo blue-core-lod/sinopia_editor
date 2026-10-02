@@ -1,7 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 import { authenticate, signIn, signOut } from "actionCreators/authenticate"
 import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
+import { thunk } from "redux-thunk"
 import * as sinopiaApi from "sinopiaApi"
 
 jest.mock("KeycloakContext", () => ({

@@ -1,7 +1,7 @@
 import { loadResourceTemplate } from "actionCreators/templates"
 import Config from "Config"
 import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
+import { thunk } from "redux-thunk"
 import { createState } from "stateUtils"
 import { addTemplates } from "reducers/templates"
 import { selectSubjectTemplate } from "selectors/templates"

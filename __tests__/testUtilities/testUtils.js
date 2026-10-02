@@ -4,9 +4,14 @@ import React from "react"
 import { Provider } from "react-redux"
 import { render } from "@testing-library/react"
 import { createStore as createReduxStore, applyMiddleware } from "redux"
-import thunk from "redux-thunk"
+import { thunk } from "redux-thunk"
 import appReducer from "reducers/index"
-import { Router } from "react-router-dom"
+/*
+ * react-router v6's <Router> no longer accepts a `history` prop. HistoryRouter
+ * keeps the v5 shape so tests can continue to construct a memory history, pass
+ * it in, and assert on history.location.* (33 test files do this).
+ */
+import { unstable_HistoryRouter as Router } from "react-router-dom"
 import { createMemoryHistory } from "history"
 import _ from "lodash"
 import App from "components/App"

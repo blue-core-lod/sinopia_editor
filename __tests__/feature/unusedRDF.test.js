@@ -36,7 +36,9 @@ describe("loading RDF with unused triples", () => {
       selector: resourceHeaderSelector,
     })
 
-    screen.getByText(/Some triples are not editable with this template/)
+    // Awaited: the unused-RDF notice arrives in a separate state update, which
+    // React 19 batches rather than flushing with the header render above.
+    await screen.findByText(/Some triples are not editable with this template/)
 
     // Switch to turtle
     fireEvent.change(screen.getByLabelText(/Format/), {

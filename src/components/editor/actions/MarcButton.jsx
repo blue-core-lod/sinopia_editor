@@ -28,12 +28,20 @@ const MarcButton = ({ resourceKey }) => {
 
   const [isRequesting, setRequesting] = useState(false)
 
+  /*
+   * Empty dep array is required, not cosmetic. Without it this effect re-runs
+   * on every render, and its cleanup sets isMounted.current = false just before
+   * each re-run. A getMarcJob promise resolving inside that window hits the
+   * !isMounted.current guard in marcJobTimer and silently bails, so
+   * setRequesting(false) never fires and the button stays stuck on
+   * "Requesting MARC". Mount once, unmount once.
+   */
   useEffect(() => {
     isMounted.current = true
     return () => {
       isMounted.current = false
     }
-  })
+  }, [])
 
   if (!resource?.uri || !isBfInstance(resource?.classes)) return null
 

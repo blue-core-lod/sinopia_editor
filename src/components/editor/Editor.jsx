@@ -15,7 +15,7 @@ import {
   hasValidationErrors as hasValidationErrorsSelector,
 } from "selectors/errors"
 import { selectCurrentResourceKey, selectResourceId } from "selectors/resources"
-import { useHistory, useRouteMatch } from "react-router-dom"
+import { useNavigate, useMatch } from "react-router-dom"
 import EditorPreviewModal from "./preview/EditorPreviewModal"
 import { selectSubjectTemplateForSubject } from "selectors/templates"
 import AlertsContextProvider from "components/alerts/AlertsContextProvider"
@@ -25,12 +25,9 @@ import InputLang from "./inputs/InputLang"
 import MarcModal from "./actions/MarcModal"
 
 const Editor = (props) => {
-  const history = useHistory()
-  const editorTemplateMatch = useRouteMatch({
-    path: "/editor/:templateId",
-    exact: true,
-  })
-  const editorResourceMatch = useRouteMatch("/editor/resource/:collection/:id")
+  const navigate = useNavigate()
+  const editorTemplateMatch = useMatch("/editor/:templateId")
+  const editorResourceMatch = useMatch("/editor/resource/:collection/:id")
 
   const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
   // Resource ID is extracted from the URI. Presence indicates the resource has been saved.
@@ -62,13 +59,13 @@ const Editor = (props) => {
         `${editorResourceMatch.params.collection}/${editorResourceMatch.params.id}` !==
           resourceId
       ) {
-        history.replace(`/editor/resource/${resourceId}`)
+        navigate(`/editor/resource/${resourceId}`, { replace: true })
       }
     } else if (
       !editorTemplateMatch ||
       editorTemplateMatch.params.templateId !== subjectTemplateId
     ) {
-      history.replace(`/editor/${subjectTemplateId}`)
+      navigate(`/editor/${subjectTemplateId}`, { replace: true })
     }
   }, [
     resourceKey,
@@ -76,7 +73,7 @@ const Editor = (props) => {
     editorResourceMatch,
     subjectTemplateId,
     resourceId,
-    history,
+    navigate,
   ])
 
   if (!resourceKey) return <div id="editor">Loading ...</div>
