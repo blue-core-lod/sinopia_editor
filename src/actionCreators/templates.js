@@ -79,7 +79,6 @@ export const loadResourceTemplateWithoutValidation =
       resourceTemplateId.startsWith("https://")
 
     if (isFullUri && isForeignHost(resourceTemplateId))
-      // eslint-disable-next-line no-console
       console.warn(
         "Nested resource template reference points at a different environment; it will be followed across environments:",
         resourceTemplateId

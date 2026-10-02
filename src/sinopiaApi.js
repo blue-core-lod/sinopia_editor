@@ -6,7 +6,7 @@ import {
   jsonldFromDataset,
 } from "utilities/Utilities"
 import Config from "Config"
-/* eslint-disable node/no-unpublished-import */
+/* eslint-disable n/no-unpublished-import */
 import {
   hasFixtureResource,
   getFixtureResource,

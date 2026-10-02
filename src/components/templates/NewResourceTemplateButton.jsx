@@ -1,9 +1,8 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React, { useEffect, useState } from "react"
-import PropTypes from "prop-types"
 import { useSelector, useDispatch } from "react-redux"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { newResource } from "actionCreators/resources"
 import { selectErrors } from "selectors/errors"
 import { selectCurrentResourceKey } from "selectors/resources"
@@ -14,8 +13,9 @@ import useAlerts from "hooks/useAlerts"
 import { useKeycloak } from "../../KeycloakContext"
 import LoadingButton from "../buttons/LoadingButton"
 
-const NewResourceTemplateButton = (props) => {
+const NewResourceTemplateButton = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { keycloak } = useKeycloak()
   const { canCreate } = usePermissions()
   const errorKey = useAlerts()
@@ -29,9 +29,9 @@ const NewResourceTemplateButton = (props) => {
   useEffect(() => {
     // Forces a wait until the root resource has been set in state
     if (navigateEditor && resourceKey && _.isEmpty(errors)) {
-      props.history.push("/editor")
+      navigate("/editor")
     }
-  }, [navigateEditor, resourceKey, props.history, errors])
+  }, [navigateEditor, resourceKey, navigate, errors])
 
   const handleClick = (event) => {
     event.preventDefault()
@@ -56,10 +56,6 @@ const NewResourceTemplateButton = (props) => {
       </button>
     </Link>
   )
-}
-
-NewResourceTemplateButton.propTypes = {
-  history: PropTypes.object,
 }
 
 export default NewResourceTemplateButton

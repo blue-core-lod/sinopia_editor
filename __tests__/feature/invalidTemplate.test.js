@@ -46,7 +46,7 @@ describe("an invalid resource template", () => {
     const input = screen.getByPlaceholderText(
       "Enter id, label, URI, remark, group, or author"
     )
-    await fireEvent.change(input, { target: { value: "Not found" } })
+    fireEvent.change(input, { target: { value: "Not found" } })
 
     // try to open the template
     const link = await screen.findByTestId(

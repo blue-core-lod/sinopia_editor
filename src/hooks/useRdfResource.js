@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { newResourceFromDataset } from "actionCreators/resources"
 import { clearErrors } from "actions/errors"
 import { selectCurrentResourceKey } from "selectors/resources"
-import { useHistory } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 /**
  * Hook for transforming a resource to state and changing the page to the editor (i.e., /editor path).
@@ -12,12 +12,12 @@ import { useHistory } from "react-router-dom"
  * @param {string} baseURI of the resource
  * @param {string} resourceTemplateId to use for the resource
  * @param {string} errorKey to use when adding errors to state
- * @param {Object} history react-router history object
+ * @param {Object} navigate react-router navigate function
  * @return {[Object, rdf.Dataset, string]} resource state, unused RDF, error
  */
 const useRdfResource = (dataset, baseURI, resourceTemplateId, errorKey) => {
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const hasResource = useSelector((state) => !!selectCurrentResourceKey(state))
 
   // Indicates that would like to change to editor once resource is in state
@@ -44,9 +44,9 @@ const useRdfResource = (dataset, baseURI, resourceTemplateId, errorKey) => {
   useEffect(() => {
     // Forces a wait until the root resource has been set in state
     if (navigateEditor && hasResource) {
-      history.push("/editor")
+      navigate("/editor")
     }
-  }, [navigateEditor, history, hasResource])
+  }, [navigateEditor, navigate, hasResource])
 }
 
 export default useRdfResource

@@ -1,7 +1,7 @@
 import { validateTemplates } from "actionCreators/templateValidationHelpers"
 import Config from "Config"
 import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
+import { thunk } from "redux-thunk"
 import { createState } from "stateUtils"
 import ResourceBuilder from "resourceBuilderUtils"
 

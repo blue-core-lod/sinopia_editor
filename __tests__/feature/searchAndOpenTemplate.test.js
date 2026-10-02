@@ -49,7 +49,7 @@ describe("searching and opening a resource", () => {
     const input = screen.getByPlaceholderText(
       "Enter id, label, URI, remark, group, or author"
     )
-    await fireEvent.change(input, { target: { value: queryString } })
+    fireEvent.change(input, { target: { value: queryString } })
     await screen.findByText("resourceTemplate:bf2:Title:Note")
 
     // Has a create, view, and copy buttons

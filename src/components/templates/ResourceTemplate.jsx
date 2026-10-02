@@ -15,7 +15,7 @@ const ResourceTemplate = (props) => (
       <Header triggerEditorMenu={props.triggerHandleOffsetMenu} />
       <ContextAlert />
       <PreviewModal />
-      <TemplateSearch history={props.history} />
+      <TemplateSearch />
     </section>
   </AlertsContextProvider>
 )
@@ -23,7 +23,6 @@ const ResourceTemplate = (props) => (
 ResourceTemplate.propTypes = {
   children: PropTypes.array,
   triggerHandleOffsetMenu: PropTypes.func,
-  history: PropTypes.object,
 }
 
 export default ResourceTemplate

@@ -6,7 +6,7 @@ import {
 } from "actionCreators/user"
 import * as sinopiaApi from "sinopiaApi"
 import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
+import { thunk } from "redux-thunk"
 import { createState } from "stateUtils"
 import * as sinopiaSearch from "sinopiaSearch"
 

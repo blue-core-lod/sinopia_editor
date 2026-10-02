@@ -29,17 +29,24 @@ describe("requesting MARC", () => {
 
       await screen.findByText("Instance1", { selector: resourceHeaderSelector })
 
-      fireEvent.click(screen.getByText("MARC"))
-      fireEvent.click(screen.getByText("Request conversion to MARC"))
+      fireEvent.click(await screen.findByText("MARC"))
+      fireEvent.click(await screen.findByText("Request conversion to MARC"))
 
       await screen.findByText(/Requesting MARC/)
 
-      fireEvent.click(await screen.findByText("MARC"))
-      fireEvent.click(screen.getByText("View MARC"))
+      /*
+       * MarcButton schedules marcJobTimer with a 1000ms setTimeout, and until it
+       * fires the button reads "Requesting MARC" — which findByText("MARC") does
+       * not match, since matching is exact by default. RTL's default query
+       * timeout is also 1000ms, so the two race and this test has been
+       * intermittently failing. Wait past the production timer explicitly.
+       */
+      fireEvent.click(await screen.findByText("MARC", {}, { timeout: 5000 }))
+      fireEvent.click(await screen.findByText("View MARC"))
 
       // Modal opens.
       await screen.findByText(marc)
-      screen.getByText(/Copy MARC/, { selector: "button" })
+      await screen.findByText(/Copy MARC/, { selector: "button" })
     })
   })
 
@@ -57,8 +64,8 @@ describe("requesting MARC", () => {
 
       await screen.findByText("Instance1", { selector: resourceHeaderSelector })
 
-      fireEvent.click(screen.getByText("MARC"))
-      fireEvent.click(screen.getByText("Request conversion to MARC"))
+      fireEvent.click(await screen.findByText("MARC"))
+      fireEvent.click(await screen.findByText("Request conversion to MARC"))
 
       await screen.findByText(/Error requesting MARC: Ooops/)
     })

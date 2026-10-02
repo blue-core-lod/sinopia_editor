@@ -5,7 +5,7 @@ import PropTypes from "prop-types"
 import { useSelector } from "react-redux"
 import SearchRow from "./SearchRow"
 import useSearch from "hooks/useSearch"
-import { useHistory } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { selectSearchQuery } from "selectors/search"
 
 /**
@@ -15,12 +15,12 @@ const SearchList = (props) => {
   const { fetchNewSearchResults } = useSearch()
   const [navigateSearch, setNavigateSearch] = useState(false)
   const query = useSelector((state) => selectSearchQuery(state, "resource"))
-  const history = useHistory()
+  const navigate = useNavigate()
 
   // Need to wait until results before navigating
   useEffect(() => {
-    if (navigateSearch && query) history.push("/search")
-  }, [navigateSearch, query, history])
+    if (navigateSearch && query) navigate("/search")
+  }, [navigateSearch, query, navigate])
 
   const handleSearch = (queryString, event) => {
     event.preventDefault()

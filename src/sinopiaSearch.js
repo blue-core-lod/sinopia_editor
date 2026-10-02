@@ -1,13 +1,13 @@
 // Copyright 2019 Stanford University see LICENSE for license
 import Config from "Config"
-/* eslint-disable node/no-unpublished-import */
+/* eslint-disable n/no-unpublished-import */
 import {
   getFixtureTemplateSearchResults,
   hasFixtureResource,
   resourceSearchResults,
 } from "../__tests__/testUtilities/fixtureLoaderHelper"
 
-/* eslint-enable node/no-unpublished-import */
+/* eslint-enable n/no-unpublished-import */
 
 // Not using ES client because not intended for use in browser.
 /**
@@ -64,7 +64,7 @@ export const getSearchResultsWithFacets = async (
         const body = new URLSearchParams({ q: query })
         url = `${Config.sinopiaApiBase}/search/?${body}`
       }
-    } catch (e) {
+    } catch {
       // URL parsing failed; fall back to treating it as a search term
       const body = new URLSearchParams({ q: query })
       url = `${Config.sinopiaApiBase}/search/?${body}`

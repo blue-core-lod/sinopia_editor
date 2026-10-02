@@ -41,7 +41,7 @@ describe("Copying a template resource", () => {
     const input = screen.getByPlaceholderText(
       "Enter id, label, URI, remark, group, or author"
     )
-    await fireEvent.change(input, { target: { value: "note" } })
+    fireEvent.change(input, { target: { value: "note" } })
     await screen.findByText("resourceTemplate:bf2:Note")
 
     // Open the template
