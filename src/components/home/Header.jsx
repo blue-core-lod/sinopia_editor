@@ -8,6 +8,7 @@ import { connect } from "react-redux"
 import { selectUser } from "selectors/authenticate"
 import { signOut } from "actionCreators/authenticate"
 import { useKeycloak } from "../../KeycloakContext"
+import SessionStatus from "../SessionStatus"
 
 import { bindActionCreators } from "redux"
 
@@ -38,6 +39,7 @@ const Header = (props) => {
                 {props.currentUser.username}
               </span>
             </li>
+            <SessionStatus />
             <div className="nav-link">•</div>
             <li className="nav-item">
               <Link to="/dashboard" className="nav-link">

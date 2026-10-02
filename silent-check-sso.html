@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <!-- Used by keycloak-js check-sso to detect an existing Keycloak session without a full-page redirect. -->
+    <script>
+      parent.postMessage(location.href, location.origin)
+    </script>
+  </body>
+</html>

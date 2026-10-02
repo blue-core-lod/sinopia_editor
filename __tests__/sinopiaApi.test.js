@@ -209,6 +209,7 @@ describe("postResource", () => {
   const post = (resource, currentUser) =>
     postResource(resource, currentUser, "pcc", ["cornell"], {
       token: "Secret-Token",
+      updateToken: jest.fn().mockResolvedValue(false),
     })
 
   it("POSTs to the resources endpoint and returns the minted uri", async () => {
@@ -300,9 +301,33 @@ describe("putResource", () => {
         null,
         {
           token: "Secret-Token",
+          updateToken: jest.fn().mockResolvedValue(false),
         }
       )
       expect(result).toBeTruthy()
+    })
+
+    it("refreshes the token before saving", async () => {
+      global.fetch = jest.fn().mockResolvedValue({ ok: true })
+      const keycloak = {
+        token: "Expired-Token",
+        updateToken: jest.fn().mockImplementation(() => {
+          keycloak.token = "Fresh-Token"
+          return Promise.resolve(true)
+        }),
+      }
+
+      await putResource(resource, currentUser, null, null, null, keycloak)
+
+      expect(keycloak.updateToken).toHaveBeenCalledWith(30)
+      expect(global.fetch).toHaveBeenCalledWith(
+        resource.uri,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: "Bearer Fresh-Token",
+          }),
+        })
+      )
     })
 
     it("errors if save failed", async () => {
@@ -314,6 +339,7 @@ describe("putResource", () => {
       await expect(
         putResource(resource, currentUser, null, null, null, {
           token: "Secret-Token",
+          updateToken: jest.fn().mockResolvedValue(false),
         })
       ).rejects.toThrow("Blue Core API returned Cannot save resource")
     })

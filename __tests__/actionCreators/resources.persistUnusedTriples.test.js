@@ -68,6 +68,7 @@ describe("saveResource with triples not covered by the template", () => {
     await store.dispatch(
       saveResource(resourceKey, "stanford", [], "testerror", {
         token: "test-token",
+        updateToken: jest.fn().mockResolvedValue(false),
       })
     )
 
