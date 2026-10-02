@@ -4,11 +4,11 @@ import {
   fetchTemplateGuessSearchResults as fetchTemplateGuessSearchResultsCreator,
 } from "actionCreators/search"
 import { clearSearchResults } from "actions/search"
-import { useHistory } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 const useSearch = (errorKey) => {
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const fetchSearchResults = (
     queryString,
@@ -31,7 +31,7 @@ const useSearch = (errorKey) => {
   const fetchNewSearchResults = (queryString, searchOptions = {}, keycloak) => {
     fetchSearchResults(queryString, searchOptions, 0, keycloak).then(
       (result) => {
-        if (result) history.push("/search")
+        if (result) navigate("/search")
       }
     )
   }

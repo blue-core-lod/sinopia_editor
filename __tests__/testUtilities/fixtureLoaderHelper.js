@@ -146,10 +146,8 @@ export const getFixtureResource = (uri) => {
     /* eslint security/detect-non-literal-require: 'off' */
     resource = require(`../__template_fixtures__/${profileFilename}`)
   } else if (resourceFilenames[id]) {
-    /* eslint security/detect-non-literal-require: 'off' */
     resource = require(`../__resource_fixtures__/${resourceFilenames[id]}`)
   } else {
-    /* eslint security/detect-non-literal-require: 'off' */
     resource = require(`../__template_fixtures__/${templateFilenames[id]}`)
   }
 

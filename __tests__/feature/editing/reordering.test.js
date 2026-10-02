@@ -78,7 +78,9 @@ describe("reordering properties", () => {
     within(nestedResources1[2]).getByTestId("Move up Uber template4")
 
     // Move "b" up
-    within(nestedResources1[1]).getByTestId("Move up Uber template4").click()
+    fireEvent.click(
+      within(nestedResources1[1]).getByTestId("Move up Uber template4")
+    )
 
     const values1 = within(nestedResource1).getAllByPlaceholderText(
       "Uber template4, property1"
@@ -88,7 +90,9 @@ describe("reordering properties", () => {
     expect(values1[2]).toHaveTextContent(/c/)
 
     // Move "a" down
-    within(nestedResources1[0]).getByTestId("Move down Uber template4").click()
+    fireEvent.click(
+      within(nestedResources1[0]).getByTestId("Move down Uber template4")
+    )
     const values2 = within(nestedResource1).getAllByPlaceholderText(
       "Uber template4, property1"
     )

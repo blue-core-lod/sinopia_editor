@@ -5,8 +5,7 @@ import { useSelector, useDispatch } from "react-redux"
 import PropTypes from "prop-types"
 import { hideModal } from "actions/modals"
 import { isCurrentModal } from "selectors/modals"
-import { DialogOverlay, DialogContent } from "@reach/dialog"
-import "@reach/dialog/styles.css"
+import * as Dialog from "@radix-ui/react-dialog"
 
 const ModalWrapper = ({
   modalName,
@@ -32,29 +31,49 @@ const ModalWrapper = ({
   const wrapperClasses = ["modal-wrapper"]
   if (size === "lg") wrapperClasses.push("modal-wrapper-lg")
 
+  const dismiss = handleClose || close
+
+  /*
+   * Radix drives dismissal through onEscapeKeyDown/onPointerDownOutside, both of
+   * which receive an event. onOpenChange does not, and every handleClose passed
+   * in by a consumer calls event.preventDefault(). Visibility is owned by redux
+   * (isCurrentModal), so preventing Radix's own close is correct here — the
+   * hideModal dispatch inside dismiss is what actually closes the modal.
+   */
   return (
-    <DialogOverlay
-      initialFocusRef={initialInputRef}
-      className={wrapperClasses.join(" ")}
-      onDismiss={handleClose || close}
-    >
-      <DialogContent aria-label={ariaLabel} {...props}>
-        <div className="card">
-          <div className="card-header">
-            {header}
-            <button
-              type="button"
-              className="btn-close"
-              onClick={handleClose || close}
-              aria-label="Close"
-              data-testid="Close"
-            ></button>
-          </div>
-          <div className="card-body">{body}</div>
-          {footer && <div className="card-footer">{footer}</div>}
-        </div>
-      </DialogContent>
-    </DialogOverlay>
+    <Dialog.Root open>
+      <Dialog.Portal>
+        <Dialog.Overlay className="modal-overlay">
+          <Dialog.Content
+            className={wrapperClasses.join(" ")}
+            aria-label={ariaLabel}
+            onEscapeKeyDown={dismiss}
+            onPointerDownOutside={dismiss}
+            onOpenAutoFocus={(event) => {
+              if (!initialInputRef?.current) return
+              event.preventDefault()
+              initialInputRef.current.focus()
+            }}
+            {...props}
+          >
+            <div className="card">
+              <div className="card-header">
+                {header}
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={dismiss}
+                  aria-label="Close"
+                  data-testid="Close"
+                ></button>
+              </div>
+              <div className="card-body">{body}</div>
+              {footer && <div className="card-footer">{footer}</div>}
+            </div>
+          </Dialog.Content>
+        </Dialog.Overlay>
+      </Dialog.Portal>
+    </Dialog.Root>
   )
 }
 

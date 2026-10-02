@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
 import PropTypes from "prop-types"
-import { DialogOverlay, DialogContent } from "@reach/dialog"
-import "@reach/dialog/styles.css"
+import * as Dialog from "@radix-ui/react-dialog"
 import { useKeycloak, SESSION_WARNING_MS as WARN_MS } from "../KeycloakContext"
 
 const formatCountdown = (ms) => {
@@ -12,18 +11,35 @@ const formatCountdown = (ms) => {
   return `${minutes}:${seconds}`
 }
 
+/*
+ * Radix renders the backdrop and the dialog as separate elements, so the
+ * backdrop takes .modal-overlay and the dialog takes .modal-wrapper (see
+ * styles/modal.scss). Visibility is owned by this component's state rather than
+ * Radix, so there is no onOpenChange — the dismissal hooks forward to
+ * onDismiss, and a dialog given no onDismiss can't be dismissed at all.
+ */
 const SessionDialog = ({ title, children, footer, onDismiss }) => (
-  <DialogOverlay className="modal-wrapper" onDismiss={onDismiss}>
-    <DialogContent aria-label={title}>
-      <div className="card">
-        <div className="card-header">
-          <h4 className="card-title">{title}</h4>
-        </div>
-        <div className="card-body">{children}</div>
-        <div className="card-footer">{footer}</div>
-      </div>
-    </DialogContent>
-  </DialogOverlay>
+  <Dialog.Root open>
+    <Dialog.Portal>
+      <Dialog.Overlay className="modal-overlay">
+        <Dialog.Content
+          className="modal-wrapper"
+          onEscapeKeyDown={onDismiss}
+          onPointerDownOutside={onDismiss}
+        >
+          <div className="card">
+            <div className="card-header">
+              <Dialog.Title asChild>
+                <h4 className="card-title">{title}</h4>
+              </Dialog.Title>
+            </div>
+            <div className="card-body">{children}</div>
+            <div className="card-footer">{footer}</div>
+          </div>
+        </Dialog.Content>
+      </Dialog.Overlay>
+    </Dialog.Portal>
+  </Dialog.Root>
 )
 
 SessionDialog.propTypes = {

@@ -1,13 +1,14 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import React from "react"
-import ReactDOM from "react-dom"
+import { createRoot } from "react-dom/client"
 import RootContainer from "./components/RootContainer"
 import "@popperjs/core"
 import "bootstrap"
 
-const root = document.createElement("div")
-root.className = "container-fluid"
-document.body.appendChild(root)
+const container = document.createElement("div")
+container.className = "container-fluid"
+document.body.appendChild(container)
 
-ReactDOM.render(React.createElement(RootContainer), root)
+// React 19 removed ReactDOM.render; createRoot is the only entry point.
+createRoot(container).render(React.createElement(RootContainer))

@@ -16,7 +16,7 @@ import {
   setCurrentResource,
   setCurrentPreviewResource,
 } from "actions/resources"
-import { useHistory } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useKeycloak } from "../KeycloakContext"
 
 const useResource = (
@@ -24,7 +24,7 @@ const useResource = (
   { resourceTemplateId = null, resourceURI = null }
 ) => {
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const { keycloak } = useKeycloak()
   const errors = useSelector((state) => selectErrors(state, errorKey))
   const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
@@ -37,9 +37,9 @@ const useResource = (
   useEffect(() => {
     // Forces a wait until the root resource has been set in state
     if (navigateEditor && resourceKey && _.isEmpty(errors)) {
-      history.push("/editor")
+      navigate("/editor")
     }
-  }, [navigateEditor, resourceKey, history, errors])
+  }, [navigateEditor, resourceKey, navigate, errors])
 
   const handleNew = (event) => {
     if (event) event.preventDefault()

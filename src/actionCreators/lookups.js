@@ -60,7 +60,7 @@ const responseToOptions = (json) => {
       labels.forEach((label) =>
         opts.push({ id: newId, label: label["@value"], uri })
       )
-    } catch (err) {
+    } catch {
       // Ignore
     }
   }

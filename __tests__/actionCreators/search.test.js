@@ -5,7 +5,7 @@ import {
 } from "actionCreators/search"
 import * as server from "sinopiaSearch"
 import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
+import { thunk } from "redux-thunk"
 import { createState } from "stateUtils"
 import * as sinopiaApi from "sinopiaApi"
 import rdf from "rdf-ext"

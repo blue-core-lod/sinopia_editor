@@ -2,6 +2,7 @@
 
 import React from "react"
 import PropTypes from "prop-types"
+import { useParams } from "react-router-dom"
 import Header from "../Header"
 import AlertsContextProvider from "components/alerts/AlertsContextProvider"
 import ContextAlert from "components/alerts/ContextAlert"
@@ -236,12 +237,9 @@ const AllProperties = () => (
 const vocabErrorKey = "vocab"
 
 const Vocab = (props) => {
+  const params = useParams()
   const body =
-    props.match.params.element === undefined ? (
-      <AllProperties />
-    ) : (
-      displayProperty(props.match.params)
-    )
+    params.element === undefined ? <AllProperties /> : displayProperty(params)
   return (
     <AlertsContextProvider value={vocabErrorKey}>
       <div id="vocabulary">
@@ -255,7 +253,6 @@ const Vocab = (props) => {
 
 Vocab.propTypes = {
   triggerHandleOffsetMenu: PropTypes.func,
-  match: PropTypes.object,
 }
 
 export default Vocab

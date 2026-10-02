@@ -1,6 +1,6 @@
 // Copyright 2019 Stanford University see LICENSE for license
 import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
+import { thunk } from "redux-thunk"
 import * as sinopiaApi from "sinopiaApi"
 import { createState } from "stateUtils"
 import { transfer } from "actionCreators/transfer"

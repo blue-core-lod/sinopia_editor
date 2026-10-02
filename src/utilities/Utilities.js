@@ -32,7 +32,7 @@ export const isValidURI = (value) => {
     /* eslint no-new: 'off' */
     new URL(value)
     return true
-  } catch (e) {
+  } catch {
     return false
   }
 }
@@ -52,7 +52,7 @@ export const isHttp = (uri) =>
 export const isBlueCoreUri = (uri) => {
   try {
     return new URL(uri).origin === new URL(Config.sinopiaApiBase).origin
-  } catch (e) {
+  } catch {
     return false
   }
 }
@@ -69,7 +69,7 @@ export const resourceIdFromUri = (uri) => {
   let segments
   try {
     segments = new URL(uri).pathname.split("/").filter(Boolean)
-  } catch (e) {
+  } catch {
     return null
   }
   if (segments.length < 2) return null

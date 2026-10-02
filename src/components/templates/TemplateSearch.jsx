@@ -16,12 +16,11 @@ import {
   selectSearchTotalResults,
 } from "selectors/search"
 import { clearErrors, addError } from "actions/errors"
-import PropTypes from "prop-types"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons"
 import useAlerts from "hooks/useAlerts"
 
-const TemplateSearch = (props) => {
+const TemplateSearch = () => {
   const dispatch = useDispatch()
   const errorKey = useAlerts()
   // Tokens allow us to cancel an existing search. Does not actually stop the
@@ -161,12 +160,12 @@ const TemplateSearch = (props) => {
             </div>
           </div>
           <div className="col-md-2">
-            <NewResourceTemplateButton history={props.history} />
+            <NewResourceTemplateButton />
           </div>
         </div>
       </div>
 
-      <SinopiaResourceTemplates history={props.history} />
+      <SinopiaResourceTemplates />
       <SearchResultsPaging
         changePage={changePage}
         resultsPerPage={searchOptions.resultsPerPage}
@@ -177,8 +176,6 @@ const TemplateSearch = (props) => {
   )
 }
 
-TemplateSearch.propTypes = {
-  history: PropTypes.object,
-}
+TemplateSearch.propTypes = {}
 
 export default TemplateSearch
