@@ -11,7 +11,7 @@ const LoginPanel = () => {
   const dispatch = useDispatch()
   const hasUser = useSelector((state) => hasUserSelector(state))
 
-  const { keycloak } = useKeycloak()
+  const { keycloak, initialized, authenticated } = useKeycloak()
 
   const error = _.first(
     useSelector((state) => selectErrors(state, signInErrorKey))
@@ -26,7 +26,9 @@ const LoginPanel = () => {
     dispatch(signIn(keycloak, signInErrorKey, redirectUri))
   }
 
-  if (hasUser) return null
+  // Hide until Keycloak has checked for an existing session and any signed-in
+  // user has been loaded, so the login button doesn't flash for them.
+  if (hasUser || !initialized || authenticated) return null
 
   return (
     <React.Fragment>

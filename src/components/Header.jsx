@@ -12,6 +12,7 @@ import { selectCurrentResourceKey } from "selectors/resources"
 import { useKeycloak } from "../KeycloakContext"
 import usePermissions from "hooks/usePermissions"
 import HeaderSearch from "./search/HeaderSearch"
+import SessionStatus from "./SessionStatus"
 
 const bcLogo = require("../styles/bluecore-small.png")
 
@@ -50,6 +51,7 @@ const Header = (props) => {
                   </span>
                 </li>
               )}
+              {props.currentUser && <SessionStatus />}
               <div className="nav-link">•</div>
               {props.currentUser && (
                 <li className="nav-item">

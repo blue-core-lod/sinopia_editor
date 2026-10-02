@@ -84,6 +84,12 @@ module.exports = {
       filename: "index.html",
       hash: true,
     }),
+    // Target page for keycloak-js silent check-sso (see KeycloakContext).
+    new HtmlWebpackPlugin({
+      template: "silent-check-sso.html",
+      filename: "silent-check-sso.html",
+      inject: false,
+    }),
   ],
   devtool: "source-map",
   devServer: {

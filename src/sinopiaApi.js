@@ -131,17 +131,22 @@ export const getGroups = () =>
 
 // Sends a serialized resource body to the Blue Core API with the appropriate
 // auth header. Shared by postResource and putResource.
-const sendResourceBody = (url, body, method, keycloak) => {
-  const jwt = getJwt(keycloak)
-  return fetch(url, {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${jwt}`,
-    },
-    body,
-  })
-}
+// The token is refreshed first in case the user was idle and it expired; a
+// failed refresh is left for the API to reject so the save reports an error.
+const sendResourceBody = (url, body, method, keycloak) =>
+  keycloak
+    .updateToken(30)
+    .catch(() => {})
+    .then(() =>
+      fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getJwt(keycloak)}`,
+        },
+        body,
+      })
+    )
 
 // Determines the Blue Core API collection a new resource should be POSTed to,
 // based on its class. The server mints the uri and returns it in the response.
