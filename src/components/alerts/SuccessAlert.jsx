@@ -3,6 +3,7 @@
 import React, { useRef, useState, useLayoutEffect } from "react"
 import PropTypes from "prop-types"
 import SuccessWrapper from "./SuccessWrapper"
+import SuccessMessage from "./SuccessMessage"
 import _ from "lodash"
 
 const SuccessAlert = ({ messages }) => {
@@ -17,7 +18,11 @@ const SuccessAlert = ({ messages }) => {
 
   if (_.isEmpty(messages)) return null
 
-  const messageText = messages.map((message) => <p key={message}>{message}</p>)
+  const messageText = messages.map((message) => (
+    <p key={message.resourceUri || message}>
+      <SuccessMessage message={message} />
+    </p>
+  ))
 
   return <SuccessWrapper ref={ref}>{messageText}</SuccessWrapper>
 }

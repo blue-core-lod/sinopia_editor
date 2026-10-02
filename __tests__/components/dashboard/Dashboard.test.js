@@ -28,6 +28,22 @@ describe("<Dashboard />", () => {
     expect(screen.getByText("Import is being processed.")).toBeInTheDocument()
   })
 
+  it("renders a success message that links to a resource", () => {
+    renderDashboard({
+      [dashboardErrorKey]: [
+        {
+          text: "The new work was created:",
+          resourceUri: "http://localhost:3000/works/abc-123",
+        },
+      ],
+    })
+
+    expect(screen.getByText("The new work was created:")).toBeInTheDocument()
+    expect(
+      screen.getByRole("link", { name: "http://localhost:3000/works/abc-123" })
+    ).toHaveAttribute("href", "/editor/resource/works/abc-123")
+  })
+
   it("renders no success alert when there are no messages", () => {
     renderDashboard()
 
