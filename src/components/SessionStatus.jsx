@@ -64,13 +64,15 @@ const SessionStatus = () => {
 
   const logBackIn = () => keycloak.login({ redirectUri: window.location.href })
 
-  // Extends the session. If the end time doesn't move, the session has hit
-  // its maximum length and can't be extended.
+  // Extends the session. If the refresh works but the end time doesn't move,
+  // the session has hit its maximum length and can't be extended. A failed
+  // refresh (e.g. network error) leaves Continue available to try again.
   const continueSession = () => {
     const previousExpiresAt = sessionExpiresAt
     setExtending(true)
-    extendSession().then(() => {
+    extendSession().then((refreshed) => {
       setExtending(false)
+      if (!refreshed) return
       const exp = keycloak.refreshTokenParsed?.exp
       const newExpiresAt = exp && (exp + (keycloak.timeSkew || 0)) * 1000
       if (newExpiresAt && newExpiresAt - previousExpiresAt < 5000)

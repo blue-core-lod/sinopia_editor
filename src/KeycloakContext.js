@@ -173,8 +173,16 @@ export const KeycloakProvider = ({ children }) => {
       )
   }, [keycloak, refresh])
 
-  // Extends the session (used by the Continue button).
-  const extendSession = useCallback(() => refresh(-1), [refresh])
+  // Extends the session (used by the Continue button). Resolves to whether
+  // the refresh worked, so a failed one isn't mistaken for the session limit.
+  const extendSession = useCallback(
+    () =>
+      keycloak.updateToken(-1).then(
+        () => true,
+        () => false
+      ),
+    [keycloak]
+  )
 
   return (
     <KeycloakContext.Provider

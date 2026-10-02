@@ -223,7 +223,9 @@ describe("KeycloakProvider", () => {
     const instance = newInstance()
     await renderProvider(instance)
 
-    await act(() => context.extendSession())
+    await act(async () => {
+      expect(await context.extendSession()).toBe(true)
+    })
 
     expect(instance.updateToken).toHaveBeenCalledWith(-1)
   })
@@ -251,7 +253,9 @@ describe("KeycloakProvider", () => {
     })
     await renderProvider(instance)
 
-    await act(() => context.extendSession())
+    await act(async () => {
+      expect(await context.extendSession()).toBe(false)
+    })
 
     expect(context.sessionExpired).toBe(false)
   })

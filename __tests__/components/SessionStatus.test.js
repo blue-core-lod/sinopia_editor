@@ -20,16 +20,21 @@ const renderStatus = ({
   msLeft = null,
   sessionExpired = false,
   expAfterExtend = null,
+  extendFails = false,
 } = {}) => {
   const keycloak = { login: jest.fn(), timeSkew: 0 }
+  const sessionExpiresAt = msLeft === null ? null : Date.now() + msLeft
+  if (sessionExpiresAt)
+    keycloak.refreshTokenParsed = { exp: sessionExpiresAt / 1000 }
   const extendSession = jest.fn().mockImplementation(() => {
+    if (extendFails) return Promise.resolve(false)
     if (expAfterExtend)
       keycloak.refreshTokenParsed = { exp: expAfterExtend / 1000 }
-    return Promise.resolve()
+    return Promise.resolve(true)
   })
   useKeycloak.mockReturnValue({
     keycloak,
-    sessionExpiresAt: msLeft === null ? null : Date.now() + msLeft,
+    sessionExpiresAt,
     sessionExpired,
     extendSession,
   })
@@ -98,6 +103,24 @@ describe("<SessionStatus />", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Close" }))
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
+  })
+
+  // A failed refresh (e.g. network error) isn't the session limit.
+  it("keeps Continue available when the refresh fails", async () => {
+    const { extendSession } = renderStatus({
+      msLeft: 2 * MINUTE,
+      extendFails: true,
+    })
+
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }))
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled()
+    )
+    expect(screen.queryByText(/can't be extended/)).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }))
+    expect(extendSession).toHaveBeenCalledTimes(2)
   })
 
   // With a short timeout, Continue still works even if under 5 minutes are left.
