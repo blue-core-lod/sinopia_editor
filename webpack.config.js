@@ -77,7 +77,7 @@ module.exports = {
   plugins: [
     new webpack.ProvidePlugin({
       Buffer: ["buffer", "Buffer"],
-      process: "process/browser",
+      process: "process/browser.js",
     }),
     new HtmlWebpackPlugin({
       template: "index.html",
@@ -121,17 +121,22 @@ module.exports = {
       })
       return middlewares
     },
-    proxy: {
-      "/api/search": "http://localhost:8000",
-      "/api/qa": {
+    proxy: [
+      {
+        context: ["/api/search"],
+        target: "http://localhost:8000",
+      },
+      {
+        context: ["/api/qa"],
         target: "https://lookup.ld4l.org",
         changeOrigin: true,
         pathRewrite: { "^/api/qa": "" },
       },
-      "/keycloak": {
+      {
+        context: ["/keycloak"],
         target: "http://localhost",
         changeOrigin: true,
       },
-    },
+    ],
   },
 }
