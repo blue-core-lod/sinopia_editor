@@ -4,7 +4,7 @@ import {
 } from "actionCreators/relationships"
 import * as sinopiaApi from "sinopiaApi"
 import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
+import { thunk } from "redux-thunk"
 import { createState } from "stateUtils"
 import { datasetFromJsonld } from "utilities/Utilities"
 import instanceWithRefs from "../__resource_fixtures__/instance_with_refs.json"

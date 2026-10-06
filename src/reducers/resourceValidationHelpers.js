@@ -49,11 +49,17 @@ export const literalIntegerValidationError = (value, propertyTemplate) => {
 
 export const literalDateTimeValidationError = (value, propertyTemplate) => {
   const errors = []
-  // this regex not restrictive enough, but with Date object instantiation, it's good enough
+  /*
+   * The regex alone is not restrictive enough (it accepts month 99), so the
+   * Date check is what rejects impossible dates. It previously read
+   * `new Date(value) !== "Invalid Date"`, comparing a Date object to a string,
+   * which is always true — so nothing was validated and 2024-99-99T99:99:99
+   * passed. ESLint 9's no-constant-binary-expression flagged it.
+   */
   // eslint-disable-next-line security/detect-unsafe-regex
-  const xsdDateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(.\d+)?$/
+  const xsdDateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?$/
   const isValidXsdDateTime = (value) =>
-    xsdDateTimeRegex.test(value) && new Date(value) !== "Invalid Date"
+    xsdDateTimeRegex.test(value) && !Number.isNaN(new Date(value).getTime())
 
   if (
     propertyTemplate.validationDataType ===
@@ -71,12 +77,13 @@ export const literalDateTimeStampValidationError = (
   propertyTemplate
 ) => {
   const errors = []
-  // this regex not restrictive enough, but with Date object instantiation, it's good enough
+  // Same always-true Date comparison as literalDateTimeValidationError above.
   const xsdDateTimeStampRegex =
     // eslint-disable-next-line security/detect-unsafe-regex
-    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(.\d+)?(Z|([+-]\d{2}):\d{2})$/
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|([+-]\d{2}):\d{2})$/
   const isValidXsdDateTimeStamp = (value) =>
-    xsdDateTimeStampRegex.test(value) && new Date(value) !== "Invalid Date"
+    xsdDateTimeStampRegex.test(value) &&
+    !Number.isNaN(new Date(value).getTime())
 
   if (
     propertyTemplate.validationDataType ===
@@ -98,7 +105,7 @@ export const literalEdtfValidationError = (value, propertyTemplate) => {
     try {
       edtfParse(value)
       return true
-    } catch (e) {
+    } catch {
       return false
     }
   }

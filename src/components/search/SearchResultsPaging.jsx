@@ -51,7 +51,7 @@ const SearchResultsPaging = (props) => {
     return null
   }
   const lastPage = Math.ceil(props.totalResults / props.resultsPerPage)
-  // eslint-disable-next-line max-params
+
   const pageButton = (key, label, page, active) => {
     const classes = ["page-item"]
     if (active) classes.push("active")

@@ -22,11 +22,11 @@ import { dashboardErrorKey } from "utilities/errorKeyFactory"
 import MarcModal from "../editor/actions/MarcModal"
 import ResourceTemplateChoiceModal from "../ResourceTemplateChoiceModal"
 import { completeResourceLoadingWithTemplate } from "actionCreators/resources"
-import { useHistory } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 const Dashboard = (props) => {
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const historicalTemplates = useSelector((state) =>
     selectHistoricalTemplates(state)
   )
@@ -49,7 +49,7 @@ const Dashboard = (props) => {
   const chooseResourceTemplate = (resourceTemplateId) => {
     dispatch(completeResourceLoadingWithTemplate(resourceTemplateId)).then(
       (result) => {
-        if (result) history.push("/editor")
+        if (result) navigate("/editor")
       }
     )
   }

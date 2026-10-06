@@ -1,7 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
 import { createStore, applyMiddleware, compose } from "redux"
-import thunk from "redux-thunk"
+import { thunk } from "redux-thunk"
 import reducer from "./reducers/index"
 import { sinopiaSearchUri } from "utilities/authorityConfig"
 

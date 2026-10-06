@@ -29,9 +29,14 @@ describe("preview within editor", () => {
     await screen.findByText(/Uber template1/)
     fireEvent.click(screen.getByTestId("Create resource for Uber template1"))
 
-    // Click on the Preview RDF Button
-    await screen.findByText(/Uber template1/)
-    fireEvent.click(screen.getAllByTitle("Preview resource")[0])
+    /*
+     * findAllByTitle, not getAllByTitle: /Uber template1/ also matches text on
+     * the templates page, so awaiting it does not guarantee the editor has
+     * rendered. React 19 batches the post-navigation update, so the button has
+     * to be awaited rather than queried synchronously.
+     */
+    const previewButtons = await screen.findAllByTitle("Preview resource")
+    fireEvent.click(previewButtons[0])
 
     // Wait for RDF Preview Modal and selects turtle Format
     await screen.findByText(/Preview/)

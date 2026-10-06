@@ -39,9 +39,14 @@ describe("viewing the dashboard", () => {
 
       fireEvent.click(screen.getByText("Dashboard", { selector: "a" }))
 
-      expect(screen.queryByText(/Welcome to Sinopia/)).not.toBeInTheDocument()
+      /*
+       * Await the dashboard before asserting the homepage is gone. React 19
+       * batches the post-navigation update, so a synchronous negative assertion
+       * here would pass simply because nothing had rendered yet.
+       */
+      await screen.findByText("Recent templates")
 
-      screen.getByText("Recent templates")
+      expect(screen.queryByText(/Welcome to Sinopia/)).not.toBeInTheDocument()
 
       // The result
       screen.getByText(/Uber template1/)

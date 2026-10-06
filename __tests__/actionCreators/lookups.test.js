@@ -2,7 +2,7 @@
 
 import { fetchLookup } from "actionCreators/lookups"
 import configureMockStore from "redux-mock-store"
-import thunk from "redux-thunk"
+import { thunk } from "redux-thunk"
 import { nanoid } from "nanoid"
 import "isomorphic-fetch"
 import { createState } from "stateUtils"

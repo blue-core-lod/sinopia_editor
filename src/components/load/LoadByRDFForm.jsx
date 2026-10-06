@@ -18,7 +18,7 @@ import { showModal } from "actions/modals"
 import { dashboardErrorKey } from "utilities/errorKeyFactory"
 import ResourceTemplateChoiceModal from "../ResourceTemplateChoiceModal"
 import useAlerts from "hooks/useAlerts"
-import { useHistory } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useKeycloak } from "../../KeycloakContext"
 import { getJwt } from "utilities/SinopiaApiHelper"
 import Config from "Config"
@@ -55,7 +55,7 @@ const LoadByRDFForm = () => {
   const dispatch = useDispatch()
   const errorKey = useAlerts()
   const { keycloak } = useKeycloak()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const [baseURI, setBaseURI] = useState("")
   const [rdf, setRdf] = useState("")
@@ -155,7 +155,7 @@ const LoadByRDFForm = () => {
           "Your MARC record was submitted and is being processed. The new work will appear here once it is ready."
         )
       )
-      history.push("/dashboard")
+      navigate("/dashboard")
       fetch(`${Config.sinopiaApiBase}/works`, {
         method: "POST",
         headers: {

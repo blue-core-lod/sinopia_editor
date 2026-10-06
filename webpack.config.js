@@ -1,6 +1,6 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
-/* eslint node/no-unpublished-require: ["off"] */
+/* eslint n/no-unpublished-require: ["off"] */
 const path = require("path")
 const webpack = require("webpack")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
@@ -60,7 +60,7 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ["*", ".js", ".jsx"],
+    extensions: [".js", ".jsx"],
     fallback: {
       fs: false,
       stream: require.resolve("stream-browserify"),
