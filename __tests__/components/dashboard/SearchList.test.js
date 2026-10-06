@@ -32,7 +32,7 @@ describe("<SearchList />", () => {
 
     fireEvent.click(screen.getByTestId("Search twain (Sinopia resources)"))
 
-    expect(mockGetSearchResults).toBeCalledWith(
+    expect(mockGetSearchResults).toHaveBeenCalledWith(
       "twain",
       { startOfRange: 0 },
       undefined

@@ -42,7 +42,7 @@ describe("<Search />", () => {
     fireEvent.click(screen.getByTestId("Submit search"))
 
     // Called once
-    expect(mockGetSearchResults).toBeCalledWith(
+    expect(mockGetSearchResults).toHaveBeenCalledWith(
       "foo",
       { startOfRange: 0 },
       undefined
@@ -79,7 +79,7 @@ describe("<Search />", () => {
     })
 
     // Called once
-    expect(mockGetSearchResults).toBeCalledWith(
+    expect(mockGetSearchResults).toHaveBeenCalledWith(
       "foo",
       { startOfRange: 0 },
       undefined

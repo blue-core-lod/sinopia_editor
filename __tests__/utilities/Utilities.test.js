@@ -135,7 +135,7 @@ describe("Utilities", () => {
   })
 
   it("raises an error for invalid N3", async () => {
-    await expect(datasetFromN3("foo")).rejects.toThrowError()
+    await expect(datasetFromN3("foo")).rejects.toThrow()
   })
 
   describe("formatISODate()", () => {
