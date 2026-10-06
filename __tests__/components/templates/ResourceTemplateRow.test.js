@@ -55,21 +55,34 @@ describe("ResourceTemplateRow actions", () => {
   })
 
   describe("when the user has template_edit only", () => {
-    it("renders edit but not create or copy", () => {
+    it("renders create and edit but not copy", () => {
       renderRowForRoles(["template_edit"])
 
       screen.getByTestId(`Edit ${label}`)
       screen.getByTestId(`View ${label}`)
-      expect(
-        screen.queryByTestId(`Create resource for ${label}`)
-      ).not.toBeInTheDocument()
+      screen.getByTestId(`Create resource for ${label}`)
       expect(screen.queryByTestId(`Copy ${label}`)).not.toBeInTheDocument()
     })
   })
 
   describe("when the user has neither template role", () => {
-    it("renders view only", () => {
+    it("renders view and create but not edit or copy", () => {
       renderRowForRoles([])
+
+      screen.getByTestId(`View ${label}`)
+      screen.getByTestId(`Create resource for ${label}`)
+      expect(screen.queryByTestId(`Copy ${label}`)).not.toBeInTheDocument()
+      expect(screen.queryByTestId(`Edit ${label}`)).not.toBeInTheDocument()
+    })
+  })
+
+  describe("when the user is not in any groups", () => {
+    it("renders view only, even with both template roles", () => {
+      const state = createState({ noGroups: true })
+      renderComponent(
+        <ResourceTemplateSearchResult results={[row]} />,
+        createStore(state)
+      )
 
       screen.getByTestId(`View ${label}`)
       expect(
