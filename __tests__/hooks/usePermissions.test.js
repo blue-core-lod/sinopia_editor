@@ -27,7 +27,7 @@ describe("hasRole()", () => {
   describe("when the user has the role", () => {
     it("returns true", () => {
       expect(
-        renderProbe("template_edit", ["template_edit", "offline_access"])
+        renderProbe("template_edit", ["template_edit", "offline_access"]),
       ).toEqual("true")
     })
   })

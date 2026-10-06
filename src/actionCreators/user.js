@@ -11,15 +11,15 @@ export const loadUserData = (userId, keycloak) => (dispatch) =>
   fetchUser(userId)
     .then((userData) => {
       const templateIds = userData.data.history.template.map(
-        (historyItem) => historyItem.payload
+        (historyItem) => historyItem.payload,
       )
       dispatch(loadTemplateHistory(templateIds))
       const searches = userData.data.history.search.map((historyItem) =>
-        JSON.parse(historyItem.payload)
+        JSON.parse(historyItem.payload),
       )
       dispatch(loadSearchHistory(searches, keycloak))
       const resourceUris = userData.data.history.resource.map(
-        (historyItem) => historyItem.payload
+        (historyItem) => historyItem.payload,
       )
       dispatch(loadResourceHistory(resourceUris))
     })
@@ -33,7 +33,7 @@ const addHistory = (historyType, payload, keycloak) => (dispatch, getState) => {
     historyType,
     md5(payload).toString(),
     payload,
-    keycloak
+    keycloak,
   ).catch((err) => console.error(err))
 }
 

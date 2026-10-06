@@ -23,7 +23,7 @@ const MarcButton = ({ resourceKey }) => {
         "subjectTemplateKey",
         "classes",
       ]),
-    shallowEqual
+    shallowEqual,
   )
 
   const [isRequesting, setRequesting] = useState(false)
@@ -59,7 +59,7 @@ const MarcButton = ({ resourceKey }) => {
       .catch((err) => {
         if (!isMounted.current) return
         dispatch(
-          addError(errorKey, `Error requesting MARC: ${err.message || err}`)
+          addError(errorKey, `Error requesting MARC: ${err.message || err}`),
         )
         setRequesting(false)
       })
@@ -77,7 +77,7 @@ const MarcButton = ({ resourceKey }) => {
       .catch((err) => {
         if (!isMounted.current) return
         dispatch(
-          addError(errorKey, `Error requesting MARC: ${err.message || err}`)
+          addError(errorKey, `Error requesting MARC: ${err.message || err}`),
         )
         setRequesting(false)
       })
@@ -98,7 +98,7 @@ const MarcButton = ({ resourceKey }) => {
         saveAs(blob, `record-${resource.uri}.mar`)
       })
       .catch(
-        (err) => (marcs.current[resourceKey] = { error: err.message || err })
+        (err) => (marcs.current[resourceKey] = { error: err.message || err }),
       )
     event.preventDefault()
   }

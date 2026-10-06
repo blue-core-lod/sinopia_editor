@@ -30,20 +30,24 @@ export const loadResourceTemplate =
     dispatch(
       loadResourceTemplateWithoutValidation(
         resourceTemplateId,
-        resourceTemplatePromises
-      )
+        resourceTemplatePromises,
+      ),
     )
       .then((subjectTemplate) =>
         dispatch(
-          validateTemplates(subjectTemplate, resourceTemplatePromises, errorKey)
-        ).then((isValid) => (isValid ? subjectTemplate : null))
+          validateTemplates(
+            subjectTemplate,
+            resourceTemplatePromises,
+            errorKey,
+          ),
+        ).then((isValid) => (isValid ? subjectTemplate : null)),
       )
       .catch((err) => {
         dispatch(
           addError(
             errorKey,
-            `Error retrieving ${resourceTemplateId}: ${err.message || err}`
-          )
+            `Error retrieving ${resourceTemplateId}: ${err.message || err}`,
+          ),
         )
         return null
       })
@@ -67,7 +71,7 @@ export const loadResourceTemplateWithoutValidation =
     // Try to get it from state.
     const subjectTemplate = selectSubjectAndPropertyTemplates(
       getState(),
-      resourceTemplateId
+      resourceTemplateId,
     )
     if (subjectTemplate) {
       return Promise.resolve(subjectTemplate)
@@ -81,7 +85,7 @@ export const loadResourceTemplateWithoutValidation =
     if (isFullUri && isForeignHost(resourceTemplateId))
       console.warn(
         "Nested resource template reference points at a different environment; it will be followed across environments:",
-        resourceTemplateId
+        resourceTemplateId,
       )
 
     const templateUriPromise = isFullUri
@@ -96,7 +100,7 @@ export const loadResourceTemplateWithoutValidation =
                 (result) =>
                   result.resourceId === resourceTemplateId ||
                   result.id === resourceTemplateId ||
-                  result.templateId === resourceTemplateId
+                  result.templateId === resourceTemplateId,
               )
 
               if (matchingResult && matchingResult.uri) {
@@ -107,7 +111,7 @@ export const loadResourceTemplateWithoutValidation =
               // If no exact match found, log the issue and fall back
               console.warn(
                 `Template search for ${resourceTemplateId} returned ${searchResults.results.length} results but none matched`,
-                searchResults.results
+                searchResults.results,
               )
             }
 
@@ -117,10 +121,10 @@ export const loadResourceTemplateWithoutValidation =
             }/resource/${resourceToName(resourceTemplateId)}`
             console.warn(
               `Template search failed for ${resourceTemplateId}, using fallback:`,
-              fallbackUri
+              fallbackUri,
             )
             return fallbackUri
-          }
+          },
         )
 
     const newResourceTemplatePromise = templateUriPromise.then((templateUri) =>
@@ -137,7 +141,7 @@ export const loadResourceTemplateWithoutValidation =
           user.username,
           response.group,
           response.editGroups,
-          resourceTemplateId
+          resourceTemplateId,
         )
         // A URI reference carries no expected id to compare against, but a
         // payload that is not a resource template at all is detectable. Catch
@@ -145,7 +149,7 @@ export const loadResourceTemplateWithoutValidation =
         // unopenable resource.
         if (!builder.isResourceTemplate) {
           const error = new Error(
-            `${resourceTemplateId} is not a resource template: ${templateUri} is not typed sinopia:ResourceTemplate.`
+            `${resourceTemplateId} is not a resource template: ${templateUri} is not typed sinopia:ResourceTemplate.`,
           )
           console.error(error.message)
           throw error
@@ -155,7 +159,7 @@ export const loadResourceTemplateWithoutValidation =
         // Only check when we used search (not a full URI), to work around Blue Core search
         if (!isFullUri && subjectTemplate.id !== resourceTemplateId) {
           const error = new Error(
-            `Search returned wrong template: requested ${resourceTemplateId} but got ${subjectTemplate.id} from ${templateUri}. This indicates the Blue Core API search index is misconfigured.`
+            `Search returned wrong template: requested ${resourceTemplateId} but got ${subjectTemplate.id} from ${templateUri}. This indicates the Blue Core API search index is misconfigured.`,
           )
           console.error(error.message)
           throw error
@@ -167,7 +171,7 @@ export const loadResourceTemplateWithoutValidation =
         // later as an opaque crash rather than a nameable bad reference.
         if (!subjectTemplate.id) {
           const error = new Error(
-            `${resourceTemplateId} is not a resource template: ${templateUri} has no sinopia:hasResourceId.`
+            `${resourceTemplateId} is not a resource template: ${templateUri} has no sinopia:hasResourceId.`,
           )
           console.error(error.message)
           throw error
@@ -175,7 +179,7 @@ export const loadResourceTemplateWithoutValidation =
 
         dispatch(addTemplates(subjectTemplate))
         return subjectTemplate
-      })
+      }),
     )
 
     if (resourceTemplatePromises)

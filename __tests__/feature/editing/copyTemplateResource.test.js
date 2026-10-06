@@ -39,7 +39,7 @@ describe("Copying a template resource", () => {
 
     // Search for the template resource
     const input = screen.getByPlaceholderText(
-      "Enter id, label, URI, remark, group, or author"
+      "Enter id, label, URI, remark, group, or author",
     )
     fireEvent.change(input, { target: { value: "note" } })
     await screen.findByText("resourceTemplate:bf2:Note")
@@ -60,7 +60,7 @@ describe("Copying a template resource", () => {
 
     // It has the 'template' class for header color
     expect(screen.getByTestId("Template ID panelProperty")).toHaveClass(
-      "template"
+      "template",
     )
   }, 10000)
 })

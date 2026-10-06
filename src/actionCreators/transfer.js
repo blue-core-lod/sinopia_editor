@@ -15,7 +15,10 @@ export const transfer =
       })
       .catch((err) => {
         dispatch(
-          addError(errorKey, `Error requesting transfer: ${err.message || err}`)
+          addError(
+            errorKey,
+            `Error requesting transfer: ${err.message || err}`,
+          ),
         )
       })
   }

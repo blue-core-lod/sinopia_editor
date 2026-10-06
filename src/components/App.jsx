@@ -82,8 +82,8 @@ const App = (props) => {
           dispatch(
             newResourceCreator(
               editorTemplateMatch.params.templateId,
-              templateErrorKey
-            )
+              templateErrorKey,
+            ),
           ).then((result) => {
             if (!result) navigate("/templates")
           })
@@ -92,7 +92,7 @@ const App = (props) => {
         }
       } else if (resourceParam) {
         dispatch(
-          loadResource(resourceParam, dashboardErrorKey, { keycloak })
+          loadResource(resourceParam, dashboardErrorKey, { keycloak }),
         ).then((result) => {
           if (!result) {
             navigate("/dashboard")
@@ -101,7 +101,7 @@ const App = (props) => {
           const [, resource] = result
           if (canEdit(resource)) {
             dispatch(
-              dispatchResourceForEditor(result, resourceParam, {}, keycloak)
+              dispatchResourceForEditor(result, resourceParam, {}, keycloak),
             )
             navigate("/editor")
           } else {
@@ -115,7 +115,7 @@ const App = (props) => {
       } else if (editorResourceMatch) {
         const uri = uriFromResourceId(
           editorResourceMatch.params.collection,
-          editorResourceMatch.params.id
+          editorResourceMatch.params.id,
         )
         dispatch(loadResource(uri, dashboardErrorKey)).then((result) => {
           if (!result) {

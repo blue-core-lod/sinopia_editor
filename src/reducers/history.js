@@ -36,7 +36,7 @@ const addTemplateResult = (state, result) => {
     templates: addToHistory(
       state.templates,
       result,
-      (newItem, checkItem) => newItem.id !== checkItem.id
+      (newItem, checkItem) => newItem.id !== checkItem.id,
     ),
   }
 }
@@ -46,7 +46,7 @@ export const addSearchHistory = (state, action) => ({
   searches: addToHistory(
     state.searches,
     action.payload,
-    (newItem, checkItem) => !_.isEqual(newItem, checkItem)
+    (newItem, checkItem) => !_.isEqual(newItem, checkItem),
   ),
 })
 
@@ -70,13 +70,13 @@ const addResourceResult = (state, result) => ({
   resources: addToHistory(
     state.resources,
     result,
-    (newItem, checkItem) => newItem.uri !== checkItem.uri
+    (newItem, checkItem) => newItem.uri !== checkItem.uri,
   ),
 })
 
 const addToHistory = (historyItems, newItem, compareFunc) => {
   const filteredHistoryItems = historyItems.filter((checkItem) =>
-    compareFunc(newItem, checkItem)
+    compareFunc(newItem, checkItem),
   )
   return [newItem, ...filteredHistoryItems].slice(0, 10)
 }

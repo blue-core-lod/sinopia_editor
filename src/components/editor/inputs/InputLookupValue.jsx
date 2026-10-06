@@ -31,7 +31,7 @@ const InputLookupValue = ({
   const dispatch = useDispatch()
   const inputRef = useRef(null)
   const defaultLang = useSelector((state) =>
-    selectDefaultLang(state, value.rootSubjectKey)
+    selectDefaultLang(state, value.rootSubjectKey),
   )
   const [focusHasBeenSet, setFocusHasBeenSet] = useState(false)
   const [showLookup, setShowLookup] = useState(false)
@@ -85,10 +85,10 @@ const InputLookupValue = ({
           value.property,
           value.propertyUri,
           translatedText,
-          marcCode
+          marcCode,
         ),
-        value.key
-      )
+        value.key,
+      ),
     )
   }
 
@@ -125,8 +125,8 @@ const InputLookupValue = ({
         null,
         null,
         chooseLang(propertyTemplate.languageSuppressed, defaultLang),
-        "InputURIValue"
-      )
+        "InputURIValue",
+      ),
     )
     event.preventDefault()
   }
@@ -152,13 +152,13 @@ const InputLookupValue = ({
         value.key,
         literal,
         propertyTemplate.languageSuppressed ? null : defaultLang,
-        "InputLiteralValue"
-      )
+        "InputLiteralValue",
+      ),
     )
   }
 
   const authorityLabels = propertyTemplate.authorities.map(
-    (authority) => authority.label
+    (authority) => authority.label,
   )
 
   const controlClasses = ["form-control"]

@@ -115,7 +115,7 @@ module.exports = {
               KEYCLOAK_URL: process.env.KEYCLOAK_URL,
               SINOPIA_URI: process.env.SINOPIA_URI,
               SINOPIA_API_BASE_URL: process.env.SINOPIA_API_BASE_URL,
-            })};`
+            })};`,
           )
         },
       })

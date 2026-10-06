@@ -23,7 +23,7 @@ const renderVocab = (path) =>
       <Route path="/vocabulary/:element/:sub" element={<Vocab />} />
     </Routes>,
     undefined,
-    createHistory([path])
+    createHistory([path]),
   )
 
 describe("Sinopia Vocabulary", () => {

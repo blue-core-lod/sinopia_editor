@@ -46,8 +46,8 @@ export const fetchSinopiaSearchResults =
             sinopiaSearchUri,
             "Sinopia resources",
             query,
-            keycloak
-          )
+            keycloak,
+          ),
         )
         dispatch(addApiSearchHistory(sinopiaSearchUri, query, keycloak))
         // Use extracted options from response if available, otherwise use passed options
@@ -66,8 +66,8 @@ export const fetchSinopiaSearchResults =
             query,
             finalOptions,
             response.error,
-            response.links
-          )
+            response.links,
+          ),
         )
         if (response.results) {
           response.results
@@ -80,13 +80,13 @@ export const fetchSinopiaSearchResults =
           dispatch(
             addError(
               errorKey,
-              `An error occurred while searching: ${response.error.toString()}`
-            )
+              `An error occurred while searching: ${response.error.toString()}`,
+            ),
           )
           return false
         }
         return true
-      }
+      },
     )
   }
 
@@ -104,12 +104,15 @@ export const fetchTemplateGuessSearchResults =
           {},
           queryString,
           options,
-          response.error
-        )
+          response.error,
+        ),
       )
       if (response.error) {
         dispatch(
-          addError(errorKey, `Error searching for templates: ${response.error}`)
+          addError(
+            errorKey,
+            `Error searching for templates: ${response.error}`,
+          ),
         )
       }
     })

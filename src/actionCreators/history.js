@@ -50,8 +50,8 @@ export const loadSearchHistory = (searches, keycloak) => (dispatch) => {
         search.authorityUri,
         authorityConfig.label,
         search.query,
-        keycloak
-      )
+        keycloak,
+      ),
     )
   })
 }
@@ -92,8 +92,8 @@ export const addResourceHistory =
               resourceUri,
               type,
               group,
-              modified || new Date().toISOString()
-            )
+              modified || new Date().toISOString(),
+            ),
           )
         } else {
           dispatch(addResourceHistoryByResult(response.results[0]))

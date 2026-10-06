@@ -56,14 +56,14 @@ describe("loadResource", () => {
     it("dispatches actions", async () => {
       const keycloak = { token: "test-token" }
       const result = await store.dispatch(
-        loadResourceForEditor(uri, "testerrorkey", {}, keycloak)
+        loadResourceForEditor(uri, "testerrorkey", {}, keycloak),
       )
       expect(result).toBe(true)
 
       const actions = store.getActions()
 
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
       expect(addSubjectAction).not.toBeNull()
       // safeStringify is used because it removes circular references
@@ -86,14 +86,14 @@ describe("loadResource", () => {
         "resource",
         "87d27b05d48874c9f80cd4b7e8fc0dcc",
         uri,
-        keycloak
+        keycloak,
       )
 
       // loadRelationships is invoked async and do not wait for results
       expect(relationshipActionCreators.loadRelationships).toHaveBeenCalledWith(
         "abc123",
         uri,
-        "testerrorkey"
+        "testerrorkey",
       )
     })
   })
@@ -105,13 +105,13 @@ describe("loadResource", () => {
       const result = await store.dispatch(
         loadResourceForEditor(uri, "testerrorkey", {
           asNewResource: true,
-        })
+        }),
       )
       expect(result).toBe(true)
 
       const actions = store.getActions()
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
       expect(addSubjectAction).not.toBeNull()
 
@@ -140,7 +140,7 @@ describe("loadResource", () => {
 
     it("dispatches actions", async () => {
       const result = await store.dispatch(
-        loadResourceForPreview(uri, "testerrorkey")
+        loadResourceForPreview(uri, "testerrorkey"),
       )
       expect(result).toBe(true)
 
@@ -159,7 +159,7 @@ describe("loadResource", () => {
       const result = await store.dispatch(
         loadResourceForDiff(uri, "testerrorkey", "compareFromResourceKey", {
           version: "2019-10-16T17:13:45.084Z",
-        })
+        }),
       )
       expect(result).toBe(true)
 
@@ -190,14 +190,14 @@ describe("loadResource", () => {
           noTemplateUri,
           "testerrorkey",
           "compareFromResourceKey",
-          { version: "2019-10-16T17:13:45.084Z" }
-        )
+          { version: "2019-10-16T17:13:45.084Z" },
+        ),
       )
 
       expect(result).toBe(false)
       expect(store.getActions()).toHaveAction(
         "SHOW_MODAL",
-        "ResourceTemplateChoiceModal"
+        "ResourceTemplateChoiceModal",
       )
     })
 
@@ -211,15 +211,15 @@ describe("loadResource", () => {
           {
             version: "2019-10-16T17:13:45.084Z",
             defaultResourceTemplateId: "resourceTemplate:bf2:Instance",
-          }
-        )
+          },
+        ),
       )
 
       expect(result).toBe(true)
       const actions = store.getActions()
       expect(actions).not.toHaveAction(
         "SHOW_MODAL",
-        "ResourceTemplateChoiceModal"
+        "ResourceTemplateChoiceModal",
       )
       expect(actions).toHaveAction("SET_CURRENT_DIFF_RESOURCES", {
         compareFromResourceKey: "abc123",
@@ -234,7 +234,7 @@ describe("loadResource", () => {
       const uri =
         "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f-invalid"
       const result = await store.dispatch(
-        loadResourceForEditor(uri, "testerrorkey")
+        loadResourceForEditor(uri, "testerrorkey"),
       )
       expect(result).toBe(false)
 
@@ -255,7 +255,7 @@ describe("loadResource", () => {
       const uri =
         "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f-invalid-template"
       const result = await store.dispatch(
-        loadResourceForEditor(uri, "testerrorkey")
+        loadResourceForEditor(uri, "testerrorkey"),
       )
       expect(result).toBe(false)
 
@@ -271,7 +271,7 @@ describe("loadResource", () => {
     it("dispatches actions", async () => {
       // http://error is a special URI that will cause an error to be thrown.
       const result = await store.dispatch(
-        loadResourceForEditor("http://error", "testerrorkey")
+        loadResourceForEditor("http://error", "testerrorkey"),
       )
       expect(result).toBe(false)
 
@@ -296,19 +296,19 @@ describe("loadResource", () => {
 
     it("dispatches actions", async () => {
       const result = await store.dispatch(
-        loadResourceForEditor(uri, "testerrorkey")
+        loadResourceForEditor(uri, "testerrorkey"),
       )
       expect(result).toBe(true)
 
       const actions = store.getActions()
 
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
       expect(addSubjectAction).not.toBeNull()
       // safeStringify is used because it removes circular references
       expect(safeAction(addSubjectAction)).toEqual(
-        expectedMultiplePropertyUrisAction
+        expectedMultiplePropertyUrisAction,
       )
     })
   })

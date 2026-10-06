@@ -27,7 +27,7 @@ const renderRowForRoles = (roles) => {
   const state = createState({ roles })
   renderComponent(
     <ResourceTemplateSearchResult results={[row]} />,
-    createStore(state)
+    createStore(state),
   )
 }
 
@@ -60,7 +60,9 @@ describe("ResourceTemplateRow actions", () => {
 
       screen.getByTestId(`Edit ${label}`)
       screen.getByTestId(`View ${label}`)
-      screen.getByTestId(`Create resource for ${label}`)
+      expect(
+        screen.queryByTestId(`Create resource for ${label}`),
+      ).not.toBeInTheDocument()
       expect(screen.queryByTestId(`Copy ${label}`)).not.toBeInTheDocument()
     })
   })
@@ -86,7 +88,7 @@ describe("ResourceTemplateRow actions", () => {
 
       screen.getByTestId(`View ${label}`)
       expect(
-        screen.queryByTestId(`Create resource for ${label}`)
+        screen.queryByTestId(`Create resource for ${label}`),
       ).not.toBeInTheDocument()
       expect(screen.queryByTestId(`Copy ${label}`)).not.toBeInTheDocument()
       expect(screen.queryByTestId(`Edit ${label}`)).not.toBeInTheDocument()

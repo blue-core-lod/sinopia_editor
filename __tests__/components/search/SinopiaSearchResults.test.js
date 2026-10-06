@@ -15,10 +15,10 @@ describe("<SinopiaSearchResults />", () => {
 
     it("does not contain the main div", () => {
       expect(
-        screen.queryByTestId("sinopia-search-results")
+        screen.queryByTestId("sinopia-search-results"),
       ).not.toBeInTheDocument()
       expect(
-        screen.queryByText("Class", { selector: "th" })
+        screen.queryByText("Class", { selector: "th" }),
       ).not.toBeInTheDocument()
     })
   })
@@ -74,7 +74,7 @@ describe("<SinopiaSearchResults />", () => {
       // First row of search results
       screen.queryByText(/An item title/)
       expect(
-        screen.queryByText(/https:\/\/api.sinopia.io\/resource\/some\/path/)
+        screen.queryByText(/https:\/\/api.sinopia.io\/resource\/some\/path/),
       ).not.toBeInTheDocument()
       screen.queryByText("Oct 23, 2019")
       screen.queryByText("http://schema.org/Thing")

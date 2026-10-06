@@ -34,10 +34,10 @@ describe("<PropertyLabelInfo />", () => {
       ]
     renderComponent(
       <PropertyLabelInfo propertyTemplate={propertyTemplate} />,
-      store
+      store,
     )
     expect(screen.getByRole("link").getAttribute("data-bs-content")).toBe(
-      "Nested, repeatable resource template."
+      "Nested, repeatable resource template.",
     )
     expect(screen.getAllByRole("link").length).toBe(1) // only one link present, the remark
   })
@@ -52,10 +52,10 @@ describe("<PropertyLabelInfo />", () => {
 
     renderComponent(
       <PropertyLabelInfo propertyTemplate={propertyTemplate} />,
-      store
+      store,
     )
     expect(screen.getByRole("link").getAttribute("title")).toBe(
-      "https://www.stanford.edu"
+      "https://www.stanford.edu",
     )
     expect(screen.getAllByRole("link").length).toBe(1) //  only one link present, the remark URL
   })
@@ -70,7 +70,7 @@ describe("<PropertyLabelInfo />", () => {
 
     renderComponent(
       <PropertyLabelInfo propertyTemplate={propertyTemplate} />,
-      store
+      store,
     )
     expect(screen.getAllByRole("link").length).toBe(2) //  two links present, the remark and the remark URL
   })
@@ -85,7 +85,7 @@ describe("<PropertyLabelInfo />", () => {
 
     renderComponent(
       <PropertyLabelInfo propertyTemplate={propertyTemplate} />,
-      store
+      store,
     )
     expect(screen.queryAllByRole("link")).toBeFalsy //  no links present
   })

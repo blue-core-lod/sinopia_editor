@@ -31,7 +31,7 @@ export const selectFilteredSearchResults = (state, searchType) => {
   if (!typeFilter.length) return []
   const activeFilters = Array.isArray(typeFilter) ? typeFilter : [typeFilter]
   return results.filter((result) =>
-    result.type?.some((t) => activeFilters.includes(t))
+    result.type?.some((t) => activeFilters.includes(t)),
   )
 }
 

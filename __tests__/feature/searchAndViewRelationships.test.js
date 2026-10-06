@@ -21,8 +21,8 @@ describe("searching and view relationships for a resource", () => {
         .mockResolvedValue(
           resourceSearchResults(
             uri,
-            "http://id.loc.gov/ontologies/bibframe/Instance"
-          )
+            "http://id.loc.gov/ontologies/bibframe/Instance",
+          ),
         )
     })
 
@@ -40,7 +40,7 @@ describe("searching and view relationships for a resource", () => {
       screen.getByText("Instance", { selector: "span.resource-label" })
 
       fireEvent.click(
-        await screen.findByTestId(`Show relationships for ${uri}`)
+        await screen.findByTestId(`Show relationships for ${uri}`),
       )
       await screen.findByTestId(`Hide relationships for ${uri}`)
 

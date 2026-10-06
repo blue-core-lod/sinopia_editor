@@ -21,12 +21,12 @@ describe("loadResourceTemplate()", () => {
       const store = mockStore(createState())
 
       const subjectTemplate = await store.dispatch(
-        loadResourceTemplate("ld4p:RT:bf2:Title:AbbrTitle", {}, "testerrorkey")
+        loadResourceTemplate("ld4p:RT:bf2:Title:AbbrTitle", {}, "testerrorkey"),
       )
       expect(subjectTemplate).toBeSubjectTemplate("ld4p:RT:bf2:Title:AbbrTitle")
       expect(subjectTemplate.propertyTemplates).toHaveLength(1)
       expect(subjectTemplate.propertyTemplates[0]).toBePropertyTemplate(
-        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal"
+        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal",
       )
 
       expect(store.getActions()).toEqual([
@@ -43,12 +43,12 @@ describe("loadResourceTemplate()", () => {
       const store = mockStore(createState({ hasResourceWithLiteral: true }))
 
       const subjectTemplate = await store.dispatch(
-        loadResourceTemplate("ld4p:RT:bf2:Title:AbbrTitle", {}, "testerrorkey")
+        loadResourceTemplate("ld4p:RT:bf2:Title:AbbrTitle", {}, "testerrorkey"),
       )
       expect(subjectTemplate).toBeSubjectTemplate("ld4p:RT:bf2:Title:AbbrTitle")
       expect(subjectTemplate.propertyTemplates).toHaveLength(1)
       expect(subjectTemplate.propertyTemplates[0]).toBePropertyTemplate(
-        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal"
+        "ld4p:RT:bf2:Title:AbbrTitle > http://id.loc.gov/ontologies/bibframe/mainTitle > literal",
       )
 
       expect(store.getActions()).toHaveLength(0)
@@ -63,8 +63,8 @@ describe("loadResourceTemplate()", () => {
         loadResourceTemplate(
           "rt:repeated:propertyURI:propertyLabel",
           {},
-          "testerrorkey"
-        )
+          "testerrorkey",
+        ),
       )
       expect(subjectTemplate).toBeNull()
 
@@ -72,7 +72,7 @@ describe("loadResourceTemplate()", () => {
         {
           type: "ADD_TEMPLATES",
           payload: expect.toBeSubjectTemplate(
-            "rt:repeated:propertyURI:propertyLabel"
+            "rt:repeated:propertyURI:propertyLabel",
           ),
         },
         {
@@ -92,7 +92,7 @@ describe("loadResourceTemplate()", () => {
       const store = mockStore(createState({ hasResourceWithLiteral: true }))
 
       const subjectTemplate = await store.dispatch(
-        loadResourceTemplate("ld4p:RT:bf2:xxx", {}, "testerrorkey")
+        loadResourceTemplate("ld4p:RT:bf2:xxx", {}, "testerrorkey"),
       )
       expect(subjectTemplate).toBeNull()
 
@@ -120,7 +120,7 @@ describe("loadResourceTemplate()", () => {
         .filter((action) => action.type === "ADD_TEMPLATES")
         .reduce(
           (entities, action) => addTemplates(entities, action),
-          createState().entities
+          createState().entities,
         )
 
     it("keys a version-pinned template on the version URI, not its human id", async () => {
@@ -128,7 +128,7 @@ describe("loadResourceTemplate()", () => {
       const versionUri = `${profileUri}/version/1`
 
       const subjectTemplate = await store.dispatch(
-        loadResourceTemplate(versionUri, {}, "testerrorkey")
+        loadResourceTemplate(versionUri, {}, "testerrorkey"),
       )
 
       expect(subjectTemplate.key).toEqual(versionUri)
@@ -144,7 +144,7 @@ describe("loadResourceTemplate()", () => {
       const entities = stateAfterLoading(store.getActions())
 
       expect(
-        selectSubjectTemplate({ entities }, profileUri)
+        selectSubjectTemplate({ entities }, profileUri),
       ).not.toBeUndefined()
     })
 
@@ -156,15 +156,15 @@ describe("loadResourceTemplate()", () => {
         loadResourceTemplate(
           `${profileUri}/version/1`,
           resourceTemplatePromises,
-          "testerrorkey"
-        )
+          "testerrorkey",
+        ),
       )
       const v2 = await store.dispatch(
         loadResourceTemplate(
           `${profileUri}/version/2`,
           resourceTemplatePromises,
-          "testerrorkey"
-        )
+          "testerrorkey",
+        ),
       )
 
       // Same template, two versions -- so the same human id, but they must not
@@ -174,10 +174,10 @@ describe("loadResourceTemplate()", () => {
 
       const entities = stateAfterLoading(store.getActions())
       expect(
-        selectSubjectTemplate({ entities }, `${profileUri}/version/1`).label
+        selectSubjectTemplate({ entities }, `${profileUri}/version/1`).label,
       ).toEqual("Versioned Title v1")
       expect(
-        selectSubjectTemplate({ entities }, `${profileUri}/version/2`).label
+        selectSubjectTemplate({ entities }, `${profileUri}/version/2`).label,
       ).toEqual("Versioned Title v2")
     })
 
@@ -185,7 +185,7 @@ describe("loadResourceTemplate()", () => {
       const store = mockStore(createState())
 
       const subjectTemplate = await store.dispatch(
-        loadResourceTemplate("ld4p:RT:bf2:Title:AbbrTitle", {}, "testerrorkey")
+        loadResourceTemplate("ld4p:RT:bf2:Title:AbbrTitle", {}, "testerrorkey"),
       )
 
       expect(subjectTemplate.key).toEqual("ld4p:RT:bf2:Title:AbbrTitle")
@@ -201,14 +201,14 @@ describe("loadResourceTemplate()", () => {
       const warn = jest.spyOn(console, "warn").mockImplementation(() => {})
 
       const subjectTemplate = await store.dispatch(
-        loadResourceTemplate(profileUri, {}, "testerrorkey")
+        loadResourceTemplate(profileUri, {}, "testerrorkey"),
       )
 
       expect(subjectTemplate).not.toBeNull()
       expect(subjectTemplate.id).toEqual("bluecore:bf2:Title:VersionedTitle")
       expect(warn).toHaveBeenCalledWith(
         expect.stringContaining("different environment"),
-        profileUri
+        profileUri,
       )
       warn.mockRestore()
     })
@@ -220,7 +220,7 @@ describe("loadResourceTemplate()", () => {
       const store = mockStore(createState())
 
       const subjectTemplate = await store.dispatch(
-        loadResourceTemplate("sinopia:template:resource", {}, "testerrorkey")
+        loadResourceTemplate("sinopia:template:resource", {}, "testerrorkey"),
       )
 
       expect(subjectTemplate.key).toEqual("sinopia:template:resource")
@@ -240,7 +240,7 @@ describe("loadResourceTemplate()", () => {
         "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f-invalid-template"
 
       const subjectTemplate = await store.dispatch(
-        loadResourceTemplate(notATemplate, {}, "testerrorkey")
+        loadResourceTemplate(notATemplate, {}, "testerrorkey"),
       )
 
       expect(subjectTemplate).toBeNull()
@@ -264,7 +264,7 @@ describe("loadResourceTemplate()", () => {
         "http://localhost:3000/profiles/44444444-4444-4444-8444-444444444444"
 
       const subjectTemplate = await store.dispatch(
-        loadResourceTemplate(noIdProfile, {}, "testerrorkey")
+        loadResourceTemplate(noIdProfile, {}, "testerrorkey"),
       )
 
       expect(subjectTemplate).toBeNull()

@@ -39,7 +39,7 @@ describe("dev server health middleware", () => {
     const existingEntry = { name: "existing-middleware" }
     const middlewares = webpackConfig.devServer.setupMiddlewares(
       [existingEntry],
-      {}
+      {},
     )
     return { middlewares, existingEntry }
   }
@@ -56,7 +56,7 @@ describe("dev server health middleware", () => {
     const { middlewares } = setupMiddlewares()
 
     expect(middlewares.map((each) => each.name)).toContain(
-      "existing-middleware"
+      "existing-middleware",
     )
   })
 

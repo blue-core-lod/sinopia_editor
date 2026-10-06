@@ -32,10 +32,10 @@ const Editor = (props) => {
   const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
   // Resource ID is extracted from the URI. Presence indicates the resource has been saved.
   const resourceId = useSelector((state) =>
-    selectResourceId(state, resourceKey)
+    selectResourceId(state, resourceKey),
   )
   const subjectTemplate = useSelector((state) =>
-    selectSubjectTemplateForSubject(state, resourceKey)
+    selectSubjectTemplateForSubject(state, resourceKey),
   )
   // id, not key: /editor/:templateId matches a single path segment and means
   // "create a new resource from this template", for which the latest version
@@ -44,10 +44,10 @@ const Editor = (props) => {
   const subjectTemplateId = subjectTemplate?.id
 
   const displayErrors = useSelector((state) =>
-    displayResourceValidations(state, resourceKey)
+    displayResourceValidations(state, resourceKey),
   )
   const hasValidationErrors = useSelector((state) =>
-    hasValidationErrorsSelector(state, resourceKey)
+    hasValidationErrorsSelector(state, resourceKey),
   )
 
   useEffect(() => {

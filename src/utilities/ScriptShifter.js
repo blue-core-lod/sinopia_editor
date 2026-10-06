@@ -13,7 +13,7 @@ export const languages = () =>
     })
     .catch((err) => {
       console.error(
-        `Error fetching ScriptShifter languages: ${err.message || err}`
+        `Error fetching ScriptShifter languages: ${err.message || err}`,
       )
       throw err
     })
@@ -32,11 +32,11 @@ export const translate = (
   lang,
   tDir = "r2s",
   capitalize = "no_change",
-  options = {}
+  options = {},
 ) => {
   if (!text || !text.trim())
     return Promise.reject(
-      new Error("Field is empty. Please enter a value to transliterate.")
+      new Error("Field is empty. Please enter a value to transliterate."),
     )
 
   return fetch(`${Config.scriptShifterUrl}/trans`, {
@@ -54,7 +54,7 @@ export const translate = (
     })
     .catch((err) => {
       console.error(
-        `Error fetching ScriptShifter translation: ${err.message || err}`
+        `Error fetching ScriptShifter translation: ${err.message || err}`,
       )
       throw err
     })

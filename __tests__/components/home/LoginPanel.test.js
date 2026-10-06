@@ -13,7 +13,7 @@ const renderPanel = (keycloakState) => {
   useKeycloak.mockReturnValue({ keycloak: {}, ...keycloakState })
   renderComponent(
     <LoginPanel />,
-    createStore(createState({ notAuthenticated: true }))
+    createStore(createState({ notAuthenticated: true })),
   )
 }
 
@@ -26,14 +26,14 @@ describe("<LoginPanel />", () => {
   it("hides the login button while Keycloak is still checking", () => {
     renderPanel({ initialized: false, authenticated: false })
     expect(
-      screen.queryByRole("button", { name: "Login" })
+      screen.queryByRole("button", { name: "Login" }),
     ).not.toBeInTheDocument()
   })
 
   it("hides the login button while a signed-in user is being loaded", () => {
     renderPanel({ initialized: true, authenticated: true })
     expect(
-      screen.queryByRole("button", { name: "Login" })
+      screen.queryByRole("button", { name: "Login" }),
     ).not.toBeInTheDocument()
   })
 })

@@ -43,7 +43,7 @@ describe("getUserCount", () => {
       {
         method: "GET",
         headers: { Accept: "application/json" },
-      }
+      },
     )
   })
 })
@@ -62,7 +62,7 @@ describe("getTemplateCount", () => {
       {
         method: "GET",
         headers: { Accept: "application/json" },
-      }
+      },
     )
   })
 })
@@ -81,7 +81,7 @@ describe("getResourceCount", () => {
       {
         method: "GET",
         headers: { Accept: "application/json" },
-      }
+      },
     )
   })
 })
@@ -105,7 +105,7 @@ describe("getTemplateCreatedCount", () => {
       {
         method: "GET",
         headers: { Accept: "application/json" },
-      }
+      },
     )
   })
 })
@@ -127,7 +127,7 @@ describe("getResourceCreatedCount", () => {
       {
         method: "GET",
         headers: { Accept: "application/json" },
-      }
+      },
     )
   })
 })
@@ -151,7 +151,7 @@ describe("getTemplateEditedCount", () => {
       {
         method: "GET",
         headers: { Accept: "application/json" },
-      }
+      },
     )
   })
 })
@@ -173,7 +173,7 @@ describe("getResourceEditedCount", () => {
       {
         method: "GET",
         headers: { Accept: "application/json" },
-      }
+      },
     )
   })
 })
@@ -195,7 +195,7 @@ describe("getTemplateUsageCount", () => {
       {
         method: "GET",
         headers: { Accept: "application/json" },
-      }
+      },
     )
   })
 })

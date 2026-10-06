@@ -21,7 +21,7 @@ describe("suggest()", () => {
 
     expect(result).toEqual(mockResponse)
     expect(global.fetch).toHaveBeenCalledWith(
-      "https://id.loc.gov/authorities/subjects/suggest2/?q=potato&rdftype=SimpleType&count=25&offset=0&searchtype=left"
+      "https://id.loc.gov/authorities/subjects/suggest2/?q=potato&rdftype=SimpleType&count=25&offset=0&searchtype=left",
     )
   })
 
@@ -34,7 +34,7 @@ describe("suggest()", () => {
     await suggest("potato", "ComplexSubject", 25)
 
     expect(global.fetch).toHaveBeenCalledWith(
-      "https://id.loc.gov/authorities/subjects/suggest2/?q=potato&rdftype=ComplexSubject&count=25&offset=25&searchtype=left"
+      "https://id.loc.gov/authorities/subjects/suggest2/?q=potato&rdftype=ComplexSubject&count=25&offset=25&searchtype=left",
     )
   })
 
@@ -45,7 +45,7 @@ describe("suggest()", () => {
     })
 
     await expect(suggest("potato", "SimpleType")).rejects.toThrow(
-      "LOC Suggest Service returned Service Unavailable"
+      "LOC Suggest Service returned Service Unavailable",
     )
   })
 
@@ -53,7 +53,7 @@ describe("suggest()", () => {
     global.fetch = jest.fn().mockRejectedValue(new Error("Network error"))
 
     await expect(suggest("potato", "SimpleType")).rejects.toThrow(
-      "Network error"
+      "Network error",
     )
   })
 })

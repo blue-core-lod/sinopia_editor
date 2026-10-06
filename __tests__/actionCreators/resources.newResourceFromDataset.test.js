@@ -68,7 +68,7 @@ describe("newResourceFromDataset", () => {
     it("dispatches actions", async () => {
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        newResourceFromDataset(dataset, uri, null, "testerrorkey"),
       )
       expect(result).toBe(true)
 
@@ -77,7 +77,7 @@ describe("newResourceFromDataset", () => {
       expect(actions).toHaveAction("ADD_TEMPLATES")
 
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
       expect(addSubjectAction).not.toBeNull()
       expect(safeAction(addSubjectAction)).toEqual(expectedAction)
@@ -87,10 +87,10 @@ describe("newResourceFromDataset", () => {
 
       // As a bonus check, roundtrip to RDF.
       const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
+        addSubjectAction.payload,
       ).graph.toCanonical()
       const expectedGraph = await datasetFromN3(
-        expectedN3.replace(/<>/g, `<${uri}>`)
+        expectedN3.replace(/<>/g, `<${uri}>`),
       )
       const expectedRdf = expectedGraph.toCanonical()
       expect(actualRdf).toMatch(expectedRdf)
@@ -117,7 +117,7 @@ describe("newResourceFromDataset", () => {
     it("dispatches actions", async () => {
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        newResourceFromDataset(dataset, uri, null, "testerrorkey"),
       )
       expect(result).toBe(true)
 
@@ -126,7 +126,7 @@ describe("newResourceFromDataset", () => {
       expect(actions).toHaveAction("ADD_TEMPLATES")
 
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
       expect(addSubjectAction).not.toBeNull()
       // safeStringify is used because it removes circular references
@@ -137,7 +137,7 @@ describe("newResourceFromDataset", () => {
 
       // Roundtripped RDF should match.
       const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
+        addSubjectAction.payload,
       ).graph.toCanonical()
       const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       const expectedRdf = expectedGraph.toCanonical()
@@ -166,7 +166,7 @@ describe("newResourceFromDataset", () => {
     it("dispatches actions", async () => {
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        newResourceFromDataset(dataset, uri, null, "testerrorkey"),
       )
       expect(result).toBe(true)
 
@@ -175,7 +175,7 @@ describe("newResourceFromDataset", () => {
       expect(actions).toHaveAction("ADD_TEMPLATES")
 
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
       expect(addSubjectAction).not.toBeNull()
       // safeStringify is used because it removes circular references
@@ -186,7 +186,7 @@ describe("newResourceFromDataset", () => {
 
       // Roundtripped RDF should NOT match.
       const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
+        addSubjectAction.payload,
       ).graph.toCanonical()
       const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       const expectedRdf = expectedGraph.toCanonical()
@@ -222,13 +222,13 @@ describe("newResourceFromDataset", () => {
     it("does not force suppression and preserves the value's real identity", async () => {
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        newResourceFromDataset(dataset, uri, null, "testerrorkey"),
       )
       expect(result).toBe(true)
 
       const actions = store.getActions()
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
       expect(addSubjectAction).not.toBeNull()
 
@@ -251,7 +251,7 @@ describe("newResourceFromDataset", () => {
 
       // Round-trips as the same NamedNode, not a fresh blank node.
       const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
+        addSubjectAction.payload,
       ).graph.toCanonical()
       const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       const expectedRdf = expectedGraph.toCanonical()
@@ -266,14 +266,14 @@ describe("newResourceFromDataset", () => {
     it("dispatches actions", async () => {
       const dataset = await datasetFromN3(n3)
       const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        newResourceFromDataset(dataset, uri, null, "testerrorkey"),
       )
       expect(result).toBe(true)
 
       const actions = store.getActions()
 
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
       expect(safeAction(addSubjectAction)).toEqual(expectedAction)
     })
@@ -288,14 +288,14 @@ describe("newResourceFromDataset", () => {
 `
       const dataset = await datasetFromN3(n3 + extraRdf)
       const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        newResourceFromDataset(dataset, uri, null, "testerrorkey"),
       )
       expect(result).toBe(true)
 
       const actions = store.getActions()
 
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
       expect(safeAction(addSubjectAction)).toEqual(expectedAction)
 
@@ -314,14 +314,14 @@ describe("newResourceFromDataset", () => {
 
       const dataset = await datasetFromN3(n3 + extraRdf)
       const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        newResourceFromDataset(dataset, uri, null, "testerrorkey"),
       )
       expect(result).toBe(true)
 
       const actions = store.getActions()
 
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
       expect(safeAction(addSubjectAction)).toEqual(expectedAction)
 
@@ -351,14 +351,14 @@ describe("newResourceFromDataset", () => {
     it("dispatches actions", async () => {
       const dataset = await datasetFromN3(n3)
       const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        newResourceFromDataset(dataset, uri, null, "testerrorkey"),
       )
       expect(result).toBe(true)
 
       const actions = store.getActions()
 
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
 
       expect(safeAction(addSubjectAction)).toEqual(expectedOrderedAction)
@@ -382,14 +382,14 @@ describe("newResourceFromDataset", () => {
 `
       const dataset = await datasetFromN3(n3)
       const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        newResourceFromDataset(dataset, uri, null, "testerrorkey"),
       )
       expect(result).toBe(true)
 
       const actions = store.getActions()
 
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
       expect(safeAction(addSubjectAction)).toEqual(expectedBadOrderedAction)
 
@@ -408,14 +408,14 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     it("dispatches actions", async () => {
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey", true)
+        newResourceFromDataset(dataset, uri, null, "testerrorkey", true),
       )
       expect(result).toBe(true)
 
       const actions = store.getActions()
 
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
 
       // URI should not be set for resource.
@@ -437,18 +437,23 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       // Change the hasResourceTemplate triple.
       const fixtureRdf = n3.replace(
         resourceTemplateId,
-        `${resourceTemplateId}x`
+        `${resourceTemplateId}x`,
       )
       const dataset = await datasetFromN3(fixtureRdf)
       const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, resourceTemplateId, "testerrorkey")
+        newResourceFromDataset(
+          dataset,
+          uri,
+          resourceTemplateId,
+          "testerrorkey",
+        ),
       )
       expect(result).toBe(true)
 
       const actions = store.getActions()
 
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
       expect(safeAction(addSubjectAction)).toEqual(expectedAction)
     })
@@ -460,11 +465,11 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     it("dispatches actions", async () => {
       const fixtureRdf = n3.replace(
         resourceTemplateId,
-        "rt:repeated:propertyURI:propertyLabel"
+        "rt:repeated:propertyURI:propertyLabel",
       )
       const dataset = await datasetFromN3(fixtureRdf)
       const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        newResourceFromDataset(dataset, uri, null, "testerrorkey"),
       )
       expect(result).toBe(false)
 
@@ -497,13 +502,13 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     it("does not apply the unmatched sibling template's default value", async () => {
       const dataset = await datasetFromN3(mergeDefaultsN3)
       const result = await store.dispatch(
-        newResourceFromDataset(dataset, mergeDefaultsUri, null, "testerrorkey")
+        newResourceFromDataset(dataset, mergeDefaultsUri, null, "testerrorkey"),
       )
       expect(result).toBe(true)
 
       const actions = store.getActions()
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
       expect(addSubjectAction).not.toBeNull()
 
@@ -513,16 +518,16 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       const matchValue = property.values.find(
         (value) =>
           value.valueSubject.subjectTemplate.id ===
-          "resourceTemplate:testing:mergeDefaultsMatch"
+          "resourceTemplate:testing:mergeDefaultsMatch",
       )
       expect(matchValue.valueSubject.properties[0].values[0].literal).toBe(
-        "Real value"
+        "Real value",
       )
 
       const siblingValue = property.values.find(
         (value) =>
           value.valueSubject.subjectTemplate.id ===
-          "resourceTemplate:testing:mergeDefaultsSibling"
+          "resourceTemplate:testing:mergeDefaultsSibling",
       )
       expect(siblingValue).not.toBeUndefined()
       // Should be null/empty, not populated from the sibling's configured default.
@@ -554,13 +559,13 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     it("recovers the value using the sole suppressible candidate", async () => {
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       const result = await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        newResourceFromDataset(dataset, uri, null, "testerrorkey"),
       )
       expect(result).toBe(true)
 
       const actions = store.getActions()
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
       expect(addSubjectAction).not.toBeNull()
 
@@ -573,13 +578,13 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       // On save, the recovered value round-trips as a flat, suppressed URI --
       // the real reference is written out, not silently dropped or replaced.
       const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
+        addSubjectAction.payload,
       ).graph.toCanonical()
       expect(actualRdf).toMatch(
-        "<http://sinopia.io/testing/Suppressible/property1> <http://foo/bar>"
+        "<http://sinopia.io/testing/Suppressible/property1> <http://foo/bar>",
       )
       expect(actualRdf).toMatch(
-        '<http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en'
+        '<http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en',
       )
       // Since no local rdf:type triple was found for the recovered value,
       // the recovered subject has no known classes, so (unlike a value
@@ -587,7 +592,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       // The core reference is preserved either way -- this only documents
       // the known asymmetry with a genuinely Sinopia-authored round-trip.
       expect(actualRdf).not.toMatch(
-        "<http://foo/bar> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"
+        "<http://foo/bar> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>",
       )
     })
   })
@@ -610,13 +615,13 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     it("does not guess which candidate the value represents", async () => {
       const dataset = await datasetFromN3(n3)
       const result = await store.dispatch(
-        newResourceFromDataset(dataset, ambiguousUri, null, "testerrorkey")
+        newResourceFromDataset(dataset, ambiguousUri, null, "testerrorkey"),
       )
       expect(result).toBe(true)
 
       const actions = store.getActions()
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
       expect(addSubjectAction).not.toBeNull()
 
@@ -624,7 +629,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       expect(property.values).toHaveLength(2)
 
       const uris = property.values.map(
-        (value) => value.valueSubject.properties[0].values?.[0]?.uri
+        (value) => value.valueSubject.properties[0].values?.[0]?.uri,
       )
       expect(uris).not.toContain("http://foo/bar")
 
@@ -632,7 +637,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       // -- the real reference is lost from the editor, but nothing wrong (or
       // guessed) is persisted either.
       const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
+        addSubjectAction.payload,
       ).graph.toCanonical()
       expect(actualRdf).not.toMatch("http://foo/bar")
     })
@@ -660,20 +665,20 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     it("resolves to the non-suppressible candidate and consumes its properties", async () => {
       const dataset = await datasetFromN3(n3)
       const result = await store.dispatch(
-        newResourceFromDataset(dataset, richUri, null, "testerrorkey")
+        newResourceFromDataset(dataset, richUri, null, "testerrorkey"),
       )
       expect(result).toBe(true)
 
       const actions = store.getActions()
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
       expect(addSubjectAction).not.toBeNull()
 
       const property = addSubjectAction.payload.properties[0]
       const valueSubject = property.values[0].valueSubject
       expect(valueSubject.subjectTemplate.id).toBe(
-        "resourceTemplate:testing:richUri"
+        "resourceTemplate:testing:richUri",
       )
       expect(valueSubject.properties[0].values[0].literal).toBe("A rich value")
       expect(valueSubject.properties[1].values[0].uri).toBe("http://foo/scheme")
@@ -685,7 +690,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       })
 
       const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
+        addSubjectAction.payload,
       ).graph.toCanonical()
       const expectedGraph = await datasetFromN3(n3)
       const expectedRdf = expectedGraph.toCanonical()
@@ -715,7 +720,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     it("dispatches an error rather than guessing", async () => {
       const dataset = await datasetFromN3(n3)
       const result = await store.dispatch(
-        newResourceFromDataset(dataset, ambiguousUri, null, "testerrorkey")
+        newResourceFromDataset(dataset, ambiguousUri, null, "testerrorkey"),
       )
       expect(result).toBe(false)
 
@@ -750,13 +755,13 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     it("does not apply the candidate template's default value", async () => {
       const dataset = await datasetFromN3(n3)
       const result = await store.dispatch(
-        newResourceFromDataset(dataset, requiredUri, null, "testerrorkey")
+        newResourceFromDataset(dataset, requiredUri, null, "testerrorkey"),
       )
       expect(result).toBe(true)
 
       const actions = store.getActions()
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
       expect(addSubjectAction).not.toBeNull()
 
@@ -792,8 +797,8 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       expect(
         await store.dispatch(
-          newResourceFromDataset(dataset, uri, null, "testerrorkey")
-        )
+          newResourceFromDataset(dataset, uri, null, "testerrorkey"),
+        ),
       ).toBe(true)
       const actions = store.getActions()
       return {
@@ -811,7 +816,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       const { values } = await load()
       const suppressed = forTemplate(
         values,
-        "resourceTemplate:testing:suppressedUri"
+        "resourceTemplate:testing:suppressedUri",
       )
 
       expect(suppressed).toBeDefined()
@@ -822,7 +827,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       const { unusedRDF } = await load()
 
       expect(unusedRDF ?? "").not.toContain(
-        "Chemistry, Physical and theoretical"
+        "Chemistry, Physical and theoretical",
       )
     })
   })
@@ -847,8 +852,8 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       expect(
         await store.dispatch(
-          newResourceFromDataset(dataset, uri, null, "testerrorkey")
-        )
+          newResourceFromDataset(dataset, uri, null, "testerrorkey"),
+        ),
       ).toBe(true)
 
       const actions = store.getActions()
@@ -862,17 +867,17 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
         values.find((value) => value.valueSubject.subjectTemplate.id === id)
 
       const suppressedValue = valueForTemplate(
-        "resourceTemplate:testing:suppressedUri"
+        "resourceTemplate:testing:suppressedUri",
       )
       expect(suppressedValue.valueSubject.properties[0].values[0].uri).toBe(
-        bareUri
+        bareUri,
       )
 
       const richValue = valueForTemplate("resourceTemplate:testing:richUri")
       expect(
         richValue.valueSubject.properties.every(
-          (property) => !property.values || property.values.length === 0
-        )
+          (property) => !property.values || property.values.length === 0,
+        ),
       ).toBe(true)
 
       // Nothing dropped and nothing left over.
@@ -886,16 +891,16 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       // a URI value's label to the URI. Removed that fallback, so saving
       // a bare reference now adds nothing the dataset did not supply.
       const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
+        addSubjectAction.payload,
       ).graph.toCanonical()
       expect(actualRdf).toMatch(
-        `<${uri}> <http://sinopia.io/testing/AmbiguousClassNonSuppressible/property1> <${bareUri}> .`
+        `<${uri}> <http://sinopia.io/testing/AmbiguousClassNonSuppressible/property1> <${bareUri}> .`,
       )
       expect(actualRdf).toMatch(
-        `<${bareUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Uri> .`
+        `<${bareUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Uri> .`,
       )
       expect(actualRdf).not.toMatch(
-        "http://www.w3.org/2000/01/rdf-schema#label"
+        "http://www.w3.org/2000/01/rdf-schema#label",
       )
     })
   })
@@ -920,8 +925,8 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       expect(
         await store.dispatch(
-          newResourceFromDataset(dataset, uri, null, "testerrorkey")
-        )
+          newResourceFromDataset(dataset, uri, null, "testerrorkey"),
+        ),
       ).toBe(true)
       const actions = store.getActions()
       const subject = actions.find((a) => a.type === "ADD_SUBJECT").payload
@@ -945,7 +950,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       const { unusedRDF } = await load()
 
       expect(unusedRDF ?? "").toContain(
-        "http://sinopia.io/testing/Uri/property1"
+        "http://sinopia.io/testing/Uri/property1",
       )
     })
 
@@ -953,7 +958,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       const { unusedRDF } = await load()
 
       expect(unusedRDF ?? "").toContain(
-        "http://id.loc.gov/ontologies/bibframe/code"
+        "http://id.loc.gov/ontologies/bibframe/code",
       )
     })
   })
@@ -968,7 +973,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       const store = mockStore(createState())
       const dataset = await datasetFromN3(n3)
       await store.dispatch(
-        newResourceFromDataset(dataset, uri, null, "testerrorkey")
+        newResourceFromDataset(dataset, uri, null, "testerrorkey"),
       )
       const addSubjectAction = store
         .getActions()
@@ -995,7 +1000,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       const { rdf } = await loadUriValue(bareN3)
 
       expect(rdf).toMatch(
-        `<${uri}> <http://sinopia.io/testing/Uri/property1> <${bareUri}> .`
+        `<${uri}> <http://sinopia.io/testing/Uri/property1> <${bareUri}> .`,
       )
       expect(rdf).not.toMatch(RDFS_LABEL)
     })
@@ -1007,7 +1012,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
       expect(value.label).toEqual("Bird's-eye view prints")
       expect(rdf).toMatch(
-        `<${bareUri}> <${RDFS_LABEL}> "Bird's-eye view prints"@en .`
+        `<${bareUri}> <${RDFS_LABEL}> "Bird's-eye view prints"@en .`,
       )
     })
   })
@@ -1030,8 +1035,8 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       expect(
         await store.dispatch(
-          newResourceFromDataset(dataset, uri, null, "testerrorkey")
-        )
+          newResourceFromDataset(dataset, uri, null, "testerrorkey"),
+        ),
       ).toBe(true)
 
       const actions = store.getActions()
@@ -1046,7 +1051,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       })
 
       const actualRdf = new GraphBuilder(
-        addSubjectAction.payload
+        addSubjectAction.payload,
       ).graph.toCanonical()
       const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       expect(actualRdf).toMatch(expectedGraph.toCanonical())
@@ -1068,8 +1073,8 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       expect(
         await store.dispatch(
-          newResourceFromDataset(dataset, uri, null, "testerrorkey")
-        )
+          newResourceFromDataset(dataset, uri, null, "testerrorkey"),
+        ),
       ).toBe(true)
 
       const actions = store.getActions()
@@ -1081,17 +1086,17 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       expect(values[0].valueSubject.uri).toBeNull()
       expect(
         values[0].valueSubject.properties.every(
-          (property) => !property.values || property.values.length === 0
-        )
+          (property) => !property.values || property.values.length === 0,
+        ),
       ).toBe(true)
 
       const unusedAction = actions.find((a) => a.type === "SET_UNUSED_RDF")
       expect(unusedAction.payload.rdf).not.toBeNull()
       expect(unusedAction.payload.rdf).toMatch(
-        "http://sinopia.io/testing/NamedNodeMultiPropHost/property1"
+        "http://sinopia.io/testing/NamedNodeMultiPropHost/property1",
       )
       expect(unusedAction.payload.rdf).toMatch(
-        "http://sinopia.io/testing/NamedNodeMultiProp"
+        "http://sinopia.io/testing/NamedNodeMultiProp",
       )
     })
   })
@@ -1103,7 +1108,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     const bUri = "http://foo/cycle-b"
     const propertyFor = (subject, uri) =>
       subject.properties.find((property) =>
-        Object.keys(property.propertyTemplate.uris).includes(uri)
+        Object.keys(property.propertyTemplate.uris).includes(uri),
       )
 
     const n3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:cycleA" .
@@ -1118,8 +1123,8 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       expect(
         await store.dispatch(
-          newResourceFromDataset(dataset, uri, null, "testerrorkey")
-        )
+          newResourceFromDataset(dataset, uri, null, "testerrorkey"),
+        ),
       ).toBe(true)
 
       const actions = store.getActions()
@@ -1128,10 +1133,10 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       // A expanded into B ...
       const bSubject = propertyFor(
         resource,
-        "http://sinopia.io/testing/CycleA/toB"
+        "http://sinopia.io/testing/CycleA/toB",
       ).values[0].valueSubject
       expect(bSubject.subjectTemplate.id).toBe(
-        "resourceTemplate:testing:cycleB"
+        "resourceTemplate:testing:cycleB",
       )
       expect(bSubject.uri).toBe(bUri)
 
@@ -1139,11 +1144,11 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       // expanding it a second time.
       const backSubject = propertyFor(
         bSubject,
-        "http://sinopia.io/testing/CycleB/toA"
+        "http://sinopia.io/testing/CycleB/toA",
       ).values[0].valueSubject
       expect(backSubject.uri).toBe(uri)
       expect(
-        propertyFor(backSubject, "http://sinopia.io/testing/CycleA/toB").values
+        propertyFor(backSubject, "http://sinopia.io/testing/CycleA/toB").values,
       ).toBeNull()
 
       expect(actions).toHaveAction("SET_UNUSED_RDF", {
@@ -1175,7 +1180,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
     const propertyFor = (subject, propertyUri) =>
       subject.properties.find((property) =>
-        Object.keys(property.propertyTemplate.uris).includes(propertyUri)
+        Object.keys(property.propertyTemplate.uris).includes(propertyUri),
       )
 
     it("stops at the loop and keeps the link as a bare reference", async () => {
@@ -1184,8 +1189,8 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
       expect(
         await store.dispatch(
-          newResourceFromDataset(dataset, uri, null, "testerrorkey")
-        )
+          newResourceFromDataset(dataset, uri, null, "testerrorkey"),
+        ),
       ).toBe(true)
 
       const resource = store
@@ -1199,7 +1204,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       // ...into B, also pinned...
       const bSubject = propertyFor(
         resource,
-        "http://sinopia.io/testing/VersionedCycleA/toVersionedCycleB"
+        "http://sinopia.io/testing/VersionedCycleA/toVersionedCycleB",
       ).values[0].valueSubject
       expect(bSubject.subjectTemplate.version).toBe(1)
       expect(bSubject.uri).toBe(bUri)
@@ -1207,14 +1212,14 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       // ...and B's link back to A stopped there rather than recursing.
       const backSubject = propertyFor(
         bSubject,
-        "http://sinopia.io/testing/VersionedCycleB/toVersionedCycleA"
+        "http://sinopia.io/testing/VersionedCycleB/toVersionedCycleA",
       ).values[0].valueSubject
       expect(backSubject.uri).toBe(uri)
       expect(
         propertyFor(
           backSubject,
-          "http://sinopia.io/testing/VersionedCycleA/toVersionedCycleB"
-        ).values
+          "http://sinopia.io/testing/VersionedCycleA/toVersionedCycleB",
+        ).values,
       ).toBeNull()
     })
   })
@@ -1232,8 +1237,8 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       expect(
         await store.dispatch(
-          newResourceFromDataset(dataset, uri, null, "testerrorkey")
-        )
+          newResourceFromDataset(dataset, uri, null, "testerrorkey"),
+        ),
       ).toBe(true)
 
       const actions = store.getActions()
@@ -1277,31 +1282,31 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
       expect(
         await store.dispatch(
-          newResourceFromDataset(dataset, uri, null, "testerrorkey")
-        )
+          newResourceFromDataset(dataset, uri, null, "testerrorkey"),
+        ),
       ).toBe(true)
 
       const actions = store.getActions()
       const resource = actions.find((a) => a.type === "ADD_SUBJECT").payload
       const branches = resource.properties.find((property) =>
         Object.keys(property.propertyTemplate.uris).includes(
-          "http://sinopia.io/testing/CycleA/toB"
-        )
+          "http://sinopia.io/testing/CycleA/toB",
+        ),
       ).values
       expect(branches).toHaveLength(2)
 
       branches.forEach((branch) => {
         const sharedSubject = branch.valueSubject.properties.find((property) =>
           Object.keys(property.propertyTemplate.uris).includes(
-            "http://sinopia.io/testing/CycleB/toA"
-          )
+            "http://sinopia.io/testing/CycleB/toA",
+          ),
         ).values[0].valueSubject
         expect(sharedSubject.uri).toBe(shared)
         // Fully expanded, not stopped short: its label came through.
         const labelProperty = sharedSubject.properties.find((property) =>
           Object.keys(property.propertyTemplate.uris).includes(
-            "http://www.w3.org/2000/01/rdf-schema#label"
-          )
+            "http://www.w3.org/2000/01/rdf-schema#label",
+          ),
         )
         expect(labelProperty.values[0].literal).toBe("shared node")
       })

@@ -37,7 +37,7 @@ const NewResourceTemplateButton = () => {
     event.preventDefault()
     setIsLoading(true)
     dispatch(
-      newResource(Config.rootResourceTemplateId, errorKey, true, keycloak)
+      newResource(Config.rootResourceTemplateId, errorKey, true, keycloak),
     ).then((result) => {
       setNavigateEditor(result)
     })

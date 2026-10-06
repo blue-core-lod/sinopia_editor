@@ -12,7 +12,7 @@ export const addSearchHistory = (
   authorityUri,
   authorityLabel,
   query,
-  keycloak
+  keycloak,
 ) => {
   const payload = { authorityUri, authorityLabel, query, keycloak }
   return {

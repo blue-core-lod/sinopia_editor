@@ -52,18 +52,18 @@ const RelationshipsDisplay = ({ resourceKey, displayActions = true }) => {
       uris.map((refUri) =>
         fetchResource(refUri)
           .then(([dataset, response]) =>
-            rowFromDataset(refUri, dataset, response)
+            rowFromDataset(refUri, dataset, response),
           )
           .catch((err) => {
             dispatch(
               addError(
                 errorKey,
-                `Error getting relationship ${refUri}: ${err.message || err}`
-              )
+                `Error getting relationship ${refUri}: ${err.message || err}`,
+              ),
             )
             return null
-          })
-      )
+          }),
+      ),
     ).then((rows) => {
       if (!isMounted) return
       const newResourceRowMap = {}

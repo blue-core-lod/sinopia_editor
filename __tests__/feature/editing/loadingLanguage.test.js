@@ -25,22 +25,24 @@ describe("loading a resource with untagged literals", () => {
 
     // Literal value.
     expect(
-      await screen.findByTestId("Change language for An untagged literal value")
+      await screen.findByTestId(
+        "Change language for An untagged literal value",
+      ),
     ).toHaveTextContent("Language: en")
 
     // URI value, tagged from its untagged rdfs:label.
     expect(
-      screen.getByTestId("Change language for Print version")
+      screen.getByTestId("Change language for Print version"),
     ).toHaveTextContent("Language: en")
 
     // Lookup value.
     expect(
-      screen.getByTestId("Change language for corn sheller")
+      screen.getByTestId("Change language for corn sheller"),
     ).toHaveTextContent("Language: en")
 
     // Value in a nested resource.
     expect(
-      screen.getByTestId("Change language for An untagged nested resource")
+      screen.getByTestId("Change language for An untagged nested resource"),
     ).toHaveTextContent("Language: en")
   }, 20000)
 
@@ -72,10 +74,10 @@ describe("loading a resource with untagged literals", () => {
     // No language button at all when the property suppresses language and the
     // value carries no tag of its own.
     expect(
-      screen.queryByTestId("Change language for A suppressed literal value")
+      screen.queryByTestId("Change language for A suppressed literal value"),
     ).not.toBeInTheDocument()
     expect(
-      screen.queryByTestId("Change language for Print version")
+      screen.queryByTestId("Change language for Print version"),
     ).not.toBeInTheDocument()
   }, 20000)
 
@@ -90,7 +92,7 @@ describe("loading a resource with untagged literals", () => {
 
     // RDF forbids a language tag on a typed literal.
     expect(
-      screen.getByTestId("Change language for 2020-01-01")
+      screen.getByTestId("Change language for 2020-01-01"),
     ).toHaveTextContent("No language specified")
   }, 20000)
 })

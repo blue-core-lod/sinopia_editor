@@ -46,7 +46,7 @@ export const loadSearchRelationships = (uri) => (dispatch) =>
     })
     .catch((err) => {
       console.warn(
-        `Could not load relationships for ${uri}: ${err.message || err}`
+        `Could not load relationships for ${uri}: ${err.message || err}`,
       )
       return false
     })

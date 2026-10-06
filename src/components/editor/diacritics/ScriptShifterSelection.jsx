@@ -22,7 +22,9 @@ const ScriptShifterSelection = ({
     setError(null)
     fetchLanguages()
       .then((data) =>
-        setLangList(Object.entries(data).map(([id, info]) => ({ id, ...info })))
+        setLangList(
+          Object.entries(data).map(([id, info]) => ({ id, ...info })),
+        ),
       )
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
@@ -36,7 +38,7 @@ const ScriptShifterSelection = ({
       text,
       lang.id,
       tDir,
-      capitalize ? "capitalize_first" : "no_change"
+      capitalize ? "capitalize_first" : "no_change",
     )
       .then((result) => {
         if (result?.output) {

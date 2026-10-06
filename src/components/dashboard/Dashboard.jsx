@@ -28,13 +28,13 @@ const Dashboard = (props) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const historicalTemplates = useSelector((state) =>
-    selectHistoricalTemplates(state)
+    selectHistoricalTemplates(state),
   )
   const historicalSearches = useSelector((state) =>
-    selectHistoricalSearches(state)
+    selectHistoricalSearches(state),
   )
   const historicalResources = useSelector((state) =>
-    selectHistoricalResources(state)
+    selectHistoricalResources(state),
   )
 
   // Success messages here are flashes (e.g. "your import is processing"), so
@@ -43,14 +43,14 @@ const Dashboard = (props) => {
     () => () => {
       dispatch(clearSuccesses(dashboardErrorKey))
     },
-    [dispatch]
+    [dispatch],
   )
 
   const chooseResourceTemplate = (resourceTemplateId) => {
     dispatch(completeResourceLoadingWithTemplate(resourceTemplateId)).then(
       (result) => {
         if (result) navigate("/editor")
-      }
+      },
     )
   }
 

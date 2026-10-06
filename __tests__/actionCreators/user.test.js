@@ -104,7 +104,7 @@ describe("addTemplateHistory()", () => {
       "template",
       "5860e2660bd44eab2be5190cd2cafb8b",
       "template1",
-      keycloak
+      keycloak,
     )
   })
 })
@@ -118,8 +118,8 @@ describe("addResourceHistory()", () => {
     await store.dispatch(
       addResourceHistory(
         "https://api.development.sinopia.io/resource/3f90a592-5070-4244-a2d9-47f503329e39",
-        keycloak
-      )
+        keycloak,
+      ),
     )
 
     expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
@@ -127,7 +127,7 @@ describe("addResourceHistory()", () => {
       "resource",
       "b7d41ce2cdf71bd8dd3198b93d5bb7bd",
       "https://api.development.sinopia.io/resource/3f90a592-5070-4244-a2d9-47f503329e39",
-      keycloak
+      keycloak,
     )
   })
 })
@@ -145,7 +145,7 @@ describe("addSearchHistory()", () => {
       "search",
       "dd5b5cc7ca199ba76faf047ffb52575d",
       '{"authorityUri":"sinopia","query":"ants"}',
-      keycloak
+      keycloak,
     )
   })
 })

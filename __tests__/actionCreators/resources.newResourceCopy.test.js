@@ -44,7 +44,7 @@ describe("newResourceCopy", () => {
       const actions = store.getActions()
 
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
 
       expect(safeAction(addSubjectAction)).toEqual(expectedAction)
@@ -64,7 +64,7 @@ describe("newResourceCopy", () => {
 
   describe("copying a resource with a nested resource", () => {
     const store = mockStore(
-      createState({ hasResourceWithNestedResource: true })
+      createState({ hasResourceWithNestedResource: true }),
     )
 
     it("does not copy the nested valueSubject", async () => {
@@ -72,7 +72,7 @@ describe("newResourceCopy", () => {
 
       const actions = store.getActions()
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
 
       // The copied resource should have the property

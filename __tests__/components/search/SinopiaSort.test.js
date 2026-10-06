@@ -20,7 +20,7 @@ describe("<SinopiaSort />", () => {
     screen.getByText("Sort by")
     screen.getByText("Label, ascending")
     expect(
-      screen.queryByText("Label, ascending", { selector: ".active" })
+      screen.queryByText("Label, ascending", { selector: ".active" }),
     ).not.toBeInTheDocument()
 
     screen.getByText("Relevance", { selector: ".active" })
@@ -82,7 +82,7 @@ describe("<SinopiaSort />", () => {
         sortField: "label",
         sortOrder: "asc",
       },
-      undefined
+      undefined,
     )
   })
 })
