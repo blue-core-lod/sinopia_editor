@@ -60,9 +60,7 @@ describe("ResourceTemplateRow actions", () => {
 
       screen.getByTestId(`Edit ${label}`)
       screen.getByTestId(`View ${label}`)
-      expect(
-        screen.queryByTestId(`Create resource for ${label}`),
-      ).not.toBeInTheDocument()
+      screen.getByTestId(`Create resource for ${label}`)
       expect(screen.queryByTestId(`Copy ${label}`)).not.toBeInTheDocument()
     })
   })
@@ -83,7 +81,7 @@ describe("ResourceTemplateRow actions", () => {
       const state = createState({ noGroups: true })
       renderComponent(
         <ResourceTemplateSearchResult results={[row]} />,
-        createStore(state)
+        createStore(state),
       )
 
       screen.getByTestId(`View ${label}`)
