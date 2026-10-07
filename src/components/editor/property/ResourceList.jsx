@@ -25,17 +25,17 @@ const ResourceList = (props) => {
   const topRef = useRef(null)
 
   const propertyTemplate = useSelector((state) =>
-    selectPropertyTemplate(state, props.property?.propertyTemplateKey)
+    selectPropertyTemplate(state, props.property?.propertyTemplateKey),
   )
   const subject = useSelector((state) =>
-    selectNormSubject(state, props.property?.subjectKey)
+    selectNormSubject(state, props.property?.subjectKey),
   )
   const subjectTemplate = useSelector((state) =>
-    selectSubjectTemplate(state, subject?.subjectTemplateKey)
+    selectSubjectTemplate(state, subject?.subjectTemplateKey),
   )
 
   const mainTitleValue = useSelector((state) =>
-    selectMainTitleValue(state, props.property?.rootSubjectKey)
+    selectMainTitleValue(state, props.property?.rootSubjectKey),
   )
 
   useEffect(() => {
@@ -52,14 +52,14 @@ const ResourceList = (props) => {
           } else {
             window.scrollTo(0, topRef.current?.offsetTop)
           }
-        }
+        },
       )
     }
     const getNewResourceList = async () => {
       const listItems = []
       const authorities = propertyTemplate.authorities.filter(
         (authority) =>
-          authority.uri.startsWith("urn:ld4p:sinopia") && authority.type
+          authority.uri.startsWith("urn:ld4p:sinopia") && authority.type,
       )
       await Promise.all(
         authorities.map((authority) =>
@@ -77,11 +77,11 @@ const ResourceList = (props) => {
                   }}
                 >
                   {hit.resourceLabel} ({hit.id})
-                </button>
+                </button>,
               )
             })
-          })
-        )
+          }),
+        ),
       )
       // De-dupicate with lodash
       if (isMounted) setNewResourceList(_.uniq(listItems))

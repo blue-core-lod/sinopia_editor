@@ -78,7 +78,7 @@ describe("getSearchResults", () => {
     global.fetch = jest
       .fn()
       .mockImplementation(() =>
-        Promise.resolve({ json: () => blueCoreResourceResult })
+        Promise.resolve({ json: () => blueCoreResourceResult }),
       )
 
     const results = await getSearchResults("foo")
@@ -90,7 +90,7 @@ describe("getSearchResults", () => {
     })
     expect(global.fetch).toHaveBeenCalledWith(
       "http://localhost:3000/search/?q=foo",
-      { method: "GET" }
+      { method: "GET" },
     )
   })
 
@@ -98,7 +98,7 @@ describe("getSearchResults", () => {
     global.fetch = jest
       .fn()
       .mockImplementation(() =>
-        Promise.resolve({ json: () => blueCoreResourceResult })
+        Promise.resolve({ json: () => blueCoreResourceResult }),
       )
     await getSearchResults("foo", {
       startOfRange: 10,
@@ -108,7 +108,7 @@ describe("getSearchResults", () => {
     })
     expect(global.fetch).toHaveBeenCalledWith(
       "http://localhost:3000/search/?q=foo",
-      { method: "GET" }
+      { method: "GET" },
     )
   })
 
@@ -170,7 +170,7 @@ describe("getSearchResults", () => {
     global.fetch = jest
       .fn()
       .mockImplementation(() =>
-        Promise.resolve({ json: () => resultWithContribution })
+        Promise.resolve({ json: () => resultWithContribution }),
       )
 
     const results = await getSearchResults("Some Work")
@@ -181,7 +181,7 @@ describe("getSearchResults", () => {
     global.fetch = jest
       .fn()
       .mockImplementation(() =>
-        Promise.resolve({ json: () => blueCoreResourceResult })
+        Promise.resolve({ json: () => blueCoreResourceResult }),
       )
 
     const results = await getSearchResults("foo")
@@ -298,7 +298,7 @@ describe("getSearchResults", () => {
     const results = await getSearchResults("Palgul sokpo")
     expect(typeof results.results[0].label).toBe("string")
     expect(results.results[0].label).toBe(
-      "Palgul sokpo! hŭk esŏ ch'ajŭn yŏngwŏn han sam"
+      "Palgul sokpo! hŭk esŏ ch'ajŭn yŏngwŏn han sam",
     )
   })
 })
@@ -308,7 +308,7 @@ describe("getSearchResultsWithFacets", () => {
     global.fetch = jest
       .fn()
       .mockImplementation(() =>
-        Promise.resolve({ json: () => blueCoreResourceResult })
+        Promise.resolve({ json: () => blueCoreResourceResult }),
       )
 
     const [results] = await getSearchResultsWithFacets("foo")
@@ -320,7 +320,7 @@ describe("getSearchResultsWithFacets", () => {
     })
     expect(global.fetch).toHaveBeenCalledWith(
       "http://localhost:3000/search/?q=foo",
-      { method: "GET" }
+      { method: "GET" },
     )
   })
 
@@ -328,7 +328,7 @@ describe("getSearchResultsWithFacets", () => {
     global.fetch = jest
       .fn()
       .mockImplementation(() =>
-        Promise.resolve({ json: () => blueCoreResourceResult })
+        Promise.resolve({ json: () => blueCoreResourceResult }),
       )
 
     await getSearchResultsWithFacets("foo", {
@@ -338,7 +338,7 @@ describe("getSearchResultsWithFacets", () => {
     })
     expect(global.fetch).toHaveBeenCalledWith(
       "http://localhost:3000/search/?q=foo",
-      { method: "GET" }
+      { method: "GET" },
     )
   })
 })
@@ -390,7 +390,7 @@ describe("getLookupResult", () => {
 
   describe("for a non-template authority with no results", () => {
     const lookupConfig = findAuthorityConfig(
-      "urn:ld4p:sinopia:bibframe:instance"
+      "urn:ld4p:sinopia:bibframe:instance",
     )
     const instanceResult = {
       total: 0,
@@ -402,7 +402,7 @@ describe("getLookupResult", () => {
       global.fetch = jest
         .fn()
         .mockImplementationOnce(() =>
-          Promise.resolve({ json: () => instanceResult })
+          Promise.resolve({ json: () => instanceResult }),
         )
 
       const result = await getLookupResult("foo", lookupConfig)
@@ -417,14 +417,14 @@ describe("getLookupResult", () => {
 
   describe("for template authority", () => {
     const lookupConfig = findAuthorityConfig(
-      "urn:ld4p:sinopia:resourceTemplate"
+      "urn:ld4p:sinopia:resourceTemplate",
     )
 
     it("performs a search and returns result", async () => {
       global.fetch = jest
         .fn()
         .mockImplementationOnce(() =>
-          Promise.resolve({ json: () => templateResult })
+          Promise.resolve({ json: () => templateResult }),
         )
 
       const result = await getLookupResult("foo", lookupConfig)
@@ -519,7 +519,7 @@ describe("getTemplateSearchResults", () => {
       {
         headers: { "Content-Type": "application/json" },
         method: "GET",
-      }
+      },
     )
   })
 
@@ -527,7 +527,7 @@ describe("getTemplateSearchResults", () => {
     global.fetch = jest
       .fn()
       .mockImplementation(() =>
-        Promise.resolve({ status: 504, statusText: "Gateway Timeout" })
+        Promise.resolve({ status: 504, statusText: "Gateway Timeout" }),
       )
     const results = await getTemplateSearchResults("Palo Alto")
     expect(results).toEqual({
@@ -587,7 +587,7 @@ describe("getTemplateSearchResults", () => {
         id: "bluecore:bf2:madsrdf:Topic:Reference",
         resourceLabel: "LCSH Subject--Reference",
         resourceURI: "http://id.loc.gov/ontologies/bibframe/Topic",
-      })
+      }),
     )
   })
 })
@@ -612,7 +612,7 @@ describe("getTemplateSearchResultsByIds", () => {
       {
         headers: { "Content-Type": "application/json" },
         method: "GET",
-      }
+      },
     )
   })
 })
@@ -641,7 +641,7 @@ describe("getSearchResultsByUris", () => {
     global.fetch = jest
       .fn()
       .mockImplementation(() =>
-        Promise.resolve({ json: () => singleResourceResult })
+        Promise.resolve({ json: () => singleResourceResult }),
       )
 
     const results = await getSearchResultsByUris([

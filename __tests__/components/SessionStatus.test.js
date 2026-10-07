@@ -41,7 +41,7 @@ const renderStatus = ({
   render(
     <ul>
       <SessionStatus />
-    </ul>
+    </ul>,
   )
   return { keycloak, extendSession }
 }
@@ -73,7 +73,7 @@ describe("<SessionStatus />", () => {
 
     expect(extendSession).toHaveBeenCalled()
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled()
+      expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled(),
     )
     expect(screen.queryByText(/can't be extended/)).not.toBeInTheDocument()
   })
@@ -88,7 +88,7 @@ describe("<SessionStatus />", () => {
 
     await screen.findByText(/can't be extended any further/)
     expect(
-      screen.queryByRole("button", { name: "Continue" })
+      screen.queryByRole("button", { name: "Continue" }),
     ).not.toBeInTheDocument()
   })
 
@@ -115,7 +115,7 @@ describe("<SessionStatus />", () => {
     fireEvent.click(screen.getByRole("button", { name: "Continue" }))
 
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled()
+      expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled(),
     )
     expect(screen.queryByText(/can't be extended/)).not.toBeInTheDocument()
 
@@ -133,7 +133,7 @@ describe("<SessionStatus />", () => {
     fireEvent.click(screen.getByRole("button", { name: "Continue" }))
 
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled()
+      expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled(),
     )
     expect(screen.queryByText(/can't be extended/)).not.toBeInTheDocument()
   })
@@ -146,7 +146,7 @@ describe("<SessionStatus />", () => {
 
     const dialog = screen.getByRole("dialog")
     expect(
-      within(dialog).getByText("You have been logged out")
+      within(dialog).getByText("You have been logged out"),
     ).toBeInTheDocument()
     fireEvent.click(within(dialog).getByRole("button", { name: "Log back in" }))
     expect(keycloak.login).toHaveBeenCalledWith({

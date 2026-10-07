@@ -50,7 +50,7 @@ describe("saveResource with triples not covered by the template", () => {
     // Load the resource (with the extra triple) into real state.
     const dataset = await datasetFromN3(`${n3}${extraTriple}\n`)
     const loaded = await store.dispatch(
-      newResourceFromDataset(dataset, uri, null, "testerror")
+      newResourceFromDataset(dataset, uri, null, "testerror"),
     )
     expect(loaded).toBe(true)
 
@@ -69,7 +69,7 @@ describe("saveResource with triples not covered by the template", () => {
       saveResource(resourceKey, "stanford", [], "testerror", {
         token: "test-token",
         updateToken: jest.fn().mockResolvedValue(false),
-      })
+      }),
     )
 
     expect(capturedBody).not.toBeNull()

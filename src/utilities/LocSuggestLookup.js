@@ -28,7 +28,7 @@ const lcClassValues = (classes) =>
 const asValues = (raw) => {
   if (raw === undefined || raw === null) return []
   return (Array.isArray(raw) ? raw : [raw]).filter(
-    (value) => typeof value === "string" && value.trim()
+    (value) => typeof value === "string" && value.trim(),
   )
 }
 

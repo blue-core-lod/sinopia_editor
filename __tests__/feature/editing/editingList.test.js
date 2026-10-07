@@ -20,12 +20,12 @@ describe("editing a list property", () => {
 
     // Authorities list
     expect(screen.getAllByText("Select from: type of recording")).toHaveLength(
-      2
+      2,
     )
 
     // No add another
     expect(
-      screen.queryByTestId("Add another Uber template1, property10")
+      screen.queryByTestId("Add another Uber template1, property10"),
     ).not.toBeInTheDocument()
 
     const select = screen.getByTestId("Select Uber template1, property10")
@@ -34,7 +34,7 @@ describe("editing a list property", () => {
     })
 
     expect(
-      screen.getByText("http://id.loc.gov/vocabulary/mrectype/analog")
+      screen.getByText("http://id.loc.gov/vocabulary/mrectype/analog"),
     ).toHaveClass("form-control")
     screen.getByText("analog", { selector: ".form-control" })
 
@@ -43,7 +43,7 @@ describe("editing a list property", () => {
 
     // Now remove it
     fireEvent.click(
-      screen.getByTestId("Remove http://id.loc.gov/vocabulary/mrectype/analog")
+      screen.getByTestId("Remove http://id.loc.gov/vocabulary/mrectype/analog"),
     )
 
     // Value removed
@@ -51,13 +51,13 @@ describe("editing a list property", () => {
       expect(
         screen.queryByText("http://id.loc.gov/vocabulary/mrectype/analog", {
           selector: ".form-control",
-        })
-      ).not.toBeInTheDocument()
+        }),
+      ).not.toBeInTheDocument(),
     )
 
     // Blank lookup
     expect(screen.getByTestId("Select Uber template1, property10")).toHaveValue(
-      "default"
+      "default",
     )
   }, 15000)
 
@@ -74,11 +74,11 @@ describe("editing a list property", () => {
     })
 
     expect(
-      screen.getByText("http://id.loc.gov/vocabulary/mrectype/analog")
+      screen.getByText("http://id.loc.gov/vocabulary/mrectype/analog"),
     ).toHaveClass("form-control")
 
     fireEvent.click(
-      screen.getByTestId("Add another Uber template1, property11")
+      screen.getByTestId("Add another Uber template1, property11"),
     )
 
     const select2 = screen.getByTestId("Select Uber template1, property11")
@@ -87,7 +87,7 @@ describe("editing a list property", () => {
     })
 
     expect(
-      screen.getByText("http://id.loc.gov/vocabulary/mrectype/digital")
+      screen.getByText("http://id.loc.gov/vocabulary/mrectype/digital"),
     ).toHaveClass("form-control")
   }, 10000)
 

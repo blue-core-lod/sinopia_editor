@@ -43,8 +43,8 @@ describe("LoadByRDFForm", () => {
       expect(screen.getByText("MARCXML output")).toBeInTheDocument()
       expect(
         screen.getByPlaceholderText(
-          "Upload a .mrc file above to convert to MARCXML."
-        )
+          "Upload a .mrc file above to convert to MARCXML.",
+        ),
       ).toBeInTheDocument()
     })
 
@@ -60,7 +60,7 @@ describe("LoadByRDFForm", () => {
       renderForm()
 
       const textarea = screen.getByPlaceholderText(
-        "Upload a .mrc file above to convert to MARCXML."
+        "Upload a .mrc file above to convert to MARCXML.",
       )
       expect(textarea).not.toBeDisabled()
     })
@@ -118,7 +118,7 @@ describe("LoadByRDFForm", () => {
 
       // Second call: marc2bibframe
       expect(fetchMock.mock.calls[1][0]).toBe(
-        "http://localhost:3000/marc2bibframe"
+        "http://localhost:3000/marc2bibframe",
       )
       expect(fetchMock.mock.calls[1][1]).toMatchObject({
         method: "POST",
@@ -137,7 +137,7 @@ describe("LoadByRDFForm", () => {
 
       await waitFor(() => {
         const textarea = screen.getByPlaceholderText(
-          "Upload a .mrc file above to convert to MARCXML."
+          "Upload a .mrc file above to convert to MARCXML.",
         )
         expect(textarea.value).toContain("leader")
       })
@@ -252,7 +252,7 @@ describe("LoadByRDFForm", () => {
               "Content-Type": "application/json",
               Authorization: "Bearer test-token",
             }),
-          })
+          }),
         )
       })
     })
@@ -322,7 +322,7 @@ describe("LoadByRDFForm", () => {
       // /api/works should not be called
       expect(global.fetch).not.toHaveBeenCalledWith(
         "http://localhost:3000/works",
-        expect.anything()
+        expect.anything(),
       )
     })
   })

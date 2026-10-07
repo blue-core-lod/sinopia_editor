@@ -18,7 +18,7 @@ import {
  */
 export const getSearchResults = async (query, options = {}) =>
   getSearchResultsWithFacets(query, { ...options, noFacetResults: true }).then(
-    ([results]) => results
+    ([results]) => results,
   )
 
 /**
@@ -30,7 +30,7 @@ export const getSearchResults = async (query, options = {}) =>
 export const getSearchResultsWithFacets = async (
   query,
   options = {},
-  keycloak
+  keycloak,
 ) => {
   if (Config.useResourceTemplateFixtures && hasFixtureResource(query))
     return Promise.resolve(resourceSearchResults(query))
@@ -184,7 +184,7 @@ const hitsToResult = (payload) => {
     const rdfTypes = []
     if (Array.isArray(types)) {
       types.forEach((type) =>
-        rdfTypes.push(`http://id.loc.gov/ontologies/bibframe/${type}`)
+        rdfTypes.push(`http://id.loc.gov/ontologies/bibframe/${type}`),
       )
     } else {
       rdfTypes.push(`http://id.loc.gov/ontologies/bibframe/${types}`)
@@ -208,7 +208,7 @@ const hitsToResult = (payload) => {
     let primaryContributor
     if (Array.isArray(contributions)) {
       const primary = contributions.find(
-        (c) => c["@type"] === "PrimaryContribution"
+        (c) => c["@type"] === "PrimaryContribution",
       )
       const agentLabel = primary?.agent?.label
       if (agentLabel !== undefined) {
@@ -258,7 +258,7 @@ export const getTemplateSearchResults = (query, options = {}) => {
       if (Config.useResourceTemplateFixtures) {
         const newResults = searchResults.results.filter(
           (hit) =>
-            [hit.id, hit.resourceURI].includes(query) || query.length === 0
+            [hit.id, hit.resourceURI].includes(query) || query.length === 0,
         )
         return {
           totalHits: newResults.length,
@@ -267,7 +267,7 @@ export const getTemplateSearchResults = (query, options = {}) => {
         }
       }
       return searchResults
-    }
+    },
   )
 }
 
@@ -296,14 +296,14 @@ export const getTemplateSearchResultsByIds = (templateIds) => {
     (searchResults) => {
       // Filter results to only include templates with matching IDs
       const newResults = searchResults.results.filter((hit) =>
-        templateIds.includes(hit.id)
+        templateIds.includes(hit.id),
       )
       return {
         totalHits: newResults.length,
         results: newResults,
         error: searchResults.error,
       }
-    }
+    },
   )
 }
 

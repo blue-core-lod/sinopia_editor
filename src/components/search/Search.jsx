@@ -27,13 +27,13 @@ const Search = (props) => {
   const { keycloak } = useKeycloak()
 
   const searchOptions = useSelector((state) =>
-    selectSearchOptions(state, "resource")
+    selectSearchOptions(state, "resource"),
   )
   const queryString = useSelector((state) =>
-    selectSearchQuery(state, "resource")
+    selectSearchQuery(state, "resource"),
   )
   const totalResults = useSelector((state) =>
-    selectSearchTotalResults(state, "resource")
+    selectSearchTotalResults(state, "resource"),
   )
   const links = useSelector((state) => selectSearchLinks(state, "resource"))
 

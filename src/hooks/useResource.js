@@ -21,7 +21,7 @@ import { useKeycloak } from "../KeycloakContext"
 
 const useResource = (
   errorKey,
-  { resourceTemplateId = null, resourceURI = null }
+  { resourceTemplateId = null, resourceURI = null },
 ) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -48,7 +48,7 @@ const useResource = (
       (result) => {
         setStatus("ready")
         if (result) setNavigateEditor(true)
-      }
+      },
     )
   }
 
@@ -60,8 +60,8 @@ const useResource = (
         resourceURI,
         errorKey,
         { asNewResource: true },
-        keycloak
-      )
+        keycloak,
+      ),
     ).then((result) => {
       setStatus("ready")
       if (result) setNavigateEditor(true)
@@ -80,7 +80,7 @@ const useResource = (
         (result) => {
           setStatus("ready")
           if (result) setNavigateEditor(true)
-        }
+        },
       )
     }
   }

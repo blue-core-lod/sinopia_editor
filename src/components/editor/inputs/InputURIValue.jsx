@@ -55,7 +55,7 @@ const InputURIValue = ({
     labelId,
     diacriticsId,
     diacriticsBtnId,
-    value.label || ""
+    value.label || "",
   )
   const handleKeyDownResourceHasChanged = useResourceHasChanged(value)
 
@@ -66,8 +66,8 @@ const InputURIValue = ({
         value.key,
         currentURIContent,
         currentLabelContent,
-        value.lang
-      )
+        value.lang,
+      ),
     )
   }
 
@@ -108,10 +108,10 @@ const InputURIValue = ({
           value.property,
           value.propertyUri,
           translatedText,
-          marcCode
+          marcCode,
         ),
-        value.key
-      )
+        value.key,
+      ),
     )
   }
 

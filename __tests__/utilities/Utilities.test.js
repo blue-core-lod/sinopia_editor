@@ -25,7 +25,7 @@ describe("Utilities", () => {
       }
 
       expect(
-        isResourceWithValueTemplateRef(templateWithValueTemplateRefs)
+        isResourceWithValueTemplateRef(templateWithValueTemplateRefs),
       ).toBeTruthy()
     })
 
@@ -42,7 +42,7 @@ describe("Utilities", () => {
       }
 
       expect(
-        isResourceWithValueTemplateRef(templateWithTwoValueTemplateRefs)
+        isResourceWithValueTemplateRef(templateWithTwoValueTemplateRefs),
       ).toBeTruthy()
     })
 
@@ -141,7 +141,7 @@ describe("Utilities", () => {
   describe("formatISODate()", () => {
     it("formats date", () => {
       expect(formatISODate(new Date("2019-05-14T11:01:58.135Z"))).toEqual(
-        "2019-05-14"
+        "2019-05-14",
       )
     })
   })
@@ -149,10 +149,10 @@ describe("Utilities", () => {
   describe("formatLocalDate()", () => {
     it("formats date", () => {
       expect(formatLocalDate(new Date("2019-05-14T11:01:58.135Z"))).toEqual(
-        "2019-05-14"
+        "2019-05-14",
       )
       expect(formatLocalDate(new Date("2019-05-14T01:01:58.135Z"))).toEqual(
-        "2019-05-13"
+        "2019-05-13",
       )
     })
   })
@@ -162,15 +162,15 @@ describe("Utilities", () => {
     it("is true for a URI sharing an origin with the Blue Core API", () => {
       expect(
         isBlueCoreUri(
-          "http://localhost:3000/resource/a5c5f4c0-e7cd-4ca5-a20f-2a37fe1080d5"
-        )
+          "http://localhost:3000/resource/a5c5f4c0-e7cd-4ca5-a20f-2a37fe1080d5",
+        ),
       ).toBe(true)
       expect(isBlueCoreUri("http://localhost:3000/instances/abc123")).toBe(true)
     })
 
     it("is false for an external URI", () => {
       expect(isBlueCoreUri("http://id.loc.gov/resources/items/14300125")).toBe(
-        false
+        false,
       )
     })
 
@@ -184,8 +184,8 @@ describe("Utilities", () => {
     it("returns collection/uuid for a Blue Core resource URI", () => {
       expect(
         resourceIdFromUri(
-          "https://dev.bcld.info/works/e3764c9a-26aa-49e4-a892-7f2ac2961234"
-        )
+          "https://dev.bcld.info/works/e3764c9a-26aa-49e4-a892-7f2ac2961234",
+        ),
       ).toEqual("works/e3764c9a-26aa-49e4-a892-7f2ac2961234")
     })
 
@@ -193,13 +193,13 @@ describe("Utilities", () => {
       // Regression: the ID used to be sliced off at the length of
       // `${sinopiaApiBase}/resource/`, yielding e.g. "orks/<uuid>".
       expect(
-        resourceIdFromUri("https://stage.bcld.info/instances/abc123")
+        resourceIdFromUri("https://stage.bcld.info/instances/abc123"),
       ).toEqual("instances/abc123")
     })
 
     it("returns collection/uuid for a production resource URI", () => {
       expect(resourceIdFromUri("https://bcld.info/works/abc124")).toEqual(
-        "works/abc124"
+        "works/abc124",
       )
     })
 
@@ -213,7 +213,7 @@ describe("Utilities", () => {
     // Config.sinopiaApiBase defaults to http://localhost:3000 in tests.
     it("rebuilds the URI on the Blue Core API origin", () => {
       expect(uriFromResourceId("works", "abc123")).toEqual(
-        "http://localhost:3000/works/abc123"
+        "http://localhost:3000/works/abc123",
       )
     })
   })

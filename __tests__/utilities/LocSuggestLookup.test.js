@@ -50,7 +50,7 @@ describe("getLocSuggestLookupResult()", () => {
     await getLocSuggestLookupResult(
       "20th",
       { uri: "urn:ld4p:locsuggest:subjects:temporal" },
-      { startOfRange: 0 }
+      { startOfRange: 0 },
     )
 
     expect(suggest).toHaveBeenCalledWith("20th", "Temporal", 0)
@@ -69,7 +69,7 @@ describe("getLocSuggestLookupResult()", () => {
         uri: "http://id.loc.gov/authorities/subjects/sh85039509",
         id: "sh85039509",
         label: "Dress accessories",
-      })
+      }),
     )
   })
 
@@ -155,7 +155,7 @@ describe("getLocSuggestLookupResult()", () => {
     const result = await getLocSuggestLookupResult(
       "dress",
       { uri: "urn:ld4p:locsuggest:subjects:nonesuch" },
-      { startOfRange: 0 }
+      { startOfRange: 0 },
     )
 
     expect(result.error).toMatch("No rdftype configured")

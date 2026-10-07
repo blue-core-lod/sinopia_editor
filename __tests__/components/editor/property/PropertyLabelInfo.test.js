@@ -5,7 +5,11 @@ import { screen } from "@testing-library/react"
 import { createState } from "stateUtils"
 import PropertyLabelInfo from "components/editor/property/PropertyLabelInfo"
 
-let mockKeycloak
+// var, not let: babel-plugin-jest-hoist lifts the jest.mock() call above
+// this declaration, and the factory body assigns mockKeycloak immediately.
+// A let/const binding would still be in its TDZ at that point.
+// eslint-disable-next-line no-var
+var mockKeycloak
 
 jest.mock("keycloak-js", () => {
   mockKeycloak = {
@@ -34,10 +38,10 @@ describe("<PropertyLabelInfo />", () => {
       ]
     renderComponent(
       <PropertyLabelInfo propertyTemplate={propertyTemplate} />,
-      store
+      store,
     )
     expect(screen.getByRole("link").getAttribute("data-bs-content")).toBe(
-      "Nested, repeatable resource template."
+      "Nested, repeatable resource template.",
     )
     expect(screen.getAllByRole("link").length).toBe(1) // only one link present, the remark
   })
@@ -52,10 +56,10 @@ describe("<PropertyLabelInfo />", () => {
 
     renderComponent(
       <PropertyLabelInfo propertyTemplate={propertyTemplate} />,
-      store
+      store,
     )
     expect(screen.getByRole("link").getAttribute("title")).toBe(
-      "https://www.stanford.edu"
+      "https://www.stanford.edu",
     )
     expect(screen.getAllByRole("link").length).toBe(1) //  only one link present, the remark URL
   })
@@ -70,7 +74,7 @@ describe("<PropertyLabelInfo />", () => {
 
     renderComponent(
       <PropertyLabelInfo propertyTemplate={propertyTemplate} />,
-      store
+      store,
     )
     expect(screen.getAllByRole("link").length).toBe(2) //  two links present, the remark and the remark URL
   })
@@ -85,7 +89,7 @@ describe("<PropertyLabelInfo />", () => {
 
     renderComponent(
       <PropertyLabelInfo propertyTemplate={propertyTemplate} />,
-      store
+      store,
     )
     expect(screen.queryAllByRole("link")).toBeFalsy //  no links present
   })

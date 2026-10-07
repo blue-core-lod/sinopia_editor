@@ -42,7 +42,7 @@ export const KeycloakProvider = ({ children }) => {
         url: Config.keycloakUrl,
         realm: Config.keycloakRealm,
         clientId: Config.keycloakClientId,
-      })
+      }),
   )
 
   const [authenticated, setAuthenticated] = useState(false)
@@ -58,7 +58,7 @@ export const KeycloakProvider = ({ children }) => {
   // Gets a new token, which also extends the session.
   const refresh = useCallback(
     (minValidity) => keycloak.updateToken(minValidity).catch(() => {}),
-    [keycloak]
+    [keycloak],
   )
 
   // Returns when the session ends, based on this tab's token.
@@ -126,7 +126,7 @@ export const KeycloakProvider = ({ children }) => {
         onLoad: "check-sso",
         silentCheckSsoRedirectUri: `${Config.sinopiaUrl.replace(
           /\/$/,
-          ""
+          "",
         )}/dist/silent-check-sso.html`,
         // Notice quickly when the user logs out in another tab or app.
         checkLoginIframe: true,
@@ -165,11 +165,11 @@ export const KeycloakProvider = ({ children }) => {
       window.addEventListener(name, onActivity, {
         capture: true,
         passive: true,
-      })
+      }),
     )
     return () =>
       ACTIVITY_EVENTS.forEach((name) =>
-        window.removeEventListener(name, onActivity, { capture: true })
+        window.removeEventListener(name, onActivity, { capture: true }),
       )
   }, [keycloak, refresh])
 
@@ -179,9 +179,9 @@ export const KeycloakProvider = ({ children }) => {
     () =>
       keycloak.updateToken(-1).then(
         () => true,
-        () => false
+        () => false,
       ),
-    [keycloak]
+    [keycloak],
   )
 
   return (

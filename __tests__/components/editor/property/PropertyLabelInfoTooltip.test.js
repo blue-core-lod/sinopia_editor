@@ -6,7 +6,11 @@ import { createState } from "stateUtils"
 import { selectSubjectAndPropertyTemplates } from "selectors/templates"
 import PropertyLabelInfoTooltip from "components/editor/property/PropertyLabelInfoTooltip"
 
-let mockKeycloak
+// var, not let: babel-plugin-jest-hoist lifts the jest.mock() call above
+// this declaration, and the factory body assigns mockKeycloak immediately.
+// A let/const binding would still be in its TDZ at that point.
+// eslint-disable-next-line no-var
+var mockKeycloak
 
 jest.mock("keycloak-js", () => {
   mockKeycloak = {
@@ -31,14 +35,14 @@ describe("<PropertyLabelInfoTooltip />", () => {
     const store = createStore(state)
     const propertyTemplate = selectSubjectAndPropertyTemplates(
       state,
-      "resourceTemplate:testing:uber1"
+      "resourceTemplate:testing:uber1",
     )
     renderComponent(
       <PropertyLabelInfoTooltip propertyTemplate={propertyTemplate} />,
-      store
+      store,
     )
     expect(screen.getByRole("link").getAttribute("data-bs-content")).toBe(
-      "Template for testing purposes."
+      "Template for testing purposes.",
     )
   })
 
@@ -47,14 +51,14 @@ describe("<PropertyLabelInfoTooltip />", () => {
     const store = createStore(state)
     const propertyTemplate = selectSubjectAndPropertyTemplates(
       state,
-      "resourceTemplate:testing:uber2"
+      "resourceTemplate:testing:uber2",
     )
     renderComponent(
       <PropertyLabelInfoTooltip propertyTemplate={propertyTemplate} />,
-      store
+      store,
     )
     expect(screen.getByRole("link").getAttribute("data-bs-content")).toBe(
-      'Template for testing purposes with single repeatable literal with a link to Stanford at <a target="_blank" href="https://www.stanford.edu">https://www.stanford.edu</a>'
+      'Template for testing purposes with single repeatable literal with a link to Stanford at <a target="_blank" href="https://www.stanford.edu">https://www.stanford.edu</a>',
     )
   })
 })

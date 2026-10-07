@@ -34,7 +34,7 @@ export default class TemplatesBuilder {
       .match(
         null,
         rdf.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-        rdf.namedNode("http://sinopia.io/vocabulary/ResourceTemplate")
+        rdf.namedNode("http://sinopia.io/vocabulary/ResourceTemplate"),
       )
       .toArray()
     this.resourceTerm =
@@ -57,11 +57,11 @@ export default class TemplatesBuilder {
   buildSubjectTemplate() {
     const resourceAttrValues = this.valuesFor(
       this.resourceTerm,
-      "http://sinopia.io/vocabulary/hasResourceAttribute"
+      "http://sinopia.io/vocabulary/hasResourceAttribute",
     )
     const id = this.valueFor(
       this.resourceTerm,
-      "http://sinopia.io/vocabulary/hasResourceId"
+      "http://sinopia.io/vocabulary/hasResourceId",
     )
     this.subjectTemplate = {
       // Unique per referenced template: the ref as the parent wrote it, so two
@@ -74,24 +74,24 @@ export default class TemplatesBuilder {
       ...this.versionFields(),
       class: this.valueFor(
         this.resourceTerm,
-        "http://sinopia.io/vocabulary/hasClass"
+        "http://sinopia.io/vocabulary/hasClass",
       ),
       classes: this.buildClasses(),
       label: this.valueFor(this.resourceTerm, rdfsLabel),
       author: this.valueFor(
         this.resourceTerm,
-        "http://sinopia.io/vocabulary/hasAuthor"
+        "http://sinopia.io/vocabulary/hasAuthor",
       ),
       remark: this.valueFor(
         this.resourceTerm,
-        "http://sinopia.io/vocabulary/hasRemark"
+        "http://sinopia.io/vocabulary/hasRemark",
       ),
       date: this.valueFor(
         this.resourceTerm,
-        "http://sinopia.io/vocabulary/hasDate"
+        "http://sinopia.io/vocabulary/hasDate",
       ),
       suppressible: resourceAttrValues.includes(
-        "http://sinopia.io/vocabulary/resourceAttribute/suppressible"
+        "http://sinopia.io/vocabulary/resourceAttribute/suppressible",
       ),
       propertyTemplateKeys: [],
       propertyTemplates: [],
@@ -124,11 +124,14 @@ export default class TemplatesBuilder {
   buildClasses() {
     const classTerms = this.objectsFor(
       this.resourceTerm,
-      "http://sinopia.io/vocabulary/hasOptionalClass"
+      "http://sinopia.io/vocabulary/hasOptionalClass",
     )
 
     classTerms.push(
-      this.objectFor(this.resourceTerm, "http://sinopia.io/vocabulary/hasClass")
+      this.objectFor(
+        this.resourceTerm,
+        "http://sinopia.io/vocabulary/hasClass",
+      ),
     )
 
     const classesMap = {}
@@ -145,7 +148,7 @@ export default class TemplatesBuilder {
     const quads = this.dataset
       .match(
         this.resourceTerm,
-        rdf.namedNode("http://sinopia.io/vocabulary/hasPropertyTemplate")
+        rdf.namedNode("http://sinopia.io/vocabulary/hasPropertyTemplate"),
       )
       .toArray()
     if (_.isEmpty(quads)) return
@@ -159,14 +162,14 @@ export default class TemplatesBuilder {
       this.dataset
         .match(
           subjectTerm,
-          rdf.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#first")
+          rdf.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#first"),
         )
-        .toArray()[0].object
+        .toArray()[0].object,
     )
     const restQuad = this.dataset
       .match(
         subjectTerm,
-        rdf.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest")
+        rdf.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"),
       )
       .toArray()[0]
     if (
@@ -184,7 +187,7 @@ export default class TemplatesBuilder {
       propertyType === "uri" &&
       this.objectFor(
         propertyTerm,
-        "http://sinopia.io/vocabulary/hasLookupAttributes"
+        "http://sinopia.io/vocabulary/hasLookupAttributes",
       )
     ) {
       propertyTemplate = this.newLookupPropertyTemplate(propertyTerm)
@@ -203,24 +206,24 @@ export default class TemplatesBuilder {
     propertyTemplate.key = `${propertyTemplate.key} > literal`
     const attributeTerm = this.objectFor(
       propertyTerm,
-      "http://sinopia.io/vocabulary/hasLiteralAttributes"
+      "http://sinopia.io/vocabulary/hasLiteralAttributes",
     )
     if (attributeTerm) {
       propertyTemplate.defaults = this.defaultsForLiteral(attributeTerm)
       const literalAttrValues = this.valuesFor(
         attributeTerm,
-        "http://sinopia.io/vocabulary/hasLiteralPropertyAttributes"
+        "http://sinopia.io/vocabulary/hasLiteralPropertyAttributes",
       )
       if (
         literalAttrValues.includes(
-          "http://sinopia.io/vocabulary/literalPropertyAttribute/userIdDefault"
+          "http://sinopia.io/vocabulary/literalPropertyAttribute/userIdDefault",
         )
       ) {
         propertyTemplate.defaults.push({ literal: this.userId, lang: null })
       }
       if (
         literalAttrValues.includes(
-          "http://sinopia.io/vocabulary/literalPropertyAttribute/dateDefault"
+          "http://sinopia.io/vocabulary/literalPropertyAttribute/dateDefault",
         )
       ) {
         propertyTemplate.defaults.push({
@@ -247,17 +250,17 @@ export default class TemplatesBuilder {
     propertyTemplate.component = "InputURI"
     const attributeTerm = this.objectFor(
       propertyTerm,
-      "http://sinopia.io/vocabulary/hasUriAttributes"
+      "http://sinopia.io/vocabulary/hasUriAttributes",
     )
     if (attributeTerm) {
       propertyTemplate.defaults = this.defaultsForUri(attributeTerm)
       const uriAttrValues = this.valuesFor(
         attributeTerm,
-        "http://sinopia.io/vocabulary/hasUriAttribute"
+        "http://sinopia.io/vocabulary/hasUriAttribute",
       )
       if (
         uriAttrValues.includes(
-          "http://sinopia.io/vocabulary/uriAttribute/labelSuppressed"
+          "http://sinopia.io/vocabulary/uriAttribute/labelSuppressed",
         )
       )
         propertyTemplate.labelSuppressed = true
@@ -268,7 +271,7 @@ export default class TemplatesBuilder {
   newBasePropertyTemplate(propertyTerm) {
     const propertyUriTerms = this.objectsFor(
       propertyTerm,
-      "http://sinopia.io/vocabulary/hasPropertyUri"
+      "http://sinopia.io/vocabulary/hasPropertyUri",
     )
     const propertyUrisMap = {}
     propertyUriTerms.forEach((propertyUriTerm) => {
@@ -277,11 +280,11 @@ export default class TemplatesBuilder {
     })
     const propertyAttrValues = this.valuesFor(
       propertyTerm,
-      "http://sinopia.io/vocabulary/hasPropertyAttribute"
+      "http://sinopia.io/vocabulary/hasPropertyAttribute",
     )
     const remarkUrl = this.valueFor(
       propertyTerm,
-      "http://sinopia.io/vocabulary/hasRemarkUrl"
+      "http://sinopia.io/vocabulary/hasRemarkUrl",
     )
     const remarkUrlLabel = remarkUrl
       ? this.valueFor(remarkUrl, rdfsLabel)
@@ -297,23 +300,23 @@ export default class TemplatesBuilder {
       uris: propertyUrisMap,
       defaultUri: _.first(Object.keys(propertyUrisMap)),
       required: propertyAttrValues.includes(
-        "http://sinopia.io/vocabulary/propertyAttribute/required"
+        "http://sinopia.io/vocabulary/propertyAttribute/required",
       ),
       repeatable: propertyAttrValues.includes(
-        "http://sinopia.io/vocabulary/propertyAttribute/repeatable"
+        "http://sinopia.io/vocabulary/propertyAttribute/repeatable",
       ),
       ordered: propertyAttrValues.includes(
-        "http://sinopia.io/vocabulary/propertyAttribute/ordered"
+        "http://sinopia.io/vocabulary/propertyAttribute/ordered",
       ),
       immutable: propertyAttrValues.includes(
-        "http://sinopia.io/vocabulary/propertyAttribute/immutable"
+        "http://sinopia.io/vocabulary/propertyAttribute/immutable",
       ),
       languageSuppressed: propertyAttrValues.includes(
-        "http://sinopia.io/vocabulary/propertyAttribute/languageSuppressed"
+        "http://sinopia.io/vocabulary/propertyAttribute/languageSuppressed",
       ),
       remark: this.valueFor(
         propertyTerm,
-        "http://sinopia.io/vocabulary/hasRemark"
+        "http://sinopia.io/vocabulary/hasRemark",
       ),
       validationRegex: null,
       validationDataType: null,
@@ -331,13 +334,13 @@ export default class TemplatesBuilder {
     propertyTemplate.type = "resource"
     const attributeTerm = this.objectFor(
       propertyTerm,
-      "http://sinopia.io/vocabulary/hasResourceAttributes"
+      "http://sinopia.io/vocabulary/hasResourceAttributes",
     )
     if (attributeTerm) {
       propertyTemplate.defaults = this.defaultsForUri(attributeTerm)
       propertyTemplate.valueSubjectTemplateKeys = this.valuesFor(
         attributeTerm,
-        "http://sinopia.io/vocabulary/hasResourceTemplateId"
+        "http://sinopia.io/vocabulary/hasResourceTemplateId",
       )
       propertyTemplate.key = `${
         propertyTemplate.key
@@ -353,13 +356,13 @@ export default class TemplatesBuilder {
     propertyTemplate.key = `${propertyTemplate.key} > lookup`
     const attributeTerm = this.objectFor(
       propertyTerm,
-      "http://sinopia.io/vocabulary/hasLookupAttributes"
+      "http://sinopia.io/vocabulary/hasLookupAttributes",
     )
     if (attributeTerm) {
       propertyTemplate.defaults = this.defaultsForUri(attributeTerm)
       propertyTemplate.authorities = this.newAuthorities(attributeTerm)
       propertyTemplate.component = this.componentForLookup(
-        propertyTemplate.authorities[0].uri
+        propertyTemplate.authorities[0].uri,
       )
     }
     return propertyTemplate
@@ -377,7 +380,7 @@ export default class TemplatesBuilder {
     return this.dataset
       .match(
         propertyTerm,
-        rdf.namedNode("http://sinopia.io/vocabulary/hasPropertyType")
+        rdf.namedNode("http://sinopia.io/vocabulary/hasPropertyType"),
       )
       .toArray()[0]
       .object.value.substring(42)
@@ -408,7 +411,7 @@ export default class TemplatesBuilder {
   defaultsForLiteral(attributeTerm) {
     const defaultTerms = this.objectsFor(
       attributeTerm,
-      "http://sinopia.io/vocabulary/hasDefault"
+      "http://sinopia.io/vocabulary/hasDefault",
     )
     return defaultTerms.map((defaultTerm) => ({
       literal: defaultTerm.value,
@@ -419,36 +422,36 @@ export default class TemplatesBuilder {
   validationRegexForLiteral(propertyTerm) {
     const attributeTerm = this.objectFor(
       propertyTerm,
-      "http://sinopia.io/vocabulary/hasLiteralAttributes"
+      "http://sinopia.io/vocabulary/hasLiteralAttributes",
     )
     if (!attributeTerm) return null
     return this.valueFor(
       attributeTerm,
-      "http://sinopia.io/vocabulary/hasValidationRegex"
+      "http://sinopia.io/vocabulary/hasValidationRegex",
     )
   }
 
   validationDataTypeForLiteral(propertyTerm) {
     const attributeTerm = this.objectFor(
       propertyTerm,
-      "http://sinopia.io/vocabulary/hasLiteralAttributes"
+      "http://sinopia.io/vocabulary/hasLiteralAttributes",
     )
     if (!attributeTerm) return null
     return this.valueFor(
       attributeTerm,
-      "http://sinopia.io/vocabulary/hasValidationDataType"
+      "http://sinopia.io/vocabulary/hasValidationDataType",
     )
   }
 
   defaultsForUri(attributeTerm) {
     const defaultTerms = this.objectsFor(
       attributeTerm,
-      "http://sinopia.io/vocabulary/hasDefault"
+      "http://sinopia.io/vocabulary/hasDefault",
     )
     return defaultTerms.map((defaultTerm) => {
       const defaultLabelTerm = this.objectFor(
         defaultTerm,
-        "http://www.w3.org/2000/01/rdf-schema#label"
+        "http://www.w3.org/2000/01/rdf-schema#label",
       )
       let uri = defaultTerm.value
       // This is for legacy defaults.
@@ -467,7 +470,7 @@ export default class TemplatesBuilder {
   newAuthorities(propertyTerm) {
     const vocabUris = this.valuesFor(
       propertyTerm,
-      "http://sinopia.io/vocabulary/hasAuthority"
+      "http://sinopia.io/vocabulary/hasAuthority",
     )
 
     return vocabUris.map((vocabUri) => {

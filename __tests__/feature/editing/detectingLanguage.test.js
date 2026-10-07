@@ -68,7 +68,7 @@ describe("clicking the language link", () => {
         headers: expect.objectContaining({
           Authorization: "Bearer Secret-Token",
         }),
-      })
+      }),
     )
   }, 15000)
 })

@@ -26,9 +26,9 @@ describe("loading RDF with unused triples", () => {
 
     fireEvent.change(
       screen.getByLabelText(
-        "RDF (Accepts JSON-LD, Turtle, TriG, N-Triples, N-Quads, and Notation3 (N3))"
+        "RDF (Accepts JSON-LD, Turtle, TriG, N-Triples, N-Quads, and Notation3 (N3))",
       ),
-      { target: { value: rdf } }
+      { target: { value: rdf } },
     )
     fireEvent.click(screen.getByText("Submit"))
 

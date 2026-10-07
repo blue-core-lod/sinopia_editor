@@ -31,8 +31,8 @@ describe("routing in editor", () => {
 
       await waitFor(() =>
         expect(history.location.pathname).toEqual(
-          "/editor/resourceTemplate:testing:uber1"
-        )
+          "/editor/resourceTemplate:testing:uber1",
+        ),
       )
 
       await screen.findByText("Uber template1", {
@@ -51,7 +51,7 @@ describe("routing in editor", () => {
       renderApp(store, history)
 
       await waitFor(() =>
-        expect(history.location.pathname).toEqual("/dashboard")
+        expect(history.location.pathname).toEqual("/dashboard"),
       )
     })
   })
@@ -63,7 +63,7 @@ describe("routing in editor", () => {
       renderApp(null, history)
 
       await waitFor(() =>
-        expect(history.location.pathname).toEqual("/templates")
+        expect(history.location.pathname).toEqual("/templates"),
       )
 
       await screen.findByText(/Not found/, { selector: ".alert p" })
@@ -82,8 +82,8 @@ describe("routing in editor", () => {
 
       await waitFor(() =>
         expect(history.location.pathname).toEqual(
-          "/editor/resource/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f"
-        )
+          "/editor/resource/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
+        ),
       )
 
       await screen.findByText("Example Label", {
@@ -102,7 +102,7 @@ describe("routing in editor", () => {
 
       await screen.findAllByText(`URI for this resource: <${blueCoreWorkUri}>`)
       expect(history.location.pathname).toEqual(
-        "/editor/resource/works/d4e1b2a3-5c6f-4a7b-8c9d-0e1f2a3b4c5d"
+        "/editor/resource/works/d4e1b2a3-5c6f-4a7b-8c9d-0e1f2a3b4c5d",
       )
     }, 10000)
   })
@@ -118,8 +118,8 @@ describe("routing in editor", () => {
       await screen.findAllByText(`URI for this resource: <${blueCoreWorkUri}>`)
       await waitFor(() =>
         expect(history.location.pathname).toEqual(
-          "/editor/resource/works/d4e1b2a3-5c6f-4a7b-8c9d-0e1f2a3b4c5d"
-        )
+          "/editor/resource/works/d4e1b2a3-5c6f-4a7b-8c9d-0e1f2a3b4c5d",
+        ),
       )
     }, 10000)
   })
@@ -136,7 +136,7 @@ describe("routing in editor", () => {
       renderApp(store, history)
 
       await waitFor(() =>
-        expect(history.location.pathname).toEqual("/dashboard")
+        expect(history.location.pathname).toEqual("/dashboard"),
       )
 
       await screen.findByText("Preview Resource", { selector: "h4" })
@@ -150,7 +150,7 @@ describe("routing in editor", () => {
       renderApp(null, history)
 
       await waitFor(() =>
-        expect(history.location.pathname).toEqual("/dashboard")
+        expect(history.location.pathname).toEqual("/dashboard"),
       )
 
       await screen.findByText(/Not Found/, { selector: ".alert p" })

@@ -20,17 +20,17 @@ const SinopiaSearchResults = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const searchResults = useSelector((state) =>
-    selectSearchResults(state, "resource")
+    selectSearchResults(state, "resource"),
   )
   const filteredResults = useSelector((state) =>
-    selectFilteredSearchResults(state, "resource")
+    selectFilteredSearchResults(state, "resource"),
   )
 
   const chooseResourceTemplate = (resourceTemplateId) => {
     dispatch(completeResourceLoadingWithTemplate(resourceTemplateId)).then(
       (result) => {
         if (result) navigate("/editor")
-      }
+      },
     )
   }
 

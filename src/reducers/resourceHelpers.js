@@ -238,7 +238,7 @@ const recursiveAncestorsFromSubject = (state, subjectKey, performFunc) => {
   return recursiveAncestorsFromValue(
     newState,
     newSubject.valueSubjectOfKey,
-    performFunc
+    performFunc,
   )
 }
 
@@ -254,7 +254,7 @@ const recursiveAncestorsFromValue = (state, valueKey, performFunc) => {
   return recursiveAncestorsFromProperty(
     newState,
     newValue.propertyKey,
-    performFunc
+    performFunc,
   )
 }
 
@@ -269,7 +269,7 @@ const recursiveAncestorsFromProperty = (state, propertyKey, performFunc) => {
   return recursiveAncestorsFromSubject(
     newState,
     newProperty.subjectKey,
-    performFunc
+    performFunc,
   )
 }
 
@@ -323,28 +323,28 @@ const addToDescWithErrorPropertyKeys = (state, propertyKey) =>
   recursiveAncestorsFromProperty(
     state,
     propertyKey,
-    addToDescWithErrorPropertyKeysFunc(propertyKey)
+    addToDescWithErrorPropertyKeysFunc(propertyKey),
   )
 
 const removeFromDescWithErrorPropertyKeys = (state, propertyKey) =>
   recursiveAncestorsFromProperty(
     state,
     propertyKey,
-    removeFromDescWithErrorPropertyKeysFunc(propertyKey)
+    removeFromDescWithErrorPropertyKeysFunc(propertyKey),
   )
 
 export const removeFromDescUriOrLiteralValueKeys = (state, valueKey) =>
   recursiveAncestorsFromValue(
     state,
     valueKey,
-    removeFromDescUriOrLiteralValueKeysFunc(valueKey)
+    removeFromDescUriOrLiteralValueKeysFunc(valueKey),
   )
 
 export const addToDescUriOrLiteralValueKeys = (state, valueKey) =>
   recursiveAncestorsFromValue(
     state,
     valueKey,
-    addToDescUriOrLiteralValueKeysFunc(valueKey)
+    addToDescUriOrLiteralValueKeysFunc(valueKey),
   )
 
 export const clearSubjectFromNewState = (state, subjectKey) => {
@@ -355,7 +355,7 @@ export const clearSubjectFromNewState = (state, subjectKey) => {
   }
   subject.propertyKeys.forEach(
     (propertyKey) =>
-      (newState = clearPropertyFromNewState(newState, propertyKey))
+      (newState = clearPropertyFromNewState(newState, propertyKey)),
   )
 
   return newState
@@ -371,7 +371,7 @@ export const clearPropertyFromNewState = (state, propertyKey) => {
 
   if (!_.isEmpty(property.valueKeys)) {
     property.valueKeys.forEach(
-      (valueKey) => (newState = clearValueFromNewState(newState, valueKey))
+      (valueKey) => (newState = clearValueFromNewState(newState, valueKey)),
     )
   }
 
@@ -445,7 +445,7 @@ const recursiveDescFromValue = (state, valueKey, performFunc) => {
     newState = recursiveDescFromSubject(
       newState,
       newValue.valueSubjectKey,
-      performFunc
+      performFunc,
     )
   }
 

@@ -14,13 +14,13 @@ const LoginPanel = () => {
   const { keycloak, initialized, authenticated } = useKeycloak()
 
   const error = _.first(
-    useSelector((state) => selectErrors(state, signInErrorKey))
+    useSelector((state) => selectErrors(state, signInErrorKey)),
   )
 
   const handleSubmit = (event) => {
     event.preventDefault()
     const resourceParam = new URLSearchParams(window.location.search).get(
-      "resource"
+      "resource",
     )
     const redirectUri = resourceParam ? window.location.href : undefined
     dispatch(signIn(keycloak, signInErrorKey, redirectUri))

@@ -40,7 +40,7 @@ describe("<Dashboard />", () => {
 
     expect(screen.getByText("The new work was created:")).toBeInTheDocument()
     expect(
-      screen.getByRole("link", { name: "http://localhost:3000/works/abc-123" })
+      screen.getByRole("link", { name: "http://localhost:3000/works/abc-123" }),
     ).toHaveAttribute("href", "/editor/resource/works/abc-123")
   })
 

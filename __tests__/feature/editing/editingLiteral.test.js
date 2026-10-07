@@ -28,18 +28,18 @@ describe("editing a literal property", () => {
     })
     fireEvent.keyDown(
       screen.getByPlaceholderText("Uber template1, property4"),
-      { key: "Enter", code: 13, charCode: 13 }
+      { key: "Enter", code: 13, charCode: 13 },
     )
 
     // There is foo text.
     await waitFor(() =>
-      expect(screen.getByText("foo")).toHaveClass("form-control")
+      expect(screen.getByText("foo")).toHaveClass("form-control"),
     )
     // There is remove button
     screen.getByTestId("Remove foo")
     // There is language button.
     expect(screen.getByTestId("Change language for foo")).toHaveTextContent(
-      "en"
+      "en",
     )
 
     // Clicking remove
@@ -74,7 +74,7 @@ describe("editing a literal property", () => {
     screen.getByTestId("Remove foo")
     // There is language button.
     expect(screen.getByTestId("Change language for foo")).toHaveTextContent(
-      "en"
+      "en",
     )
 
     // And bar text.
@@ -82,7 +82,7 @@ describe("editing a literal property", () => {
     screen.getByTestId("Remove bar")
     // There is language button.
     expect(screen.getByTestId("Change language for bar")).toHaveTextContent(
-      "en"
+      "en",
     )
     // An add another
     screen.getByTestId("Add another Uber template1, property2")
@@ -147,7 +147,7 @@ describe("editing a literal property", () => {
 
     // There is foo text.
     await waitFor(() =>
-      expect(screen.getByText("foo")).toHaveClass("form-control")
+      expect(screen.getByText("foo")).toHaveClass("form-control"),
     )
     // There is language button.
     const langBtn = screen.getByTestId("Change language for foo")
@@ -162,7 +162,7 @@ describe("editing a literal property", () => {
     fireEvent.click(langInput)
     fireEvent.change(langInput, { target: { value: "Tai (taw)" } })
     fireEvent.click(
-      screen.getByText("Tai (taw)", { selector: ".rbt-highlight-text" })
+      screen.getByText("Tai (taw)", { selector: ".rbt-highlight-text" }),
     )
 
     fireEvent.click(screen.getByTestId("Select language for foo"))
@@ -171,8 +171,8 @@ describe("editing a literal property", () => {
       expect(
         screen.queryAllByRole("heading", {
           name: "Select language tag for foo",
-        }).length
-      ).toBeFalsy()
+        }).length,
+      ).toBeFalsy(),
     )
     expect(langBtn).toHaveTextContent("taw")
   }, 30000)
@@ -191,7 +191,7 @@ describe("editing a literal property", () => {
 
     // There is foo text.
     await waitFor(() =>
-      expect(screen.getByText("foo")).toHaveClass("form-control")
+      expect(screen.getByText("foo")).toHaveClass("form-control"),
     )
     // There is language button.
     const langBtn = screen.getByTestId("Change language for foo")
@@ -205,8 +205,8 @@ describe("editing a literal property", () => {
 
     await waitFor(() =>
       expect(
-        screen.queryAllByRole("heading", { name: "Change language for foo" })
-      ).toHaveLength(0)
+        screen.queryAllByRole("heading", { name: "Change language for foo" }),
+      ).toHaveLength(0),
     )
     expect(langBtn).toHaveTextContent("No language specified")
   }, 25000)

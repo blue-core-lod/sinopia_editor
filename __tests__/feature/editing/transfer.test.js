@@ -48,10 +48,10 @@ describe("transfer saved bf:Instance when user belongs to a transfer group", () 
 
     const modal = await screen.findByRole("dialog")
     fireEvent.click(
-      within(modal).getByRole("button", { name: "Export to Catalog" })
+      within(modal).getByRole("button", { name: "Export to Catalog" }),
     )
     await screen.findByText(
-      `Export of ${bfUri} requested. You will be notified by email once processed.`
+      `Export of ${bfUri} requested. You will be notified by email once processed.`,
     )
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
   }, 15000)
@@ -85,15 +85,15 @@ describe("transfer saved bf:Instance when user belongs to a transfer group", () 
 
     fireEvent.change(
       within(modal).getByLabelText(
-        "Overlay existing catalog record with the following HRID."
+        "Overlay existing catalog record with the following HRID.",
       ),
-      { target: { value: "a123" } }
+      { target: { value: "a123" } },
     )
     expect(overlayBtn).toBeEnabled()
 
     fireEvent.click(overlayBtn)
     await screen.findByText(
-      `Export of ${bfUri} using identifier a123 requested. You will be notified by email once processed.`
+      `Export of ${bfUri} using identifier a123 requested. You will be notified by email once processed.`,
     )
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
   }, 15000)

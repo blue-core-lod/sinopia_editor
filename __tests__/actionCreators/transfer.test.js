@@ -21,12 +21,12 @@ describe("transfer", () => {
         sinopiaApi.postTransfer = jest.fn().mockResolvedValue()
         const store = mockStore(createState())
         await store.dispatch(
-          transfer(resourceUri, null, undefined, "testerrorkey")
+          transfer(resourceUri, null, undefined, "testerrorkey"),
         )
 
         expect(sinopiaApi.postTransfer).toHaveBeenCalledWith(
           { instance_uri: resourceUri },
-          undefined
+          undefined,
         )
         expect(store.getActions()).toHaveAction("ADD_SUCCESS", {
           successKey: "testerrorkey",
@@ -39,7 +39,7 @@ describe("transfer", () => {
         sinopiaApi.postTransfer = jest.fn().mockRejectedValue("Ooops!")
         const store = mockStore(createState())
         await store.dispatch(
-          transfer(resourceUri, null, undefined, "testerrorkey")
+          transfer(resourceUri, null, undefined, "testerrorkey"),
         )
 
         expect(store.getActions()).toHaveAction("ADD_ERROR", {
@@ -58,12 +58,12 @@ describe("transfer", () => {
         sinopiaApi.postTransfer = jest.fn().mockResolvedValue()
         const store = mockStore(createState())
         await store.dispatch(
-          transfer(resourceUri, localId, undefined, "testerrorkey")
+          transfer(resourceUri, localId, undefined, "testerrorkey"),
         )
 
         expect(sinopiaApi.postTransfer).toHaveBeenCalledWith(
           { instance_uri: resourceUri, local_id: localId },
-          undefined
+          undefined,
         )
         expect(store.getActions()).toHaveAction("ADD_SUCCESS", {
           successKey: "testerrorkey",
@@ -76,7 +76,7 @@ describe("transfer", () => {
         sinopiaApi.postTransfer = jest.fn().mockRejectedValue("Ooops!")
         const store = mockStore(createState())
         await store.dispatch(
-          transfer(resourceUri, localId, undefined, "testerrorkey")
+          transfer(resourceUri, localId, undefined, "testerrorkey"),
         )
 
         expect(store.getActions()).toHaveAction("ADD_ERROR", {

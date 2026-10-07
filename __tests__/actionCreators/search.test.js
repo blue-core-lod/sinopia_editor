@@ -57,8 +57,8 @@ describe("fetchSinopiaSearchResults", () => {
           sortOrder: "desc",
         },
         "testerrorkey",
-        keycloak
-      )
+        keycloak,
+      ),
     )
 
     const actions = store.getActions()
@@ -92,7 +92,7 @@ describe("fetchSinopiaSearchResults", () => {
       "search",
       "e983591a38cf0e7a8d9a2a1e3251a1b6",
       '{"authorityUri":"urn:ld4p:sinopia","query":"*"}',
-      keycloak
+      keycloak,
     )
   })
 })
@@ -123,7 +123,7 @@ describe("fetchTemplateGuessSearchResults", () => {
       await store.dispatch(
         fetchTemplateGuessSearchResults(query, "testerrorkey", {
           startOfRange: 0,
-        })
+        }),
       )
 
       const actions = store.getActions()
@@ -161,7 +161,7 @@ describe("fetchTemplateGuessSearchResults", () => {
       await store.dispatch(
         fetchTemplateGuessSearchResults(query, "testerrorkey", {
           startOfRange: 0,
-        })
+        }),
       )
 
       const actions = store.getActions()

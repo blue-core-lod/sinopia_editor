@@ -17,25 +17,25 @@ export const validateTemplates =
       Promise.resolve(validateSubjectTemplate(subjectTemplate)),
       Promise.resolve(validateSuppressible(subjectTemplate)),
       Promise.resolve(
-        validatePropertyTemplates(subjectTemplate.propertyTemplates)
+        validatePropertyTemplates(subjectTemplate.propertyTemplates),
       ),
       dispatch(
         validateAllRefResourceTemplatesExist(
           subjectTemplate.propertyTemplates,
-          resourceTemplatePromises
-        )
+          resourceTemplatePromises,
+        ),
       ),
       dispatch(
         validateRepeatedPropertyTemplates(
           subjectTemplate.propertyTemplates,
-          resourceTemplatePromises
-        )
+          resourceTemplatePromises,
+        ),
       ),
       dispatch(
         validateAllUniqueResourceURIs(
           subjectTemplate.propertyTemplates,
-          resourceTemplatePromises
-        )
+          resourceTemplatePromises,
+        ),
       ),
     ]).then((errors) => {
       const flatErrors = errors.flat()
@@ -69,7 +69,7 @@ const validateSuppressible = (template) => {
 const validatePropertyTemplates = (propertyTemplates) => {
   const errors = []
   propertyTemplates.forEach((template) =>
-    errors.push(validatePropertyTemplate(template))
+    errors.push(validatePropertyTemplate(template)),
   )
   return errors.flat()
 }
@@ -85,7 +85,7 @@ const validatePropertyTemplate = (template) => {
     errors.push(`Property template label is required for ${firstUri}.`)
   if (!template.type)
     errors.push(
-      `Cannot determine type for ${firstUri}. Must be resource, lookup, or literal.`
+      `Cannot determine type for ${firstUri}. Must be resource, lookup, or literal.`,
     )
   if (!template.component)
     errors.push(`Cannot determine component for ${firstUri}.`)
@@ -99,8 +99,8 @@ const validatePropertyTemplate = (template) => {
   ) {
     errors.push(
       `The field "${template.label}" with property "${_.first(
-        Object.keys(template.uris)
-      )}" has type nested resource, but does not specify a template in Nested resource attributes.`
+        Object.keys(template.uris),
+      )}" has type nested resource, but does not specify a template in Nested resource attributes.`,
     )
   }
 
@@ -133,8 +133,8 @@ const validateRepeatedPropertyTemplates =
                   dispatch(
                     loadResourceTemplateWithoutValidation(
                       subjectTemplateKey,
-                      resourceTemplatePromises
-                    )
+                      resourceTemplatePromises,
+                    ),
                   )
                     .then((resourceTemplate) => {
                       nestedEntries.push({
@@ -145,12 +145,12 @@ const validateRepeatedPropertyTemplates =
                       })
                     })
                     // Some templates may not exist. This is not validated here.
-                    .catch(() => {})
-              )
+                    .catch(() => {}),
+              ),
             )
-          })
+          }),
         )
-      })
+      }),
     ).then(() => {
       const dupes = new Set()
 
@@ -201,9 +201,9 @@ const validateRepeatedPropertyTemplates =
 
       return [
         `A property template may not use the same property URI as another property template (${Array.from(
-          dupes
+          dupes,
         ).join(
-          ", "
+          ", ",
         )}) unless both propery templates are of type nested resource and the nested resources are of different classes.`,
       ]
     })
@@ -214,18 +214,18 @@ const validateAllRefResourceTemplatesExist =
     Promise.all(
       propertyTemplates.map((template) =>
         dispatch(
-          validateRefResourceTemplatesExist(template, resourceTemplatePromises)
-        )
-      )
+          validateRefResourceTemplatesExist(template, resourceTemplatePromises),
+        ),
+      ),
     ).then((missingResourceTemplateIds) => {
       // If misssing, then write errors for uniq
       const uniqMissingResourceTemplateIds = _.uniq(
-        missingResourceTemplateIds.flat()
+        missingResourceTemplateIds.flat(),
       )
       if (_.isEmpty(uniqMissingResourceTemplateIds)) return []
       return [
         `The following referenced resource templates are not available in Sinopia: ${uniqMissingResourceTemplateIds.join(
-          ", "
+          ", ",
         )}`,
       ]
     })
@@ -243,14 +243,14 @@ const validateRefResourceTemplatesExist =
         dispatch(
           loadResourceTemplateWithoutValidation(
             resourceTemplateId,
-            resourceTemplatePromises
-          )
+            resourceTemplatePromises,
+          ),
         )
           .then(() => null)
-          .catch(() => resourceTemplateId)
-      )
+          .catch(() => resourceTemplateId),
+      ),
     ).then((missingResourceTemplateIds) =>
-      _.compact(missingResourceTemplateIds)
+      _.compact(missingResourceTemplateIds),
     )
   }
 
@@ -259,9 +259,12 @@ const validateAllUniqueResourceURIs =
     Promise.all(
       propertyTemplates.map((propertyTemplate) =>
         dispatch(
-          validateUniqueResourceURIs(propertyTemplate, resourceTemplatePromises)
-        )
-      )
+          validateUniqueResourceURIs(
+            propertyTemplate,
+            resourceTemplatePromises,
+          ),
+        ),
+      ),
     ).then((errors) => errors.flat())
 
 /**
@@ -277,8 +280,8 @@ const validateUniqueResourceURIs =
         dispatch(
           loadResourceTemplateWithoutValidation(
             resourceTemplateId,
-            resourceTemplatePromises
-          )
+            resourceTemplatePromises,
+          ),
         )
           .then((subjectTemplate) => [
             subjectTemplate.class,
@@ -288,8 +291,8 @@ const validateUniqueResourceURIs =
           ])
           .catch(() => {
             /* nothing */
-          })
-      )
+          }),
+      ),
     ).then((results) => {
       // No other nested template can have (required) class or optional class that is the same as this (required) class.
       // Nested templates can have same optional classes. The one exception:
@@ -312,7 +315,7 @@ const validateUniqueResourceURIs =
       classes.forEach((clazz) => {
         const candidates = classToCandidates[clazz]
         const nonSuppressibleCount = candidates.filter(
-          (candidate) => !candidate.suppressible
+          (candidate) => !candidate.suppressible,
         ).length
         if (candidates.length > 1 && nonSuppressibleCount !== 1)
           multipleClasses.add(clazz)
@@ -322,7 +325,7 @@ const validateUniqueResourceURIs =
           .map((candidate) => candidate.resourceTemplateId)
           .join(", ")
         return `The following resource templates references for ${_.first(
-          Object.keys(propertyTemplate.uris)
+          Object.keys(propertyTemplate.uris),
         )} have the same class (${clazz}), but must be unique: ${classIdsStr}`
       })
     })

@@ -11,7 +11,11 @@ import {
 import * as dataSetUtils from "utilities/Utilities"
 import { featureSetup } from "featureUtils"
 
-let mockKeycloak
+// var, not let: babel-plugin-jest-hoist lifts the jest.mock() call above
+// this declaration, and the factory body assigns mockKeycloak immediately.
+// A let/const binding would still be in its TDZ at that point.
+// eslint-disable-next-line no-var
+var mockKeycloak
 
 jest.mock("keycloak-js", () => {
   mockKeycloak = {
@@ -35,7 +39,7 @@ featureSetup()
 describe("<RDFDisplay />", () => {
   const state = createState({ hasTwoLiteralResources: true })
   const dataset = new GraphBuilder(
-    selectFullSubject(state, selectCurrentResourceKey(state))
+    selectFullSubject(state, selectCurrentResourceKey(state)),
   ).graph
 
   it("renders as a table", async () => {
@@ -49,13 +53,13 @@ describe("<RDFDisplay />", () => {
     screen.getByText("Object", "th")
     // And table rows
     expect(
-      screen.getAllByText("https://api.sinopia.io/resource/0894a8b3", "td")
+      screen.getAllByText("https://api.sinopia.io/resource/0894a8b3", "td"),
     ).toHaveLength(3)
     expect(
       screen.getAllByText(
         "http://id.loc.gov/ontologies/bibframe/mainTitle",
-        "td"
-      )
+        "td",
+      ),
     ).toHaveLength(1)
     screen.getByText("foo [en]", "td")
   })
@@ -64,7 +68,7 @@ describe("<RDFDisplay />", () => {
     render(<RDFDisplay dataset={dataset} format="n-triples" />)
 
     await screen.findByText(
-      /<https:\/\/api.sinopia.io\/resource\/0894a8b3> <http:\/\/id.loc.gov\/ontologies\/bibframe\/mainTitle> "foo"@en \./
+      /<https:\/\/api.sinopia.io\/resource\/0894a8b3> <http:\/\/id.loc.gov\/ontologies\/bibframe\/mainTitle> "foo"@en \./,
     )
   })
 
@@ -72,7 +76,7 @@ describe("<RDFDisplay />", () => {
     render(<RDFDisplay dataset={dataset} format="turtle" />)
 
     await screen.findByText(
-      /<http:\/\/id.loc.gov\/ontologies\/bibframe\/mainTitle> "foo"@en./
+      /<http:\/\/id.loc.gov\/ontologies\/bibframe\/mainTitle> "foo"@en./,
     )
   })
 

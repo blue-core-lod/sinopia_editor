@@ -30,7 +30,7 @@ const renderProvider = async (instance) => {
   render(
     <KeycloakProvider>
       <Consumer />
-    </KeycloakProvider>
+    </KeycloakProvider>,
   )
   await screen.findByText("ready")
 }
@@ -321,7 +321,7 @@ describe("KeycloakProvider", () => {
       const { unmount } = render(
         <KeycloakProvider>
           <Consumer />
-        </KeycloakProvider>
+        </KeycloakProvider>,
       )
       await screen.findByText("ready")
 

@@ -14,56 +14,56 @@ jest.mock(
   () =>
     function Header() {
       return null
-    }
+    },
 )
 jest.mock(
   "components/editor/ResourceComponent",
   () =>
     function ResourceComponent() {
       return null
-    }
+    },
 )
 jest.mock(
   "components/editor/EditorActions",
   () =>
     function EditorActions() {
       return null
-    }
+    },
 )
 jest.mock(
   "components/editor/ResourcesNav",
   () =>
     function ResourcesNav() {
       return null
-    }
+    },
 )
 jest.mock(
   "components/editor/GroupChoiceModal",
   () =>
     function GroupChoiceModal() {
       return null
-    }
+    },
 )
 jest.mock(
   "components/editor/preview/EditorPreviewModal",
   () =>
     function EditorPreviewModal() {
       return null
-    }
+    },
 )
 jest.mock(
   "components/editor/actions/MarcModal",
   () =>
     function MarcModal() {
       return null
-    }
+    },
 )
 jest.mock(
   "components/editor/inputs/InputLang",
   () =>
     function InputLang() {
       return null
-    }
+    },
 )
 
 describe("<Editor />", () => {
@@ -106,7 +106,7 @@ describe("<Editor />", () => {
     renderComponent(<Editor />, createStore(state), history)
 
     expect(history.location.pathname).toEqual(
-      "/editor/ld4p:RT:bf2:Title:AbbrTitle"
+      "/editor/ld4p:RT:bf2:Title:AbbrTitle",
     )
   })
 
@@ -115,14 +115,14 @@ describe("<Editor />", () => {
   // routing on the key would emit a path the route cannot match.
   it("routes a version-pinned template to its id, not its version URI", async () => {
     const state = pinTemplate(
-      unsaved(createState({ hasResourceWithLiteral: true }))
+      unsaved(createState({ hasResourceWithLiteral: true })),
     )
     const history = createHistory(["/editor"])
 
     renderComponent(<Editor />, createStore(state), history)
 
     expect(history.location.pathname).toEqual(
-      "/editor/ld4p:RT:bf2:Title:AbbrTitle"
+      "/editor/ld4p:RT:bf2:Title:AbbrTitle",
     )
   })
 })

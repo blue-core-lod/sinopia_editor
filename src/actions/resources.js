@@ -181,7 +181,7 @@ export const setPendingResourceTemplateSelection = (
   response,
   asNewResource,
   errorKey,
-  keycloak
+  keycloak,
 ) => ({
   type: "SET_PENDING_RESOURCE_TEMPLATE_SELECTION",
   payload: { uri, dataset, response, asNewResource, errorKey, keycloak },

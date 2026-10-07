@@ -162,7 +162,7 @@ const SessionStatus = () => {
             Log back in
           </button>
         </div>,
-        document.body
+        document.body,
       )}
       {!dismissed && (
         <SessionDialog

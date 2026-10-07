@@ -33,7 +33,7 @@ export const renderComponent = (
   component,
   store,
   history,
-  { errorKey = null } = {}
+  { errorKey = null } = {},
 ) => {
   setupModal()
   return {
@@ -44,7 +44,7 @@ export const renderComponent = (
             {component}
           </AlertsContextProvider>
         </Provider>
-      </Router>
+      </Router>,
     ),
   }
 }
@@ -53,7 +53,7 @@ export const createStore = (initialState) => {
   return createReduxStore(
     appReducer,
     initialState || createState(),
-    applyMiddleware(thunk)
+    applyMiddleware(thunk),
   )
 }
 

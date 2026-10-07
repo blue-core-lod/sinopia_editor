@@ -44,7 +44,7 @@ const prettyXml = (xml) => {
     if (children.length === 1 && !children[0].includes("\n"))
       return `${indent}<${tag}${attrs}>${children[0].trim()}</${tag}>`
     return `${indent}<${tag}${attrs}>\n${children.join(
-      "\n"
+      "\n",
     )}\n${indent}</${tag}>`
   }
   const root = doc.documentElement
@@ -111,8 +111,8 @@ const LoadByRDFForm = () => {
         })
         .catch((err) =>
           dispatch(
-            addError(errorKey, `Error converting MARC: ${err.message || err}`)
-          )
+            addError(errorKey, `Error converting MARC: ${err.message || err}`),
+          ),
         )
         .finally(() => setIsConvertingMarc(false))
     }
@@ -152,8 +152,8 @@ const LoadByRDFForm = () => {
       dispatch(
         addSuccess(
           dashboardErrorKey,
-          "Your MARC record was submitted and is being processed. The new work will appear here once it is ready."
-        )
+          "Your MARC record was submitted and is being processed. The new work will appear here once it is ready.",
+        ),
       )
       navigate("/dashboard")
       fetch(`${Config.sinopiaApiBase}/works`, {
@@ -174,16 +174,16 @@ const LoadByRDFForm = () => {
             addSuccess(dashboardErrorKey, {
               text: "The new work was created:",
               resourceUri: work.uri,
-            })
+            }),
           )
         })
         .catch((err) =>
           dispatch(
             addError(
               dashboardErrorKey,
-              `Error creating work: ${err.message || err}`
-            )
-          )
+              `Error creating work: ${err.message || err}`,
+            ),
+          ),
         )
       return
     }
@@ -200,7 +200,7 @@ const LoadByRDFForm = () => {
         // Determine if need to ask for resource template id.
         const resourceTemplateId = findRootResourceTemplateId(
           baseURI,
-          newDataset
+          newDataset,
         )
         if (resourceTemplateId) {
           setResourceTemplateId(resourceTemplateId)

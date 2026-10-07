@@ -12,7 +12,7 @@ const SinopiaSort = () => {
   const { keycloak } = useKeycloak()
 
   const searchOptions = useSelector((state) =>
-    selectSearchOptions(state, "resource")
+    selectSearchOptions(state, "resource"),
   )
   const curSortField = searchOptions.sortField
   const curSortOrder = searchOptions.sortOrder
@@ -29,8 +29,8 @@ const SinopiaSort = () => {
           sortOrder,
         },
         errorKey,
-        keycloak
-      )
+        keycloak,
+      ),
     )
 
   const getClasses = (sortField, sortOrder) =>

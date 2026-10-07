@@ -66,7 +66,7 @@ describe("GraphBuilder", () => {
       // Subject is a blank node, not an empty-uri named node (<>).
       expect(canonical).not.toContain("<>")
       expect(canonical).toContain(
-        '_:c14n0 <http://id.loc.gov/ontologies/bibframe/uber/template1/property2> "literal1" .'
+        '_:c14n0 <http://id.loc.gov/ontologies/bibframe/uber/template1/property2> "literal1" .',
       )
     })
 

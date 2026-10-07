@@ -21,7 +21,7 @@ describe("<SearchResultsPaging />", () => {
         totalResults={0}
         resultsPerPage={5}
         startOfRange={0}
-      />
+      />,
     )
     expect(screen.queryByText("First")).not.toBeInTheDocument()
   })
@@ -34,7 +34,7 @@ describe("<SearchResultsPaging />", () => {
         totalResults={5}
         resultsPerPage={5}
         startOfRange={0}
-      />
+      />,
     )
     expect(screen.queryByText("First")).not.toBeInTheDocument()
   })
@@ -47,7 +47,7 @@ describe("<SearchResultsPaging />", () => {
         totalResults={25}
         resultsPerPage={5}
         startOfRange={0}
-      />
+      />,
     )
     screen.getByLabelText("first", { selector: "li:nth-child(1) > button" })
     screen.getByLabelText("previous", { selector: "li:nth-child(2) > button" })
@@ -69,7 +69,7 @@ describe("<SearchResultsPaging />", () => {
         totalResults={25}
         resultsPerPage={5}
         startOfRange={12}
-      />
+      />,
     )
     // 3rd page
     expect(document.querySelector("li:nth-child(5)")).toHaveClass("active")
@@ -82,7 +82,7 @@ describe("<SearchResultsPaging />", () => {
         totalResults={100}
         resultsPerPage={5}
         startOfRange={0}
-      />
+      />,
     )
     screen.getByLabelText("first", { selector: "li:nth-child(1) > button" })
     screen.getByLabelText("previous", { selector: "li:nth-child(2) > button" })
@@ -107,7 +107,7 @@ describe("<SearchResultsPaging />", () => {
         totalResults={100}
         resultsPerPage={5}
         startOfRange={99}
-      />
+      />,
     )
     screen.getByLabelText("first", { selector: "li:nth-child(1) > button" })
     screen.getByLabelText("previous", { selector: "li:nth-child(2) > button" })
@@ -132,10 +132,10 @@ describe("<SearchResultsPaging />", () => {
         totalResults={25}
         resultsPerPage={5}
         startOfRange={0}
-      />
+      />,
     )
     fireEvent.click(
-      screen.getByText("3", { selector: "li:nth-child(5) > button" })
+      screen.getByText("3", { selector: "li:nth-child(5) > button" }),
     )
     expect(mockChangePage).toHaveBeenCalledWith(10)
   })
@@ -147,7 +147,7 @@ describe("<SearchResultsPaging />", () => {
         totalResults={25}
         resultsPerPage={5}
         startOfRange={10}
-      />
+      />,
     )
     fireEvent.click(screen.getByLabelText("first"))
     expect(mockChangePage).toHaveBeenCalledWith(0)
@@ -160,7 +160,7 @@ describe("<SearchResultsPaging />", () => {
         totalResults={25}
         resultsPerPage={5}
         startOfRange={10}
-      />
+      />,
     )
 
     fireEvent.click(screen.getByLabelText("last"))
@@ -174,7 +174,7 @@ describe("<SearchResultsPaging />", () => {
         totalResults={25}
         resultsPerPage={5}
         startOfRange={10}
-      />
+      />,
     )
     fireEvent.click(screen.getByLabelText("previous"))
     expect(mockChangePage).toHaveBeenCalledWith(5)
@@ -187,7 +187,7 @@ describe("<SearchResultsPaging />", () => {
         totalResults={25}
         resultsPerPage={5}
         startOfRange={10}
-      />
+      />,
     )
     fireEvent.click(screen.getByLabelText("next"))
     expect(mockChangePage).toHaveBeenCalledWith(15)

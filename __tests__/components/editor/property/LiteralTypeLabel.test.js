@@ -5,7 +5,11 @@ import { screen } from "@testing-library/react"
 import { createState } from "stateUtils"
 import LiteralTypeLabel from "components/editor/property/LiteralTypeLabel"
 
-let mockKeycloak
+// var, not let: babel-plugin-jest-hoist lifts the jest.mock() call above
+// this declaration, and the factory body assigns mockKeycloak immediately.
+// A let/const binding would still be in its TDZ at that point.
+// eslint-disable-next-line no-var
+var mockKeycloak
 
 jest.mock("keycloak-js", () => {
   mockKeycloak = {
@@ -35,7 +39,7 @@ describe("<LiteralTypeLabel />", () => {
       ]
     renderComponent(
       <LiteralTypeLabel propertyTemplate={propertyTemplate} />,
-      store
+      store,
     )
     screen.getByText("Enter a literal")
   })
@@ -52,7 +56,7 @@ describe("<LiteralTypeLabel />", () => {
       ]
     renderComponent(
       <LiteralTypeLabel propertyTemplate={propertyTemplate} />,
-      store
+      store,
     )
     screen.getByText("Enter an integer")
   })
@@ -69,7 +73,7 @@ describe("<LiteralTypeLabel />", () => {
       ]
     renderComponent(
       <LiteralTypeLabel propertyTemplate={propertyTemplate} />,
-      store
+      store,
     )
     screen.getByText('Enter a literal in the form "^Vinsky$"')
   })
@@ -87,7 +91,7 @@ describe("<LiteralTypeLabel />", () => {
       ]
     renderComponent(
       <LiteralTypeLabel propertyTemplate={propertyTemplate} />,
-      store
+      store,
     )
     screen.getByText('Enter a date time in the form "^Vinsky$"')
   })

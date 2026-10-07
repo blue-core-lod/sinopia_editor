@@ -44,7 +44,7 @@ const baseTemplates = {
  */
 export const fetchResource = (
   uri,
-  { isTemplate = false, version = null } = {}
+  { isTemplate = false, version = null } = {},
 ) => {
   const resourceUri = version ? `${uri}/version/${version}` : uri
   // Set expand=true to include sub-graphs of referenced resources with
@@ -76,7 +76,7 @@ export const fetchResource = (
       Promise.all([
         datasetFromJsonld(response.data),
         Promise.resolve(withDefaultGroups(response)),
-      ])
+      ]),
     )
     .catch((err) => {
       throw new Error(`Error parsing resource: ${err.message || err}`)
@@ -145,7 +145,7 @@ const sendResourceBody = (url, body, method, keycloak) =>
           Authorization: `Bearer ${getJwt(keycloak)}`,
         },
         body,
-      })
+      }),
     )
 
 // Determines the Blue Core API collection a new resource should be POSTed to,
@@ -168,7 +168,7 @@ export const postResource = (
   group,
   editGroups,
   keycloak,
-  unusedRDF = null
+  unusedRDF = null,
 ) => {
   const newResource = { ...resource, group, editGroups }
   const url = `${Config.sinopiaApiBase}/${apiCollectionPathFor(resource)}/`
@@ -178,12 +178,12 @@ export const postResource = (
     group,
     editGroups,
     true,
-    unusedRDF
+    unusedRDF,
   ).then((body) =>
     sendResourceBody(url, body, "POST", keycloak)
       .then((resp) => checkResp(resp))
       .then((resp) => resp.json())
-      .then((json) => json.uri)
+      .then((json) => json.uri),
   )
 }
 
@@ -195,7 +195,7 @@ export const putResource = (
   editGroups,
   method,
   keycloak,
-  unusedRDF = null
+  unusedRDF = null,
 ) =>
   saveBodyForResource(
     resource,
@@ -203,11 +203,11 @@ export const putResource = (
     group,
     editGroups,
     false,
-    unusedRDF
+    unusedRDF,
   ).then((body) =>
     sendResourceBody(resource.uri, body, method || "PUT", keycloak).then(
-      (resp) => checkResp(resp).then(() => true)
-    )
+      (resp) => checkResp(resp).then(() => true),
+    ),
   )
 
 export const postMarc = (resourceUri, keycloak) => {
@@ -219,7 +219,7 @@ export const postMarc = (resourceUri, keycloak) => {
       Authorization: `Bearer ${jwt}`,
     },
   }).then((resp) =>
-    checkResp(resp).then(() => resp.headers.get("Content-Location"))
+    checkResp(resp).then(() => resp.headers.get("Content-Location")),
   )
 }
 
@@ -231,7 +231,7 @@ export const getMarcJob = (marcJobUrl) =>
       // which retrieves the MARC text.
       if (!resp.redirected) return [undefined, undefined]
       return resp.text().then((body) => [resp.url, body])
-    })
+    }),
   )
 
 export const getMarc = (marcUrl, asText) =>
@@ -266,10 +266,10 @@ export const putUserHistory = (
   historyType,
   historyItemKey,
   historyItemPayload,
-  keycloak
+  keycloak,
 ) => {
   const url = `${userUrlFor(userId)}/history/${historyType}/${encodeURI(
-    historyItemKey
+    historyItemKey,
   )}`
   const jwt = getJwt(keycloak)
   const doPut = () =>
@@ -284,7 +284,7 @@ export const putUserHistory = (
   return doPut().then((resp) => {
     if (resp.status === 404)
       return postUser(userId, keycloak).then(() =>
-        doPut().then((resp2) => checkResp(resp2).then(() => resp2.json()))
+        doPut().then((resp2) => checkResp(resp2).then(() => resp2.json())),
       )
     return checkResp(resp).then(() => resp.json())
   })
@@ -313,7 +313,7 @@ const saveBodyForResource = (
   group,
   editGroups,
   useBlankNode = false,
-  unusedRDF = null
+  unusedRDF = null,
 ) => {
   const dataset = new GraphBuilder(resource, useBlankNode).graph
 
@@ -321,7 +321,7 @@ const saveBodyForResource = (
   // preserved rather than stripped on save. See issue #134.
   const mergeUnused = unusedRDF
     ? datasetFromN3(unusedRDF).then((unusedDataset) =>
-        dataset.addAll(unusedDataset)
+        dataset.addAll(unusedDataset),
       )
     : Promise.resolve()
 
@@ -340,7 +340,7 @@ const saveBodyForResource = (
         // bfItemRefs: resource.bfItemRefs,
         // bfInstanceRefs: resource.bfInstanceRefs,
         // bfWorkRefs: resource.bfWorkRefs,
-      })
+      }),
     )
 }
 

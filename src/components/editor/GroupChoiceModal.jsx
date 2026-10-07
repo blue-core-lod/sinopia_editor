@@ -25,7 +25,7 @@ const GroupChoiceModal = () => {
   const userGroupIds = useSelector((state) => selectGroups(state))
   const groupMap = useSelector((state) => selectGroupMap(state))
   const [ownerGroupId, setOwnerGroupId] = useState(
-    resource.group || userGroupIds[0]
+    resource.group || userGroupIds[0],
   )
   const initialInputRef = useRef()
 
@@ -49,11 +49,11 @@ const GroupChoiceModal = () => {
   const saveAndClose = (event) => {
     if (resource.uri) {
       dispatch(
-        saveResourceAction(resourceKey, ownerGroupId, [], errorKey, keycloak)
+        saveResourceAction(resourceKey, ownerGroupId, [], errorKey, keycloak),
       )
     } else {
       dispatch(
-        saveNewResource(resourceKey, ownerGroupId, [], errorKey, keycloak)
+        saveNewResource(resourceKey, ownerGroupId, [], errorKey, keycloak),
       )
     }
     dispatch(hideModal())

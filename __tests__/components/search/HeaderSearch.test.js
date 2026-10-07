@@ -20,7 +20,7 @@ const renderHeaderSearch = () => {
       <HeaderSearch />
     </AlertsContextProvider>,
     store,
-    createHistory()
+    createHistory(),
   )
 }
 
@@ -37,7 +37,7 @@ describe("<HeaderSearch />", () => {
     // Otherwise the browser fills the field with the current page URL.
     expect(screen.getByLabelText("Search")).toHaveAttribute(
       "autocomplete",
-      "off"
+      "off",
     )
   })
 })

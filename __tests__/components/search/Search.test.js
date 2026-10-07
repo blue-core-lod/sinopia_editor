@@ -45,7 +45,7 @@ describe("<Search />", () => {
     expect(mockGetSearchResults).toHaveBeenCalledWith(
       "foo",
       { startOfRange: 0 },
-      undefined
+      undefined,
     )
 
     // Result
@@ -82,7 +82,7 @@ describe("<Search />", () => {
     expect(mockGetSearchResults).toHaveBeenCalledWith(
       "foo",
       { startOfRange: 0 },
-      undefined
+      undefined,
     )
   })
 
@@ -175,8 +175,8 @@ describe("<Search />", () => {
 
     await waitFor(() =>
       expect(
-        screen.queryByText("Relevance", { selector: "button.active" })
-      ).not.toBeInTheDocument()
+        screen.queryByText("Relevance", { selector: "button.active" }),
+      ).not.toBeInTheDocument(),
     )
     screen.getByText("Modified date, newest first", {
       selector: "button.active",

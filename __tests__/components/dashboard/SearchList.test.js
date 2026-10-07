@@ -35,7 +35,7 @@ describe("<SearchList />", () => {
     expect(mockGetSearchResults).toHaveBeenCalledWith(
       "twain",
       { startOfRange: 0 },
-      undefined
+      undefined,
     )
   })
 })

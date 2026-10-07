@@ -45,7 +45,7 @@ describe("newResource", () => {
     it("dispatches actions", async () => {
       const keycloak = { token: "test-token" }
       const result = await store.dispatch(
-        newResource(resourceTemplateId, "testerrorkey", true, keycloak)
+        newResource(resourceTemplateId, "testerrorkey", true, keycloak),
       )
       expect(result).toBe("abc123")
 
@@ -54,7 +54,7 @@ describe("newResource", () => {
       expect(actions).toHaveAction("ADD_TEMPLATES")
 
       const addSubjectAction = actions.find(
-        (action) => action.type === "ADD_SUBJECT"
+        (action) => action.type === "ADD_SUBJECT",
       )
 
       expect(safeAction(addSubjectAction)).toEqual(expectedAction)
@@ -76,7 +76,7 @@ describe("newResource", () => {
         "template",
         "e2bb9b57c5d91394dc6f7e1d32d7a97b",
         resourceTemplateId,
-        keycloak
+        keycloak,
       )
     })
   })
@@ -86,7 +86,7 @@ describe("newResource", () => {
 
     it("dispatches actions", async () => {
       const result = await store.dispatch(
-        newResource("rt:repeated:propertyURI:propertyLabel", "testerrorkey")
+        newResource("rt:repeated:propertyURI:propertyLabel", "testerrorkey"),
       )
       expect(result).toBe(false)
 

@@ -37,7 +37,7 @@ describe("ScriptShifter", () => {
 
       expect(result).toEqual(mockLanguagesResponse)
       expect(global.fetch).toHaveBeenCalledWith(
-        "https://bibframe.org/scriptshifter/languages"
+        "https://bibframe.org/scriptshifter/languages",
       )
     })
 
@@ -48,7 +48,7 @@ describe("ScriptShifter", () => {
       })
 
       await expect(languages()).rejects.toThrow(
-        "ScriptShifter languages returned Not Found"
+        "ScriptShifter languages returned Not Found",
       )
     })
 
@@ -84,7 +84,7 @@ describe("ScriptShifter", () => {
             capitalize: "no_change",
             options: {},
           }),
-        }
+        },
       )
     })
 
@@ -106,7 +106,7 @@ describe("ScriptShifter", () => {
             capitalize: "uppercase",
             options: { foo: "bar" },
           }),
-        })
+        }),
       )
     })
 
@@ -117,7 +117,7 @@ describe("ScriptShifter", () => {
       })
 
       await expect(translate("Osiyo", "cherokee")).rejects.toThrow(
-        "ScriptShifter translate returned Bad Request"
+        "ScriptShifter translate returned Bad Request",
       )
     })
 
@@ -125,7 +125,7 @@ describe("ScriptShifter", () => {
       global.fetch = jest.fn().mockRejectedValue(new Error("Network error"))
 
       await expect(translate("Osiyo", "cherokee")).rejects.toThrow(
-        "Network error"
+        "Network error",
       )
     })
 
@@ -133,7 +133,7 @@ describe("ScriptShifter", () => {
       global.fetch = jest.fn()
 
       await expect(translate("", "cherokee")).rejects.toThrow(
-        "Field is empty. Please enter a value to transliterate."
+        "Field is empty. Please enter a value to transliterate.",
       )
       expect(global.fetch).not.toHaveBeenCalled()
     })
@@ -142,7 +142,7 @@ describe("ScriptShifter", () => {
       global.fetch = jest.fn()
 
       await expect(translate("   ", "cherokee")).rejects.toThrow(
-        "Field is empty. Please enter a value to transliterate."
+        "Field is empty. Please enter a value to transliterate.",
       )
       expect(global.fetch).not.toHaveBeenCalled()
     })
@@ -151,7 +151,7 @@ describe("ScriptShifter", () => {
       global.fetch = jest.fn()
 
       await expect(translate(null, "cherokee")).rejects.toThrow(
-        "Field is empty. Please enter a value to transliterate."
+        "Field is empty. Please enter a value to transliterate.",
       )
       expect(global.fetch).not.toHaveBeenCalled()
     })

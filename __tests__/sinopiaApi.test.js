@@ -87,7 +87,7 @@ describe("fetchResource", () => {
 
     it("retrieves resource template", async () => {
       const result = await fetchResource(
-        "http://localhost:3000/resource/resourceTemplate:bf2:Note"
+        "http://localhost:3000/resource/resourceTemplate:bf2:Note",
       )
       expect(result).toBeTruthy()
       expect(result[1].id).toBe("resourceTemplate:bf2:Note")
@@ -96,9 +96,9 @@ describe("fetchResource", () => {
     it("errors if fixture does not exist", async () => {
       expect.assertions(1)
       await expect(
-        fetchResource("http://localhost:3000/resource/ld4p:RT:bf2:xxx")
+        fetchResource("http://localhost:3000/resource/ld4p:RT:bf2:xxx"),
       ).rejects.toThrow(
-        "Error parsing resource: Error retrieving resource: Not Found"
+        "Error parsing resource: Error retrieving resource: Not Found",
       )
     })
   })
@@ -112,13 +112,13 @@ describe("fetchResource", () => {
       })
 
       const result = await fetchResource(
-        "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f"
+        "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f",
       )
       expect(result[1].id).toBe("yale/61f2f457-31f5-432c-8acf-b4037f77541f")
       expect(result[1].user).toBe("tat2")
       expect(global.fetch).toHaveBeenCalledWith(
         "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f?expand=true",
-        { headers: { Accept: "application/vnd.sinopia+json" } }
+        { headers: { Accept: "application/vnd.sinopia+json" } },
       )
     })
 
@@ -131,13 +131,13 @@ describe("fetchResource", () => {
 
       const result = await fetchResource(
         "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f",
-        { version: "42" }
+        { version: "42" },
       )
       expect(result[1].id).toBe("yale/61f2f457-31f5-432c-8acf-b4037f77541f")
       expect(result[1].user).toBe("tat2")
       expect(global.fetch).toHaveBeenCalledWith(
         "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f/version/42?expand=true",
-        { headers: { Accept: "application/vnd.sinopia+json" } }
+        { headers: { Accept: "application/vnd.sinopia+json" } },
       )
     })
 
@@ -148,7 +148,7 @@ describe("fetchResource", () => {
       })
 
       const result = await fetchResource(
-        "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f"
+        "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f",
       )
       expect(result[1].group).toBe("yale")
       expect(result[1].editGroups).toEqual(["cornell"])
@@ -166,7 +166,7 @@ describe("fetchResource", () => {
       })
 
       const result = await fetchResource(
-        "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f"
+        "https://api.development.sinopia.io/resource/yale/61f2f457-31f5-432c-8acf-b4037f77541f",
       )
       expect(result[1].group).toBe("blue core")
       expect(result[1].editGroups).toEqual(["blue core"])
@@ -180,9 +180,9 @@ describe("fetchResource", () => {
       })
 
       await expect(
-        fetchResource("http://api.sinopia.io/resource/12334")
+        fetchResource("http://api.sinopia.io/resource/12334"),
       ).rejects.toThrow(
-        "Error parsing resource: Blue Core API returned failed to retrieve uri"
+        "Error parsing resource: Blue Core API returned failed to retrieve uri",
       )
     })
   })
@@ -220,7 +220,7 @@ describe("postResource", () => {
 
     expect(global.fetch).toHaveBeenCalledWith(
       "http://localhost:3000/resources/",
-      expect.objectContaining({ method: "POST" })
+      expect.objectContaining({ method: "POST" }),
     )
     expect(result).toBe("https://bcld.info/resources/abc123")
   })
@@ -235,7 +235,7 @@ describe("postResource", () => {
 
     expect(global.fetch).toHaveBeenCalledWith(
       "http://localhost:3000/works/",
-      expect.objectContaining({ method: "POST" })
+      expect.objectContaining({ method: "POST" }),
     )
     expect(result).toBe("https://bcld.info/works/abc123")
   })
@@ -250,7 +250,7 @@ describe("postResource", () => {
 
     expect(global.fetch).toHaveBeenCalledWith(
       "http://localhost:3000/instances/",
-      expect.objectContaining({ method: "POST" })
+      expect.objectContaining({ method: "POST" }),
     )
     expect(result).toBe("https://bcld.info/instances/abc123")
   })
@@ -264,7 +264,7 @@ describe("postResource", () => {
 
     expect(global.fetch).toHaveBeenCalledWith(
       "http://localhost:3000/hubs/",
-      expect.objectContaining({ method: "POST" })
+      expect.objectContaining({ method: "POST" }),
     )
     expect(result).toBe("https://bcld.info/hubs/abc123")
   })
@@ -279,7 +279,7 @@ describe("postResource", () => {
 
     expect(global.fetch).toHaveBeenCalledWith(
       "http://localhost:3000/profiles/",
-      expect.objectContaining({ method: "POST" })
+      expect.objectContaining({ method: "POST" }),
     )
     expect(result).toBe("https://bcld.info/profiles/abc123")
   })
@@ -302,7 +302,7 @@ describe("putResource", () => {
         {
           token: "Secret-Token",
           updateToken: jest.fn().mockResolvedValue(false),
-        }
+        },
       )
       expect(result).toBeTruthy()
     })
@@ -326,7 +326,7 @@ describe("putResource", () => {
           headers: expect.objectContaining({
             Authorization: "Bearer Fresh-Token",
           }),
-        })
+        }),
       )
     })
 
@@ -340,7 +340,7 @@ describe("putResource", () => {
         putResource(resource, currentUser, null, null, null, {
           token: "Secret-Token",
           updateToken: jest.fn().mockResolvedValue(false),
-        })
+        }),
       ).rejects.toThrow("Blue Core API returned Cannot save resource")
     })
   })
@@ -366,7 +366,7 @@ describe("postMarc", () => {
       })
 
       expect(await postMarc(resourceUri, { token: "Secret-Token" })).toEqual(
-        jobUrl
+        jobUrl,
       )
       expect(global.fetch).toHaveBeenCalledWith(marcPostUrl, {
         method: "POST",
@@ -387,7 +387,7 @@ describe("postMarc", () => {
       })
 
       await expect(
-        postMarc(resourceUri, { token: "Secret-Token" })
+        postMarc(resourceUri, { token: "Secret-Token" }),
       ).rejects.toThrow("Ooops!: It failed.")
     })
   })
@@ -499,7 +499,7 @@ describe("fetchUser", () => {
         })
 
       expect(await fetchUser("tmann", { token: "Secret-Token" })).toEqual(
-        userData
+        userData,
       )
 
       expect(global.fetch).toHaveBeenCalledWith(
@@ -509,7 +509,7 @@ describe("fetchUser", () => {
           headers: {
             Authorization: "Bearer Secret-Token",
           },
-        }
+        },
       )
     })
   })
@@ -525,7 +525,7 @@ describe("putUserHistory", () => {
     expect(
       await putUserHistory("tmann", "template", "abc123", "template1", {
         token: "Secret-Token",
-      })
+      }),
     ).toEqual(userData)
 
     expect(global.fetch).toHaveBeenCalledWith(
@@ -537,7 +537,7 @@ describe("putUserHistory", () => {
           "Content-Type": "application/json",
         },
         body: '{"payload":"template1"}',
-      }
+      },
     )
   })
 })
@@ -551,7 +551,7 @@ describe("postTransfer", () => {
 
       await postTransfer(
         { instance_uri: resourceUri },
-        { token: "Secret-Token" }
+        { token: "Secret-Token" },
       )
 
       expect(global.fetch).toHaveBeenCalledWith(
@@ -563,7 +563,7 @@ describe("postTransfer", () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ instance_uri: resourceUri }),
-        }
+        },
       )
     })
 
@@ -583,7 +583,7 @@ describe("postTransfer", () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ local_id: "a123" }),
-        }
+        },
       )
     })
   })
@@ -597,7 +597,7 @@ describe("fetchResourceRelationships", () => {
 
     it("retrieves relationships", async () => {
       const result = await fetchResourceRelationships(
-        "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f"
+        "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
       )
       expect(result).toEqual({
         bfAdminMetadataInferredRefs: [],
@@ -628,12 +628,12 @@ describe("fetchResourceRelationships", () => {
       })
 
       const result = await fetchResourceRelationships(
-        "http://localhost:3000/resource/61f2f457-31f5-432c-8acf-b4037f77541f"
+        "http://localhost:3000/resource/61f2f457-31f5-432c-8acf-b4037f77541f",
       )
       expect(result).toStrictEqual(refs)
       expect(global.fetch).toHaveBeenCalledWith(
         "http://localhost:3000/resource/61f2f457-31f5-432c-8acf-b4037f77541f/relationships",
-        { headers: { Accept: "application/json" }, method: "GET" }
+        { headers: { Accept: "application/json" }, method: "GET" },
       )
     })
 
@@ -653,10 +653,10 @@ describe("fetchResourceRelationships", () => {
 
       await expect(
         fetchResource(
-          "http://localhost:3000/resource/61f2f457-31f5-432c-8acf-b4037f77541f/relationships"
-        )
+          "http://localhost:3000/resource/61f2f457-31f5-432c-8acf-b4037f77541f/relationships",
+        ),
       ).rejects.toThrow(
-        "Error parsing resource: Not Found: not found at /resource/61f2f457-31f5-432c-8acf-b4037f77541f/relationships"
+        "Error parsing resource: Not Found: not found at /resource/61f2f457-31f5-432c-8acf-b4037f77541f/relationships",
       )
     })
   })
@@ -670,7 +670,7 @@ describe("fetchResourceVersions", () => {
 
     it("retrieves versions", async () => {
       const result = await fetchResourceVersions(
-        "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f"
+        "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
       )
       expect(result).toHaveLength(3)
     })
@@ -699,12 +699,12 @@ describe("fetchResourceVersions", () => {
       })
 
       const result = await fetchResourceVersions(
-        "http://localhost:3000/resource/61f2f457-31f5-432c-8acf-b4037f77541f"
+        "http://localhost:3000/resource/61f2f457-31f5-432c-8acf-b4037f77541f",
       )
       expect(result).toStrictEqual(resp.versions)
       expect(global.fetch).toHaveBeenCalledWith(
         "http://localhost:3000/resource/61f2f457-31f5-432c-8acf-b4037f77541f/versions",
-        { headers: { Accept: "application/json" }, method: "GET" }
+        { headers: { Accept: "application/json" }, method: "GET" },
       )
     })
 
@@ -724,10 +724,10 @@ describe("fetchResourceVersions", () => {
 
       await expect(
         fetchResourceVersions(
-          "http://localhost:3000/resource/61f2f457-31f5-432c-8acf-b4037f77541f/relationships"
-        )
+          "http://localhost:3000/resource/61f2f457-31f5-432c-8acf-b4037f77541f/relationships",
+        ),
       ).rejects.toThrow(
-        "Not Found: not found at /resource/61f2f457-31f5-432c-8acf-b4037f77541f/versions"
+        "Not Found: not found at /resource/61f2f457-31f5-432c-8acf-b4037f77541f/versions",
       )
     })
   })
@@ -782,7 +782,7 @@ describe("detectLanguage", () => {
             "Content-Type": "text/plain",
           },
           method: "POST",
-        }
+        },
       )
     })
 
@@ -800,7 +800,9 @@ describe("detectLanguage", () => {
       })
 
       await expect(
-        detectLanguage("Who am I and why am I here?", { token: "Secret-Token" })
+        detectLanguage("Who am I and why am I here?", {
+          token: "Secret-Token",
+        }),
       ).rejects.toThrow("Server error: Something went wrong")
     })
   })

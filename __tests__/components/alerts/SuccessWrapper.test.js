@@ -9,7 +9,7 @@ describe("<SuccessWrapper />", () => {
     render(
       <SuccessWrapper>
         <p>Saved successfully</p>
-      </SuccessWrapper>
+      </SuccessWrapper>,
     )
     const alert = screen.getByRole("alert")
     expect(alert).toHaveClass("alert-success")
