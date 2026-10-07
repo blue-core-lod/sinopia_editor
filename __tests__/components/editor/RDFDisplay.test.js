@@ -11,7 +11,11 @@ import {
 import * as dataSetUtils from "utilities/Utilities"
 import { featureSetup } from "featureUtils"
 
-let mockKeycloak
+// var, not let: babel-plugin-jest-hoist lifts the jest.mock() call above
+// this declaration, and the factory body assigns mockKeycloak immediately.
+// A let/const binding would still be in its TDZ at that point.
+// eslint-disable-next-line no-var
+var mockKeycloak
 
 jest.mock("keycloak-js", () => {
   mockKeycloak = {

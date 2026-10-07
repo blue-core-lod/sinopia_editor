@@ -6,7 +6,11 @@ import ContextSuccess from "components/alerts/ContextSuccess"
 import { createStore, renderComponent } from "testUtils"
 import { createState } from "stateUtils"
 
-let mockKeycloak
+// var, not let: babel-plugin-jest-hoist lifts the jest.mock() call above
+// this declaration, and the factory body assigns mockKeycloak immediately.
+// A let/const binding would still be in its TDZ at that point.
+// eslint-disable-next-line no-var
+var mockKeycloak
 
 jest.mock("keycloak-js", () => {
   mockKeycloak = {

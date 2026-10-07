@@ -7,14 +7,20 @@ const ExpiringMessage = ({ timestamp, children, scroll = true }) => {
   const [prevLastSave, setPrevLastSave] = useState(timestamp)
   const inputRef = useRef(null)
 
-  useEffect(
-    () =>
-      function cleanup() {
-        if (timer !== undefined) {
-          clearInterval(timer)
-        }
-      },
-  )
+  // Nothing to show until a new timestamp arrives, and nothing to show again
+  // once this one has been acknowledged.
+  const expired = !timestamp || prevLastSave === timestamp
+
+  // The timer lives inside the effect that clears it. Previously it was created
+  // during render, below an early return, and the cleanup closed over a const
+  // declared after it -- which only worked because Babel downleveled the const
+  // to a hoisted var, making the `timer !== undefined` guard read as false and
+  // the cleanup a silent no-op.
+  useEffect(() => {
+    if (expired) return undefined
+    const timer = setTimeout(() => setPrevLastSave(timestamp), 3000)
+    return () => clearTimeout(timer)
+  }, [expired, timestamp])
 
   useLayoutEffect(() => {
     if (!scroll || !timestamp) return
@@ -24,11 +30,9 @@ const ExpiringMessage = ({ timestamp, children, scroll = true }) => {
     })
   }, [scroll, timestamp])
 
-  if (!timestamp || prevLastSave === timestamp) {
+  if (expired) {
     return null
   }
-
-  const timer = setInterval(() => setPrevLastSave(timestamp), 3000)
 
   return (
     <div className="alert alert-success" ref={inputRef}>
