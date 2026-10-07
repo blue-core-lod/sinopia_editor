@@ -18,9 +18,10 @@ import useAlerts from "hooks/useAlerts"
  */
 const ResourceTemplateRow = ({ row }) => {
   const { canCreate, canEdit, hasRole } = usePermissions()
-  // Templates are managed by role: anyone may view, but creating/copying and
-  // editing are each gated on a Keycloak realm role in addition to the
-  // existing group checks.
+  // Templates are managed by role: anyone may view, but copying and editing a
+  // template are each gated on a Keycloak realm role in addition to the
+  // existing group checks. Creating a *resource* from a template is ordinary
+  // cataloging, so it only needs the group-based canCreate permission.
   const canCreateTemplate = canCreate && hasRole("template_create")
   const canEditTemplate = canEdit(row) && hasRole("template_edit")
   const errorKey = useAlerts()
@@ -58,7 +59,7 @@ const ResourceTemplateRow = ({ row }) => {
       <td style={{ wordBreak: "break-all" }}>{row.remark}</td>
       <td>
         <div className="btn-group" role="group" aria-label="Result Actions">
-          {canCreateTemplate && (
+          {canCreate && (
             <NewButton
               label={row.resourceLabel}
               handleClick={handleNew}
