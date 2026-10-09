@@ -7,6 +7,7 @@
  */
 
 import express from "express"
+import path from "path"
 import Config from "./src/Config"
 
 import cors from "cors"
@@ -63,15 +64,30 @@ app.get("/env-config.js", (req, res) => {
   )
 })
 
+const distDir = path.join(__dirname, "dist")
+
 app.get("/", (req, res) => {
-  res.sendFile(`${__dirname}/dist/index.html`)
+  res.sendFile(path.join(distDir, "index.html"))
 })
 
-// Serve static assets to the browser, e.g., from src/styles/ and static/
-app.use(express.static(`${__dirname}/`))
+// Only the webpack output is public. fallthrough: false makes a missing asset
+// 404 instead of falling into the SPA catch-all below.
+app.use(
+  "/dist",
+  express.static(distDir, {
+    dotfiles: "deny",
+    index: false,
+    fallthrough: false,
+  }),
+  // Express's default error page includes a stack trace (absolute server
+  // paths) unless NODE_ENV=production, which the Dockerfile does not set.
+  (err, _req, res, _next) => res.sendStatus(err.status || 500),
+)
 
+// SPA fallback for client routes only; anything that looks like a file 404s.
 app.get("*", (req, res) => {
-  res.sendFile(`${__dirname}/dist/index.html`)
+  if (path.extname(req.path)) return res.sendStatus(404)
+  res.sendFile(path.join(distDir, "index.html"))
 })
 
 export default app

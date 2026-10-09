@@ -49,6 +49,20 @@ module.exports = {
           {
             // compiles Sass to CSS
             loader: "sass-loader",
+            options: {
+              sassOptions: {
+                // Bootstrap 5 still uses @import and global functions; nothing
+                // to act on until Bootstrap 6. quietDeps hides warnings from
+                // node_modules.
+                quietDeps: true,
+                silenceDeprecations: [
+                  "import",
+                  "global-builtin",
+                  "color-functions",
+                  "if-function",
+                ],
+              },
+            },
           },
         ],
       },
