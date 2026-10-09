@@ -1880,5 +1880,11 @@
     "uri": "urn:ld4p:locsuggest:subjects:complex",
     "rdftype": "ComplexSubject",
     "component": "lookup"
+  },
+  {
+    "label": "LCSH Geo. Subdiv.",
+    "uri": "urn:ld4p:locsuggest:subjects:hierarchicalgeographic",
+    "rdftype": "HierarchicalGeographic",
+    "component": "lookup"
   }
 ]
