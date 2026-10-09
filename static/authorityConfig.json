@@ -1891,7 +1891,7 @@
   {
     "label": "LCSH general subdiv.",
     "uri": "urn:ld4p:locsuggest:subjects:generalsubdivisions",
-    "memberOf": "http://id.loc.gov/authorities/subjects/collection_TopicSubdivisions",
+    "memberOf": "http://id.loc.gov/authorities/subjects/collection_LCSH_General",
     "component": "lookup"
   }
 ]
