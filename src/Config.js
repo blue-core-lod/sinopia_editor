@@ -57,10 +57,6 @@ class Config {
     return `${this.sinopiaUrl}`.replace("https://", "")
   }
 
-  static get sinopiaHelpAndResourcesMenuContent() {
-    return "https://ld4p.github.io/sinopia/help_and_resources/menu_content.html"
-  }
-
   static get keycloakUrl() {
     return window._env_.KEYCLOAK_URL || "http://localhost/keycloak"
   }

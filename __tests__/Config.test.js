@@ -26,12 +26,6 @@ describe("Config", () => {
       expect(Config.useResourceTemplateFixtures).toEqual(false)
     })
 
-    it("sinopia help and resource menu content has a link to github pages", () => {
-      expect(Config.sinopiaHelpAndResourcesMenuContent).toEqual(
-        "https://ld4p.github.io/sinopia/help_and_resources/menu_content.html",
-      )
-    })
-
     it("keycloak realm has static value", () => {
       expect(Config.keycloakRealm).toEqual("bluecore")
     })
