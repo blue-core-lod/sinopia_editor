@@ -27,10 +27,6 @@ beforeEach(() => {
     "https://sinopia-exports-development.s3-us-west-2.amazonaws.com",
     '<?xml version="1.0" encoding="UTF-8"?><ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Contents><Key>alberta_2020-09-06T00:01:18.798Z.zip</Key></Contents><Contents><Key>sinopia_export_all_2020-09-06T00:01:17.621Z.zip</Key></Contents></ListBucketResult>',
   )
-  fetchMock.route(
-    "https://ld4p.github.io/sinopia/help_and_resources/menu_content.html",
-    '<ul><li><a href="https://github.com/ld4p/sinopia/wiki" target="_blank" rel="noopener noreferrer" className="menu-item">Sinopia help site</a></li></ul>',
-  )
 })
 
 featureSetup()
