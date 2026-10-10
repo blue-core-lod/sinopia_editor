@@ -1846,7 +1846,7 @@
     "component": "list"
   },
   {
-    "label": "LCSH all",
+    "label": "LCSH simple",
     "uri": "urn:ld4p:locsuggest:subjects:simple",
     "rdftype": "SimpleType",
     "component": "lookup"
@@ -1855,6 +1855,7 @@
     "label": "LCSH topical",
     "uri": "urn:ld4p:locsuggest:subjects:topic",
     "rdftype": "Topic",
+    "memberOf": "http://id.loc.gov/authorities/subjects/collection_General",
     "component": "lookup"
   },
   {
@@ -1870,7 +1871,7 @@
     "component": "lookup"
   },
   {
-    "label": "LCSH form",
+    "label": "LCSH genre form",
     "uri": "urn:ld4p:locsuggest:subjects:genreform",
     "rdftype": "GenreForm",
     "component": "lookup"
@@ -1879,6 +1880,18 @@
     "label": "LCSH complex",
     "uri": "urn:ld4p:locsuggest:subjects:complex",
     "rdftype": "ComplexSubject",
+    "component": "lookup"
+  },
+  {
+    "label": "LCSH geo. subdiv.",
+    "uri": "urn:ld4p:locsuggest:subjects:geographicsubdivisions",
+    "memberOf": "http://id.loc.gov/authorities/subjects/collection_GeographicSubdivisions",
+    "component": "lookup"
+  },
+  {
+    "label": "LCSH general subdiv.",
+    "uri": "urn:ld4p:locsuggest:subjects:generalsubdivisions",
+    "memberOf": "http://id.loc.gov/authorities/subjects/collection_Subdivisions",
     "component": "lookup"
   }
 ]
