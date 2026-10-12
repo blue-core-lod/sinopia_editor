@@ -41,7 +41,7 @@ describe("getLocSuggestLookupResult()", () => {
       startOfRange: 25,
     })
 
-    expect(suggest).toHaveBeenCalledWith("dress", "SimpleType", 25)
+    expect(suggest).toHaveBeenCalledWith("dress", "SimpleType", 25, undefined)
   })
 
   it("reads the rdftype from authorityConfig.json, not the passed object", async () => {
@@ -53,7 +53,7 @@ describe("getLocSuggestLookupResult()", () => {
       { startOfRange: 0 },
     )
 
-    expect(suggest).toHaveBeenCalledWith("20th", "Temporal", 0)
+    expect(suggest).toHaveBeenCalledWith("20th", "Temporal", 0, undefined)
   })
 
   it("adapts hits to the shape LookupTab expects", async () => {
@@ -158,7 +158,7 @@ describe("getLocSuggestLookupResult()", () => {
       { startOfRange: 0 },
     )
 
-    expect(result.error).toMatch("No rdftype configured")
+    expect(result.error).toMatch("No rdftype or memberOf configured")
     expect(suggest).not.toHaveBeenCalled()
   })
 
@@ -181,5 +181,22 @@ describe("getLocSuggestLookupResult()", () => {
 
     expect(result.results).toEqual([])
     expect(result.totalHits).toEqual(0)
+  })
+
+  it("passes the configured memberOf collection to the suggest service", async () => {
+    suggest.mockResolvedValue({ count: 1, hits: [hit] })
+
+    await getLocSuggestLookupResult(
+      "France",
+      { uri: "urn:ld4p:locsuggest:subjects:geographicsubdivisions" },
+      { startOfRange: 0 },
+    )
+
+    expect(suggest).toHaveBeenCalledWith(
+      "France",
+      undefined,
+      0,
+      "http://id.loc.gov/authorities/subjects/collection_GeographicSubdivisions",
+    )
   })
 })

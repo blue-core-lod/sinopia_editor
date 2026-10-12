@@ -56,4 +56,22 @@ describe("suggest()", () => {
       "Network error",
     )
   })
+
+  it("passes memberOf and omits rdftype when none is given", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(mockResponse),
+    })
+
+    await suggest(
+      "France",
+      undefined,
+      0,
+      "http://id.loc.gov/authorities/subjects/collection_GeographicSubdivisions",
+    )
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      "https://id.loc.gov/authorities/subjects/suggest2/?q=France&memberOf=http%3A%2F%2Fid.loc.gov%2Fauthorities%2Fsubjects%2Fcollection_GeographicSubdivisions&count=25&offset=0&searchtype=left",
+    )
+  })
 })

@@ -72,8 +72,8 @@ const adaptHits = (hits) =>
  * Queries the LOC Suggest Service for one authority config and returns the
  * result in the shape LookupTab expects.
  *
- * The rdftype comes from the authority's entry in authorityConfig.json rather
- * than from the authority object handed down by the template, because
+ * The rdftype or memberOf comes from the authority's entry in authorityConfig.json
+ * rather than from the authority object handed down by the template, because
  * TemplatesBuilder.newAuthorities copies only a fixed set of fields. Reading the
  * canonical config here means a new LCSH flavour is a config entry and needs no
  * code change.
@@ -81,12 +81,13 @@ const adaptHits = (hits) =>
 const getLocSuggestLookupResult = (query, authorityConfig, options) => {
   const config = findAuthorityConfig(authorityConfig.uri)
   const rdftype = config?.rdftype
-  if (!rdftype)
+  const memberOf = config?.memberOf
+  if (!rdftype && !memberOf)
     return Promise.resolve({
-      error: `No rdftype configured for ${authorityConfig.uri}`,
+      error: `No rdftype or memberOf configured for ${authorityConfig.uri}`,
     })
 
-  return suggest(query, rdftype, options.startOfRange)
+  return suggest(query, rdftype, options.startOfRange, memberOf)
     .then((response) => {
       const results = adaptHits(response?.hits)
       return {
