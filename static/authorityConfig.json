@@ -1855,7 +1855,6 @@
     "label": "LCSH topical",
     "uri": "urn:ld4p:locsuggest:subjects:topic",
     "rdftype": "Topic",
-    "memberOf": "http://id.loc.gov/authorities/subjects/collection_General",
     "component": "lookup"
   },
   {
