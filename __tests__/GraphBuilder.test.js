@@ -1,3 +1,4 @@
+import rdf from "rdf-ext"
 import GraphBuilder from "GraphBuilder"
 import ResourceBuilder from "resourceBuilderUtils"
 
@@ -694,5 +695,123 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ont
 <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber1> .
 <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber2> .`
     expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+  })
+
+  describe("complex subject authoritative label", () => {
+    const authoritativeLabel =
+      "http://www.loc.gov/mads/rdf/v1#authoritativeLabel"
+    const componentList = "http://www.loc.gov/mads/rdf/v1#componentList"
+    const rdfsLabel = "http://www.w3.org/2000/01/rdf-schema#label"
+
+    // A Subject Part A/B/C nested component holding one looked-up uri.
+    const partValue = (uri, label) =>
+      build.subjectValue({
+        valueSubject: build.subject({
+          subjectTemplate: build.subjectTemplate({
+            id: "bluecore:bf2:madsrdf:Topic",
+            clazz: "http://www.loc.gov/mads/rdf/v1#Topic",
+            suppressible: true,
+          }),
+          properties: [
+            build.uriProperty({
+              values: [build.uriValue({ propertyUri: rdfsLabel, uri, label })],
+            }),
+          ],
+        }),
+      })
+
+    const complexSubject = ({ labelValues = [], components = [] }) =>
+      build.subject({
+        subjectTemplate: build.subjectTemplate({
+          id: "bluecore:bf2:madsrdf:Topic:Complex",
+          clazz: "http://id.loc.gov/ontologies/bibframe/Topic",
+        }),
+        uri: "http://localhost/subject1",
+        properties: [
+          build.literalProperty({
+            propertyTemplate: { defaultUri: authoritativeLabel },
+            values: labelValues,
+          }),
+          build.resourceProperty({
+            propertyTemplate: { defaultUri: componentList, ordered: true },
+            propertyUri: componentList,
+            values: components,
+          }),
+        ],
+      })
+
+    const labelsFor = (subject) =>
+      new GraphBuilder(subject).graph
+        .match(null, rdf.namedNode(authoritativeLabel))
+        .toArray()
+        .map((quad) => [quad.object.value, quad.object.language])
+
+    it("builds the label from the components when it is blank", () => {
+      const subject = complexSubject({
+        components: [
+          partValue(
+            "http://id.loc.gov/authorities/subjects/sh85059770",
+            "Heat, Mechanical equivalent of",
+          ),
+          partValue(
+            "http://id.loc.gov/authorities/subjects/sh85057890-781",
+            "Ohio",
+          ),
+        ],
+      })
+
+      expect(labelsFor(subject)).toEqual([
+        ["Heat, Mechanical equivalent of--Ohio", "en"],
+      ])
+    })
+
+    it("keeps a label the cataloger typed", () => {
+      const subject = complexSubject({
+        labelValues: [
+          build.literalValue({
+            literal: "Heat, Mechanical equivalent of--Ohio--History",
+            propertyUri: authoritativeLabel,
+          }),
+        ],
+        components: [
+          partValue(
+            "http://id.loc.gov/authorities/subjects/sh85059770",
+            "Heat, Mechanical equivalent of",
+          ),
+        ],
+      })
+
+      expect(labelsFor(subject)).toEqual([
+        ["Heat, Mechanical equivalent of--Ohio--History", "en"],
+      ])
+    })
+
+    it("adds no label when there are no components", () => {
+      expect(labelsFor(complexSubject({}))).toEqual([])
+    })
+
+    it("builds the label from uri components", () => {
+      const subject = complexSubject({ components: [] })
+      subject.properties[1] = build.uriProperty({
+        propertyTemplate: { defaultUri: componentList, ordered: true },
+        propertyUri: componentList,
+        values: [
+          build.uriValue({
+            propertyUri: componentList,
+            uri: "http://id.loc.gov/authorities/subjects/sh85059770",
+            label: "Heat, Mechanical equivalent of",
+          }),
+          build.uriValue({
+            propertyUri: componentList,
+            uri: "http://id.loc.gov/authorities/subjects/sh85057890-781",
+            label: "Ohio",
+          }),
+        ],
+      })
+
+      expect(labelsFor(subject)).toEqual([
+        ["Heat, Mechanical equivalent of--Ohio", "en"],
+      ])
+    })
   })
 })

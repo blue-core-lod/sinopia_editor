@@ -3,6 +3,30 @@
 import rdf from "rdf-ext"
 import _ from "lodash"
 
+const MADS_AUTHORITATIVE_LABEL =
+  "http://www.loc.gov/mads/rdf/v1#authoritativeLabel"
+const MADS_COMPONENT_LIST = "http://www.loc.gov/mads/rdf/v1#componentList"
+
+const findPropertyByUri = (subject, uri) =>
+  subject.properties.find(
+    (property) =>
+      property.propertyUri === uri ||
+      property.propertyTemplate?.defaultUri === uri,
+  )
+
+// The label a component shows: a nested component (Subject Part A, B, C) is
+// named by the first label or literal among its values.
+const componentLabel = (value) => {
+  if (value.valueSubject) {
+    const named = value.valueSubject.properties
+      .flatMap((property) => property.values || [])
+      .find((innerValue) => innerValue.label || innerValue.literal)
+    return named ? componentLabel(named) : null
+  }
+  const text = value.label || value.literal
+  return text ? { text, lang: value.lang } : null
+}
+
 /**
  * Builds RDF graphs for a full resource
  */
@@ -42,6 +66,35 @@ export default class GraphBuilder {
     this.addType(subjectTerm, subject.classes)
     subject.properties.forEach((property) =>
       this.buildProperty(property, subjectTerm),
+    )
+    this.addComponentListLabel(subject, subjectTerm)
+  }
+
+  // A complex subject's heading is its components' labels joined with "--",
+  // LC's form (e.g. "Heat--Transmission"). When the cataloger leaves the
+  // authoritative label blank, build it from the components so the heading is
+  // not lost to anything that only reads the label. A typed label is kept.
+  addComponentListLabel(subject, subjectTerm) {
+    const labelProperty = findPropertyByUri(subject, MADS_AUTHORITATIVE_LABEL)
+    const componentProperty = findPropertyByUri(subject, MADS_COMPONENT_LIST)
+    if (!labelProperty || !componentProperty) return
+    if (this.checkPropertyHasValue(labelProperty)) return
+
+    const labels = (componentProperty.values || [])
+      .filter((value) => this.checkValueHasValue(value))
+      .map(componentLabel)
+      .filter(Boolean)
+    if (_.isEmpty(labels)) return
+
+    this.dataset.add(
+      rdf.quad(
+        subjectTerm,
+        rdf.namedNode(MADS_AUTHORITATIVE_LABEL),
+        rdf.literal(
+          labels.map((label) => label.text).join("--"),
+          labels[0].lang,
+        ),
+      ),
     )
   }
 
