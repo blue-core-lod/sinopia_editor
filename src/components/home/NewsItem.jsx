@@ -19,9 +19,7 @@ const NewsItem = () => (
     <ul>
       <li>New Scriptshifter integration</li>
       <li>New LCSH Suggest Service 2.0 implementation</li>
-      <li>
-        New resource template versioning
-      </li>
+       <li>New resource template versioning</li>
       <li>Convert a MARC record and load BIBFRAME</li>
       <li>UI/UX updates</li>
       <li>Various bug fixes</li>
