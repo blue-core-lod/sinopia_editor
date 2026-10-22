@@ -213,4 +213,64 @@ describe("<Search />", () => {
       ],
     ])
   })
+
+  // https://github.com/blue-core-lod/sinopia_editor/issues/76
+  it("pages by offset against the original query, ignoring API links", async () => {
+    jest.spyOn(Config, "searchResultsPerPage", "get").mockReturnValue(2)
+    const mockGetSearchResults = jest.fn()
+    server.getSearchResultsWithFacets = mockGetSearchResults.mockResolvedValue([
+      {
+        totalHits: 20,
+        results: [
+          {
+            uri: "resource/ca0d53d0-2b99-4f75-afb0-739a6f0af4f4",
+            label: "foo1",
+            title: ["foo1"],
+            type: ["http://id.loc.gov/ontologies/bibframe/Title"],
+          },
+          {
+            uri: "resource/ca0d53d0-2b99-4f75-afb0-739a6f0af4f5",
+            label: "foo2",
+            title: ["foo2"],
+            type: ["http://id.loc.gov/ontologies/bibframe/Title"],
+          },
+        ],
+        // The API's links, which have no "last" and carry their own offset.
+        links: {
+          first: "http://localhost/api/search/?limit=20&offset=0&q=foo",
+          next: "http://localhost/api/search/?limit=20&offset=20&q=foo",
+        },
+      },
+    ])
+
+    renderApp()
+    fireEvent.click(screen.getByText("Linked Data Editor", { selector: "a" }))
+    fireEvent.change(screen.getByLabelText("Search"), {
+      target: { value: "foo" },
+    })
+    fireEvent.click(screen.getByTestId("Submit search"))
+    await screen.findByText("1", { selector: "li.active > button" })
+
+    fireEvent.click(screen.getByText("›"))
+    await screen.findByText("2", { selector: "li.active > button" })
+
+    // Skip ahead, the jump that used to land back on page 1.
+    fireEvent.click(screen.getByText("6", { selector: "button" }))
+    await screen.findByText("6", { selector: "li.active > button" })
+
+    fireEvent.click(screen.getByText("10", { selector: "button" }))
+    await screen.findByText("10", { selector: "li.active > button" })
+
+    expect(
+      mockGetSearchResults.mock.calls.map(([query, options]) => [
+        query,
+        options.startOfRange,
+      ]),
+    ).toEqual([
+      ["foo", 0],
+      ["foo", 2],
+      ["foo", 10],
+      ["foo", 18],
+    ])
+  })
 })

@@ -35,7 +35,4 @@ export const selectFilteredSearchResults = (state, searchType) => {
   )
 }
 
-export const selectSearchLinks = (state, searchType) =>
-  state.search[searchType]?.links
-
 export const selectHeaderSearch = (state) => state.editor.currentHeaderSearch
