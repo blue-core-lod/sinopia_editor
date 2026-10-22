@@ -89,7 +89,7 @@ describe("getSearchResults", () => {
       options: { noFacetResults: true },
     })
     expect(global.fetch).toHaveBeenCalledWith(
-      "http://localhost:3000/search/?q=foo",
+      "http://localhost:3000/search/?q=foo&limit=10&offset=0",
       { method: "GET" },
     )
   })
@@ -107,7 +107,7 @@ describe("getSearchResults", () => {
       sortOrder: "desc",
     })
     expect(global.fetch).toHaveBeenCalledWith(
-      "http://localhost:3000/search/?q=foo",
+      "http://localhost:3000/search/?q=foo&limit=15&offset=10",
       { method: "GET" },
     )
   })
@@ -319,7 +319,7 @@ describe("getSearchResultsWithFacets", () => {
       options: {},
     })
     expect(global.fetch).toHaveBeenCalledWith(
-      "http://localhost:3000/search/?q=foo",
+      "http://localhost:3000/search/?q=foo&limit=10&offset=0",
       { method: "GET" },
     )
   })
@@ -337,7 +337,7 @@ describe("getSearchResultsWithFacets", () => {
       noFacetResults: true,
     })
     expect(global.fetch).toHaveBeenCalledWith(
-      "http://localhost:3000/search/?q=foo",
+      "http://localhost:3000/search/?q=foo&limit=10&offset=0",
       { method: "GET" },
     )
   })

@@ -11,7 +11,6 @@ import {
   selectSearchQuery,
   selectSearchOptions,
   selectSearchTotalResults,
-  selectSearchLinks,
 } from "selectors/search"
 import useSearch from "hooks/useSearch"
 import AlertsContextProvider from "components/alerts/AlertsContextProvider"
@@ -35,14 +34,12 @@ const Search = (props) => {
   const totalResults = useSelector((state) =>
     selectSearchTotalResults(state, "resource"),
   )
-  const links = useSelector((state) => selectSearchLinks(state, "resource"))
 
-  const changeSearchPage = (linkOrOffset) => {
-    if (typeof linkOrOffset === "number") {
-      fetchSearchResults(queryString, searchOptions, linkOrOffset, keycloak)
-    } else {
-      fetchSearchResults(linkOrOffset, searchOptions, null, keycloak)
-    }
+  // Page by offset against the original query. Following the API's next/prev
+  // links stored the link URL as the query, so the next numbered page reused
+  // that link's offset (and the API sends no "last" link at all).
+  const changeSearchPage = (startOfRange) => {
+    fetchSearchResults(queryString, searchOptions, startOfRange, keycloak)
   }
 
   return (
@@ -57,7 +54,6 @@ const Search = (props) => {
           resultsPerPage={searchOptions.resultsPerPage}
           startOfRange={searchOptions.startOfRange}
           totalResults={totalResults}
-          links={links}
           changePage={changeSearchPage}
         />
         <SearchResultsMessage />

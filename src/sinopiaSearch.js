@@ -21,6 +21,18 @@ export const getSearchResults = async (query, options = {}) =>
     ([results]) => results,
   )
 
+// Always sends the page size and offset. Left out, the API returns its own
+// default page (20 results from offset 0), so every page showed the same
+// results and the pager's page count, based on resultsPerPage, did not match
+// what was on screen.
+const resourceSearchUrl = (query, options) => {
+  const params = new URLSearchParams()
+  if (query) params.set("q", query)
+  params.set("limit", options.resultsPerPage || Config.searchResultsPerPage)
+  params.set("offset", options.startOfRange || 0)
+  return `${Config.sinopiaApiBase}/search/?${params}`
+}
+
 /**
  * Performs a search of Sinopia resources.
  * @param {string} query
@@ -61,20 +73,14 @@ export const getSearchResultsWithFacets = async (
         }
       } else {
         // Resource URI used as a search term — pass as q= parameter
-        const body = new URLSearchParams({ q: query })
-        url = `${Config.sinopiaApiBase}/search/?${body}`
+        url = resourceSearchUrl(query, options)
       }
     } catch {
       // URL parsing failed; fall back to treating it as a search term
-      const body = new URLSearchParams({ q: query })
-      url = `${Config.sinopiaApiBase}/search/?${body}`
+      url = resourceSearchUrl(query, options)
     }
-  } else if (query) {
-    const body = new URLSearchParams({ q: query })
-    url = `${Config.sinopiaApiBase}/search/?${body}`
   } else {
-    // If query is null/undefined, construct URL without query parameter
-    url = `${Config.sinopiaApiBase}/search/`
+    url = resourceSearchUrl(query, options)
   }
 
   // const termsFilters = []
