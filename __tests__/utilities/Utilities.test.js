@@ -3,6 +3,7 @@ import {
   isResourceWithValueTemplateRef,
   resourceToName,
   datasetFromN3,
+  datasetFromJsonld,
   formatISODate,
   formatLocalDate,
   isBlueCoreUri,
@@ -136,6 +137,23 @@ describe("Utilities", () => {
 
   it("raises an error for invalid N3", async () => {
     await expect(datasetFromN3("foo")).rejects.toThrow()
+  })
+
+  describe("datasetFromJsonld()", () => {
+    // https://github.com/blue-core-lod/sinopia_editor/issues/240
+    it("gives a typed native number a string value", async () => {
+      const dataset = await datasetFromJsonld({
+        "@id": "http://localhost:3000/resource/a",
+        "http://id.loc.gov/ontologies/bflc/nonSortNum": [
+          { "@type": "http://www.w3.org/2001/XMLSchema#integer", "@value": 0 },
+        ],
+      })
+      const [quad] = dataset.toArray()
+      expect(quad.object.value).toBe("0")
+      expect(quad.object.datatype.value).toBe(
+        "http://www.w3.org/2001/XMLSchema#integer",
+      )
+    })
   })
 
   describe("formatISODate()", () => {

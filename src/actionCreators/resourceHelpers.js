@@ -96,6 +96,11 @@ export const addResourceFromDataset =
     const newUri = asNewResource ? null : uri
     const context = {
       usedDataset: rdf.dataset(),
+      // Link quads that produced a value for some property. Several properties
+      // can share a predicate (a Work's main title and its variant titles are
+      // both bf:title), and each sees every object; one property's miss must
+      // not release a link that a sibling property used.
+      claimedLinks: rdf.dataset(),
       dataset,
       errorKey,
       resourceTemplatePromises: {},
@@ -357,12 +362,13 @@ const newValuesFromDatasetByPropertyUri =
         // shown in the editor nor reported as unused RDF, and disappears
         // silently on save.
         if (!suppress && !property.propertyTemplate.ordered) {
-          objects.forEach((obj, index) => {
-            if (valuesFromObjs[index]) return
-            context.usedDataset.delete(
-              rdf.quad(subjectTerm, rdf.namedNode(propertyUri), obj),
-            )
-          })
+          releaseUnclaimedLinks(
+            subjectTerm,
+            propertyUri,
+            objects,
+            valuesFromObjs,
+            context,
+          )
         }
         if (_.isEmpty(valuesFromObjs)) return []
         const templatePromises = templatePromisesFor(
@@ -401,16 +407,39 @@ const newValuesFromDatasetByPropertyUri =
       // a value, so release the ones that did not. Otherwise the dropped
       // triple is neither shown nor reported, and disappears on save.
       if (!suppress && !property.propertyTemplate.ordered) {
-        objects.forEach((obj, index) => {
-          if (values[index]) return
-          context.usedDataset.delete(
-            rdf.quad(subjectTerm, rdf.namedNode(propertyUri), obj),
-          )
-        })
+        releaseUnclaimedLinks(
+          subjectTerm,
+          propertyUri,
+          objects,
+          values,
+          context,
+        )
       }
       return values
     })
   }
+
+// Releases the link quad of each object that yielded no value, so its triples
+// are reported as unused RDF -- unless another property sharing the predicate
+// claimed it. Properties resolve in any order, so a claim also re-adds a link
+// that a sibling released first.
+const releaseUnclaimedLinks = (
+  subjectTerm,
+  propertyUri,
+  objects,
+  values,
+  context,
+) => {
+  objects.forEach((obj, index) => {
+    const linkQuad = rdf.quad(subjectTerm, rdf.namedNode(propertyUri), obj)
+    if (values[index]) {
+      context.claimedLinks.add(linkQuad)
+      context.usedDataset.add(linkQuad)
+    } else if (!context.claimedLinks.has(linkQuad)) {
+      context.usedDataset.delete(linkQuad)
+    }
+  })
+}
 
 // Promises that return values based on template
 const templatePromisesFor = (property, errorKey, dispatch) =>

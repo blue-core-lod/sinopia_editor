@@ -137,6 +137,21 @@ export const jsonldFromDataset = (dataset) => {
   })
 }
 
+// The JSON-LD parser passes a native value through untouched when it carries
+// an explicit @type, so {"@type": "xsd:integer", "@value": 0} becomes a
+// literal whose value is the number 0. RDF/JS literal values are strings, and
+// the editor treats a falsy literal as empty, so a stored 0 would not load.
+const withStringLiteralValue = (quad) => {
+  const { object } = quad
+  if (object.termType !== "Literal" || _.isString(object.value)) return quad
+  return rdf.quad(
+    quad.subject,
+    quad.predicate,
+    rdf.literal(String(object.value), object.language || object.datatype),
+    quad.graph,
+  )
+}
+
 export const datasetFromJsonld = (jsonld) => {
   const parserJsonld = new JsonLdParser()
 
@@ -151,7 +166,7 @@ export const datasetFromJsonld = (jsonld) => {
   const dataset = rdf.dataset()
 
   output.on("data", (quad) => {
-    dataset.add(quad)
+    dataset.add(withStringLiteralValue(quad))
   })
 
   return new Promise((resolve, reject) => {
