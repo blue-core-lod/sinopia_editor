@@ -113,6 +113,15 @@ const profileTemplateFilenames = {
   "22222222-2222-4222-8222-222222222222/version/1": "versioned_cycle_b.json",
   // Typed as a resource template but carrying no hasResourceId.
   "44444444-4444-4444-8444-444444444444": "untyped_id_template.json",
+  // Served by an API that reports version_uri; see below.
+  "55555555-5555-4555-8555-555555555555": "versioned_title_v2.json",
+}
+
+// The version_id of the version_uri an API response carries for a profile
+// (blue-core-lod/bluecore_api#338). Profiles not listed here are served as by
+// an API that predates the field.
+const profileVersionIds = {
+  "55555555-5555-4555-8555-555555555555": 48213,
 }
 
 const profileFixtureKey = (uri) => {
@@ -151,10 +160,13 @@ export const getFixtureResource = (uri) => {
     resource = require(`../__template_fixtures__/${templateFilenames[id]}`)
   }
 
+  const versionId = profileVersionIds[profileFixtureKey(uri)]
+
   return {
     id,
     uri,
     data: resource,
+    ...(versionId && { version_uri: `${uri}/version/${versionId}` }),
     group: "stanford",
     editGroups: ["cornell"],
     timestamp: "2020-08-20T11:34:40.887Z",
