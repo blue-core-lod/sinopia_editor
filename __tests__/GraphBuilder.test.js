@@ -304,6 +304,23 @@ _:c14n3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ont
       expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
     })
 
+    it("points hasResourceTemplate at the template version URI when there is one", () => {
+      const versionUri =
+        "https://bluecore-dev.stanford.edu/profiles/3db30d3a-7a3e-4762-a28c-1a0efc244345/version/113"
+      const resource = build.subject({
+        subjectTemplate: build.subjectTemplate({
+          id: "bluecore:bf2:Monograph:Work",
+          clazz: "http://id.loc.gov/ontologies/bibframe/Work",
+          versionUri,
+        }),
+        properties: [build.property()],
+      })
+
+      const rdf = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> <${versionUri}> .
+<> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Work> .`
+      expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+    })
+
     it("builds a graph ignoring empty nested resources", () => {
       const resource = build.subject({
         subjectTemplate: build.subjectTemplate({

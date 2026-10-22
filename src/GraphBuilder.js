@@ -56,7 +56,7 @@ export default class GraphBuilder {
       } else {
         resourceTerm = rdf.namedNode("")
       }
-      this.addGeneratedByTriple(resourceTerm, this.resource.subjectTemplate.id)
+      this.addGeneratedByTriple(resourceTerm, this.resource.subjectTemplate)
       this.buildSubject(this.resource, resourceTerm)
     }
     return this.dataset
@@ -266,14 +266,19 @@ export default class GraphBuilder {
   /**
    * Adds the assertion that points at the resourceTemplate we used to generate this node
    * @param {rdf.Term} baseURI
-   * @param {string} resourceTemplateId the identifier of the resource template
+   * @param {Object} resourceTemplate the resource template containing the versionUri or id to use as the object of the triple
+   * @returns {void}
+   * @throws when resourceTemplate is missing both versionUri and id
    */
-  addGeneratedByTriple(baseURI, resourceTemplateId) {
+  addGeneratedByTriple(baseURI, resourceTemplate) {
+    const templateTerm = resourceTemplate.versionUri
+      ? rdf.namedNode(resourceTemplate.versionUri)
+      : rdf.literal(resourceTemplate.id)
     this.dataset.add(
       rdf.quad(
         baseURI,
         rdf.namedNode("http://sinopia.io/vocabulary/hasResourceTemplate"),
-        rdf.literal(resourceTemplateId),
+        templateTerm,
       ),
     )
   }
