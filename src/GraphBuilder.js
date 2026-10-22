@@ -264,15 +264,21 @@ export default class GraphBuilder {
   }
 
   /**
-   * Adds the assertion that points at the resourceTemplate we used to generate this node
+   * Adds the assertion that points at the resourceTemplate we used to generate this node.
+   * Prefers the version URI, which pins the exact template version. A profile
+   * whose version could not be resolved falls back to its unversioned URI: still
+   * an IRI naming the right profile, which resolves to its latest version. Only
+   * a template with no profile at all (base templates, legacy ids) is written as
+   * its id literal.
    * @param {rdf.Term} baseURI
-   * @param {Object} resourceTemplate the resource template containing the versionUri or id to use as the object of the triple
+   * @param {Object} resourceTemplate the subject template, with versionUri, profileUri, and id
    * @returns {void}
-   * @throws when resourceTemplate is missing both versionUri and id
    */
   addGeneratedByTriple(baseURI, resourceTemplate) {
-    const templateTerm = resourceTemplate.versionUri
-      ? rdf.namedNode(resourceTemplate.versionUri)
+    const templateUri =
+      resourceTemplate.versionUri || resourceTemplate.profileUri
+    const templateTerm = templateUri
+      ? rdf.namedNode(templateUri)
       : rdf.literal(resourceTemplate.id)
     this.dataset.add(
       rdf.quad(
