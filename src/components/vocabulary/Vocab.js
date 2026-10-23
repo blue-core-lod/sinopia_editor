@@ -85,7 +85,7 @@ const vocabulary = {
   },
   hasResourceTemplate: {
     description:
-      "The template used in creating, editing, or updating a resource",
+      "The template used in creating, editing, or updating a resource: the URI of the profile version, e.g., https://bcld.info/profiles/{uuid}/version/{id}. Resources saved before template versioning carry the template ID as a literal instead.",
     url: "http://sinopia.io/vocabulary/hasResourceTemplate",
   },
   hasResourceTemplateId: {
