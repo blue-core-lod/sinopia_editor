@@ -56,7 +56,7 @@ export default class GraphBuilder {
       } else {
         resourceTerm = rdf.namedNode("")
       }
-      this.addGeneratedByTriple(resourceTerm, this.resource.subjectTemplate.id)
+      this.addGeneratedByTriple(resourceTerm, this.resource.subjectTemplate)
       this.buildSubject(this.resource, resourceTerm)
     }
     return this.dataset
@@ -264,16 +264,27 @@ export default class GraphBuilder {
   }
 
   /**
-   * Adds the assertion that points at the resourceTemplate we used to generate this node
+   * Adds the assertion that points at the resourceTemplate we used to generate this node.
+   * Prefers the version URI, which pins the exact template version. A profile
+   * whose version could not be resolved falls back to its unversioned URI: still
+   * an IRI naming the right profile, which resolves to its latest version. Only
+   * a template with no profile at all (base templates, legacy ids) is written as
+   * its id literal.
    * @param {rdf.Term} baseURI
-   * @param {string} resourceTemplateId the identifier of the resource template
+   * @param {Object} resourceTemplate the subject template, with versionUri, profileUri, and id
+   * @returns {void}
    */
-  addGeneratedByTriple(baseURI, resourceTemplateId) {
+  addGeneratedByTriple(baseURI, resourceTemplate) {
+    const templateUri =
+      resourceTemplate.versionUri || resourceTemplate.profileUri
+    const templateTerm = templateUri
+      ? rdf.namedNode(templateUri)
+      : rdf.literal(resourceTemplate.id)
     this.dataset.add(
       rdf.quad(
         baseURI,
         rdf.namedNode("http://sinopia.io/vocabulary/hasResourceTemplate"),
-        rdf.literal(resourceTemplateId),
+        templateTerm,
       ),
     )
   }

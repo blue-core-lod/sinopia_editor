@@ -282,6 +282,17 @@ describe("postResource", () => {
       expect.objectContaining({ method: "POST" }),
     )
     expect(result).toBe("https://bcld.info/profiles/abc123")
+
+    // Base templates have no profile or version, so a template still records
+    // the literal id of the template it was edited with.
+    const { data } = JSON.parse(global.fetch.mock.calls[0][1].body)
+    expect(JSON.parse(data)).toContainEqual(
+      expect.objectContaining({
+        "http://sinopia.io/vocabulary/hasResourceTemplate": [
+          { "@value": "sinopia:template:resource" },
+        ],
+      }),
+    )
   })
 })
 

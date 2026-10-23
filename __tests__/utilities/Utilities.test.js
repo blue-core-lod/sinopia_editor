@@ -8,6 +8,7 @@ import {
   isBlueCoreUri,
   resourceIdFromUri,
   uriFromResourceId,
+  findRootResourceTemplateId,
 } from "utilities/Utilities"
 import timezoneMock from "timezone-mock"
 
@@ -215,6 +216,36 @@ describe("Utilities", () => {
       expect(uriFromResourceId("works", "abc123")).toEqual(
         "http://localhost:3000/works/abc123",
       )
+    })
+  })
+
+  describe("findRootResourceTemplateId()", () => {
+    const uri = "http://localhost:3000/works/abc123"
+    const versionUri =
+      "https://bluecore-dev.stanford.edu/profiles/3db30d3a-7a3e-4762-a28c-1a0efc244345/version/113"
+
+    it("returns a legacy literal template id", async () => {
+      const dataset = await datasetFromN3(
+        `<${uri}> <http://sinopia.io/vocabulary/hasResourceTemplate> "bluecore:bf2:Monograph:Work" .`,
+      )
+      expect(findRootResourceTemplateId(uri, dataset)).toEqual(
+        "bluecore:bf2:Monograph:Work",
+      )
+    })
+
+    it("returns a profile version URI from a named node", async () => {
+      const dataset = await datasetFromN3(
+        `<${uri}> <http://sinopia.io/vocabulary/hasResourceTemplate> <${versionUri}> .`,
+      )
+      expect(findRootResourceTemplateId(uri, dataset)).toEqual(versionUri)
+    })
+
+    it("returns null when there is not exactly one", async () => {
+      const dataset = await datasetFromN3(
+        `<${uri}> <http://sinopia.io/vocabulary/hasResourceTemplate> <${versionUri}> .
+<${uri}> <http://sinopia.io/vocabulary/hasResourceTemplate> "bluecore:bf2:Monograph:Work" .`,
+      )
+      expect(findRootResourceTemplateId(uri, dataset)).toBeNull()
     })
   })
 })
