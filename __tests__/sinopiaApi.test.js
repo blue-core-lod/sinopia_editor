@@ -348,7 +348,8 @@ describe("putResource", () => {
       global.fetch = jest.fn().mockResolvedValue({
         ok: false,
         json: jest.fn().mockResolvedValue({
-          detail: "Unable to save resource: Found more than one subject URI",
+          title: "Unable to save resource",
+          detail: "Found more than one subject URI",
         }),
         statusText: "Unprocessable Content",
       })

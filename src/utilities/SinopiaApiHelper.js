@@ -16,11 +16,12 @@ export const checkResp = (resp) => {
     })
 }
 
-// The Blue Core API (FastAPI) reports errors as {detail: "message"}, or as
-// {detail: [{msg, ...}]} for request validation errors. The older Sinopia API
-// used [{title, details}].
+// The Blue Core API (FastAPI) reports errors as {detail: "message"}, sometimes
+// with a title, or as {detail: [{msg, ...}]} for request validation errors. The
+// older Sinopia API used [{title, details}].
 const apiErrorMessage = (errors) => {
-  if (typeof errors.detail === "string") return errors.detail
+  if (typeof errors.detail === "string")
+    return errors.title ? `${errors.title}: ${errors.detail}` : errors.detail
   if (Array.isArray(errors.detail))
     return errors.detail.map((error) => error.msg).join("; ")
   // Assuming only one for now.
