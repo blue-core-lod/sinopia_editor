@@ -343,6 +343,44 @@ describe("putResource", () => {
         }),
       ).rejects.toThrow("Blue Core API returned Cannot save resource")
     })
+
+    it("errors with the reason the Blue Core API gives", async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: false,
+        json: jest.fn().mockResolvedValue({
+          title: "Unable to save resource",
+          detail: "Found more than one subject URI",
+        }),
+        statusText: "Unprocessable Content",
+      })
+      await expect(
+        putResource(resource, currentUser, null, null, null, {
+          token: "Secret-Token",
+          updateToken: jest.fn().mockResolvedValue(false),
+        }),
+      ).rejects.toThrow(
+        "Unable to save resource: Found more than one subject URI",
+      )
+    })
+
+    it("errors with the Blue Core API's validation messages", async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: false,
+        json: jest.fn().mockResolvedValue({
+          detail: [
+            { loc: ["body", "data"], msg: "Field required", type: "missing" },
+            { loc: ["body", "uri"], msg: "Input should be a valid string" },
+          ],
+        }),
+        statusText: "Unprocessable Content",
+      })
+      await expect(
+        putResource(resource, currentUser, null, null, null, {
+          token: "Secret-Token",
+          updateToken: jest.fn().mockResolvedValue(false),
+        }),
+      ).rejects.toThrow("Field required; Input should be a valid string")
+    })
   })
 })
 
