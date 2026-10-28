@@ -85,7 +85,6 @@ describe("getSearchResults", () => {
     expect(results).toEqual({
       totalHits: 2,
       results: expectedResourceResults,
-      links: null,
       options: { noFacetResults: true },
     })
     expect(global.fetch).toHaveBeenCalledWith(
@@ -315,7 +314,6 @@ describe("getSearchResultsWithFacets", () => {
     expect(results).toEqual({
       totalHits: 2,
       results: expectedResourceResults,
-      links: null,
       options: {},
     })
     expect(global.fetch).toHaveBeenCalledWith(
@@ -382,7 +380,6 @@ describe("getLookupResult", () => {
             editGroups: ["blue core"],
           },
         ],
-        links: null,
         options: { noFacetResults: true, typeFilter: lookupConfig.type },
       })
     })
@@ -409,7 +406,6 @@ describe("getLookupResult", () => {
       expect(result).toEqual({
         totalHits: 0,
         results: [],
-        links: null,
         options: { noFacetResults: true, typeFilter: lookupConfig.type },
       })
     })
@@ -661,7 +657,6 @@ describe("getSearchResultsByUris", () => {
           editGroups: ["blue core"],
         },
       ],
-      links: null,
       options: undefined,
     })
     expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/search/", {

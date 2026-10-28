@@ -53,7 +53,6 @@ const searchExample = {
   },
   uri: "https://sinopia.io",
   error: undefined,
-  links: undefined,
 }
 
 const templatesSearchExample = {

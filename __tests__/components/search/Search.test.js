@@ -215,7 +215,7 @@ describe("<Search />", () => {
   })
 
   // https://github.com/blue-core-lod/sinopia_editor/issues/76
-  it("pages by offset against the original query, ignoring API links", async () => {
+  it("pages by offset against the original query", async () => {
     jest.spyOn(Config, "searchResultsPerPage", "get").mockReturnValue(2)
     const mockGetSearchResults = jest.fn()
     server.getSearchResultsWithFacets = mockGetSearchResults.mockResolvedValue([
@@ -235,11 +235,6 @@ describe("<Search />", () => {
             type: ["http://id.loc.gov/ontologies/bibframe/Title"],
           },
         ],
-        // The API's links, which have no "last" and carry their own offset.
-        links: {
-          first: "http://localhost/api/search/?limit=20&offset=0&q=foo",
-          next: "http://localhost/api/search/?limit=20&offset=20&q=foo",
-        },
       },
     ])
 

@@ -47,41 +47,7 @@ export const getSearchResultsWithFacets = async (
   if (Config.useResourceTemplateFixtures && hasFixtureResource(query))
     return Promise.resolve(resourceSearchResults(query))
 
-  // Check if query is a full URL (for pagination links)
-  let url
-  const extractedOptions = { ...options }
-
-  if (
-    query &&
-    typeof query === "string" &&
-    (query.startsWith("http://") || query.startsWith("https://"))
-  ) {
-    // Determine if this is a pagination URL (has limit/offset params) or a
-    // resource URI being used as a search term.
-    try {
-      const urlObj = new URL(query)
-      const offset = urlObj.searchParams.get("offset")
-      const limit = urlObj.searchParams.get("limit")
-      if (offset !== null || limit !== null) {
-        // Pagination link from the search API — use directly
-        url = query
-        if (offset !== null) {
-          extractedOptions.startOfRange = parseInt(offset, 10)
-        }
-        if (limit !== null) {
-          extractedOptions.resultsPerPage = parseInt(limit, 10)
-        }
-      } else {
-        // Resource URI used as a search term — pass as q= parameter
-        url = resourceSearchUrl(query, options)
-      }
-    } catch {
-      // URL parsing failed; fall back to treating it as a search term
-      url = resourceSearchUrl(query, options)
-    }
-  } else {
-    url = resourceSearchUrl(query, options)
-  }
+  const url = resourceSearchUrl(query, options)
 
   // const termsFilters = []
   // if (options.typeFilter) {
@@ -119,7 +85,7 @@ export const getSearchResultsWithFacets = async (
   //     },
   //   }
   // }
-  return fetchSearchResultsFromUrl(url, keycloak, extractedOptions)
+  return fetchSearchResultsFromUrl(url, keycloak, options)
 }
 
 export const getSearchResultsByUris = (resourceUris) => {
@@ -151,7 +117,7 @@ export const getSearchResultsByUris = (resourceUris) => {
   return fetchSearchResultsFromUrl(url, null).then((results) => results[0])
 }
 
-const fetchSearchResultsFromUrl = (url, keycloak, extractedOptions) =>
+const fetchSearchResultsFromUrl = (url, keycloak, options) =>
   fetch(url, {
     method: "GET",
   })
@@ -163,14 +129,13 @@ const fetchSearchResultsFromUrl = (url, keycloak, extractedOptions) =>
             totalHits: 0,
             results: [],
             error: json.error.reason || json.error,
-            options: extractedOptions,
+            options,
           },
           undefined,
         ]
       }
       const result = hitsToResult(json)
-      // Add extracted options to result
-      result.options = extractedOptions
+      result.options = options
       return [result, aggregationsToResult(json)]
     })
     .catch((err) => [
@@ -178,7 +143,7 @@ const fetchSearchResultsFromUrl = (url, keycloak, extractedOptions) =>
         totalHits: 0,
         results: [],
         error: err.toString(),
-        options: extractedOptions,
+        options,
       },
       undefined,
     ])
@@ -242,7 +207,6 @@ const hitsToResult = (payload) => {
   return {
     totalHits: payload.total,
     results,
-    links: payload.links,
   }
 }
 
