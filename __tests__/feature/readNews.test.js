@@ -11,7 +11,7 @@ describe("reading the latest Sinopia news items", () => {
     renderApp()
     await screen.findByText("Latest news")
     await screen.findByText(/Sinopia Version \d+\.\d+\.\d+ highlights/)
-    screen.getByText("Sinopia help site", { selector: "a" })
+    screen.getByText("Blue Core help site", { selector: "a" })
     expect(document.querySelectorAll("li").length).toBeGreaterThanOrEqual(1) // eslint-disable-line testing-library/no-node-access
   })
 })
