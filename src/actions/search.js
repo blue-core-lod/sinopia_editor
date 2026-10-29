@@ -12,7 +12,6 @@ export const setSearchResults = (
   query,
   options,
   error,
-  links,
 ) => ({
   type: "SET_SEARCH_RESULTS",
   payload: {
@@ -24,7 +23,6 @@ export const setSearchResults = (
     query,
     options,
     error,
-    links,
   },
 })
 

@@ -85,11 +85,10 @@ describe("getSearchResults", () => {
     expect(results).toEqual({
       totalHits: 2,
       results: expectedResourceResults,
-      links: null,
       options: { noFacetResults: true },
     })
     expect(global.fetch).toHaveBeenCalledWith(
-      "http://localhost:3000/search/?q=foo",
+      "http://localhost:3000/search/?q=foo&limit=10&offset=0",
       { method: "GET" },
     )
   })
@@ -107,7 +106,7 @@ describe("getSearchResults", () => {
       sortOrder: "desc",
     })
     expect(global.fetch).toHaveBeenCalledWith(
-      "http://localhost:3000/search/?q=foo",
+      "http://localhost:3000/search/?q=foo&limit=15&offset=10",
       { method: "GET" },
     )
   })
@@ -315,11 +314,10 @@ describe("getSearchResultsWithFacets", () => {
     expect(results).toEqual({
       totalHits: 2,
       results: expectedResourceResults,
-      links: null,
       options: {},
     })
     expect(global.fetch).toHaveBeenCalledWith(
-      "http://localhost:3000/search/?q=foo",
+      "http://localhost:3000/search/?q=foo&limit=10&offset=0",
       { method: "GET" },
     )
   })
@@ -337,7 +335,7 @@ describe("getSearchResultsWithFacets", () => {
       noFacetResults: true,
     })
     expect(global.fetch).toHaveBeenCalledWith(
-      "http://localhost:3000/search/?q=foo",
+      "http://localhost:3000/search/?q=foo&limit=10&offset=0",
       { method: "GET" },
     )
   })
@@ -382,7 +380,6 @@ describe("getLookupResult", () => {
             editGroups: ["blue core"],
           },
         ],
-        links: null,
         options: { noFacetResults: true, typeFilter: lookupConfig.type },
       })
     })
@@ -409,7 +406,6 @@ describe("getLookupResult", () => {
       expect(result).toEqual({
         totalHits: 0,
         results: [],
-        links: null,
         options: { noFacetResults: true, typeFilter: lookupConfig.type },
       })
     })
@@ -661,7 +657,6 @@ describe("getSearchResultsByUris", () => {
           editGroups: ["blue core"],
         },
       ],
-      links: null,
       options: undefined,
     })
     expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/search/", {

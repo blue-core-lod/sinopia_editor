@@ -79,7 +79,6 @@ describe("fetchSinopiaSearchResults", () => {
         startOfRange: 5,
         resultsPerPage: 10,
       },
-      links: undefined,
     })
     expect(actions).toHaveAction("ADD_SEARCH_HISTORY", {
       authorityUri: "urn:ld4p:sinopia",
@@ -140,7 +139,6 @@ describe("fetchTemplateGuessSearchResults", () => {
         options: {
           startOfRange: 0,
         },
-        links: undefined,
       })
     })
   })
@@ -178,7 +176,6 @@ describe("fetchTemplateGuessSearchResults", () => {
         options: {
           startOfRange: 0,
         },
-        links: undefined,
       })
       expect(actions).toHaveAction("ADD_ERROR", {
         errorKey: "testerrorkey",
