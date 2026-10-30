@@ -149,7 +149,10 @@ describe("loadResourceTemplate()", () => {
       ).not.toBeUndefined()
     })
 
-    it("resolves an unversioned profile URI to its latest version", async () => {
+    it("does not record a version whose definition was never loaded", async () => {
+      // The response carries the v2 definition but no version_uri, while the
+      // versions list (as if the profile were edited in between) tops out at
+      // 3. Nothing ties either id to the definition in hand.
       const store = mockStore(createState())
       const versionsSpy = jest.spyOn(
         fixtureLoaderHelper,
@@ -160,12 +163,11 @@ describe("loadResourceTemplate()", () => {
         loadResourceTemplate(profileUri, {}, "testerrorkey"),
       )
 
-      // No version_uri on this response, so the versions list is
-      // consulted, and the fixture versions list tops out at id 3.
-      expect(versionsSpy).toHaveBeenCalled()
       expect(subjectTemplate.key).toEqual(profileUri)
-      expect(subjectTemplate.version).toEqual(3)
-      expect(subjectTemplate.versionUri).toEqual(`${profileUri}/version/3`)
+      expect(subjectTemplate.label).toEqual("Versioned Title v2")
+      expect(subjectTemplate.version).toBeNull()
+      expect(subjectTemplate.versionUri).toBeNull()
+      expect(versionsSpy).not.toHaveBeenCalled()
       versionsSpy.mockRestore()
     })
 

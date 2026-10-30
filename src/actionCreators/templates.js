@@ -5,11 +5,10 @@ import Config from "Config"
 import { addTemplates } from "actions/templates"
 import { selectSubjectAndPropertyTemplates } from "selectors/templates"
 import TemplatesBuilder from "TemplatesBuilder"
-import { fetchResource, fetchResourceVersions } from "sinopiaApi"
+import { fetchResource } from "sinopiaApi"
 import { resourceToName } from "../utilities/Utilities"
 import { selectUser } from "selectors/authenticate"
 import { getTemplateSearchResultsByIds } from "sinopiaSearch"
-import _ from "lodash"
 
 // True when a reference names a host other than the configured API's. These
 // resolve, and must keep resolving, but reaching into another environment for
@@ -33,41 +32,19 @@ const withVersionUri = (subjectTemplate, versionUri) => ({
 })
 
 // A template fetched by its unversioned profile URI is whatever the profile
-// says today. Resolve that to the version it actually is, so that a save can
-// record exactly which template version the resource was edited with
-// (GraphBuilder.addGeneratedByTriple). A failed lookup leaves the template
-// unversioned rather than failing the load.
-const withLatestVersion = (subjectTemplate, response) => {
+// says today. The API reports the version URI of the profile it returned, which
+// is exactly the version of the data in hand, so that a save can record which
+// template version the resource was edited with
+// (GraphBuilder.addGeneratedByTriple). See blue-core-lod/bluecore_api#338.
+//
+// Without version_uri the template is left unversioned. The version list is
+// not a substitute: it is a second request, and an edit to the profile between
+// the two would record a version whose definition was never loaded.
+const withReportedVersion = (subjectTemplate, response) => {
   if (subjectTemplate.versionUri || !subjectTemplate.profileUri)
-    return Promise.resolve(subjectTemplate)
-
-  // The API reports the version URI of the profile it returned, which is both
-  // one request and exactly the version of the data in hand. See
-  // blue-core-lod/bluecore_api#338.
-  if (versionIdRegex.test(response?.version_uri ?? ""))
-    return Promise.resolve(
-      withVersionUri(subjectTemplate, response.version_uri),
-    )
-
-  // An API that predates version_uri: ask for the version list. This can race
-  // an edit to the profile made between the two requests.
-  return fetchResourceVersions(subjectTemplate.profileUri)
-    .then((versions) => {
-      // Version ids are the API's global Version.id, so the newest is the max.
-      const latest = _.maxBy(versions, "id")
-      if (!latest) return subjectTemplate
-      return withVersionUri(
-        subjectTemplate,
-        `${subjectTemplate.profileUri}/version/${latest.id}`,
-      )
-    })
-    .catch((err) => {
-      console.warn(
-        `Could not resolve the current version of ${subjectTemplate.profileUri}:`,
-        err,
-      )
-      return subjectTemplate
-    })
+    return subjectTemplate
+  if (!versionIdRegex.test(response?.version_uri ?? "")) return subjectTemplate
+  return withVersionUri(subjectTemplate, response.version_uri)
 }
 
 /**
@@ -226,12 +203,9 @@ export const loadResourceTemplateWithoutValidation =
           throw error
         }
 
-        return withLatestVersion(subjectTemplate, response).then(
-          (versionedTemplate) => {
-            dispatch(addTemplates(versionedTemplate))
-            return versionedTemplate
-          },
-        )
+        const versionedTemplate = withReportedVersion(subjectTemplate, response)
+        dispatch(addTemplates(versionedTemplate))
+        return versionedTemplate
       }),
     )
 
