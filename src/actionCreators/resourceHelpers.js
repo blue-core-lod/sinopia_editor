@@ -17,11 +17,19 @@ import { findRootResourceTemplateId } from "utilities/Utilities"
 import { chooseLang } from "utilities/Language"
 import Config from "Config"
 
-// Work-Instance relationship property URIs to exclude when copying resources
-const skipPropertyUris = [
+// Work-Instance relationship property URIs whose values are not carried over
+// when copying a resource: the copy is a new resource, not another link to the
+// original's Work or Instances (#156). The properties themselves are kept, so
+// the copy's form still offers them (#236).
+const relationshipPropertyUris = [
   "http://id.loc.gov/ontologies/bibframe/hasInstance",
   "http://id.loc.gov/ontologies/bibframe/instanceOf",
 ]
+
+const isRelationshipProperty = (property) =>
+  Object.keys(property.propertyTemplate?.uris || {}).some((uri) =>
+    relationshipPropertyUris.includes(uri),
+  )
 
 /**
  * Helper methods that should only be used in 'actionCreators/resources'
@@ -130,13 +138,14 @@ export const addResourceFromDataset =
       if (asNewResource) {
         newResource.group = null
         newResource.editGroups = []
-        // Strip Work-Instance relationship properties from copy
-        newResource.properties = newResource.properties.filter(
-          (property) =>
-            !Object.keys(property.propertyTemplate?.uris || {}).some((uri) =>
-              skipPropertyUris.includes(uri),
-            ),
-        )
+        // Empty the Work-Instance relationship properties, leaving them as a
+        // property with no data loads
+        newResource.properties
+          .filter((property) => isRelationshipProperty(property))
+          .forEach((property) => {
+            property.values = null
+            property.show = false
+          })
       }
 
       dispatch(addSubjectAction(newResource))
@@ -972,12 +981,6 @@ export const newSubjectCopy = (subjectKey, value) => (dispatch, getState) => {
 const newPropertyCopy = (propertyKey, subject) => (dispatch, getState) => {
   const property = selectProperty(getState(), propertyKey)
 
-  // Skip Work-Instance relationship properties
-  const templateUris = Object.keys(property.propertyTemplate?.uris || {})
-  if (templateUris.some((uri) => skipPropertyUris.includes(uri))) {
-    return Promise.resolve(null)
-  }
-
   const newProperty = _.pick(property, [
     "propertyTemplate",
     "propertyUri",
@@ -989,6 +992,14 @@ const newPropertyCopy = (propertyKey, subject) => (dispatch, getState) => {
 
   newProperty.key = nanoid()
   newProperty.subject = subject
+
+  // Copy a Work-Instance relationship property empty
+  if (isRelationshipProperty(property)) {
+    newProperty.values = null
+    newProperty.show = false
+    return newProperty
+  }
+
   newProperty.values = property.valueKeys === null ? null : []
 
   // Add values
