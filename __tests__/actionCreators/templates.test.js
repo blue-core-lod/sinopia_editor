@@ -171,6 +171,28 @@ describe("loadResourceTemplate()", () => {
       versionsSpy.mockRestore()
     })
 
+    it("ignores a version_uri that names a different profile", async () => {
+      const getFixtureResource = fixtureLoaderHelper.getFixtureResource
+      const resourceSpy = jest
+        .spyOn(fixtureLoaderHelper, "getFixtureResource")
+        .mockImplementation((uri) => ({
+          ...getFixtureResource(uri),
+          version_uri:
+            "https://bluecore-dev.stanford.edu/profiles/99999999-9999-4999-8999-999999999999/version/7",
+        }))
+      const store = mockStore(createState())
+
+      const subjectTemplate = await store.dispatch(
+        loadResourceTemplate(profileUri, {}, "testerrorkey"),
+      )
+
+      // Left unversioned, so a save names the plain profile URI.
+      expect(subjectTemplate.profileUri).toEqual(profileUri)
+      expect(subjectTemplate.version).toBeNull()
+      expect(subjectTemplate.versionUri).toBeNull()
+      resourceSpy.mockRestore()
+    })
+
     it("takes the version from version_uri without a versions request", async () => {
       const store = mockStore(createState())
       const versionsSpy = jest.spyOn(

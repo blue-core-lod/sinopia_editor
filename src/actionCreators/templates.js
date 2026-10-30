@@ -39,12 +39,19 @@ const withVersionUri = (subjectTemplate, versionUri) => ({
 //
 // Without version_uri the template is left unversioned. The version list is
 // not a substitute: it is a second request, and an edit to the profile between
-// the two would record a version whose definition was never loaded.
+// the two would record a version whose definition was never loaded. So is a
+// version_uri naming another profile or host, since a save writes it into the
+// resource as this template's version.
 const withReportedVersion = (subjectTemplate, response) => {
   if (subjectTemplate.versionUri || !subjectTemplate.profileUri)
     return subjectTemplate
-  if (!versionIdRegex.test(response?.version_uri ?? "")) return subjectTemplate
-  return withVersionUri(subjectTemplate, response.version_uri)
+  const versionUri = response?.version_uri ?? ""
+  if (
+    !versionUri.startsWith(`${subjectTemplate.profileUri}/version/`) ||
+    !versionIdRegex.test(versionUri)
+  )
+    return subjectTemplate
+  return withVersionUri(subjectTemplate, versionUri)
 }
 
 /**
