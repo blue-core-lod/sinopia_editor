@@ -279,6 +279,49 @@ describe("newResourceFromDataset", () => {
     })
   })
 
+  // The literal template id above is the legacy form; a resource saved since
+  // https://github.com/blue-core-lod/sinopia_editor/issues/190 names its
+  // template by profile version URI instead.
+  describe("loading a resource whose template is a profile version URI", () => {
+    const versionUri =
+      "https://bluecore-dev.stanford.edu/profiles/3db30d3a-7a3e-4762-a28c-1a0efc244345/version/1"
+    const pinnedN3 = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> <${versionUri}> .
+<> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Title> .
+<> <http://id.loc.gov/ontologies/bibframe/mainTitle> "A title"@en .
+`
+    const store = mockStore(createState())
+
+    it("builds against that version and writes it back unchanged", async () => {
+      const dataset = await datasetFromN3(pinnedN3.replace(/<>/g, `<${uri}>`))
+      const result = await store.dispatch(
+        newResourceFromDataset(dataset, uri, null, "testerrorkey"),
+      )
+      expect(result).toBe(true)
+
+      const actions = store.getActions()
+      const resource = actions.find(
+        (action) => action.type === "ADD_SUBJECT",
+      ).payload
+
+      // v1, not the profile's latest (v2), which adds a subtitle.
+      expect(resource.subjectTemplate.key).toBe(versionUri)
+      expect(resource.subjectTemplate.versionUri).toBe(versionUri)
+      expect(resource.subjectTemplate.label).toBe("Versioned Title v1")
+
+      // The named node is consumed, not parked as unused RDF.
+      expect(actions).toHaveAction("SET_UNUSED_RDF", {
+        resourceKey: "abc123",
+        rdf: null,
+      })
+
+      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
+      const expectedGraph = await datasetFromN3(
+        pinnedN3.replace(/<>/g, `<${uri}>`),
+      )
+      expect(actualRdf).toMatch(expectedGraph.toCanonical())
+    })
+  })
+
   describe("loading a resource with extra triples", () => {
     const store = mockStore(createState())
 

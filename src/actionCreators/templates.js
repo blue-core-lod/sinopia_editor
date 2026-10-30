@@ -21,6 +21,39 @@ const isForeignHost = (uri) => {
   }
 }
 
+// The version id is the API's global Version.id, the last segment of a
+// version URI.
+const versionIdRegex = /\/version\/(\d+)$/
+
+const withVersionUri = (subjectTemplate, versionUri) => ({
+  ...subjectTemplate,
+  version: Number(versionIdRegex.exec(versionUri)[1]),
+  versionUri,
+})
+
+// A template fetched by its unversioned profile URI is whatever the profile
+// says today. The API reports the version URI of the profile it returned, which
+// is exactly the version of the data in hand, so that a save can record which
+// template version the resource was edited with
+// (GraphBuilder.addGeneratedByTriple). See blue-core-lod/bluecore_api#338.
+//
+// Without version_uri the template is left unversioned. The version list is
+// not a substitute: it is a second request, and an edit to the profile between
+// the two would record a version whose definition was never loaded. So is a
+// version_uri naming another profile or host, since a save writes it into the
+// resource as this template's version.
+const withReportedVersion = (subjectTemplate, response) => {
+  if (subjectTemplate.versionUri || !subjectTemplate.profileUri)
+    return subjectTemplate
+  const versionUri = response?.version_uri ?? ""
+  if (
+    !versionUri.startsWith(`${subjectTemplate.profileUri}/version/`) ||
+    !versionIdRegex.test(versionUri)
+  )
+    return subjectTemplate
+  return withVersionUri(subjectTemplate, versionUri)
+}
+
 /**
  * A thunk that gets a resource template from state or the server.
  * @return [Object] subject template
@@ -177,8 +210,9 @@ export const loadResourceTemplateWithoutValidation =
           throw error
         }
 
-        dispatch(addTemplates(subjectTemplate))
-        return subjectTemplate
+        const versionedTemplate = withReportedVersion(subjectTemplate, response)
+        dispatch(addTemplates(versionedTemplate))
+        return versionedTemplate
       }),
     )
 

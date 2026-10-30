@@ -40,6 +40,47 @@ describe("loading from RDF", () => {
     })
   })
 
+  // The RDF above names its template by literal id, the legacy form. Since
+  // https://github.com/blue-core-lod/sinopia_editor/issues/190 a saved
+  // resource names it by profile version URI.
+  describe("when RDF names its template by profile version URI", () => {
+    it("opens the resource against that version", async () => {
+      renderApp()
+
+      fireEvent.click(screen.getByText("Linked Data Editor", { selector: "a" }))
+      fireEvent.click(screen.getByText("Load RDF", { selector: "a" }))
+
+      screen.getByText("Load RDF into Editor")
+
+      const versionUri =
+        "https://bluecore-dev.stanford.edu/profiles/3db30d3a-7a3e-4762-a28c-1a0efc244345/version/1"
+      const rdf = `
+<> <http://id.loc.gov/ontologies/bibframe/mainTitle> "foo"@en .
+<> <http://sinopia.io/vocabulary/hasResourceTemplate> <${versionUri}> .
+<> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Title> .
+      `
+
+      fireEvent.change(
+        screen.getByLabelText(
+          "RDF (Accepts JSON-LD, Turtle, TriG, N-Triples, N-Quads, and Notation3 (N3))",
+        ),
+        { target: { value: rdf } },
+      )
+      fireEvent.click(screen.getByText("Submit", { selector: "button" }))
+
+      await screen.findByText("Versioned Title v1", {
+        selector: resourceHeaderSelector,
+      })
+
+      screen.getByText("foo")
+      expect(
+        screen.getAllByText(`Template version: <${versionUri}>`, {
+          exact: false,
+        }).length,
+      ).toBeTruthy()
+    })
+  })
+
   describe("when RDF with base URI", () => {
     it("opens the resource", async () => {
       renderApp()

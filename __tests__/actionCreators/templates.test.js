@@ -5,6 +5,7 @@ import { thunk } from "redux-thunk"
 import { createState } from "stateUtils"
 import { addTemplates } from "reducers/templates"
 import { selectSubjectTemplate } from "selectors/templates"
+import * as fixtureLoaderHelper from "../testUtilities/fixtureLoaderHelper"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -146,6 +147,81 @@ describe("loadResourceTemplate()", () => {
       expect(
         selectSubjectTemplate({ entities }, profileUri),
       ).not.toBeUndefined()
+    })
+
+    it("does not record a version whose definition was never loaded", async () => {
+      // The response carries the v2 definition but no version_uri, while the
+      // versions list (as if the profile were edited in between) tops out at
+      // 3. Nothing ties either id to the definition in hand.
+      const store = mockStore(createState())
+      const versionsSpy = jest.spyOn(
+        fixtureLoaderHelper,
+        "getFixtureResourceVersions",
+      )
+
+      const subjectTemplate = await store.dispatch(
+        loadResourceTemplate(profileUri, {}, "testerrorkey"),
+      )
+
+      expect(subjectTemplate.key).toEqual(profileUri)
+      expect(subjectTemplate.label).toEqual("Versioned Title v2")
+      expect(subjectTemplate.version).toBeNull()
+      expect(subjectTemplate.versionUri).toBeNull()
+      expect(versionsSpy).not.toHaveBeenCalled()
+      versionsSpy.mockRestore()
+    })
+
+    it("ignores a version_uri that names a different profile", async () => {
+      const getFixtureResource = fixtureLoaderHelper.getFixtureResource
+      const resourceSpy = jest
+        .spyOn(fixtureLoaderHelper, "getFixtureResource")
+        .mockImplementation((uri) => ({
+          ...getFixtureResource(uri),
+          version_uri:
+            "https://bluecore-dev.stanford.edu/profiles/99999999-9999-4999-8999-999999999999/version/7",
+        }))
+      const store = mockStore(createState())
+
+      const subjectTemplate = await store.dispatch(
+        loadResourceTemplate(profileUri, {}, "testerrorkey"),
+      )
+
+      // Left unversioned, so a save names the plain profile URI.
+      expect(subjectTemplate.profileUri).toEqual(profileUri)
+      expect(subjectTemplate.version).toBeNull()
+      expect(subjectTemplate.versionUri).toBeNull()
+      resourceSpy.mockRestore()
+    })
+
+    it("takes the version from version_uri without a versions request", async () => {
+      const store = mockStore(createState())
+      const versionsSpy = jest.spyOn(
+        fixtureLoaderHelper,
+        "getFixtureResourceVersions",
+      )
+      const reportingProfileUri =
+        "https://bluecore-dev.stanford.edu/profiles/55555555-5555-4555-8555-555555555555"
+
+      const subjectTemplate = await store.dispatch(
+        loadResourceTemplate(reportingProfileUri, {}, "testerrorkey"),
+      )
+
+      expect(subjectTemplate.version).toEqual(48213)
+      expect(subjectTemplate.versionUri).toEqual(
+        `${reportingProfileUri}/version/48213`,
+      )
+      expect(versionsSpy).not.toHaveBeenCalled()
+      versionsSpy.mockRestore()
+    })
+
+    it("keeps the pinned version of a version URI rather than the latest", async () => {
+      const store = mockStore(createState())
+
+      const subjectTemplate = await store.dispatch(
+        loadResourceTemplate(`${profileUri}/version/1`, {}, "testerrorkey"),
+      )
+
+      expect(subjectTemplate.versionUri).toEqual(`${profileUri}/version/1`)
     })
 
     it("renders two versions of one template independently in a single session", async () => {
