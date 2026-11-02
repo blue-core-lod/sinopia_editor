@@ -19,8 +19,8 @@ import Config from "Config"
 
 // Work-Instance relationship property URIs whose values are not carried over
 // when copying a resource: the copy is a new resource, not another link to the
-// original's Work or Instances (#156). The properties themselves are kept, so
-// the copy's form still offers them (#236).
+// original's Work or Instances. The properties themselves are kept, so
+// the copy's form still offers them.
 const relationshipPropertyUris = [
   "http://id.loc.gov/ontologies/bibframe/hasInstance",
   "http://id.loc.gov/ontologies/bibframe/instanceOf",
