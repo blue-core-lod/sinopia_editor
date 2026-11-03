@@ -15,6 +15,7 @@ import {
   setCurrentPreviewResource,
   saveResourceFinished,
   setUnusedRDF,
+  setTemplateUsage,
   loadResourceFinished,
   setResourceGroup,
   setCurrentDiff,
@@ -36,6 +37,7 @@ import {
   selectValue,
   selectFullSubject,
   selectMainTitleProperty,
+  selectTemplateUsage,
 } from "selectors/resources"
 import { newLiteralValue, newValueSubject } from "utilities/valueFactory"
 import { selectUser } from "selectors/authenticate"
@@ -48,6 +50,8 @@ import { addResourceHistory } from "actionCreators/history"
 import _ from "lodash"
 import { setCurrentComponent } from "actions/index"
 import { loadRelationships } from "./relationships"
+import { loadTemplateUsage } from "./templateUsage"
+import { isTemplate } from "utilities/SinopiaApiHelper"
 
 /**
  * A thunk that loads an existing resource from Sinopia API and adds to state.
@@ -163,6 +167,17 @@ export const dispatchResourceForEditor =
       ),
     )
     dispatch(setCurrentResource(resource.key))
+    // Not awaited: the usage warnings arrive when they arrive, and never hold
+    // up opening the template.
+    if (isTemplate(resource))
+      dispatch(
+        loadTemplateUsage(
+          resource.key,
+          uri,
+          { copied: asNewResource },
+          keycloak,
+        ),
+      )
     if (!asNewResource) {
       dispatch(addUserResourceHistory(uri, keycloak))
       dispatch(
@@ -312,7 +327,7 @@ export const newResource =
 /**
  * A thunk that creates a new resource from an existing in-state resource and adds to state.
  */
-export const newResourceCopy = (resourceKey) => (dispatch) =>
+export const newResourceCopy = (resourceKey) => (dispatch, getState) =>
   dispatch(newSubjectCopy(resourceKey))
     .then((newResource) => {
       dispatch(addSubjectAction(newResource))
@@ -325,6 +340,11 @@ export const newResourceCopy = (resourceKey) => (dispatch) =>
       )
       dispatch(setCurrentResource(newResource.key))
       dispatch(setUnusedRDF(newResource.key, null))
+      // A copied template is a new profile; the resources made with the
+      // original stay with it.
+      const usage = selectTemplateUsage(getState(), resourceKey)
+      if (usage)
+        dispatch(setTemplateUsage(newResource.key, { ...usage, copied: true }))
     })
     .catch((err) => {
       console.error(err)

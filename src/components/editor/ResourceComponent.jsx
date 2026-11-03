@@ -5,6 +5,7 @@ import { useSelector } from "react-redux"
 import PanelResource from "./property/PanelResource"
 import CopyToNewMessage from "./CopyToNewMessage"
 import ResourceURIMessage from "./ResourceURIMessage"
+import TemplateUsageMessage from "./TemplateUsageMessage"
 import PermissionsAction from "./actions/PermissionsAction"
 import SaveAlert from "./SaveAlert"
 import {
@@ -66,6 +67,7 @@ const ResourceComponent = () => {
             <PermissionsAction />
           </div>
         </div>
+        <TemplateUsageMessage resourceKey={resourceKey} />
         <SaveAlert />
       </section>
       <div id="sticky-beacon" />

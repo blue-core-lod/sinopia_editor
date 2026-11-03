@@ -23,6 +23,7 @@ import ContextAlert from "components/alerts/ContextAlert"
 import { resourceEditErrorKey } from "utilities/errorKeyFactory"
 import InputLang from "./inputs/InputLang"
 import MarcModal from "./actions/MarcModal"
+import TemplateVersionWarningModal from "./actions/TemplateVersionWarningModal"
 
 const Editor = (props) => {
   const navigate = useNavigate()
@@ -89,6 +90,7 @@ const Editor = (props) => {
           <ErrorMessages resourceKey={resourceKey} />
         )}
         <GroupChoiceModal />
+        <TemplateVersionWarningModal />
         <MarcModal />
         <InputLang />
         <ResourcesNav />

@@ -185,6 +185,9 @@ export const selectSiblingValues = (state, valueKey) => {
   })
 }
 
+export const selectTemplateUsage = (state, resourceKey) =>
+  state.editor.templateUsage?.[resourceKey]
+
 export const selectResourceLabel = (state, subjectKey) =>
   selectNormSubject(state, subjectKey)?.label
 

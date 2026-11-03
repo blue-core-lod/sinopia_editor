@@ -211,6 +211,33 @@ export const putResource = (
     ),
   )
 
+// Reports what uses a profile: POST {profile uri}/validate
+// (blue-core-lod/bluecore_api#338). Given the resource being edited, it also
+// checks the change a save would make, by sending the body putResource would.
+// The API never writes on this call. Resolves null instead of rejecting, since
+// the warnings it drives must never block editing or saving.
+export const validateProfile = (
+  profileUri,
+  keycloak,
+  { resource = null, unusedRDF = null } = {},
+) => {
+  if (Config.useResourceTemplateFixtures || !keycloak?.updateToken)
+    return Promise.resolve(null)
+  const bodyPromise = resource
+    ? saveBodyForResource(resource, null, null, null, false, unusedRDF)
+    : Promise.resolve(undefined)
+  return bodyPromise
+    .then((body) =>
+      sendResourceBody(`${profileUri}/validate`, body, "POST", keycloak),
+    )
+    .then((resp) => checkResp(resp))
+    .then((resp) => resp.json())
+    .catch((err) => {
+      console.error(`Error validating ${profileUri}:`, err)
+      return null
+    })
+}
+
 export const postMarc = (resourceUri, keycloak) => {
   const url = resourceUri.replace("resource", "marc")
   const jwt = getJwt(keycloak)

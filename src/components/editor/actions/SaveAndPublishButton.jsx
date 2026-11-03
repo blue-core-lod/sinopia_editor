@@ -1,13 +1,15 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
-import React from "react"
+import React, { useState } from "react"
 import { useSelector, useDispatch, shallowEqual } from "react-redux"
 import PropTypes from "prop-types"
 import { saveResource as saveResourceAction } from "actionCreators/resources"
+import { checkTemplateChange } from "actionCreators/templateUsage"
 import {
   resourceHasChangesSinceLastSave,
   selectPickSubject,
   selectCurrentResourceKey,
+  selectTemplateUsage,
 } from "selectors/resources"
 import {
   displayResourceValidations,
@@ -46,10 +48,17 @@ const SaveAndPublishButton = (props) => {
   const validationErrorsAreShowing = useSelector((state) =>
     displayResourceValidations(state, resourceKey),
   )
+  // Only template resources have usage, so only they are checked before saving.
+  const templateUsage = useSelector((state) =>
+    selectTemplateUsage(state, resourceKey),
+  )
+  const [isChecking, setChecking] = useState(false)
 
   const isSaved = !!resource.uri
   const isDisabled =
-    !resourceHasChanged || (validationErrorsAreShowing && hasValidationErrors)
+    isChecking ||
+    !resourceHasChanged ||
+    (validationErrorsAreShowing && hasValidationErrors)
 
   const formIsValid = () => {
     if (hasValidationErrors) {
@@ -63,7 +72,7 @@ const SaveAndPublishButton = (props) => {
   const handleClick = (event) => {
     event.preventDefault()
     if (formIsValid()) {
-      if (isSaved) {
+      const save = () =>
         dispatch(
           saveResourceAction(
             resourceKey,
@@ -73,6 +82,19 @@ const SaveAndPublishButton = (props) => {
             keycloak,
           ),
         )
+      if (isSaved && templateUsage?.instance_count && !templateUsage.copied) {
+        // Warning 2 of #209. A check that fails resolves null and saves.
+        setChecking(true)
+        dispatch(checkTemplateChange(resourceKey, keycloak)).then((result) => {
+          setChecking(false)
+          if (result?.requires_new_version) {
+            dispatch(showModalAction("TemplateVersionWarningModal"))
+          } else {
+            save()
+          }
+        })
+      } else if (isSaved) {
+        save()
       } else {
         // Show group chooser
         dispatch(hideModalAction())
