@@ -186,7 +186,8 @@ describe("loadResourceTemplate()", () => {
         loadResourceTemplate(profileUri, {}, "testerrorkey"),
       )
 
-      // Left unversioned, so a save names the plain profile URI.
+      // Left unversioned, so a save is refused rather than naming the plain
+      // profile URI.
       expect(subjectTemplate.profileUri).toEqual(profileUri)
       expect(subjectTemplate.version).toBeNull()
       expect(subjectTemplate.versionUri).toBeNull()

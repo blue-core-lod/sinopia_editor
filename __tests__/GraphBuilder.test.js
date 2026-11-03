@@ -321,7 +321,7 @@ _:c14n3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ont
       expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
     })
 
-    it("points hasResourceTemplate at the profile URI when its version is unknown", () => {
+    it("never writes an unversioned profile URI as hasResourceTemplate", () => {
       const profileUri =
         "https://bluecore-dev.stanford.edu/profiles/3db30d3a-7a3e-4762-a28c-1a0efc244345"
       const resource = build.subject({
@@ -333,9 +333,12 @@ _:c14n3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ont
         properties: [build.property()],
       })
 
-      const rdf = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> <${profileUri}> .
-<> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Work> .`
-      expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+      const rdf = `<> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Work> .`
+      const graph = new GraphBuilder(resource).graph.toCanonical()
+      expect(graph).toMatch(rdf)
+      expect(graph).not.toMatch(
+        "http://sinopia.io/vocabulary/hasResourceTemplate",
+      )
     })
 
     it("builds a graph ignoring empty nested resources", () => {

@@ -85,12 +85,12 @@ const vocabulary = {
   },
   hasResourceTemplate: {
     description:
-      "The template used in creating, editing, or updating a resource: the URI of the profile version, e.g., https://bcld.info/profiles/{uuid}/version/{id}. Resources saved before template versioning carry the template ID as a literal instead.",
+      "The template used in creating, editing, or updating a resource: the URI of the profile version, e.g., https://bcld.info/profiles/{uuid}/version/{id}.",
     url: "http://sinopia.io/vocabulary/hasResourceTemplate",
   },
   hasResourceTemplateId: {
     description:
-      "The resource's Template ID, e.g., ld4p:RT:bf2:Title:AbbrTitle",
+      "The template nested by a property: the URI of the profile version, e.g., https://bcld.info/profiles/{uuid}/version/{id}.",
     url: "http://sinopia.io/vocabulary/hasResourceTemplateId",
   },
   hasUri: {
