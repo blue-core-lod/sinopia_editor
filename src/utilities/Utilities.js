@@ -177,6 +177,13 @@ export const datasetFromJsonld = (jsonld) => {
 
 export const generateMD5 = (message) => CryptoJS.MD5(message).toString()
 
+// True for a profile template whose version could not be resolved. Such a
+// template cannot be named by sinopia:hasResourceTemplate, which must pin a
+// profile version (GraphBuilder.addGeneratedByTriple), so a resource made with
+// it cannot be saved.
+export const hasUnknownTemplateVersion = (subjectTemplate) =>
+  !!subjectTemplate.profileUri && !subjectTemplate.versionUri
+
 export const findRootResourceTemplateId = (resourceURI, dataset) => {
   const rtQuads = dataset
     .match(

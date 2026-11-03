@@ -439,11 +439,25 @@ describe("getLookupResult", () => {
             remark: "based on LC template ld4p:RT:bf2:Cartographic:Item",
             resourceLabel: "Cartographic Item (BIBFRAME)",
             resourceURI: "http://id.loc.gov/ontologies/bibframe/Item",
-            uri: "http://localhost:3000/profiles/29908869-339b-4cec-9ef6-4baa06cfb297",
+            uri: "http://localhost:3000/profiles/29908869-339b-4cec-9ef6-4baa06cfb297/version/42",
           },
         ],
         links: null,
       })
+    })
+
+    it("leaves out a template without a version_uri", async () => {
+      // eslint-disable-next-line no-unused-vars
+      const { version_uri, ...unversionedRow } = templateResult.results[0]
+      const unversioned = { ...templateResult, results: [unversionedRow] }
+      global.fetch = jest
+        .fn()
+        .mockImplementationOnce(() =>
+          Promise.resolve({ json: () => unversioned }),
+        )
+
+      const result = await getLookupResult("foo", lookupConfig)
+      expect(result.results).toEqual([])
     })
   })
 })
@@ -456,6 +470,8 @@ const templateResult = {
       id: 201,
       uuid: "29908869-339b-4cec-9ef6-4baa06cfb297",
       uri: "http://localhost:3000/profiles/29908869-339b-4cec-9ef6-4baa06cfb297",
+      version_uri:
+        "http://localhost:3000/profiles/29908869-339b-4cec-9ef6-4baa06cfb297/version/42",
       data: [
         {
           "@id":

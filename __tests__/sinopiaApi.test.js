@@ -392,6 +392,26 @@ describe("putResource", () => {
         }),
       ).rejects.toThrow("Field required; Input should be a valid string")
     })
+
+    it("refuses to save when the profile template version is unknown", async () => {
+      global.fetch = jest.fn()
+      const unversioned = {
+        ...resource,
+        subjectTemplate: {
+          ...resource.subjectTemplate,
+          profileUri:
+            "https://bluecore-dev.stanford.edu/profiles/3db30d3a-7a3e-4762-a28c-1a0efc244345",
+          versionUri: null,
+        },
+      }
+      await expect(
+        putResource(unversioned, currentUser, null, null, null, {
+          token: "Secret-Token",
+          updateToken: jest.fn().mockResolvedValue(false),
+        }),
+      ).rejects.toThrow("did not report a version for template")
+      expect(global.fetch).not.toHaveBeenCalled()
+    })
   })
 })
 

@@ -375,15 +375,21 @@ const templateHitsToResult = (payload) => ({
   links: payload.links,
 })
 
+// A lookup result becomes a nested template reference
+// (sinopia:hasResourceTemplateId), which must pin a profile version. A row
+// without version_uri cannot be referenced, so it is left out.
 const templateLookupToResult = (payload) => ({
   totalHits: payload.total || payload.results?.length || 0,
-  results: (payload.results || []).map((row) => {
-    const template = templateModFromBlueCore(row)
-    return {
-      ...template,
-      label: `${template.resourceLabel} (${template.id})`,
-    }
-  }),
+  results: (payload.results || [])
+    .filter((row) => row.version_uri)
+    .map((row) => {
+      const template = templateModFromBlueCore(row)
+      return {
+        ...template,
+        label: `${template.resourceLabel} (${template.id})`,
+        uri: row.version_uri,
+      }
+    }),
   links: payload.links,
 })
 
@@ -393,7 +399,8 @@ const getTemplateLookupResults = (query, options = {}) => {
 }
 
 export const getLookupResult = (query, lookupConfig, options) => {
-  // Templates get special handling since use id rather than URI.
+  // Templates are searched in the profile index, and each result's uri is its
+  // profile version URI (templateLookupToResult).
   let getSearchResultsPromise
   if (lookupConfig.uri === "urn:ld4p:sinopia:resourceTemplate") {
     getSearchResultsPromise = getTemplateLookupResults(query, options)
