@@ -1,0 +1,80 @@
+name: Weekly Dependency Update and Version Bump
+
+on:
+  schedule:
+    # GitHub cron runs in UTC. 03:00 UTC Monday = Sunday 8 PM PDT / 7 PM PST.
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: weekly-version-bump
+  cancel-in-progress: false
+
+jobs:
+  update-and-bump:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      BRANCH: dependency-update
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.4.0"
+
+      - name: Update dependencies
+        run: |
+          # Updates installed packages within the semver ranges in package.json,
+          # rewriting package-lock.json accordingly
+          npm update
+
+      # If lint or tests fail, the job stops here and nothing is committed or pushed
+      - name: Run lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Bump patch version
+        id: bump
+        run: |
+          # Updates package.json and package-lock.json without creating a git tag
+          NEW_VERSION=$(npm version patch --no-git-tag-version)
+          echo "version=${NEW_VERSION#v}" >> "$GITHUB_OUTPUT"
+
+      # Never pushes to main: changes go to the dependency-update branch and a PR.
+      # The branch is rebuilt from main each week, so an unmerged PR from a
+      # previous week is updated in place rather than duplicated.
+      - name: Commit to dependency-update branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH"
+          git add package.json package-lock.json
+          git commit -m "Weekly dependency update; bump version to ${{ steps.bump.outputs.version }}"
+          git push --force origin "$BRANCH"
+
+      - name: Open or update pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.bump.outputs.version }}
+        run: |
+          TITLE="Weekly dependency update (v${VERSION})"
+          BODY="Automated weekly update from the \`${{ github.workflow }}\` workflow ([run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})).
+
+          - Ran \`npm update\` (changes within existing semver ranges)
+          - \`npm run lint\` and \`npm run test\` passed
+          - Bumped patch version to \`${VERSION}\`"
+
+          EXISTING=$(gh pr list --head "$BRANCH" --base main --state open --json number --jq '.[0].number')
+          if [ -n "$EXISTING" ]; then
+            gh pr edit "$EXISTING" --title "$TITLE" --body "$BODY"
+            echo "Updated PR #$EXISTING"
+          else
+            gh pr create --head "$BRANCH" --base main --title "$TITLE" --body "$BODY"
+          fi
