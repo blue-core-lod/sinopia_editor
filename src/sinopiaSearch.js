@@ -399,7 +399,8 @@ const getTemplateLookupResults = (query, options = {}) => {
 }
 
 export const getLookupResult = (query, lookupConfig, options) => {
-  // Templates get special handling since use id rather than URI.
+  // Templates are searched in the profile index, and each result's uri is its
+  // profile version URI (templateLookupToResult).
   let getSearchResultsPromise
   if (lookupConfig.uri === "urn:ld4p:sinopia:resourceTemplate") {
     getSearchResultsPromise = getTemplateLookupResults(query, options)

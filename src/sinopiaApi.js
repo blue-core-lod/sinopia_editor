@@ -3,6 +3,7 @@
 import {
   datasetFromJsonld,
   datasetFromN3,
+  hasUnknownTemplateVersion,
   jsonldFromDataset,
 } from "utilities/Utilities"
 import Config from "Config"
@@ -318,7 +319,7 @@ const saveBodyForResource = (
   // A resource must name the template version it was edited with, and an
   // unversioned profile URI does not (GraphBuilder.addGeneratedByTriple).
   const { subjectTemplate } = resource
-  if (subjectTemplate.profileUri && !subjectTemplate.versionUri)
+  if (hasUnknownTemplateVersion(subjectTemplate))
     return Promise.reject(
       new Error(
         `Blue Core did not report a version for template ${subjectTemplate.id} (${subjectTemplate.profileUri}), so the resource cannot record which template version it was made with. Contact a Blue Core administrator.`,

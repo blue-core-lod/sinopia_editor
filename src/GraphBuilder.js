@@ -2,6 +2,7 @@
 
 import rdf from "rdf-ext"
 import _ from "lodash"
+import { hasUnknownTemplateVersion } from "utilities/Utilities"
 
 const MADS_AUTHORITATIVE_LABEL =
   "http://www.loc.gov/mads/rdf/v1#authoritativeLabel"
@@ -275,7 +276,7 @@ export default class GraphBuilder {
    * @returns {void}
    */
   addGeneratedByTriple(baseURI, resourceTemplate) {
-    if (!resourceTemplate.versionUri && resourceTemplate.profileUri) return
+    if (hasUnknownTemplateVersion(resourceTemplate)) return
     const templateTerm = resourceTemplate.versionUri
       ? rdf.namedNode(resourceTemplate.versionUri)
       : rdf.literal(resourceTemplate.id)
