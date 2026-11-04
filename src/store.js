@@ -29,6 +29,7 @@ export const initialState = {
     resources: [], // Subject keys for open resources
     resourceValidation: {}, // Show validation {<resourceKey>: boolean}
     unusedRDF: {}, // {<resourceKey>: rdf}
+    templateUsage: {}, // {<resourceKey>: {copied, ...profile validation response}}
     marc: null, // marc record for display
     currentHeaderSearch: {
       query: null,

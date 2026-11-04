@@ -80,6 +80,14 @@ export const setUnusedRDF = (state, action) => ({
   },
 })
 
+export const setTemplateUsage = (state, action) => ({
+  ...state,
+  templateUsage: {
+    ...state.templateUsage,
+    [action.payload.resourceKey]: action.payload.usage,
+  },
+})
+
 export const setCurrentEditResource = (state, action) => {
   const resourceKey = action.payload
   const newState = {
@@ -452,6 +460,9 @@ export const clearResourceFromEditor = (state, action) => {
     unusedRDF: {
       ...state.unusedRDF,
     },
+    templateUsage: {
+      ...state.templateUsage,
+    },
   }
 
   const resourceIndex = state.resources.indexOf(resourceKey)
@@ -467,6 +478,7 @@ export const clearResourceFromEditor = (state, action) => {
   delete newState.errors[resourceEditErrorKey(resourceKey)]
   delete newState.lastSave[resourceKey]
   delete newState.unusedRDF[resourceKey]
+  delete newState.templateUsage[resourceKey]
 
   return newState
 }
