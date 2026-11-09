@@ -1,6 +1,7 @@
 import rdf from "rdf-ext"
 import GraphBuilder from "GraphBuilder"
 import ResourceBuilder from "resourceBuilderUtils"
+import { expectIsomorphic } from "rdfUtils"
 
 describe("GraphBuilder", () => {
   const build = new ResourceBuilder({
@@ -9,7 +10,7 @@ describe("GraphBuilder", () => {
     injectClassesIntoSubject: true,
   })
   describe("graph()", () => {
-    it("builds a graph for literals", () => {
+    it("builds a graph for literals", async () => {
       const resource = build.subject({
         subjectTemplate: build.subjectTemplate({
           id: "resourceTemplate:testing:uber1",
@@ -40,7 +41,7 @@ describe("GraphBuilder", () => {
 <> <http://id.loc.gov/ontologies/bibframe/uber/template1/property3> "literal2" .
 <> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:uber1" .
 <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber1> .`
-      expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+      await expectIsomorphic(new GraphBuilder(resource).graph, rdf)
     })
 
     it("uses a blank node subject when useBlankNode is set and the resource has no uri", () => {
@@ -71,7 +72,7 @@ describe("GraphBuilder", () => {
       )
     })
 
-    it("builds a graph for literal with validationDataType", () => {
+    it("builds a graph for literal with validationDataType", async () => {
       const resource = build.subject({
         subjectTemplate: build.subjectTemplate({
           id: "resourceTemplate:testing:literalValidation",
@@ -106,10 +107,10 @@ describe("GraphBuilder", () => {
       const rdf = `<> <http://sinopia.io/testing/LiteralValidation/property3> "literal with dataType"^^<http://www.w3.org/2001/XMLSchema#integer> .
 <> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:literalValidation" .
 <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/LiteralValidation> .`
-      expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+      await expectIsomorphic(new GraphBuilder(resource).graph, rdf)
     })
 
-    it("builds a graph for uris", () => {
+    it("builds a graph for uris", async () => {
       const resource = build.subject({
         subjectTemplate: build.subjectTemplate({
           id: "resourceTemplate:testing:uber1",
@@ -141,10 +142,10 @@ describe("GraphBuilder", () => {
 <> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:uber1" .
 <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber1> .
 <http://sinopia.io/uri1> <http://www.w3.org/2000/01/rdf-schema#label> "URI1"@en .`
-      expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+      await expectIsomorphic(new GraphBuilder(resource).graph, rdf)
     })
 
-    it("builds a graph for nested resources", () => {
+    it("builds a graph for nested resources", async () => {
       const resource = build.subject({
         subjectTemplate: build.subjectTemplate({
           id: "resourceTemplate:testing:uber1",
@@ -189,10 +190,10 @@ describe("GraphBuilder", () => {
 _:c14n0 <http://id.loc.gov/ontologies/bibframe/uber/template2/property1> "literal3"@en .
 _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber2> .
 _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber2a> .`
-      expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+      await expectIsomorphic(new GraphBuilder(resource).graph, rdf)
     })
 
-    it("builds a graph for ordered resources", () => {
+    it("builds a graph for ordered resources", async () => {
       const resource = build.subject({
         subjectTemplate: build.subjectTemplate({
           id: "resourceTemplate:testing:uber1",
@@ -287,10 +288,10 @@ _:c14n2 <http://id.loc.gov/ontologies/bibframe/uber/template4/property1> "litera
 _:c14n2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber4> .
 _:c14n3 <http://id.loc.gov/ontologies/bibframe/uber/template4/property1> "literal2"@en .
 _:c14n3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber4> .`
-      expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+      await expectIsomorphic(new GraphBuilder(resource).graph, rdf)
     })
 
-    it("builds a graph ignoring null values", () => {
+    it("builds a graph ignoring null values", async () => {
       const resource = build.subject({
         subjectTemplate: build.subjectTemplate({
           id: "resourceTemplate:testing:uber1",
@@ -301,10 +302,10 @@ _:c14n3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ont
 
       const rdf = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:uber1" .
 <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber1> .`
-      expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+      await expectIsomorphic(new GraphBuilder(resource).graph, rdf)
     })
 
-    it("points hasResourceTemplate at the template version URI when there is one", () => {
+    it("points hasResourceTemplate at the template version URI when there is one", async () => {
       const versionUri =
         "https://bluecore-dev.stanford.edu/profiles/3db30d3a-7a3e-4762-a28c-1a0efc244345/version/113"
       const resource = build.subject({
@@ -318,10 +319,10 @@ _:c14n3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ont
 
       const rdf = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> <${versionUri}> .
 <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Work> .`
-      expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+      await expectIsomorphic(new GraphBuilder(resource).graph, rdf)
     })
 
-    it("never writes an unversioned profile URI as hasResourceTemplate", () => {
+    it("never writes an unversioned profile URI as hasResourceTemplate", async () => {
       const profileUri =
         "https://bluecore-dev.stanford.edu/profiles/3db30d3a-7a3e-4762-a28c-1a0efc244345"
       const resource = build.subject({
@@ -333,15 +334,12 @@ _:c14n3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ont
         properties: [build.property()],
       })
 
+      // No hasResourceTemplate triple at all.
       const rdf = `<> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Work> .`
-      const graph = new GraphBuilder(resource).graph.toCanonical()
-      expect(graph).toMatch(rdf)
-      expect(graph).not.toMatch(
-        "http://sinopia.io/vocabulary/hasResourceTemplate",
-      )
+      await expectIsomorphic(new GraphBuilder(resource).graph, rdf)
     })
 
-    it("builds a graph ignoring empty nested resources", () => {
+    it("builds a graph ignoring empty nested resources", async () => {
       const resource = build.subject({
         subjectTemplate: build.subjectTemplate({
           id: "resourceTemplate:testing:uber1",
@@ -372,10 +370,10 @@ _:c14n3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ont
 
       const rdf = `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:uber1" .
 <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber1> .`
-      expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+      await expectIsomorphic(new GraphBuilder(resource).graph, rdf)
     })
 
-    it("builds a graph ignoring empty literals", () => {
+    it("builds a graph ignoring empty literals", async () => {
       const resource = build.subject({
         subjectTemplate: build.subjectTemplate({
           id: "resourceTemplate:testing:uber1",
@@ -403,10 +401,10 @@ _:c14n3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ont
       const rdf = `<> <http://id.loc.gov/ontologies/bibframe/uber/template1/property2> "literal1"@en .
 <> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:uber1" .
 <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber1> .`
-      expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+      await expectIsomorphic(new GraphBuilder(resource).graph, rdf)
     })
 
-    it("builds a graph ignoring empty URIs", () => {
+    it("builds a graph ignoring empty URIs", async () => {
       const resource = build.subject({
         subjectTemplate: build.subjectTemplate({
           id: "resourceTemplate:testing:uber1",
@@ -437,10 +435,10 @@ _:c14n3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ont
 <> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:uber1" .
 <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber1> .
 <http://sinopia.io/uri1> <http://www.w3.org/2000/01/rdf-schema#label> "URI1" .`
-      expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+      await expectIsomorphic(new GraphBuilder(resource).graph, rdf)
     })
 
-    it("builds a graph for suppressible nested resource with uri", () => {
+    it("builds a graph for suppressible nested resource with uri", async () => {
       const resource = build.subject({
         subjectTemplate: build.subjectTemplate({
           id: "resourceTemplate:testing:uber1",
@@ -488,10 +486,10 @@ _:c14n3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ont
 <http://sinopia.io/uri1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber2> .
 <http://sinopia.io/uri1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber2a> .
 <http://sinopia.io/uri1> <http://www.w3.org/2000/01/rdf-schema#label> "URI1" .`
-      expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+      await expectIsomorphic(new GraphBuilder(resource).graph, rdf)
     })
 
-    it("builds a graph for suppressible nested resource with multiple uris", () => {
+    it("builds a graph for suppressible nested resource with multiple uris", async () => {
       const resource = build.subject({
         subjectTemplate: build.subjectTemplate({
           id: "resourceTemplate:testing:uber1",
@@ -544,10 +542,10 @@ _:c14n3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ont
 <http://sinopia.io/uri1> <http://www.w3.org/2000/01/rdf-schema#label> "URI1" .
 <http://sinopia.io/uri2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber2> .
 <http://sinopia.io/uri2> <http://www.w3.org/2000/01/rdf-schema#label> "URI2" .`
-      expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+      await expectIsomorphic(new GraphBuilder(resource).graph, rdf)
     })
 
-    it("builds a graph for suppresible nested resource with literal", () => {
+    it("builds a graph for suppresible nested resource with literal", async () => {
       const resource = build.subject({
         subjectTemplate: build.subjectTemplate({
           id: "resourceTemplate:testing:uber1",
@@ -588,11 +586,11 @@ _:c14n3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ont
 <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber1> .
 _:c14n0 <http://id.loc.gov/ontologies/bibframe/uber/template2/property1> "literal3"@en .
 _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber2> .`
-      expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+      await expectIsomorphic(new GraphBuilder(resource).graph, rdf)
     })
   })
 
-  it("builds a graph for suppresible nested resource with multiple literal", () => {
+  it("builds a graph for suppresible nested resource with multiple literal", async () => {
     const resource = build.subject({
       subjectTemplate: build.subjectTemplate({
         id: "resourceTemplate:testing:uber1",
@@ -639,10 +637,10 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ont
 _:c14n0 <http://id.loc.gov/ontologies/bibframe/uber/template2/property1> "literal3"@en .
 _:c14n0 <http://id.loc.gov/ontologies/bibframe/uber/template2/property2> "literal4"@en .
 _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber2> .`
-    expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+    await expectIsomorphic(new GraphBuilder(resource).graph, rdf)
   })
 
-  it("builds a graph for suppressible nested resource with uri and literal", () => {
+  it("builds a graph for suppressible nested resource with uri and literal", async () => {
     const resource = build.subject({
       subjectTemplate: build.subjectTemplate({
         id: "resourceTemplate:testing:uber1",
@@ -692,10 +690,10 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ont
 <http://sinopia.io/uri1> <http://www.w3.org/2000/01/rdf-schema#label> "URI1"@en .
 _:c14n0 <http://id.loc.gov/ontologies/bibframe/uber/template2/property2> "literal3"@en .
 _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber2> .`
-    expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+    await expectIsomorphic(new GraphBuilder(resource).graph, rdf)
   })
 
-  it("builds a graph when multiple classes", () => {
+  it("builds a graph when multiple classes", async () => {
     const resource = build.subject({
       subjectTemplate: build.subjectTemplate({
         id: "resourceTemplate:testing:uber1",
@@ -731,7 +729,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ont
 <> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:uber1" .
 <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber1> .
 <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Uber2> .`
-    expect(new GraphBuilder(resource).graph.toCanonical()).toMatch(rdf)
+    await expectIsomorphic(new GraphBuilder(resource).graph, rdf)
   })
 
   describe("complex subject authoritative label", () => {
