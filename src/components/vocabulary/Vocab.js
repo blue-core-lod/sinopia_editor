@@ -43,7 +43,7 @@ const vocabulary = {
     url: "http://sinopia.io/vocabulary/lastModified",
   },
   bfVersion: {
-    description: "Ontology version associated with the descriptive resource",
+    description: "Ontology version associated with the resource",
     url: "http://sinopia.io/vocabulary/bfVersion",
   },
   hasDefault: {
