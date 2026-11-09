@@ -34,7 +34,7 @@ const vocabulary = {
     description: "Date associated with the template",
     url: "http://sinopia.io/vocabulary/hasDate",
   },
-    creationDate: {
+  creationDate: {
     description: "Creation date of the template",
     url: "http://sinopia.io/vocabulary/creationDate",
   },
