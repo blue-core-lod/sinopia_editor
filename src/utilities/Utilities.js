@@ -90,11 +90,12 @@ export const uriFromResourceId = (collection, id) =>
 /**
  * Loads N3 into a dataset.
  * @param {string} data that is the N3
+ * @param {string} [baseIRI] base IRI against which relative IRIs (e.g., <>) are resolved
  * @return {Promise<rdf.Dataset>} a promise that resolves to the loaded dataset
  */
-export const datasetFromN3 = (data) =>
+export const datasetFromN3 = (data, baseIRI) =>
   new Promise((resolve, reject) => {
-    const parser = new N3Parser({ factory: rdf })
+    const parser = new N3Parser({ factory: rdf, baseIRI })
     const dataset = rdf.dataset()
     parser.parse(data, (err, quad) => {
       if (err) {
