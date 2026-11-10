@@ -67,7 +67,7 @@ describe("newResourceFromDataset", () => {
     const store = mockStore(createState())
 
     it("dispatches actions", async () => {
-      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const dataset = await datasetFromN3(n3, uri)
       const result = await store.dispatch(
         newResourceFromDataset(dataset, uri, null, "testerrorkey"),
       )
@@ -89,7 +89,8 @@ describe("newResourceFromDataset", () => {
       // As a bonus check, roundtrip to RDF.
       await expectIsomorphic(
         new GraphBuilder(addSubjectAction.payload).graph,
-        expectedN3.replace(/<>/g, `<${uri}>`),
+        expectedN3,
+        uri,
       )
 
       expect(actions).toHaveAction("SET_UNUSED_RDF", {
@@ -112,7 +113,7 @@ describe("newResourceFromDataset", () => {
     const store = mockStore(createState())
 
     it("dispatches actions", async () => {
-      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const dataset = await datasetFromN3(n3, uri)
       const result = await store.dispatch(
         newResourceFromDataset(dataset, uri, null, "testerrorkey"),
       )
@@ -135,7 +136,8 @@ describe("newResourceFromDataset", () => {
       // Roundtripped RDF should match.
       await expectIsomorphic(
         new GraphBuilder(addSubjectAction.payload).graph,
-        n3.replace(/<>/g, `<${uri}>`),
+        n3,
+        uri,
       )
 
       expect(actions).toHaveAction("SET_UNUSED_RDF", {
@@ -159,7 +161,7 @@ describe("newResourceFromDataset", () => {
     const store = mockStore(createState())
 
     it("dispatches actions", async () => {
-      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const dataset = await datasetFromN3(n3, uri)
       const result = await store.dispatch(
         newResourceFromDataset(dataset, uri, null, "testerrorkey"),
       )
@@ -183,11 +185,12 @@ describe("newResourceFromDataset", () => {
       // is replaced by the URI it wrapped, which takes on its rdf:type.
       await expectIsomorphic(
         new GraphBuilder(addSubjectAction.payload).graph,
-        `<${uri}> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:suppressible" .
-        <${uri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Suppressible> .
-        <${uri}> <http://sinopia.io/testing/Suppressible/property1> <http://foo/bar> .
+        `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:suppressible" .
+        <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Suppressible> .
+        <> <http://sinopia.io/testing/Suppressible/property1> <http://foo/bar> .
         <http://foo/bar> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Uri> .
         <http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en .`,
+        uri,
       )
 
       expect(actions).toHaveAction("SET_UNUSED_RDF", {
@@ -218,7 +221,7 @@ describe("newResourceFromDataset", () => {
     const store = mockStore(createState())
 
     it("does not force suppression and preserves the value's real identity", async () => {
-      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const dataset = await datasetFromN3(n3, uri)
       const result = await store.dispatch(
         newResourceFromDataset(dataset, uri, null, "testerrorkey"),
       )
@@ -250,7 +253,8 @@ describe("newResourceFromDataset", () => {
       // Round-trips as the same NamedNode, not a fresh blank node.
       await expectIsomorphic(
         new GraphBuilder(addSubjectAction.payload).graph,
-        n3.replace(/<>/g, `<${uri}>`),
+        n3,
+        uri,
       )
     })
   })
@@ -288,7 +292,7 @@ describe("newResourceFromDataset", () => {
     const store = mockStore(createState())
 
     it("builds against that version and writes it back unchanged", async () => {
-      const dataset = await datasetFromN3(pinnedN3.replace(/<>/g, `<${uri}>`))
+      const dataset = await datasetFromN3(pinnedN3, uri)
       const result = await store.dispatch(
         newResourceFromDataset(dataset, uri, null, "testerrorkey"),
       )
@@ -310,10 +314,7 @@ describe("newResourceFromDataset", () => {
         rdf: null,
       })
 
-      await expectIsomorphic(
-        new GraphBuilder(resource).graph,
-        pinnedN3.replace(/<>/g, `<${uri}>`),
-      )
+      await expectIsomorphic(new GraphBuilder(resource).graph, pinnedN3, uri)
     })
   })
 
@@ -444,7 +445,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     const store = mockStore(createState())
 
     it("dispatches actions", async () => {
-      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const dataset = await datasetFromN3(n3, uri)
       const result = await store.dispatch(
         newResourceFromDataset(dataset, uri, null, "testerrorkey", true),
       )
@@ -593,7 +594,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     const store = mockStore(createState())
 
     it("recovers the value using the sole suppressible candidate", async () => {
-      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const dataset = await datasetFromN3(n3, uri)
       const result = await store.dispatch(
         newResourceFromDataset(dataset, uri, null, "testerrorkey"),
       )
@@ -620,7 +621,8 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       // the known asymmetry with a genuinely Sinopia-authored round-trip.
       await expectIsomorphic(
         new GraphBuilder(addSubjectAction.payload).graph,
-        n3.replace(/<>/g, `<${uri}>`),
+        n3,
+        uri,
       )
     })
   })
@@ -829,7 +831,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
     const load = async () => {
       const store = mockStore(createState())
-      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const dataset = await datasetFromN3(n3, uri)
       expect(
         await store.dispatch(
           newResourceFromDataset(dataset, uri, null, "testerrorkey"),
@@ -884,7 +886,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
     it("falls back to the suppressible template and keeps the reference", async () => {
       const store = mockStore(createState())
-      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const dataset = await datasetFromN3(n3, uri)
       expect(
         await store.dispatch(
           newResourceFromDataset(dataset, uri, null, "testerrorkey"),
@@ -927,7 +929,8 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       // a bare reference now adds nothing the dataset did not supply.
       await expectIsomorphic(
         new GraphBuilder(addSubjectAction.payload).graph,
-        n3.replace(/<>/g, `<${uri}>`),
+        n3,
+        uri,
       )
     })
   })
@@ -949,7 +952,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
     const load = async () => {
       const store = mockStore(createState())
-      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const dataset = await datasetFromN3(n3, uri)
       expect(
         await store.dispatch(
           newResourceFromDataset(dataset, uri, null, "testerrorkey"),
@@ -1054,7 +1057,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
     it("keeps the value and round-trips its URI", async () => {
       const store = mockStore(createState())
-      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const dataset = await datasetFromN3(n3, uri)
       expect(
         await store.dispatch(
           newResourceFromDataset(dataset, uri, null, "testerrorkey"),
@@ -1074,7 +1077,8 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
       await expectIsomorphic(
         new GraphBuilder(addSubjectAction.payload).graph,
-        n3.replace(/<>/g, `<${uri}>`),
+        n3,
+        uri,
       )
     })
   })
@@ -1091,7 +1095,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
     it("drops the value but reports it as unused RDF", async () => {
       const store = mockStore(createState())
-      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const dataset = await datasetFromN3(n3, uri)
       expect(
         await store.dispatch(
           newResourceFromDataset(dataset, uri, null, "testerrorkey"),
@@ -1141,7 +1145,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
     it("stops at the loop and keeps the link as a bare reference", async () => {
       const store = mockStore(createState())
-      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const dataset = await datasetFromN3(n3, uri)
       expect(
         await store.dispatch(
           newResourceFromDataset(dataset, uri, null, "testerrorkey"),
@@ -1178,10 +1182,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       })
 
       // The loop round-trips exactly, in both directions.
-      await expectIsomorphic(
-        new GraphBuilder(resource).graph,
-        n3.replace(/<>/g, `<${uri}>`),
-      )
+      await expectIsomorphic(new GraphBuilder(resource).graph, n3, uri)
     })
   })
 
@@ -1207,7 +1208,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
     it("stops at the loop and keeps the link as a bare reference", async () => {
       const store = mockStore(createState())
-      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const dataset = await datasetFromN3(n3, uri)
 
       expect(
         await store.dispatch(
@@ -1256,7 +1257,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
     it("stops at the self-reference and round-trips it", async () => {
       const store = mockStore(createState())
-      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const dataset = await datasetFromN3(n3, uri)
       expect(
         await store.dispatch(
           newResourceFromDataset(dataset, uri, null, "testerrorkey"),
@@ -1272,10 +1273,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
         rdf: null,
       })
 
-      await expectIsomorphic(
-        new GraphBuilder(resource).graph,
-        n3.replace(/<>/g, `<${uri}>`),
-      )
+      await expectIsomorphic(new GraphBuilder(resource).graph, n3, uri)
     })
   })
 
@@ -1302,7 +1300,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
     it("expands the shared node in both branches", async () => {
       const store = mockStore(createState())
-      const dataset = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
+      const dataset = await datasetFromN3(n3, uri)
       expect(
         await store.dispatch(
           newResourceFromDataset(dataset, uri, null, "testerrorkey"),
