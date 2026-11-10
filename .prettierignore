@@ -15,3 +15,4 @@ __tests__/__template_fixtures__/*.json
 cypress/fixtures/*.txt
 dist
 static/*.json
+__tests__/__golden_fixtures__/profiles/*.json
