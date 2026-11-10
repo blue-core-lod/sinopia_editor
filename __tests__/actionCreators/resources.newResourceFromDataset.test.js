@@ -12,6 +12,7 @@ import expectedOrderedAction from "../__action_fixtures__/newResourceFromDataset
 import expectedBadOrderedAction from "../__action_fixtures__/newResourceFromDataset-ADD_SUBJECT-bad-ordered"
 import expectedNestedAction from "../__action_fixtures__/newResourceFromDataset-ADD_SUBJECT-nested"
 import { safeAction, cloneAddResourceActionAsNewResource } from "actionUtils"
+import { expectIsomorphic } from "rdfUtils"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -86,14 +87,10 @@ describe("newResourceFromDataset", () => {
       expect(addSubjectAction.payload.uri).toBe(uri)
 
       // As a bonus check, roundtrip to RDF.
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload,
-      ).graph.toCanonical()
-      const expectedGraph = await datasetFromN3(
+      await expectIsomorphic(
+        new GraphBuilder(addSubjectAction.payload).graph,
         expectedN3.replace(/<>/g, `<${uri}>`),
       )
-      const expectedRdf = expectedGraph.toCanonical()
-      expect(actualRdf).toMatch(expectedRdf)
 
       expect(actions).toHaveAction("SET_UNUSED_RDF", {
         resourceKey: "abc123",
@@ -136,12 +133,10 @@ describe("newResourceFromDataset", () => {
       expect(addSubjectAction.payload.uri).toBe(uri)
 
       // Roundtripped RDF should match.
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload,
-      ).graph.toCanonical()
-      const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
-      const expectedRdf = expectedGraph.toCanonical()
-      expect(actualRdf).toMatch(expectedRdf)
+      await expectIsomorphic(
+        new GraphBuilder(addSubjectAction.payload).graph,
+        n3.replace(/<>/g, `<${uri}>`),
+      )
 
       expect(actions).toHaveAction("SET_UNUSED_RDF", {
         resourceKey: "abc123",
@@ -184,13 +179,16 @@ describe("newResourceFromDataset", () => {
       // URI should be set for resource.
       expect(addSubjectAction.payload.uri).toBe(uri)
 
-      // Roundtripped RDF should NOT match.
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload,
-      ).graph.toCanonical()
-      const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
-      const expectedRdf = expectedGraph.toCanonical()
-      expect(actualRdf).not.toMatch(expectedRdf)
+      // Roundtripped RDF is rewritten in the suppressed shape: the blank node
+      // is replaced by the URI it wrapped, which takes on its rdf:type.
+      await expectIsomorphic(
+        new GraphBuilder(addSubjectAction.payload).graph,
+        `<${uri}> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:suppressible" .
+        <${uri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Suppressible> .
+        <${uri}> <http://sinopia.io/testing/Suppressible/property1> <http://foo/bar> .
+        <http://foo/bar> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Uri> .
+        <http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en .`,
+      )
 
       expect(actions).toHaveAction("SET_UNUSED_RDF", {
         resourceKey: "abc123",
@@ -250,12 +248,10 @@ describe("newResourceFromDataset", () => {
       })
 
       // Round-trips as the same NamedNode, not a fresh blank node.
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload,
-      ).graph.toCanonical()
-      const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
-      const expectedRdf = expectedGraph.toCanonical()
-      expect(actualRdf).toMatch(expectedRdf)
+      await expectIsomorphic(
+        new GraphBuilder(addSubjectAction.payload).graph,
+        n3.replace(/<>/g, `<${uri}>`),
+      )
     })
   })
 
@@ -314,11 +310,10 @@ describe("newResourceFromDataset", () => {
         rdf: null,
       })
 
-      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
-      const expectedGraph = await datasetFromN3(
+      await expectIsomorphic(
+        new GraphBuilder(resource).graph,
         pinnedN3.replace(/<>/g, `<${uri}>`),
       )
-      expect(actualRdf).toMatch(expectedGraph.toCanonical())
     })
   })
 
@@ -579,9 +574,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       // And on save, the unmatched sibling (having no real content) should not
       // be written to the graph at all -- confirming no phantom default value
       // is persisted.
-      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
-      expect(actualRdf).not.toMatch("Sibling default value")
-      expect(actualRdf).toMatch("Real value")
+      await expectIsomorphic(new GraphBuilder(resource).graph, mergeDefaultsN3)
     })
   })
 
@@ -620,22 +613,14 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
       // On save, the recovered value round-trips as a flat, suppressed URI --
       // the real reference is written out, not silently dropped or replaced.
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload,
-      ).graph.toCanonical()
-      expect(actualRdf).toMatch(
-        "<http://sinopia.io/testing/Suppressible/property1> <http://foo/bar>",
-      )
-      expect(actualRdf).toMatch(
-        '<http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en',
-      )
       // Since no local rdf:type triple was found for the recovered value,
       // the recovered subject has no known classes, so (unlike a value
       // matched by a real local type) no rdf:type is re-stamped on save.
       // The core reference is preserved either way -- this only documents
       // the known asymmetry with a genuinely Sinopia-authored round-trip.
-      expect(actualRdf).not.toMatch(
-        "<http://foo/bar> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>",
+      await expectIsomorphic(
+        new GraphBuilder(addSubjectAction.payload).graph,
+        n3.replace(/<>/g, `<${uri}>`),
       )
     })
   })
@@ -676,13 +661,22 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       )
       expect(uris).not.toContain("http://foo/bar")
 
-      // Both candidate placeholders are empty, so on save neither is written
-      // -- the real reference is lost from the editor, but nothing wrong (or
-      // guessed) is persisted either.
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload,
-      ).graph.toCanonical()
-      expect(actualRdf).not.toMatch("http://foo/bar")
+      // Both candidate placeholders are empty, so the form writes neither --
+      // the real reference is not editable, but nothing wrong (or guessed) is
+      // persisted either.
+      await expectIsomorphic(
+        new GraphBuilder(addSubjectAction.payload).graph,
+        `<${ambiguousUri}> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:suppressibleAmbiguous" .
+        <${ambiguousUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/SuppressibleAmbiguous> .`,
+      )
+
+      // The reference is parked as unused RDF, which is merged back on save.
+      const unusedAction = actions.find((a) => a.type === "SET_UNUSED_RDF")
+      await expectIsomorphic(
+        unusedAction.payload.rdf,
+        `<${ambiguousUri}> <http://sinopia.io/testing/SuppressibleAmbiguous/property1> <http://foo/bar> .
+        <http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en .`,
+      )
     })
   })
 
@@ -732,12 +726,10 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
         rdf: null,
       })
 
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload,
-      ).graph.toCanonical()
-      const expectedGraph = await datasetFromN3(n3)
-      const expectedRdf = expectedGraph.toCanonical()
-      expect(actualRdf).toMatch(expectedRdf)
+      await expectIsomorphic(
+        new GraphBuilder(addSubjectAction.payload).graph,
+        n3,
+      )
     })
   })
 
@@ -815,8 +807,8 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       const innerProperty = property.values[0].valueSubject.properties[0]
       expect(innerProperty.values).toBeFalsy()
 
-      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
-      expect(actualRdf).not.toMatch("Sibling default value")
+      // Nothing is written for the empty required property.
+      await expectIsomorphic(new GraphBuilder(resource).graph, n3)
     })
   })
   describe("loading a typed NamedNode value whose sibling template declares rdf:type", () => {
@@ -933,17 +925,9 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       // rdfs:label holding the URI itself, because newUriFromObject defaulted
       // a URI value's label to the URI. Removed that fallback, so saving
       // a bare reference now adds nothing the dataset did not supply.
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload,
-      ).graph.toCanonical()
-      expect(actualRdf).toMatch(
-        `<${uri}> <http://sinopia.io/testing/AmbiguousClassNonSuppressible/property1> <${bareUri}> .`,
-      )
-      expect(actualRdf).toMatch(
-        `<${bareUri}> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Uri> .`,
-      )
-      expect(actualRdf).not.toMatch(
-        "http://www.w3.org/2000/01/rdf-schema#label",
+      await expectIsomorphic(
+        new GraphBuilder(addSubjectAction.payload).graph,
+        n3.replace(/<>/g, `<${uri}>`),
       )
     })
   })
@@ -1023,7 +1007,7 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
         .find((action) => action.type === "ADD_SUBJECT")
       return {
         value: addSubjectAction?.payload?.properties?.[0]?.values?.[0],
-        rdf: new GraphBuilder(addSubjectAction.payload).graph.toCanonical(),
+        graph: new GraphBuilder(addSubjectAction.payload).graph,
       }
     }
 
@@ -1040,23 +1024,18 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
     })
 
     it("does not write a made-up rdfs:label on save", async () => {
-      const { rdf } = await loadUriValue(bareN3)
+      const { graph } = await loadUriValue(bareN3)
 
-      expect(rdf).toMatch(
-        `<${uri}> <http://sinopia.io/testing/Uri/property1> <${bareUri}> .`,
-      )
-      expect(rdf).not.toMatch(RDFS_LABEL)
+      await expectIsomorphic(graph, bareN3)
     })
 
     it("still keeps a label the dataset does supply", async () => {
       const labelledN3 = `${bareN3}<${bareUri}> <${RDFS_LABEL}> "Bird's-eye view prints"@en .
       `
-      const { value, rdf } = await loadUriValue(labelledN3)
+      const { value, graph } = await loadUriValue(labelledN3)
 
       expect(value.label).toEqual("Bird's-eye view prints")
-      expect(rdf).toMatch(
-        `<${bareUri}> <${RDFS_LABEL}> "Bird's-eye view prints"@en .`,
-      )
+      await expectIsomorphic(graph, labelledN3)
     })
   })
 
@@ -1093,11 +1072,10 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
         rdf: null,
       })
 
-      const actualRdf = new GraphBuilder(
-        addSubjectAction.payload,
-      ).graph.toCanonical()
-      const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
-      expect(actualRdf).toMatch(expectedGraph.toCanonical())
+      await expectIsomorphic(
+        new GraphBuilder(addSubjectAction.payload).graph,
+        n3.replace(/<>/g, `<${uri}>`),
+      )
     })
   })
 
@@ -1135,11 +1113,11 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
 
       const unusedAction = actions.find((a) => a.type === "SET_UNUSED_RDF")
       expect(unusedAction.payload.rdf).not.toBeNull()
-      expect(unusedAction.payload.rdf).toMatch(
-        "http://sinopia.io/testing/NamedNodeMultiPropHost/property1",
-      )
-      expect(unusedAction.payload.rdf).toMatch(
-        "http://sinopia.io/testing/NamedNodeMultiProp",
+      // Exactly the link and the blank node's type, nothing the form consumed.
+      await expectIsomorphic(
+        unusedAction.payload.rdf,
+        `<${uri}> <http://sinopia.io/testing/NamedNodeMultiPropHost/property1> _:b1 .
+        _:b1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/NamedNodeMultiProp> .`,
       )
     })
   })
@@ -1200,9 +1178,10 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
       })
 
       // The loop round-trips exactly, in both directions.
-      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
-      const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
-      expect(actualRdf).toMatch(expectedGraph.toCanonical())
+      await expectIsomorphic(
+        new GraphBuilder(resource).graph,
+        n3.replace(/<>/g, `<${uri}>`),
+      )
     })
   })
 
@@ -1293,9 +1272,10 @@ _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/tes
         rdf: null,
       })
 
-      const actualRdf = new GraphBuilder(resource).graph.toCanonical()
-      const expectedGraph = await datasetFromN3(n3.replace(/<>/g, `<${uri}>`))
-      expect(actualRdf).toMatch(expectedGraph.toCanonical())
+      await expectIsomorphic(
+        new GraphBuilder(resource).graph,
+        n3.replace(/<>/g, `<${uri}>`),
+      )
     })
   })
 
