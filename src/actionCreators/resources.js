@@ -30,6 +30,7 @@ import {
   chooseURI,
   defaultValuesFor,
   resourceTemplateIdFromDataset,
+  loadErrorMessage,
 } from "./resourceHelpers"
 import { putResource, postResource, fetchResource } from "sinopiaApi"
 import {
@@ -137,9 +138,7 @@ export const loadResource =
       })
       .catch((err) => {
         // console.error(err)
-        dispatch(
-          addError(errorKey, `Error retrieving ${uri}: ${err.message || err}`),
-        )
+        dispatch(addError(errorKey, loadErrorMessage(uri, err)))
         return false
       })
   }

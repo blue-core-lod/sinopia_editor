@@ -279,7 +279,23 @@ describe("loadResource", () => {
       expect(actions).toHaveAction("CLEAR_ERRORS")
       expect(actions).toHaveAction("ADD_ERROR", {
         errorKey: "testerrorkey",
-        error: "Error retrieving http://error: Error parsing resource: Ooops",
+        error: "Error retrieving http://error: Ooops",
+      })
+    })
+
+    // https://github.com/blue-core-lod/sinopia_editor/issues/255
+    it("shows a load error as is, since it already names the URL", async () => {
+      const loadError = new Error("http://localhost:3000/works/a was not found")
+      loadError.name = "ResourceLoadError"
+      jest.spyOn(sinopiaApi, "fetchResource").mockRejectedValueOnce(loadError)
+
+      await store.dispatch(
+        loadResourceForEditor("http://localhost:3000/works/a", "testerrorkey"),
+      )
+
+      expect(store.getActions()).toHaveAction("ADD_ERROR", {
+        errorKey: "testerrorkey",
+        error: "http://localhost:3000/works/a was not found",
       })
     })
   })
