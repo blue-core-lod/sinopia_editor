@@ -2,11 +2,22 @@
 
 import rdf from "rdf-ext"
 import _ from "lodash"
+import { customAlphabet } from "nanoid"
 import { hasUnknownTemplateVersion } from "utilities/Utilities"
 
 const MADS_AUTHORITATIVE_LABEL =
   "http://www.loc.gov/mads/rdf/v1#authoritativeLabel"
 const MADS_COMPONENT_LIST = "http://www.loc.gov/mads/rdf/v1#componentList"
+const XSD_STRING = "http://www.w3.org/2001/XMLSchema#string"
+
+// A node the form created gets a fresh label in the same style as the API's,
+// long enough not to collide with the labels that loaded nodes keep.
+const newNodeId = customAlphabet("0123456789abcdef", 32)
+const newBlankNode = () => rdf.blankNode(`N${newNodeId()}`)
+
+// A loaded blank node keeps its label; anything else gets a fresh one.
+const blankNodeFor = (nodeId) =>
+  nodeId ? rdf.blankNode(nodeId) : newBlankNode()
 
 const findPropertyByUri = (subject, uri) =>
   subject.properties.find(
@@ -53,7 +64,7 @@ export default class GraphBuilder {
       if (this.resource.uri) {
         resourceTerm = rdf.namedNode(this.resource.uri)
       } else if (this.useBlankNode) {
-        resourceTerm = rdf.blankNode()
+        resourceTerm = newBlankNode()
       } else {
         resourceTerm = rdf.namedNode("")
       }
@@ -108,7 +119,7 @@ export default class GraphBuilder {
       )
       if (_.isEmpty(values)) return
 
-      let nextNode = rdf.blankNode()
+      let nextNode = blankNodeFor(values[0].listNodeId)
       this.dataset.add(
         rdf.quad(
           subjectTerm,
@@ -121,7 +132,7 @@ export default class GraphBuilder {
         const thisNode = nextNode
         nextNode =
           index !== values.length - 1
-            ? rdf.blankNode()
+            ? blankNodeFor(values[index + 1].listNodeId)
             : rdf.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#nil")
         this.dataset.add(
           rdf.quad(
@@ -166,11 +177,14 @@ export default class GraphBuilder {
 
   buildLiteralValue(value, subjectTerm, propertyTerm) {
     // TODO: ?. accessor for 2 tests that are hella annoying to fix
-    const validationDataType =
-      value.property?.propertyTemplate?.validationDataType
+    // A loaded literal's own datatype wins (see newLiteralFromObject).
+    const datatype =
+      value.datatype || value.property?.propertyTemplate?.validationDataType
     let valueTerm
-    if (validationDataType) {
-      const namedNode = rdf.namedNode(validationDataType)
+    if (datatype === XSD_STRING) {
+      valueTerm = rdf.literal(value.literal)
+    } else if (datatype) {
+      const namedNode = rdf.namedNode(datatype)
       valueTerm = rdf.literal(value.literal, namedNode)
     } else {
       valueTerm = rdf.literal(value.literal, value.lang)
@@ -194,7 +208,12 @@ export default class GraphBuilder {
 
   buildValueSubject(value, subjectTerm, propertyTerm) {
     if (!this.shouldAddValueSubject(value)) return
-    if (value.valueSubject.subjectTemplate.suppressible) {
+    // A suppressible template loaded from a blank node (the legacy shape) is
+    // written back as that node, not rewritten as the bare URI it wraps.
+    if (
+      value.valueSubject.subjectTemplate.suppressible &&
+      !value.valueSubject.nodeId
+    ) {
       this.buildSuppressedValueSubject(value, subjectTerm, propertyTerm)
     } else {
       // Preserve a real URI identity (e.g. loaded from a NamedNode value
@@ -202,7 +221,7 @@ export default class GraphBuilder {
       // fresh blank node -- otherwise that identity is lost on save.
       const objTerm = value.valueSubject.uri
         ? rdf.namedNode(value.valueSubject.uri)
-        : rdf.blankNode()
+        : blankNodeFor(value.valueSubject.nodeId)
       this.dataset.add(rdf.quad(subjectTerm, propertyTerm, objTerm))
       this.buildSubject(value.valueSubject, objTerm)
     }
@@ -220,7 +239,7 @@ export default class GraphBuilder {
       (value) => value.literal,
     )
     if (!_.isEmpty(literalValues)) {
-      const bnode = rdf.blankNode()
+      const bnode = newBlankNode()
       this.dataset.add(rdf.quad(subjectTerm, propertyTerm, bnode))
       this.addType(bnode, value.valueSubject.classes)
       literalValues.forEach((literalValue) => {

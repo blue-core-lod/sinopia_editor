@@ -29,6 +29,7 @@ export const initialState = {
     resources: [], // Subject keys for open resources
     resourceValidation: {}, // Show validation {<resourceKey>: boolean}
     unusedRDF: {}, // {<resourceKey>: rdf}
+    loadedRDF: {}, // {<resourceKey>: rdf}, the record as loaded or last saved
     marc: null, // marc record for display
     currentHeaderSearch: {
       query: null,

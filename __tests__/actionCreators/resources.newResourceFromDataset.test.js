@@ -1,5 +1,6 @@
 import { newResourceFromDataset } from "actionCreators/resources"
 import mockConsole from "jest-mock-console"
+import _ from "lodash"
 import Config from "Config"
 import configureMockStore from "redux-mock-store"
 import { thunk } from "redux-thunk"
@@ -58,11 +59,6 @@ describe("newResourceFromDataset", () => {
   _:b2 <http://sinopia.io/testing/Literal/property1> "A nested resource"@en .
   `
 
-  // The "audio roll" label arrives untagged, so the editor applies the resource
-  // default language on load and writes it back tagged.
-  // See https://github.com/blue-core-lod/sinopia_editor/issues/191
-  const expectedN3 = n3.replace('"audio roll" .', '"audio roll"@en .')
-
   describe("loading a resource", () => {
     const store = mockStore(createState())
 
@@ -89,7 +85,7 @@ describe("newResourceFromDataset", () => {
       // As a bonus check, roundtrip to RDF.
       await expectIsomorphic(
         new GraphBuilder(addSubjectAction.payload).graph,
-        expectedN3,
+        n3,
         uri,
       )
 
@@ -175,21 +171,21 @@ describe("newResourceFromDataset", () => {
         (action) => action.type === "ADD_SUBJECT",
       )
       expect(addSubjectAction).not.toBeNull()
+      // The nested subject keeps the label of the blank node it came from.
+      const expectedLegacyAction = _.cloneDeep(expectedNestedAction)
+      expectedLegacyAction.payload.properties[0].values[0].valueSubject.nodeId =
+        "b3"
       // safeStringify is used because it removes circular references
-      expect(safeAction(addSubjectAction)).toEqual(expectedNestedAction)
+      expect(safeAction(addSubjectAction)).toEqual(expectedLegacyAction)
 
       // URI should be set for resource.
       expect(addSubjectAction.payload.uri).toBe(uri)
 
-      // Roundtripped RDF is rewritten in the suppressed shape: the blank node
-      // is replaced by the URI it wrapped, which takes on its rdf:type.
+      // Roundtripped RDF keeps the legacy shape: the blank node is written
+      // back as it was, not replaced by the URI it wraps.
       await expectIsomorphic(
         new GraphBuilder(addSubjectAction.payload).graph,
-        `<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:testing:suppressible" .
-        <> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Suppressible> .
-        <> <http://sinopia.io/testing/Suppressible/property1> <http://foo/bar> .
-        <http://foo/bar> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Uri> .
-        <http://foo/bar> <http://www.w3.org/2000/01/rdf-schema#label> "Foo Bar"@en .`,
+        n3,
         uri,
       )
 
@@ -434,8 +430,9 @@ describe("newResourceFromDataset", () => {
 
       expect(actions).toHaveAction("SET_UNUSED_RDF", {
         resourceKey: "abc123",
-        rdf: `_:c14n0 <http://sinopia.io/testing/Literal/property1> "literal1"@en .
-_:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Literal> .
+        rdf: `<> <http://sinopia.io/testing/Ordered/property1> _:b9 .
+_:b9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sinopia.io/testing/Literal> .
+_:b9 <http://sinopia.io/testing/Literal/property1> "literal1"@en .
 `,
       })
     })

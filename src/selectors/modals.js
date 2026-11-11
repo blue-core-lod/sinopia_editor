@@ -7,6 +7,9 @@ export const selectCurrentModal = (state) =>
 export const selectUnusedRDF = (state, resourceKey) =>
   state.editor.unusedRDF[resourceKey]
 
+export const selectLoadedRDF = (state, resourceKey) =>
+  state.editor.loadedRDF?.[resourceKey]
+
 export const isModalOpen = (state) => !_.isEmpty(state.editor.currentModal)
 
 export const isCurrentModal = (state, name) =>

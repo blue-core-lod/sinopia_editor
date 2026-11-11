@@ -49,7 +49,6 @@ const expectedAction = {
             propertyUri: "http://sinopia.io/testing/Inputs/property4",
             uri: "http://id.loc.gov/vocabulary/carriers/sq",
             label: "audio roll",
-            lang: "en",
             component: "InputURIValue",
           }),
         ],
@@ -58,23 +57,26 @@ const expectedAction = {
         values: [
           build.value({
             propertyUri: "http://sinopia.io/testing/Inputs/property5",
-            valueSubject: build.subject({
-              subjectTemplate: literalSubjectTemplate,
-              classes: ["http://sinopia.io/testing/Literal"],
-              properties: [
-                build.property({
-                  values: [
-                    build.value({
-                      propertyUri:
-                        "http://sinopia.io/testing/Literal/property1",
-                      literal: "A nested resource",
-                      lang: "en",
-                      component: "InputLiteralValue",
-                    }),
-                  ],
-                }),
-              ],
-            }),
+            valueSubject: {
+              ...build.subject({
+                subjectTemplate: literalSubjectTemplate,
+                classes: ["http://sinopia.io/testing/Literal"],
+                properties: [
+                  build.property({
+                    values: [
+                      build.value({
+                        propertyUri:
+                          "http://sinopia.io/testing/Literal/property1",
+                        literal: "A nested resource",
+                        lang: "en",
+                        component: "InputLiteralValue",
+                      }),
+                    ],
+                  }),
+                ],
+              }),
+              nodeId: "b2",
+            },
           }),
         ],
       }),

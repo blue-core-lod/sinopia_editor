@@ -3,8 +3,9 @@
 // Each record in __golden_fixtures__/manifest.json is loaded into a real store
 // with the real profiles it uses (recorded by refreshProfiles.mjs), then saved
 // through the real saveResource, and the body PUT to the API is parsed back
-// into a dataset. That output must be isomorphic to the input. Loading and
-// saving the output a second time must give the same output again.
+// into a dataset. That output must be the input, triple for triple, with every
+// blank node keeping its label. Loading and saving the output a second time
+// must give the same output again.
 //
 // Where today's editor does change a record, its output is recorded instead and
 // the record is listed in __golden_fixtures__/KNOWN_DIFFERENCES.md:
@@ -13,13 +14,13 @@
 //
 // UPDATE_GOLDEN=1 re-records both from today's output.
 import fs from "node:fs"
+import _ from "lodash"
 import path from "node:path"
 import { newResourceFromDataset, saveResource } from "actionCreators/resources"
 import { resourceTemplateIdFromDataset } from "actionCreators/resourceHelpers"
 import { selectCurrentResourceKey } from "selectors/resources"
 import { selectErrors } from "selectors/errors"
 import { createStore } from "testUtils"
-import { expectIsomorphic } from "rdfUtils"
 import { datasetFromN3, datasetFromJsonld } from "utilities/Utilities"
 
 jest.mock("KeycloakContext", () => ({
@@ -122,12 +123,17 @@ afterAll(() => {
   window._env_ = originalEnv
 })
 
+// The triples of a dataset as sorted N-Triples lines, blank node labels and all.
+const triplesOf = (dataset) =>
+  dataset.toString().split("\n").filter(Boolean).sort()
+
 // The recorded output for a save, or the dataset it should be unchanged from.
 // UPDATE_GOLDEN=1 records the output when it differs, and drops a stale record.
 const expectedFor = async (expectedPath, output, unchangedFrom) => {
   if (process.env.UPDATE_GOLDEN) {
-    if (output.equals(unchangedFrom)) fs.rmSync(expectedPath, { force: true })
-    else fs.writeFileSync(expectedPath, output.toCanonical())
+    if (_.isEqual(triplesOf(output), triplesOf(unchangedFrom)))
+      fs.rmSync(expectedPath, { force: true })
+    else fs.writeFileSync(expectedPath, `${triplesOf(output).join("\n")}\n`)
   }
   return fs.existsSync(expectedPath)
     ? datasetFromN3(fs.readFileSync(expectedPath, "utf8"))
@@ -142,23 +148,25 @@ describe("golden corpus: load and save with no edits", () => {
       const input = await datasetFromN3(fs.readFileSync(recordPath, "utf8"))
 
       const firstSave = await loadAndSave(input, record)
-      await expectIsomorphic(
-        firstSave,
-        await expectedFor(
-          recordPath.replace(/\.nt$/, ".expected.nt"),
-          firstSave,
-          input,
+      expect(triplesOf(firstSave)).toEqual(
+        triplesOf(
+          await expectedFor(
+            recordPath.replace(/\.nt$/, ".expected.nt"),
+            firstSave,
+            input,
+          ),
         ),
       )
 
       // Stable: reopening and saving the output changes nothing more.
       const secondSave = await loadAndSave(firstSave, record)
-      await expectIsomorphic(
-        secondSave,
-        await expectedFor(
-          recordPath.replace(/\.nt$/, ".expected-resave.nt"),
-          secondSave,
-          firstSave,
+      expect(triplesOf(secondSave)).toEqual(
+        triplesOf(
+          await expectedFor(
+            recordPath.replace(/\.nt$/, ".expected-resave.nt"),
+            secondSave,
+            firstSave,
+          ),
         ),
       )
     },

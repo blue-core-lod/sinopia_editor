@@ -46,6 +46,11 @@ export const setUnusedRDF = (resourceKey, rdf) => ({
   payload: { resourceKey, rdf },
 })
 
+export const setLoadedRDF = (resourceKey, rdf) => ({
+  type: "SET_LOADED_RDF",
+  payload: { resourceKey, rdf },
+})
+
 export const showProperty = (propertyKey) => ({
   type: "SHOW_PROPERTY",
   payload: propertyKey,

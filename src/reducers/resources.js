@@ -80,6 +80,14 @@ export const setUnusedRDF = (state, action) => ({
   },
 })
 
+export const setLoadedRDF = (state, action) => ({
+  ...state,
+  loadedRDF: {
+    ...state.loadedRDF,
+    [action.payload.resourceKey]: action.payload.rdf,
+  },
+})
+
 export const setCurrentEditResource = (state, action) => {
   const resourceKey = action.payload
   const newState = {
@@ -164,9 +172,10 @@ const addSubjectToNewState = (state, subject, valueSubjectOfKey) => {
     newSubject.labels = [subjectTemplate.label]
   }
 
-  // Add classes if it doesn't already have.
-  if (_.isEmpty(newSubject.classes))
-    newSubject.classes = [subjectTemplate.class]
+  // Add classes if it doesn't already have. A subject loaded from data has the
+  // classes the data gave it, possibly none (an external IRI held in a lookup),
+  // and keeps them so a save does not add types the record did not have.
+  if (_.isNil(newSubject.classes)) newSubject.classes = [subjectTemplate.class]
 
   // Add properties for resource (if root subject)
   if (newSubject.rootSubjectKey === newSubject.key) {

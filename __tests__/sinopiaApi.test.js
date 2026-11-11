@@ -19,6 +19,9 @@ import { selectUser } from "selectors/authenticate"
 import { createState } from "stateUtils"
 
 import Config from "Config"
+import rdf from "rdf-ext"
+import GraphBuilder from "GraphBuilder"
+import { datasetFromJsonld } from "utilities/Utilities"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({
@@ -412,6 +415,78 @@ describe("putResource", () => {
       ).rejects.toThrow("did not report a version for template")
       expect(global.fetch).not.toHaveBeenCalled()
     })
+  })
+})
+
+describe("putResource with the record as loaded", () => {
+  const state = createState({ hasResourceWithLiteral: true })
+  const resource = selectFullSubject(state, "t9zVwg2zO")
+  const currentUser = selectUser(state)
+  const keycloak = {
+    token: "Secret-Token",
+    updateToken: jest.fn().mockResolvedValue(false),
+  }
+  const hasResourceTemplate = rdf.namedNode(
+    "http://sinopia.io/vocabulary/hasResourceTemplate",
+  )
+  // What a save of this resource writes, less hasResourceTemplate: a record
+  // that had none when it was loaded.
+  const loadedWithoutTemplateRef = () => {
+    const dataset = new GraphBuilder(resource).graph
+    return dataset.difference(dataset.match(null, hasResourceTemplate))
+  }
+  const sentTemplateRefs = async () => {
+    const { data } = JSON.parse(global.fetch.mock.calls[0][1].body)
+    const sent = await datasetFromJsonld(JSON.parse(data))
+    return sent.match(null, hasResourceTemplate).size
+  }
+
+  beforeEach(() => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: true })
+  })
+
+  it("does not add hasResourceTemplate when nothing was edited", async () => {
+    const loadedRDF = loadedWithoutTemplateRef().toString()
+    const savedRDF = await putResource(
+      resource,
+      currentUser,
+      null,
+      null,
+      null,
+      keycloak,
+      null,
+      loadedRDF,
+    )
+    expect(await sentTemplateRefs()).toBe(0)
+    // Resolves to the record as saved, which is the record as loaded.
+    expect(savedRDF.split("\n").sort()).toEqual(loadedRDF.split("\n").sort())
+  })
+
+  it("adds hasResourceTemplate once something was edited", async () => {
+    const loaded = loadedWithoutTemplateRef()
+    loaded.add(
+      rdf.quad(
+        rdf.namedNode(resource.uri),
+        rdf.namedNode("http://example.org/removedByTheCataloger"),
+        rdf.literal("gone"),
+      ),
+    )
+    await putResource(
+      resource,
+      currentUser,
+      null,
+      null,
+      null,
+      keycloak,
+      null,
+      loaded.toString(),
+    )
+    expect(await sentTemplateRefs()).toBe(1)
+  })
+
+  it("adds hasResourceTemplate to a resource that was not loaded", async () => {
+    await putResource(resource, currentUser, null, null, null, keycloak)
+    expect(await sentTemplateRefs()).toBe(1)
   })
 })
 

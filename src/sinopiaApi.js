@@ -7,6 +7,7 @@ import {
   jsonldFromDataset,
 } from "utilities/Utilities"
 import Config from "Config"
+import rdf from "rdf-ext"
 /* eslint-disable n/no-unpublished-import */
 import {
   hasFixtureResource,
@@ -180,7 +181,7 @@ export const postResource = (
     editGroups,
     true,
     unusedRDF,
-  ).then((body) =>
+  ).then(([body]) =>
     sendResourceBody(url, body, "POST", keycloak)
       .then((resp) => checkResp(resp))
       .then((resp) => resp.json())
@@ -188,7 +189,8 @@ export const postResource = (
   )
 }
 
-// Saves an existing resource
+// Saves an existing resource. Resolves to the saved record as N-Triples.
+// loadedRDF is the record as loaded or last saved (see dropTemplateRefIfUnedited).
 export const putResource = (
   resource,
   currentUser,
@@ -197,6 +199,7 @@ export const putResource = (
   method,
   keycloak,
   unusedRDF = null,
+  loadedRDF = null,
 ) =>
   saveBodyForResource(
     resource,
@@ -205,9 +208,10 @@ export const putResource = (
     editGroups,
     false,
     unusedRDF,
-  ).then((body) =>
+    loadedRDF,
+  ).then(([body, savedRDF]) =>
     sendResourceBody(resource.uri, body, method || "PUT", keycloak).then(
-      (resp) => checkResp(resp).then(() => true),
+      (resp) => checkResp(resp).then(() => savedRDF),
     ),
   )
 
@@ -308,6 +312,25 @@ export const postTransfer = (body, keycloak) => {
 const userUrlFor = (userId) =>
   `${Config.sinopiaApiBase}/user/${encodeURI(userId)}`
 
+const sortedNTriples = (ntriples) =>
+  ntriples.split("\n").filter(Boolean).sort().join("\n")
+
+// A record saved with no edits is written back exactly as it was loaded. The
+// editor adds hasResourceTemplate to every save (#190); a loaded record that
+// had none only gains it once something in it has been edited.
+const dropTemplateRefIfUnedited = (dataset, uri, loadedRDF) => {
+  if (!loadedRDF) return
+  const templateRefs = dataset.match(
+    uri ? rdf.namedNode(uri) : null,
+    rdf.namedNode("http://sinopia.io/vocabulary/hasResourceTemplate"),
+  )
+  const withoutTemplateRefs = dataset.difference(templateRefs)
+  if (
+    sortedNTriples(withoutTemplateRefs.toString()) === sortedNTriples(loadedRDF)
+  )
+    templateRefs.forEach((quad) => dataset.delete(quad))
+}
+
 const saveBodyForResource = (
   resource,
   user,
@@ -315,6 +338,7 @@ const saveBodyForResource = (
   editGroups,
   useBlankNode = false,
   unusedRDF = null,
+  loadedRDF = null,
 ) => {
   // A resource must name the template version it was edited with, and an
   // unversioned profile URI does not (GraphBuilder.addGeneratedByTriple).
@@ -337,8 +361,9 @@ const saveBodyForResource = (
     : Promise.resolve()
 
   return mergeUnused
+    .then(() => dropTemplateRefIfUnedited(dataset, resource.uri, loadedRDF))
     .then(() => jsonldFromDataset(dataset))
-    .then((jsonld) =>
+    .then((jsonld) => [
       JSON.stringify({
         data: JSON.stringify(jsonld),
         // user,
@@ -352,7 +377,8 @@ const saveBodyForResource = (
         // bfInstanceRefs: resource.bfInstanceRefs,
         // bfWorkRefs: resource.bfWorkRefs,
       }),
-    )
+      dataset.toString(),
+    ])
 }
 
 export const detectLanguage = (text, keycloak) => {

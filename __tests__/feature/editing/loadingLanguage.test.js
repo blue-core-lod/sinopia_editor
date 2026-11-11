@@ -11,11 +11,12 @@ featureSetup()
 
 jest.spyOn(sinopiaApi, "detectLanguage").mockResolvedValue([])
 
-// Resources ingested from LC arrive with untagged literals. Catalogers should
-// not have to open the language modal on every value to tag them. See
-// https://github.com/blue-core-lod/sinopia_editor/issues/191
+// Resources ingested from LC arrive with untagged literals. A value keeps the
+// language tag it was loaded with, or its lack of one, so that a save with no
+// edits writes the record back unchanged. (This reverses the load-time default
+// of https://github.com/blue-core-lod/sinopia_editor/issues/191.)
 describe("loading a resource with untagged literals", () => {
-  it("applies the default language to untagged values", async () => {
+  it("leaves untagged values untagged", async () => {
     const history = createHistory([
       "/editor/resource/resource/e1f2a3b4-5c6d-4e7f-8a9b-0c1d2e3f4a5b",
     ])
@@ -28,22 +29,22 @@ describe("loading a resource with untagged literals", () => {
       await screen.findByTestId(
         "Change language for An untagged literal value",
       ),
-    ).toHaveTextContent("Language: en")
+    ).toHaveTextContent("No language specified")
 
-    // URI value, tagged from its untagged rdfs:label.
+    // URI value with an untagged rdfs:label.
     expect(
       screen.getByTestId("Change language for Print version"),
-    ).toHaveTextContent("Language: en")
+    ).toHaveTextContent("No language specified")
 
     // Lookup value.
     expect(
       screen.getByTestId("Change language for corn sheller"),
-    ).toHaveTextContent("Language: en")
+    ).toHaveTextContent("No language specified")
 
     // Value in a nested resource.
     expect(
       screen.getByTestId("Change language for An untagged nested resource"),
-    ).toHaveTextContent("Language: en")
+    ).toHaveTextContent("No language specified")
   }, 20000)
 
   it("does not dirty the resource", async () => {

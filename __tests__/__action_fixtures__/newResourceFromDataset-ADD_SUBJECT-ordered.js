@@ -14,45 +14,57 @@ const expectedAction = {
       build.property({
         propertyUri: "http://sinopia.io/testing/Ordered/property1",
         values: [
-          build.value({
-            propertyUri: "http://sinopia.io/testing/Ordered/property1",
-            valueSubject: build.subject({
-              subjectTemplate: literalSubjectTemplate,
-              classes: ["http://sinopia.io/testing/Literal"],
-              properties: [
-                build.property({
-                  values: [
-                    build.value({
-                      propertyUri:
-                        "http://sinopia.io/testing/Literal/property1",
-                      literal: "literal1",
-                      lang: "en",
-                      component: "InputLiteralValue",
+          {
+            ...build.value({
+              propertyUri: "http://sinopia.io/testing/Ordered/property1",
+              valueSubject: {
+                ...build.subject({
+                  subjectTemplate: literalSubjectTemplate,
+                  classes: ["http://sinopia.io/testing/Literal"],
+                  properties: [
+                    build.property({
+                      values: [
+                        build.value({
+                          propertyUri:
+                            "http://sinopia.io/testing/Literal/property1",
+                          literal: "literal1",
+                          lang: "en",
+                          component: "InputLiteralValue",
+                        }),
+                      ],
                     }),
                   ],
                 }),
-              ],
+                nodeId: "b11",
+              },
             }),
-          }),
-          build.value({
-            propertyUri: "http://sinopia.io/testing/Ordered/property1",
-            valueSubject: build.orderedSubject({
-              classes: ["http://sinopia.io/testing/Literal"],
-              properties: [
-                build.property({
-                  values: [
-                    build.value({
-                      propertyUri:
-                        "http://sinopia.io/testing/Literal/property1",
-                      literal: "literal2",
-                      lang: "en",
-                      component: "InputLiteralValue",
+            listNodeId: "b9",
+          },
+          {
+            ...build.value({
+              propertyUri: "http://sinopia.io/testing/Ordered/property1",
+              valueSubject: {
+                ...build.orderedSubject({
+                  classes: ["http://sinopia.io/testing/Literal"],
+                  properties: [
+                    build.property({
+                      values: [
+                        build.value({
+                          propertyUri:
+                            "http://sinopia.io/testing/Literal/property1",
+                          literal: "literal2",
+                          lang: "en",
+                          component: "InputLiteralValue",
+                        }),
+                      ],
                     }),
                   ],
                 }),
-              ],
+                nodeId: "b12",
+              },
             }),
-          }),
+            listNodeId: "b10",
+          },
         ],
       }),
     ],

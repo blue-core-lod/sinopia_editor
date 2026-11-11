@@ -1,6 +1,8 @@
 // Polyfill Node.js globals not available in Jest's jsdom VM context.
-// Required for rdf-canonize@5.x and undici (used by @digitalbazaar/http-client
-// via jsonld@9.x via @rdfjs/serializer-jsonld-ext@4.x).
+// Added for rdf-canonize@5.x and undici (used by @digitalbazaar/http-client
+// via jsonld@9.x via @rdfjs/serializer-jsonld-ext@4.x). None of those are
+// dependencies any more (jsonldFromDataset writes JSON-LD itself), so these
+// may no longer be needed.
 const { setImmediate, clearImmediate } = require("timers")
 const { TextEncoder, TextDecoder } = require("util")
 const nodeCrypto = require("node:crypto")

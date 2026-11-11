@@ -4,6 +4,7 @@ import {
   resourceToName,
   datasetFromN3,
   datasetFromJsonld,
+  jsonldFromDataset,
   formatISODate,
   formatLocalDate,
   isBlueCoreUri,
@@ -264,6 +265,34 @@ describe("Utilities", () => {
 <${uri}> <http://sinopia.io/vocabulary/hasResourceTemplate> "bluecore:bf2:Monograph:Work" .`,
       )
       expect(findRootResourceTemplateId(uri, dataset)).toBeNull()
+    })
+  })
+
+  describe("jsonldFromDataset()", () => {
+    const n3 = `<http://example.org/work> <http://example.org/list> _:N1 .
+_:N1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> _:N3 .
+_:N1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+_:N3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.org/Topic> .
+_:N3 <http://example.org/date> "2026-09-12T02:52:32+00:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+_:N3 <http://example.org/label> "Guides" .
+_:N3 <http://example.org/label> "Guides"@en .
+`
+    it("writes every blank node with its own label, once prefixed", async () => {
+      const jsonld = await jsonldFromDataset(await datasetFromN3(n3))
+      expect(jsonld.map((node) => node["@id"]).sort()).toEqual([
+        "_:N1",
+        "_:N3",
+        "http://example.org/work",
+      ])
+    })
+
+    it("round trips exactly, keeping list cells, types and tags", async () => {
+      const dataset = await datasetFromN3(n3)
+      const roundTripped = await datasetFromJsonld(
+        await jsonldFromDataset(dataset),
+      )
+      const lines = (ds) => ds.toString().split("\n").sort()
+      expect(lines(roundTripped)).toEqual(lines(dataset))
     })
   })
 })

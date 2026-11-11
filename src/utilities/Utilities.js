@@ -7,10 +7,8 @@ import CryptoJS from "crypto-js"
 import { JsonLdParser } from "jsonld-streaming-parser"
 import { Writer as N3Writer } from "n3"
 import dateFormat from "date-and-time"
-import SerializerJsonld from "@rdfjs/serializer-jsonld-ext"
 import Config from "Config"
 
-const concatStream = require("concat-stream")
 const Readable = require("stream").Readable
 
 export const isResourceWithValueTemplateRef = (property) =>
@@ -93,9 +91,12 @@ export const uriFromResourceId = (collection, id) =>
  * @param {string} [baseIRI] base IRI against which relative IRIs (e.g., <>) are resolved
  * @return {Promise<rdf.Dataset>} a promise that resolves to the loaded dataset
  */
+// Blank node labels are kept as written (the parser would otherwise prefix
+// them), so a node keeps its identity between the record, the unused RDF and
+// the triples rebuilt from the form.
 export const datasetFromN3 = (data, baseIRI) =>
   new Promise((resolve, reject) => {
-    const parser = new N3Parser({ factory: rdf, baseIRI })
+    const parser = new N3Parser({ factory: rdf, baseIRI, blankNodePrefix: "" })
     const dataset = rdf.dataset()
     parser.parse(data, (err, quad) => {
       if (err) {
@@ -126,16 +127,38 @@ export const n3FromDataset = (dataset, format) =>
     })
   })
 
+const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+const XSD_STRING = "http://www.w3.org/2001/XMLSchema#string"
+
+const jsonldIdFor = (term) =>
+  term.termType === "BlankNode" ? `_:${term.value}` : term.value
+
+const jsonldObjectFor = (term) => {
+  if (term.termType !== "Literal") return { "@id": jsonldIdFor(term) }
+  if (term.language) return { "@value": term.value, "@language": term.language }
+  if (term.datatype.value === XSD_STRING) return { "@value": term.value }
+  return { "@value": term.value, "@type": term.datatype.value }
+}
+
+// Expanded JSON-LD with one node object per subject, so that every blank node
+// keeps its label. jsonld.fromRDF would fold RDF lists into @list, and the
+// list cells would come back with new labels.
 export const jsonldFromDataset = (dataset) => {
-  const serializerJsonld = new SerializerJsonld()
-
-  const output = serializerJsonld.import(dataset.toStream())
-
-  return new Promise((resolve, reject) => {
-    output.pipe(concatStream((content) => resolve(content)))
-
-    output.on("error", (err) => reject(err))
+  const nodes = new Map()
+  dataset.forEach(({ subject, predicate, object }) => {
+    const id = jsonldIdFor(subject)
+    if (!nodes.has(id)) nodes.set(id, { "@id": id })
+    const node = nodes.get(id)
+    if (predicate.value === RDF_TYPE && object.termType === "NamedNode") {
+      node["@type"] = [...(node["@type"] || []), object.value]
+    } else {
+      node[predicate.value] = [
+        ...(node[predicate.value] || []),
+        jsonldObjectFor(object),
+      ]
+    }
   })
+  return Promise.resolve([...nodes.values()])
 }
 
 // The JSON-LD parser passes a native value through untouched when it carries

@@ -15,6 +15,7 @@ import {
   setCurrentPreviewResource,
   saveResourceFinished,
   setUnusedRDF,
+  setLoadedRDF,
   loadResourceFinished,
   setResourceGroup,
   setCurrentDiff,
@@ -39,7 +40,7 @@ import {
 } from "selectors/resources"
 import { newLiteralValue, newValueSubject } from "utilities/valueFactory"
 import { selectUser } from "selectors/authenticate"
-import { selectUnusedRDF } from "selectors/modals"
+import { selectUnusedRDF, selectLoadedRDF } from "selectors/modals"
 import {
   addTemplateHistory as addUserTemplateHistory,
   addResourceHistory as addUserResourceHistory,
@@ -111,9 +112,12 @@ export const loadResource =
             dispatch(
               setUnusedRDF(
                 resource.key,
-                unusedDataset.size > 0 ? unusedDataset.toCanonical() : null,
+                unusedDataset.size > 0 ? unusedDataset.toString() : null,
               ),
             )
+            // The record as loaded, so a save can tell whether it was edited.
+            if (!asNewResource)
+              dispatch(setLoadedRDF(resource.key, dataset.toString()))
             dispatch(loadRelationships(resource.key, uri, errorKey))
             return [response, resource, unusedDataset]
           })
@@ -214,9 +218,12 @@ export const completeResourceLoadingWithTemplate =
         dispatch(
           setUnusedRDF(
             resource.key,
-            unusedDataset.size > 0 ? unusedDataset.toCanonical() : null,
+            unusedDataset.size > 0 ? unusedDataset.toString() : null,
           ),
         )
+        // The record as loaded, so a save can tell whether it was edited.
+        if (!asNewResource)
+          dispatch(setLoadedRDF(resource.key, dataset.toString()))
         dispatch(loadRelationships(resource.key, uri, errorKey))
         const result = [response, resource, unusedDataset]
         return dispatch(
@@ -358,9 +365,12 @@ export const newResourceFromDataset =
         dispatch(
           setUnusedRDF(
             resource.key,
-            unusedDataset.size > 0 ? unusedDataset.toCanonical() : null,
+            unusedDataset.size > 0 ? unusedDataset.toString() : null,
           ),
         )
+        // The record as loaded, so a save can tell whether it was edited.
+        if (!asNewResource)
+          dispatch(setLoadedRDF(resource.key, dataset.toString()))
         dispatch(setCurrentResource(resource.key))
         if (!asNewResource) dispatch(loadResourceFinished(resource.key))
         return true
@@ -431,6 +441,7 @@ export const saveResource =
     const resource = selectFullSubject(state, resourceKey)
     const currentUser = selectUser(state)
     const unusedRDF = selectUnusedRDF(state, resourceKey)
+    const loadedRDF = selectLoadedRDF(state, resourceKey)
 
     dispatch(clearErrors(errorKey))
 
@@ -442,8 +453,10 @@ export const saveResource =
       null,
       keycloak,
       unusedRDF,
+      loadedRDF,
     )
-      .then(() => {
+      .then((savedRDF) => {
+        dispatch(setLoadedRDF(resourceKey, savedRDF))
         dispatch(setResourceGroup(resourceKey, group, editGroups))
         dispatch(saveResourceFinished(resourceKey))
         dispatch(addUserResourceHistory(resource.uri, keycloak))

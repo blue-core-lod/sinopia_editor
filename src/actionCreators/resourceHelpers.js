@@ -14,8 +14,6 @@ import {
 import { clearErrors, addError } from "actions/errors"
 import { fetchResource } from "sinopiaApi"
 import { findRootResourceTemplateId } from "utilities/Utilities"
-import { chooseLang } from "utilities/Language"
-import Config from "Config"
 
 // Work-Instance relationship property URIs whose values are not carried over
 // when copying a resource: the copy is a new resource, not another link to the
@@ -62,7 +60,7 @@ export const loadResource =
             dispatch(
               setUnusedRDF(
                 resource.key,
-                unusedDataset.size > 0 ? unusedDataset.toCanonical() : null,
+                unusedDataset.size > 0 ? unusedDataset.toString() : null,
               ),
             )
             return [response, resource, unusedDataset]
@@ -288,6 +286,10 @@ const newSubjectFromDataset =
         .toArray()
       context.usedDataset.addAll(typeQuads)
       subject.classes = typeQuads.map((quad) => quad.object.value)
+      // A blank node keeps its label, so a save writes the same node back and
+      // its unused triples (if any) stay attached to it.
+      if (subjectTerm.termType === "BlankNode")
+        subject.nodeId = subjectTerm.value
       return subject
     })
 
@@ -345,77 +347,30 @@ const newValuesFromDatasetByProperty =
 
 const newValuesFromDatasetByPropertyUri =
   (subjectTerm, property, propertyUri, suppress, context) => (dispatch) => {
-    // Get the objects for the values. How depends on whether property is ordered or suppressed.
-    let objects = null
-    if (suppress) {
-      objects = [subjectTerm]
-    } else if (property.propertyTemplate.ordered) {
-      objects = orderedObjects(subjectTerm, propertyUri, context)
-    } else {
-      objects = unorderedObjects(subjectTerm, propertyUri, context)
-    }
-
-    if (property.propertyTemplate.type === "resource") {
-      // Get the values based on the template and the dataset then merge.
-      // Deliberately not compacted: the results are zipped back against
-      // objects below, so the two arrays must stay index-aligned.
-      const objPromises = objects.map((obj) =>
-        dispatch(
-          newNestedResourceFromObject(obj, property, propertyUri, context),
+    if (!suppress && property.propertyTemplate.ordered)
+      return dispatch(
+        newOrderedValuesFromDataset(
+          subjectTerm,
+          property,
+          propertyUri,
+          context,
         ),
       )
-      return Promise.all(objPromises).then((valuesFromObjs) => {
-        // An object that produced no value leaves its triples unaccounted
-        // for. unorderedObjects() marked the link quad used before that was
-        // known, so put it back -- otherwise the dropped data is neither
-        // shown in the editor nor reported as unused RDF, and disappears
-        // silently on save.
-        if (!suppress && !property.propertyTemplate.ordered) {
-          releaseUnclaimedLinks(
-            subjectTerm,
-            propertyUri,
-            objects,
-            valuesFromObjs,
-            context,
-          )
-        }
-        if (_.isEmpty(valuesFromObjs)) return []
-        const templatePromises = templatePromisesFor(
-          property,
-          context.errorKey,
-          dispatch,
-        )
-        return Promise.all(templatePromises).then((valuesFromTemplates) =>
-          mergeValues(valuesFromTemplates, valuesFromObjs),
-        )
-      })
-    }
-    return Promise.all(
-      objects.map((obj) => {
-        if (obj.termType === "NamedNode") {
-          // URI
-          return Promise.resolve(
-            newUriFromObject(obj, property, propertyUri, context),
-          )
-        }
-        if (obj.termType === "Literal") {
-          return Promise.resolve(
-            newLiteralFromObject(obj, property, propertyUri),
-          )
-        }
-        // A blank node on a literal or uri property: only a resource property
-        // can hold one. Its value is the label the parser invented for it, so
-        // treating it as a literal would write a parser artifact into the
-        // record. Drop the value instead and let the triples be reported as
-        // unused RDF, which is what they are until a template can hold them.
-        return Promise.resolve(null)
-      }),
+
+    // Get the objects for the values. How depends on whether property is suppressed.
+    const objects = suppress
+      ? [subjectTerm]
+      : unorderedObjects(subjectTerm, propertyUri, context)
+
+    return dispatch(
+      newValuesFromObjects(objects, property, propertyUri, context),
     ).then((values) => {
-      // Same reasoning as the resource branch above: unorderedObjects() marked
-      // each link quad used before it was known whether the object would yield
-      // a value, so release the ones that did not. Otherwise the dropped
-      // triple is neither shown nor reported, and disappears on save.
-      if (!suppress && !property.propertyTemplate.ordered) {
+      // An object that produced no value leaves its triples unaccounted
+      // for. unorderedObjects() marked the link quad used before that was
+      // known, so put it back -- otherwise the dropped data is neither
+      // shown in the editor nor reported as unused RDF, and disappears
+      // silently on save.
+      if (!suppress)
         releaseUnclaimedLinks(
           subjectTerm,
           propertyUri,
@@ -423,9 +378,81 @@ const newValuesFromDatasetByPropertyUri =
           values,
           context,
         )
-      }
-      return values
+      if (property.propertyTemplate.type !== "resource") return values
+      if (_.isEmpty(values)) return []
+      return Promise.all(
+        templatePromisesFor(property, context.errorKey, dispatch),
+      ).then((valuesFromTemplates) => mergeValues(valuesFromTemplates, values))
     })
+  }
+
+// An RDF list is loaded whole or not at all. If any member yields no value,
+// the form cannot write the list back as it was, so none of it is marked
+// used: the list and its members stay in the unused RDF, intact and still
+// attached to their subject. Members are expanded against their own used
+// dataset so that a failed list leaves no partial claims behind.
+const newOrderedValuesFromDataset =
+  (subjectTerm, property, propertyUri, context) => (dispatch) => {
+    const list = orderedList(subjectTerm, propertyUri, context)
+    if (!list) return Promise.resolve([])
+
+    const listContext = { ...context, usedDataset: rdf.dataset() }
+    return dispatch(
+      newValuesFromObjects(list.objects, property, propertyUri, listContext),
+    ).then((values) => {
+      if (!list.complete || values.some((value) => !value)) return []
+      context.usedDataset.addAll(list.quads)
+      context.usedDataset.addAll(listContext.usedDataset)
+      // Each member keeps the label of its list cell.
+      values.forEach((value, index) => {
+        value.listNodeId = list.cells[index].value
+      })
+      if (property.propertyTemplate.type !== "resource") return values
+      // Keep the list's order. Templates with no member in the list still get
+      // a placeholder, after the members, as mergeValues gives them.
+      return Promise.all(
+        templatePromisesFor(property, context.errorKey, dispatch),
+      ).then((valuesFromTemplates) => {
+        const keys = values.map(valuesMapKeyFor)
+        return values.concat(
+          valuesFromTemplates.filter(
+            (valueFromTemplate) =>
+              !keys.includes(valuesMapKeyFor(valueFromTemplate)),
+          ),
+        )
+      })
+    })
+  }
+
+// One value per object, index-aligned with objects: null where an object
+// yields no value.
+const newValuesFromObjects =
+  (objects, property, propertyUri, context) => (dispatch) => {
+    if (property.propertyTemplate.type === "resource")
+      return Promise.all(
+        objects.map((obj) =>
+          dispatch(
+            newNestedResourceFromObject(obj, property, propertyUri, context),
+          ),
+        ),
+      )
+    return Promise.all(
+      objects.map((obj) => {
+        if (obj.termType === "NamedNode") {
+          // URI
+          return newUriFromObject(obj, property, propertyUri, context)
+        }
+        if (obj.termType === "Literal") {
+          return newLiteralFromObject(obj, property, propertyUri)
+        }
+        // A blank node on a literal or uri property: only a resource property
+        // can hold one. Its value is the label the parser invented for it, so
+        // treating it as a literal would write a parser artifact into the
+        // record. Drop the value instead and let the triples be reported as
+        // unused RDF, which is what they are until a template can hold them.
+        return null
+      }),
+    )
   }
 
 // Releases the link quad of each object that yielded no value, so its triples
@@ -511,7 +538,10 @@ const valuesMapKeyFor = (value) =>
     value.propertyKey || value.property.key,
   ].join("-")
 
-const orderedObjects = (subjectTerm, propertyUri, context) => {
+// The list a subject's ordered property points to: its members, the cell
+// nodes that hold them, and every quad that makes up the list. complete when
+// it has members and ends in rdf:nil, i.e. a save can write it back as it was.
+const orderedList = (subjectTerm, propertyUri, context) => {
   // All quads for this property uri
   const quads = context.dataset
     .match(subjectTerm, rdf.namedNode(propertyUri))
@@ -519,36 +549,38 @@ const orderedObjects = (subjectTerm, propertyUri, context) => {
   // Should only be one.
   if (quads.length > 1) {
     console.error(`More than one quad for ordered property ${propertyUri}.`)
-    return []
+    return null
   }
-  if (quads.length === 0) return []
-  context.usedDataset.addAll(quads)
-  const objects = []
-  recursiveOrderedObjects(quads[0].object, objects, context)
-  return objects
+  if (quads.length === 0) return null
+  const list = { quads, cells: [], objects: [], complete: false }
+  recursiveOrderedObjects(quads[0].object, list, context)
+  return list
 }
 
-const recursiveOrderedObjects = (subjectTerm, objects, context) => {
+const recursiveOrderedObjects = (cell, list, context) => {
   const firstQuad = context.dataset
     .match(
-      subjectTerm,
+      cell,
       rdf.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#first"),
     )
     .toArray()[0]
   if (!firstQuad) return
-  context.usedDataset.add(firstQuad)
-  objects.push(firstQuad.object)
+  list.quads.push(firstQuad)
+  list.cells.push(cell)
+  list.objects.push(firstQuad.object)
   const restQuad = context.dataset
     .match(
-      subjectTerm,
+      cell,
       rdf.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"),
     )
     .toArray()[0]
-  context.usedDataset.add(restQuad)
+  if (!restQuad) return
+  list.quads.push(restQuad)
   if (
-    restQuad.object.value !== "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"
+    restQuad.object.value === "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"
   )
-    recursiveOrderedObjects(restQuad.object, objects, context)
+    list.complete = true
+  else recursiveOrderedObjects(restQuad.object, list, context)
 }
 
 const unorderedObjects = (subjectTerm, propertyUri, context) => {
@@ -823,34 +855,25 @@ const selectSuppressibleResourceTemplateId =
       return compactIds.length === 1 ? compactIds[0] : undefined
     })
 
-// Literals ingested from outside Blue Core (LC, for example) frequently carry
-// no language tag, which left every value in the editor reading "No language
-// specified" until a cataloger opened the language modal on each one. Fall back
-// to the same default that newBlankLiteralValue/newBlankUriValue already give a
-// value the cataloger creates by hand, so loaded and new values behave alike.
-// See https://github.com/blue-core-lod/sinopia_editor/issues/191
-//
-// Read the default from Config rather than the root subject: the subject is not
-// in the store yet while its values are being built. reducers/resources seeds
-// subject.defaultLang from this same constant.
-const defaultLangFor = (property) =>
-  chooseLang(
-    property.propertyTemplate.languageSuppressed,
-    Config.defaultLanguageId,
-  )
+// A loaded literal keeps the language tag it arrived with, or its lack of one:
+// a save with no edits writes the record back unchanged. The resource default
+// language applies only to values the cataloger creates (newBlankLiteralValue,
+// newBlankUriValue).
+const XSD_STRING = "http://www.w3.org/2001/XMLSchema#string"
 
-// Only a plain string literal may carry a language tag. A typed literal
-// (xsd:date, xsd:integer, ...) must not, so it keeps whatever it arrived with.
-// TemplatesBuilder already suppresses language for templates that declare a
-// validationDataType; this guards data whose literal type disagrees with its
-// template.
-const isTaggable = (term) =>
-  term.datatype?.value === "http://www.w3.org/2001/XMLSchema#string"
-
+// A loaded literal also keeps its datatype wherever that is not what a save
+// would write anyway: the template's validationDataType, else a plain string.
 const newLiteralFromObject = (obj, property, propertyUri) => {
-  const lang =
-    obj.language || (isTaggable(obj) ? defaultLangFor(property) : null)
-  return newLiteralValue(property, propertyUri, obj.value, lang)
+  const value = newLiteralValue(
+    property,
+    propertyUri,
+    obj.value,
+    obj.language || null,
+  )
+  const datatype = obj.datatype.value
+  const written = property.propertyTemplate.validationDataType || XSD_STRING
+  if (!obj.language && datatype !== written) value.datatype = datatype
+  return value
 }
 
 const newUriFromObject = (obj, property, propertyUri, context) => {
@@ -871,9 +894,7 @@ const newUriFromObject = (obj, property, propertyUri, context) => {
         (labelQuad) => !labelQuad.object.value.startsWith("http"),
       ) || labelQuads[0]
     label = labelQuad.object.value
-    lang =
-      labelQuad.object.language ||
-      (isTaggable(labelQuad.object) ? defaultLangFor(property) : null)
+    lang = labelQuad.object.language || null
     // Adding all to usedData, even though only using first. This is to avoid user confusion over extra triples, e.g., https://github.com/LD4P/sinopia_editor/issues/2634
     context.usedDataset.addAll(labelQuads)
   }
