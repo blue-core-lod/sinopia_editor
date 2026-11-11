@@ -185,6 +185,11 @@ export const generateMD5 = (message) => CryptoJS.MD5(message).toString()
 export const hasUnknownTemplateVersion = (subjectTemplate) =>
   !!subjectTemplate.profileUri && !subjectTemplate.versionUri
 
+// The id at the end of a profile version URI (.../version/{id}). It is the
+// API's global Version.id, not an ordinal, so it is shown as "version id N".
+export const versionIdFromUri = (uri) =>
+  /\/version\/(\d+)$/.exec(uri || "")?.[1] ?? null
+
 export const findRootResourceTemplateId = (resourceURI, dataset) => {
   const rtQuads = dataset
     .match(

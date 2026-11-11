@@ -13,6 +13,7 @@ import {
   fetchResourceRelationships,
   fetchResourceVersions,
   detectLanguage,
+  validateProfile,
 } from "sinopiaApi"
 import { selectFullSubject } from "selectors/resources"
 import { selectUser } from "selectors/authenticate"
@@ -412,6 +413,92 @@ describe("putResource", () => {
       ).rejects.toThrow("did not report a version for template")
       expect(global.fetch).not.toHaveBeenCalled()
     })
+  })
+})
+
+describe("validateProfile", () => {
+  const profileUri =
+    "https://bluecore-dev.stanford.edu/profiles/3db30d3a-7a3e-4762-a28c-1a0efc244345"
+  const keycloak = {
+    token: "Secret-Token",
+    updateToken: jest.fn().mockResolvedValue(false),
+  }
+  const validation = { profile_uri: profileUri, instance_count: 3 }
+
+  // Other describes in this file turn fixtures on when they are collected, and
+  // share this spy, so put back whatever they set.
+  let fixturesSpy
+  let usedFixtures
+  beforeEach(() => {
+    usedFixtures = Config.useResourceTemplateFixtures
+    fixturesSpy = jest
+      .spyOn(Config, "useResourceTemplateFixtures", "get")
+      .mockReturnValue(false)
+  })
+  afterEach(() => fixturesSpy.mockReturnValue(usedFixtures))
+
+  it("resolves null without calling the API when using fixtures", async () => {
+    jest
+      .spyOn(Config, "useResourceTemplateFixtures", "get")
+      .mockReturnValue(true)
+    global.fetch = jest.fn()
+
+    expect(await validateProfile(profileUri, keycloak)).toBeNull()
+    expect(global.fetch).not.toHaveBeenCalled()
+  })
+
+  it("reports on the stored profile when given no resource", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue(validation),
+    })
+
+    const result = await validateProfile(profileUri, keycloak)
+
+    expect(result).toEqual(validation)
+    expect(global.fetch).toHaveBeenCalledWith(`${profileUri}/validate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer Secret-Token",
+      },
+      body: undefined,
+    })
+  })
+
+  it("sends the body a save would send when given a resource", async () => {
+    const state = createState({ hasResourceWithLiteral: true })
+    const resource = selectFullSubject(state, "t9zVwg2zO")
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue(validation),
+    })
+
+    await validateProfile(profileUri, keycloak, { resource })
+
+    const { body } = global.fetch.mock.calls[0][1]
+    expect(JSON.parse(JSON.parse(body).data)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ "@id": resource.uri }),
+      ]),
+    )
+  })
+
+  it("resolves null when the API errors", async () => {
+    jest.spyOn(console, "error").mockImplementation(() => {})
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      json: jest.fn().mockResolvedValue({ detail: "Profile not found" }),
+    })
+
+    expect(await validateProfile(profileUri, keycloak)).toBeNull()
+  })
+
+  it("resolves null without calling the API when not logged in", async () => {
+    global.fetch = jest.fn()
+
+    expect(await validateProfile(profileUri, {})).toBeNull()
+    expect(global.fetch).not.toHaveBeenCalled()
   })
 })
 

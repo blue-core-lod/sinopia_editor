@@ -62,6 +62,24 @@ describe("newResourceCopy", () => {
     })
   })
 
+  describe("copying a template that resources use", () => {
+    const usage = { profile_uri: "https://api.sinopia.io/resource/0894a8b3" }
+    const state = createState({ hasResourceWithLiteral: true })
+    state.editor.templateUsage = {
+      t9zVwg2zO: { ...usage, instance_count: 3, copied: false },
+    }
+    const store = mockStore(state)
+
+    it("carries the original's usage over to the copy", async () => {
+      await store.dispatch(newResourceCopy("t9zVwg2zO"))
+
+      expect(store.getActions()).toHaveAction("SET_TEMPLATE_USAGE", {
+        resourceKey: "abc123",
+        usage: { ...usage, instance_count: 3, copied: true },
+      })
+    })
+  })
+
   describe("copying a resource with a nested resource", () => {
     const store = mockStore(
       createState({ hasResourceWithNestedResource: true }),
