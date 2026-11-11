@@ -5,6 +5,24 @@
       "uri": "https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0",
       "description": "Serial Work from batch ingest, no hasResourceTemplate",
       "resourceTemplate": "https://stage.bcld.info/profiles/deeb77f0-55be-4346-aefe-e00a2d5a3e67"
+    },
+    {
+      "file": "anarchists-cookbook.nt",
+      "uri": "https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486",
+      "description": "The dungeon anarchist's cookbook",
+      "resourceTemplate": "https://stage.bcld.info/profiles/deeb77f0-55be-4346-aefe-e00a2d5a3e67"
+    },
+    {
+      "file": "dream-golf-courses.nt",
+      "uri": "https://stage.bcld.info/works/c9732c53-f25f-4e14-a469-7db743bd680c",
+      "description": "Dream golf courses : remarkable golf courses around the world",
+      "resourceTemplate": "https://stage.bcld.info/profiles/deeb77f0-55be-4346-aefe-e00a2d5a3e67"
+    },
+    {
+      "file": "lazy-dungeon-master.nt",
+      "uri": "https://stage.bcld.info/works/b02252a4-5cac-4b3b-8c1b-3e7dd311cf77",
+      "description": "Lazy dungeon master",
+      "resourceTemplate": "https://stage.bcld.info/profiles/deeb77f0-55be-4346-aefe-e00a2d5a3e67"
     }
   ]
 }
