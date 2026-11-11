@@ -99,8 +99,103 @@ describe("fetchResource", () => {
       expect.assertions(1)
       await expect(
         fetchResource("http://localhost:3000/resource/ld4p:RT:bf2:xxx"),
-      ).rejects.toThrow(
-        "Error parsing resource: Error retrieving resource: Not Found",
+      ).rejects.toThrow("Error retrieving resource: Not Found")
+    })
+  })
+
+  // https://github.com/blue-core-lod/sinopia_editor/issues/255
+  describe("load errors", () => {
+    const uri = "http://localhost:3000/works/a"
+
+    const mockFailedResponse = (status, statusText, body) => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: false,
+        status,
+        statusText,
+        json: body
+          ? jest.fn().mockResolvedValue(body)
+          : jest.fn().mockRejectedValue(new SyntaxError("Unexpected token")),
+      })
+    }
+
+    const loadError = (promise) =>
+      promise.then(
+        () => {
+          throw new Error("expected fetchResource to reject")
+        },
+        (err) => err,
+      )
+
+    it("says the API couldn't be reached", async () => {
+      global.fetch = jest
+        .fn()
+        .mockRejectedValue(new TypeError("Failed to fetch"))
+
+      const err = await loadError(fetchResource(uri))
+      expect(err.name).toBe("ResourceLoadError")
+      expect(err.kind).toBe("fetch")
+      expect(err.message).toBe(`Couldn't reach ${uri}: Failed to fetch`)
+    })
+
+    it("says the resource was not found", async () => {
+      mockFailedResponse(404, "Not Found", { detail: "Work a not found" })
+
+      const err = await loadError(fetchResource(uri))
+      expect(err.kind).toBe("notFound")
+      expect(err.message).toBe(`${uri} was not found: Work a not found`)
+    })
+
+    it.each([401, 403])(
+      "says the cataloger isn't authorized (%i)",
+      async (status) => {
+        mockFailedResponse(status, "Forbidden")
+
+        const err = await loadError(fetchResource(uri))
+        expect(err.kind).toBe("notAuthorized")
+        expect(err.message).toBe(`Not authorized to read ${uri}`)
+      },
+    )
+
+    it("names the status for any other failure", async () => {
+      mockFailedResponse(500, "Internal Server Error")
+
+      const err = await loadError(fetchResource(uri))
+      expect(err.kind).toBe("http")
+      expect(err.message).toBe(`${uri} returned 500 Internal Server Error`)
+    })
+
+    it("says the response couldn't be read", async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: jest
+          .fn()
+          .mockRejectedValue(new SyntaxError("Unexpected token <")),
+      })
+
+      const err = await loadError(fetchResource(uri))
+      expect(err.kind).toBe("parse")
+      expect(err.message).toBe(
+        `Couldn't read the response for ${uri}: Unexpected token <`,
+      )
+    })
+
+    it("says the resource couldn't be parsed, naming the context", async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: jest.fn().mockResolvedValue({
+          data: {
+            "@context": "https://example.com/context.jsonld",
+            "@id": uri,
+          },
+        }),
+      })
+
+      const err = await loadError(fetchResource(uri))
+      expect(err.kind).toBe("parse")
+      expect(err.message).toBe(
+        `Couldn't parse ${uri}: Failed to load remote context https://example.com/context.jsonld: the editor only uses its bundled JSON-LD contexts and the API's own`,
       )
     })
   })
@@ -197,14 +292,15 @@ describe("fetchResource", () => {
     it("errors when unable to retrieve resource", async () => {
       global.fetch = jest.fn().mockResolvedValue({
         json: jest.fn().mockRejectedValue("Parse error"),
-        statusText: "failed to retrieve uri",
+        status: 500,
+        statusText: "Internal Server Error",
         ok: false,
       })
 
       await expect(
         fetchResource("http://api.sinopia.io/resource/12334"),
       ).rejects.toThrow(
-        "Error parsing resource: Blue Core API returned failed to retrieve uri",
+        "http://api.sinopia.io/resource/12334 returned 500 Internal Server Error",
       )
     })
   })
@@ -833,7 +929,7 @@ describe("fetchResourceRelationships", () => {
           "http://localhost:3000/resource/61f2f457-31f5-432c-8acf-b4037f77541f/relationships",
         ),
       ).rejects.toThrow(
-        "Error parsing resource: Not Found: not found at /resource/61f2f457-31f5-432c-8acf-b4037f77541f/relationships",
+        "http://localhost:3000/resource/61f2f457-31f5-432c-8acf-b4037f77541f/relationships was not found: Not Found: not found at /resource/61f2f457-31f5-432c-8acf-b4037f77541f/relationships",
       )
     })
   })

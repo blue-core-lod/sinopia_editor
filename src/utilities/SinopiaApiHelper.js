@@ -16,6 +16,14 @@ export const checkResp = (resp) => {
     })
 }
 
+// The API's own message for a failed response, or null when the body isn't
+// one of the error shapes below.
+export const apiErrorDetail = (resp) =>
+  resp
+    .json()
+    .then(apiErrorMessage)
+    .catch(() => null)
+
 // The Blue Core API (FastAPI) reports errors as {detail: "message"}, sometimes
 // with a title, or as {detail: [{msg, ...}]} for request validation errors. The
 // older Sinopia API used [{title, details}].

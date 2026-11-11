@@ -58,7 +58,7 @@ describe("JSON-LD context loading", () => {
     await expect(
       datasetFromJsonld(compactedWork("https://example.com/context.jsonld")),
     ).rejects.toThrow(
-      "Couldn't load the JSON-LD context https://example.com/context.jsonld",
+      "Failed to load remote context https://example.com/context.jsonld: the editor only uses its bundled JSON-LD contexts and the API's own",
     )
     expect(global.fetch).not.toHaveBeenCalled()
   })

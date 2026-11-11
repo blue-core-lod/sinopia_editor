@@ -18,13 +18,14 @@ const apiContextUrl = () => `${Config.sinopiaApiBase}/context.jsonld`
 const fetchLoader = new FetchDocumentLoader((url, init) => fetch(url, init))
 
 // Like bluecore-models, refuse any other remote context rather than fetch it.
+// The parser prefixes the message with "Failed to load remote context <url>: ".
 export const documentLoader = {
   load: (url) => {
     if (bundledContexts[url]) return Promise.resolve(bundledContexts[url])
     if (url === apiContextUrl()) return fetchLoader.load(url)
     return Promise.reject(
       new Error(
-        `Couldn't load the JSON-LD context ${url}: the editor only uses its bundled contexts and the API's own`,
+        "the editor only uses its bundled JSON-LD contexts and the API's own",
       ),
     )
   },
