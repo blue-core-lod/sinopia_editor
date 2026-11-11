@@ -14,3 +14,6 @@ cypress.env.json
 test.html
 cypress/videos/
 cypress/screenshots/
+
+# Recorded by __tests__/__golden_fixtures__/refreshProfiles.mjs when missing
+__tests__/__golden_fixtures__/profiles/

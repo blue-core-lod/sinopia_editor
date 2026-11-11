@@ -12,6 +12,7 @@
 //   <record>.expected-resave.nt  the second save, when it differs from the first
 //
 // UPDATE_GOLDEN=1 re-records both from today's output.
+import { execFileSync } from "node:child_process"
 import fs from "node:fs"
 import path from "node:path"
 import { newResourceFromDataset, saveResource } from "actionCreators/resources"
@@ -28,6 +29,16 @@ jest.mock("KeycloakContext", () => ({
 
 const fixturesDir = path.join(__dirname, "__golden_fixtures__")
 const profilesDir = path.join(fixturesDir, "profiles")
+
+// The profiles are not checked in. Record them from the live API when missing;
+// refreshProfiles.mjs writes ids.json last, so a partial run is retried.
+if (!fs.existsSync(path.join(profilesDir, "ids.json"))) {
+  execFileSync(
+    process.execPath,
+    [path.join(fixturesDir, "refreshProfiles.mjs")],
+    { stdio: "inherit" },
+  )
+}
 const { records } = JSON.parse(
   fs.readFileSync(path.join(fixturesDir, "manifest.json"), "utf8"),
 )
