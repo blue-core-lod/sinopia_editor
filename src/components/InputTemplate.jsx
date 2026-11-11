@@ -2,10 +2,8 @@
 
 import React, { useState, useCallback, useEffect, useRef } from "react"
 import PropTypes from "prop-types"
-import { Typeahead, withAsync } from "react-bootstrap-typeahead"
+import { Typeahead, useAsync } from "react-bootstrap-typeahead"
 import { getTemplateSearchResults } from "sinopiaSearch"
-
-const AsyncTypeahead = withAsync(Typeahead)
 
 const InputTemplate = ({
   setTemplateId,
@@ -51,21 +49,20 @@ const InputTemplate = ({
     }
   }
 
-  return (
-    <AsyncTypeahead
-      ref={typeaheadRef}
-      onSearch={search}
-      onChange={change}
-      options={options}
-      multiple={false}
-      isLoading={isLoading}
-      selected={selected}
-      placeholder="Enter id, label, URI, remark, or author"
-      minLength={1}
-      allowNew={() => false}
-      {...props}
-    />
-  )
+  const typeaheadProps = useAsync({
+    onSearch: search,
+    onChange: change,
+    options,
+    multiple: false,
+    isLoading,
+    selected,
+    placeholder: "Enter id, label, URI, remark, or author",
+    minLength: 1,
+    allowNew: () => false,
+    ...props,
+  })
+
+  return <Typeahead ref={typeaheadRef} {...typeaheadProps} />
 }
 
 InputTemplate.propTypes = {

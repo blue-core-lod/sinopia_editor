@@ -75,6 +75,8 @@ const fakeApi = (url, { method = "GET", body } = {}) => {
   }
   if (target.endsWith("/search/profile"))
     return respond(200, searchResultsFor(url))
+  // Resource search, used to add the saved resource to the user's history.
+  if (target.endsWith("/search/")) return respond(200, { results: [] })
   const profile = profileFor(decodeURI(target))
   return profile ? respond(200, profile) : respond(404, { error: "Not found" })
 }
