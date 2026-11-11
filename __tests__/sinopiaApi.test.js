@@ -20,6 +20,7 @@ import { selectUser } from "selectors/authenticate"
 import { createState } from "stateUtils"
 
 import Config from "Config"
+import rdf from "rdf-ext"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({
@@ -105,6 +106,26 @@ describe("fetchResource", () => {
   })
 
   describe("when using the api", () => {
+    // https://github.com/blue-core-lod/sinopia_editor/issues/255
+    it("retrieves a resource compacted with the bibframe-json.org context without fetching it", async () => {
+      const remoteContextWork = require("./__resource_fixtures__/remote_context_work.json")
+      global.fetch = jest.fn().mockResolvedValue({
+        json: jest.fn().mockResolvedValue(remoteContextWork),
+        ok: true,
+      })
+
+      const [dataset] = await fetchResource(remoteContextWork.uri)
+
+      expect(global.fetch).toHaveBeenCalledTimes(1)
+      expect(
+        dataset.match(
+          rdf.namedNode(remoteContextWork.uri),
+          rdf.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
+          rdf.namedNode("http://id.loc.gov/ontologies/bibframe/Work"),
+        ).size,
+      ).toBe(1)
+    })
+
     it("retrieves resource", async () => {
       // mocks call to Sinopia API for a resource
       global.fetch = jest.fn().mockResolvedValue({
