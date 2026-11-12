@@ -88,18 +88,6 @@ Each phase is an epic issue and is blocked by the phases it depends on. Each PR 
 | 7 | Cleanup and optional toolchain | 3, 4 | No |
 | After | Policy changes, one row per PR | 3 | Yes, by decision |
 
-### Suggested staffing
-
-With 2–3 developers, three workstreams keep people from blocking each other:
-
-- **Core:** 0b → 3 → 5 (copy between panes).
-- **Platform:** 0a → 2 → 4 → 7.
-- **Bugs and UX:** 1 → 6 (non-editor pages first: header and footer, search, templates, dashboard) → 6 (editor pages, after 4).
-
-When there are only two developers, Bugs and UX alternates with Platform. Phase 6's non-editor pages are the first thing to slip.
-
----
-
 ### Phase 0a: Safety net
 
 **Goal:** tests that fail on the bug classes that recur, and CI that runs the real app. Nothing in `src/` changes, apart from the one-line config fix CI needs.
@@ -169,7 +157,7 @@ When there are only two developers, Bugs and UX alternates with Platform. Phase 
    - Add a fixture that uses the remote context.
    - Ask the tester to open the context URL to confirm the cause.
 2. **#255: honest load errors.** Separate the "fetch failed", "not found", "not authorized" and "couldn't parse" messages in `fetchResource` and `loadResource`, naming the URL that failed.
-3. **#269: verify and close.**
+3. ~~**#269: verify and close.**~~ [COMPLETE]
    - Confirm on stage that paging works since `fe6ce954`, and close the issue citing that commit.
    - Fix `Search.jsx`'s missing error key so paging errors are shown.
    - Add a stale-response guard to resource search.
