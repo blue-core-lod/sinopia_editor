@@ -8,6 +8,7 @@ import {
 } from "../../testUtilities/testUtils"
 import { createState } from "stateUtils"
 import { dashboardErrorKey } from "utilities/errorKeyFactory"
+import useRdfResource from "hooks/useRdfResource"
 
 // Mock KeycloakContext with a token so getJwt works
 jest.mock("KeycloakContext", () => ({
@@ -20,6 +21,13 @@ jest.mock("KeycloakContext", () => ({
 jest.mock("hooks/useRdfResource", () => jest.fn())
 
 const originalFetch = global.fetch
+
+// fetch calls to the works endpoint, with the URL parsed so tests can check
+// the path and query parameters separately.
+const worksCalls = () =>
+  global.fetch.mock.calls
+    .map(([url, options]) => [new URL(url), options])
+    .filter(([url]) => url.pathname === "/works")
 
 afterEach(() => {
   global.fetch = originalFetch
@@ -244,17 +252,54 @@ describe("LoadByRDFForm", () => {
       fireEvent.click(screen.getByText("Submit"))
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith(
-          "http://localhost:3000/works",
-          expect.objectContaining({
-            method: "POST",
-            headers: expect.objectContaining({
-              "Content-Type": "application/json",
-              Authorization: "Bearer test-token",
-            }),
-          }),
-        )
+        expect(worksCalls()).toHaveLength(1)
       })
+      const [url, options] = worksCalls()[0]
+      expect(`${url.origin}${url.pathname}`).toBe("http://localhost:3000/works")
+      expect(options).toMatchObject({
+        method: "POST",
+        headers: expect.objectContaining({
+          "Content-Type": "application/json",
+          Authorization: "Bearer test-token",
+        }),
+      })
+    })
+
+    // Fails if the MARC submit stops sending record_derived_from=false, so the
+    // API records the placeholder example.org URIs as bf:derivedFrom (#271).
+    it("asks the API not to record derivedFrom for the placeholder URIs", async () => {
+      await setupMarcConversion()
+
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        json: jest.fn().mockResolvedValue({ uuid: "abc-123" }),
+      })
+
+      fireEvent.click(screen.getByText("Submit"))
+
+      await waitFor(() => {
+        expect(worksCalls()).toHaveLength(1)
+      })
+      const [url] = worksCalls()[0]
+      expect(url.searchParams.get("record_derived_from")).toBe("false")
+    })
+
+    // Fails if adding the query parameter changes the POST body sent to /works.
+    it("still posts the converted RDF as the request body", async () => {
+      await setupMarcConversion()
+
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: true,
+        json: jest.fn().mockResolvedValue({ uuid: "abc-123" }),
+      })
+
+      fireEvent.click(screen.getByText("Submit"))
+
+      await waitFor(() => {
+        expect(worksCalls()).toHaveLength(1)
+      })
+      const [, options] = worksCalls()[0]
+      expect(JSON.parse(options.body)).toEqual({ data: rdfText })
     })
 
     const workUri = "http://localhost:3000/works/abc-123"
@@ -320,10 +365,41 @@ describe("LoadByRDFForm", () => {
       fireEvent.click(screen.getByText("Submit"))
 
       // /api/works should not be called
-      expect(global.fetch).not.toHaveBeenCalledWith(
-        "http://localhost:3000/works",
-        expect.anything(),
+      expect(worksCalls()).toHaveLength(0)
+    })
+  })
+
+  describe("RDF submit flow", () => {
+    // Fails if ordinary Load RDF is routed through the MARC /works POST (for
+    // example, if the isMarcBibframe check is dropped), which would save it
+    // straight to the API without derivedFrom instead of loading the editor.
+    it("loads RDF into the editor without posting to /works", async () => {
+      global.fetch = jest.fn()
+      renderForm()
+
+      const rdf =
+        '<> <http://sinopia.io/vocabulary/hasResourceTemplate> "resourceTemplate:bf2:WorkTitle" .'
+      fireEvent.change(screen.getByLabelText(/Accepts JSON-LD/), {
+        target: { value: rdf },
+      })
+      fireEvent.click(screen.getByText("Submit"))
+
+      // The normal flow hands the parsed dataset to useRdfResource.
+      await waitFor(() => {
+        expect(useRdfResource).toHaveBeenLastCalledWith(
+          expect.objectContaining({ size: 1 }),
+          "",
+          "resourceTemplate:bf2:WorkTitle",
+          expect.anything(),
+        )
+      })
+      expect(worksCalls()).toHaveLength(0)
+      const derivedFromCalls = global.fetch.mock.calls.filter(([url]) =>
+        new URL(url, "http://localhost").searchParams.has(
+          "record_derived_from",
+        ),
       )
+      expect(derivedFromCalls).toHaveLength(0)
     })
   })
 
