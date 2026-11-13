@@ -9,6 +9,7 @@ import { Writer as N3Writer } from "n3"
 import dateFormat from "date-and-time"
 import SerializerJsonld from "@rdfjs/serializer-jsonld-ext"
 import Config from "Config"
+import { documentLoader } from "utilities/jsonldDocumentLoader"
 
 const concatStream = require("concat-stream")
 const Readable = require("stream").Readable
@@ -154,7 +155,7 @@ const withStringLiteralValue = (quad) => {
 }
 
 export const datasetFromJsonld = (jsonld) => {
-  const parserJsonld = new JsonLdParser()
+  const parserJsonld = new JsonLdParser({ documentLoader })
 
   const input = new Readable({
     read: () => {

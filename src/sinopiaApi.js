@@ -23,6 +23,7 @@ import rtResourcePropertyAttrs from "../static/templates/rt_resource_property_at
 import rtResourceRemplate from "../static/templates/rt_resource_template_doc.json"
 import rtUriPropertyAttrs from "../static/templates/rt_uri_property_attrs_doc.json"
 import {
+  apiErrorDetail,
   checkResp,
   getJson,
   isTemplate,
@@ -67,21 +68,75 @@ export const fetchResource = (
   } else if (Config.useResourceTemplateFixtures && isTemplate) {
     fetchPromise = Promise.reject(new Error("Not found"))
   } else {
-    fetchPromise = fetch(fetchUri, {
-      headers: { Accept: "application/vnd.sinopia+json" },
-    }).then((resp) => checkResp(resp).then(() => resp.json()))
+    fetchPromise = fetchApiResource(resourceUri, fetchUri)
   }
 
-  return fetchPromise
-    .then((response) =>
-      Promise.all([
-        datasetFromJsonld(response.data),
-        Promise.resolve(withDefaultGroups(response)),
-      ]),
+  return fetchPromise.then((response) =>
+    datasetFromJsonld(response.data).then(
+      (dataset) => [dataset, withDefaultGroups(response)],
+      (err) => {
+        throw new ResourceLoadError(
+          "parse",
+          `Couldn't parse ${resourceUri}: ${err.message || err}`,
+        )
+      },
+    ),
+  )
+}
+
+/**
+ * Why a resource could not be loaded: "fetch" (the API couldn't be reached),
+ * "notFound", "notAuthorized", "http" (any other failed response) or "parse".
+ * The message names the URL that failed, so callers can show it as is.
+ */
+export class ResourceLoadError extends Error {
+  constructor(kind, message) {
+    super(message)
+    this.name = "ResourceLoadError"
+    this.kind = kind
+  }
+}
+
+const fetchApiResource = (resourceUri, fetchUri) =>
+  fetch(fetchUri, {
+    headers: { Accept: "application/vnd.sinopia+json" },
+  }).then(
+    (resp) => {
+      if (!resp.ok)
+        return apiErrorDetail(resp).then((detail) => {
+          throw failedResponseError(resp, resourceUri, detail)
+        })
+      return resp.json().catch((err) => {
+        throw new ResourceLoadError(
+          "parse",
+          `Couldn't read the response for ${resourceUri}: ${err.message || err}`,
+        )
+      })
+    },
+    (err) => {
+      throw new ResourceLoadError(
+        "fetch",
+        `Couldn't reach ${resourceUri}: ${err.message || err}`,
+      )
+    },
+  )
+
+const failedResponseError = (resp, resourceUri, detail) => {
+  const withDetail = (message) => (detail ? `${message}: ${detail}` : message)
+  if (resp.status === 404)
+    return new ResourceLoadError(
+      "notFound",
+      withDetail(`${resourceUri} was not found`),
     )
-    .catch((err) => {
-      throw new Error(`Error parsing resource: ${err.message || err}`)
-    })
+  if (resp.status === 401 || resp.status === 403)
+    return new ResourceLoadError(
+      "notAuthorized",
+      withDetail(`Not authorized to read ${resourceUri}`),
+    )
+  return new ResourceLoadError(
+    "http",
+    withDetail(`${resourceUri} returned ${resp.status} ${resp.statusText}`),
+  )
 }
 
 // The Blue Core API does not return group information, so supply the default
