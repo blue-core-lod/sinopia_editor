@@ -853,11 +853,33 @@ const newLiteralFromObject = (obj, property, propertyUri) => {
   return newLiteralValue(property, propertyUri, obj.value, lang)
 }
 
+const rdfsLabel = rdf.namedNode("http://www.w3.org/2000/01/rdf-schema#label")
+const profileVersionUriRegex = /^(.+\/profiles\/[^/]+)\/version\/\d+$/
+
+// A profile can be named by its profile URI or by one of its version URIs, and
+// a template may write a nested template ref one way and that template's label
+// the other way. When the ref has no label of its own, use the label on its
+// alias: the profile URI for a version URI, or a version URI for a profile URI.
+// See https://github.com/blue-core-lod/sinopia_editor/issues/254
+const aliasLabelQuadsFor = (uri, dataset) => {
+  const profileUri = profileVersionUriRegex.exec(uri)?.[1]
+  if (profileUri)
+    return dataset.match(rdf.namedNode(profileUri), rdfsLabel).toArray()
+  return dataset
+    .match(null, rdfsLabel)
+    .toArray()
+    .filter(
+      (quad) =>
+        quad.subject.termType === "NamedNode" &&
+        profileVersionUriRegex.exec(quad.subject.value)?.[1] === uri,
+    )
+}
+
 const newUriFromObject = (obj, property, propertyUri, context) => {
   const uri = obj.value
-  const labelQuads = context.dataset
-    .match(obj, rdf.namedNode("http://www.w3.org/2000/01/rdf-schema#label"))
-    .toArray()
+  let labelQuads = context.dataset.match(obj, rdfsLabel).toArray()
+  if (labelQuads.length === 0)
+    labelQuads = aliasLabelQuadsFor(uri, context.dataset)
   // No fallback to the uri. A label invented purely for display used to be
   // written back on save as though a cataloger had supplied it. The uri stays
   // visible in the URI field above the label, so nothing is hidden by leaving
