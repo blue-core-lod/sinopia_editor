@@ -88,6 +88,14 @@ export const setTemplateUsage = (state, action) => ({
   },
 })
 
+export const setTemplateVersionCheck = (state, action) => ({
+  ...state,
+  templateVersionCheck: {
+    ...state.templateVersionCheck,
+    [action.payload.resourceKey]: action.payload.check,
+  },
+})
+
 export const setCurrentEditResource = (state, action) => {
   const resourceKey = action.payload
   const newState = {
@@ -463,13 +471,20 @@ export const clearResourceFromEditor = (state, action) => {
     templateUsage: {
       ...state.templateUsage,
     },
+    templateVersionCheck: {
+      ...state.templateVersionCheck,
+    },
   }
 
+  // A resource can be in state without being open (loaded but never made
+  // current), and slicing at -1 would duplicate the open resources.
   const resourceIndex = state.resources.indexOf(resourceKey)
-  newState.resources = [
-    ...state.resources.slice(0, resourceIndex),
-    ...state.resources.slice(resourceIndex + 1),
-  ]
+  if (resourceIndex !== -1) {
+    newState.resources = [
+      ...state.resources.slice(0, resourceIndex),
+      ...state.resources.slice(resourceIndex + 1),
+    ]
+  }
 
   if (state.currentResource === resourceKey) {
     newState.currentResource = _.first(newState.resources) || null
@@ -479,6 +494,7 @@ export const clearResourceFromEditor = (state, action) => {
   delete newState.lastSave[resourceKey]
   delete newState.unusedRDF[resourceKey]
   delete newState.templateUsage[resourceKey]
+  delete newState.templateVersionCheck[resourceKey]
 
   return newState
 }

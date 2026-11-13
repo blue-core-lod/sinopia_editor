@@ -779,6 +779,32 @@ describe("validateProfile", () => {
     )
   })
 
+  it("sends only the resource_uri when given a resourceUri", async () => {
+    const state = createState({ hasResourceWithLiteral: true })
+    const resource = selectFullSubject(state, "t9zVwg2zO")
+    const resourceUri = "https://bcld.info/works/abc"
+    const check = { ...validation, is_latest: false, compatible: true }
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue(check),
+    })
+
+    const result = await validateProfile(profileUri, keycloak, {
+      resource,
+      resourceUri,
+    })
+
+    expect(result).toEqual(check)
+    expect(global.fetch).toHaveBeenCalledWith(`${profileUri}/validate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer Secret-Token",
+      },
+      body: JSON.stringify({ resource_uri: resourceUri }),
+    })
+  })
+
   it("resolves null when the API errors", async () => {
     jest.spyOn(console, "error").mockImplementation(() => {})
     global.fetch = jest.fn().mockResolvedValue({
