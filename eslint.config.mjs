@@ -193,6 +193,8 @@ export default [
        */
       "no-import-assign": "off",
       "n/no-unpublished-import": "off",
+      // Fixtures are read and recorded by computed path under __tests__.
+      "security/detect-non-literal-fs-filename": "off",
     },
   },
 

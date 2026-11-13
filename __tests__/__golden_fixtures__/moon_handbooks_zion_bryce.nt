@@ -1,0 +1,188 @@
+_:N91087b0ee19f4ae8b8d004a2667359ac <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> _:Nf238c00b1a4a47fda1452b4d7e0a2d65 .
+_:Nae675531281940efba0ee26e1b1ca1ef <http://id.loc.gov/ontologies/bibframe/code> "13" .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/genreForm> <http://id.loc.gov/authorities/genreForms/gf2014026108> .
+_:N864d0fef97c049888f5bb97d2611eeb5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> _:N8b6d28bcde8d4b9ba43b30b3da21b796 .
+_:N7830b701ba78468d97b6697edd72f2e0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.loc.gov/mads/rdf/v1#GenreForm> .
+_:Ncf0630cfbd0348d8aad13dfa1d31d9a5 <http://id.loc.gov/ontologies/bibframe/note> _:N01f8ad45a4b247548dd99ab57330210a .
+_:Nb1ada461636949a9ae6c93073593ff79 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/ClassificationLcc> .
+_:Ndca197e46b594b5ba870b2755d5356df <http://www.w3.org/2000/01/rdf-schema#label> "travel guidebooks" .
+_:N9dc11654e9fc437180a0cef80cecac36 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:N864d0fef97c049888f5bb97d2611eeb5 .
+_:N24431b007efa488086ea41a7eb60d24f <http://id.loc.gov/ontologies/bibframe/assigner> _:N7ad8575f792844318fa764f9fa7ec3ee .
+_:N18fcf68bd58a4236a4e18522fef7e531 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> _:N7830b701ba78468d97b6697edd72f2e0 .
+_:N24431b007efa488086ea41a7eb60d24f <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/IssnL> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/title> _:N07d00e167cf0490b9e04d722401d30cc .
+_:Nd09d01da73f6442c968973fff50b26b2 <http://id.loc.gov/ontologies/bibframe/source> <http://id.loc.gov/vocabulary/subjectSchemes/rvm> .
+_:Na957d767191841a19593678c87efbb2f <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.loc.gov/mads/rdf/v1#GenreForm> .
+_:N71084b14eaea4183aa8933afe6d73316 <http://id.loc.gov/ontologies/bflc/catalogerId> "Unknown" .
+_:N4be7fe796cfa4b3793a43e8988256a23 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Agent> .
+_:Ndca197e46b594b5ba870b2755d5356df <http://www.loc.gov/mads/rdf/v1#isMemberOfMADSScheme> <http://id.loc.gov/vocabulary/subjectSchemes/aat> .
+_:N1ecdfd20166c4f738b49a7347f7ccb19 <http://www.loc.gov/mads/rdf/v1#authoritativeLabel> "Guides" .
+_:Nae370f88f86f45f3b40920f8e2cd32cd <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <http://id.loc.gov/rwo/agents/n79021759-781> .
+_:Nb1ada461636949a9ae6c93073593ff79 <http://id.loc.gov/ontologies/bibframe/assigner> <http://id.loc.gov/vocabulary/organizations/dlc> .
+_:N3a79270e8ba54dcfa661278f2b843ce3 <http://www.w3.org/2000/01/rdf-schema#label> "Parcs nationaux--Utah--Guides" .
+_:N01f8ad45a4b247548dd99ab57330210a <http://www.w3.org/2000/01/rdf-schema#label> "From <2021->" .
+_:N8b6d28bcde8d4b9ba43b30b3da21b796 <http://www.loc.gov/mads/rdf/v1#authoritativeLabel> "Guides" .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bflc/aap-normalized> "moonhandbookszion&bryce" .
+_:Ndca197e46b594b5ba870b2755d5356df <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.loc.gov/mads/rdf/v1#Topic> .
+_:Nae370f88f86f45f3b40920f8e2cd32cd <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:N91087b0ee19f4ae8b8d004a2667359ac .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Serial> .
+_:N39ad3203f2ee47fd970f3b38160e1991 <http://www.loc.gov/mads/rdf/v1#componentList> _:N9dc11654e9fc437180a0cef80cecac36 .
+_:Nb1ada461636949a9ae6c93073593ff79 <http://id.loc.gov/ontologies/bibframe/status> <http://id.loc.gov/vocabulary/mstatus/uba> .
+_:Ndca197e46b594b5ba870b2755d5356df <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Topic> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/title> _:N251afd378b034322b0eeae6621875123 .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/title> _:Nd86bfe2f490b4294a0fea67430af2a75 .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/subject> _:Nd09d01da73f6442c968973fff50b26b2 .
+_:N71084b14eaea4183aa8933afe6d73316 <http://id.loc.gov/ontologies/bibframe/descriptionLanguage> <http://id.loc.gov/vocabulary/languages/eng> .
+_:N07d00e167cf0490b9e04d722401d30cc <http://id.loc.gov/ontologies/bibframe/mainTitle> "Moon handbooks" .
+_:N864d0fef97c049888f5bb97d2611eeb5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+_:N4feb4fafbcf041c6aa642616149ac105 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <http://id.loc.gov/authorities/subjects/sh91004723> .
+_:N251afd378b034322b0eeae6621875123 <http://id.loc.gov/ontologies/bibframe/mainTitle> "Zion and Bryce" .
+_:N4feb4fafbcf041c6aa642616149ac105 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:N0fa676c5d97d49b99c693c43c0b2357d .
+_:N7ad8575f792844318fa764f9fa7ec3ee <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Agent> .
+_:Ne9a1755c7b7546c8808cdde2912a49fc <http://www.loc.gov/mads/rdf/v1#authoritativeLabel> "Bryce Canyon National Park (Utah)--Guides" .
+_:Nda9f800d1ba449f09712a935e2e8109b <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.loc.gov/mads/rdf/v1#Topic> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/adminMetadata> _:N71084b14eaea4183aa8933afe6d73316 .
+_:Na957d767191841a19593678c87efbb2f <http://www.loc.gov/mads/rdf/v1#authoritativeLabel> "Guides" .
+_:N793d6dfd0bb34a23996fe20e01c18546 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:N18fcf68bd58a4236a4e18522fef7e531 .
+_:N16e07ef2a4c94d488ef5053f2af3f276 <http://id.loc.gov/ontologies/bibframe/classificationPortion> "917" .
+_:Nce721af40d94480a90fdc09a5d4eab63 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Topic> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/content> <http://id.loc.gov/vocabulary/contentTypes/txt> .
+_:Nd09d01da73f6442c968973fff50b26b2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.loc.gov/mads/rdf/v1#ComplexSubject> .
+_:N71084b14eaea4183aa8933afe6d73316 <http://id.loc.gov/ontologies/bibframe/descriptionLevel> <http://id.loc.gov/ontologies/bibframe-2-6-0/> .
+_:Ncf0630cfbd0348d8aad13dfa1d31d9a5 <http://id.loc.gov/ontologies/bibframe/mainTitle> "Moon Zion & Bryce" .
+_:Nbf0b9e9f13474f23999a4502d186536a <http://id.loc.gov/ontologies/bibframe/date> "2026-09-12T02:52:32.876089+00:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+_:N7ad8575f792844318fa764f9fa7ec3ee <http://id.loc.gov/ontologies/bibframe/code> "1" .
+_:N07d00e167cf0490b9e04d722401d30cc <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/VariantTitle> .
+_:N71084b14eaea4183aa8933afe6d73316 <http://id.loc.gov/ontologies/bibframe/descriptionAuthentication> <http://id.loc.gov/vocabulary/marcauthen/pcc> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/subject> _:Ndca197e46b594b5ba870b2755d5356df .
+_:Ndca197e46b594b5ba870b2755d5356df <http://www.loc.gov/mads/rdf/v1#authoritativeLabel> "travel guidebooks" .
+_:Ne9a1755c7b7546c8808cdde2912a49fc <http://id.loc.gov/ontologies/bflc/aap-normalized> "brycecanyonnationalpark(utah)guides" .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/subject> <http://id.loc.gov/authorities/subjects/sh85149885> .
+_:Nd86bfe2f490b4294a0fea67430af2a75 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Title> .
+_:Ne9a1755c7b7546c8808cdde2912a49fc <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Topic> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/subject> _:N39ad3203f2ee47fd970f3b38160e1991 .
+_:Nd49889637a644fdc968579733fae7a48 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> _:Na957d767191841a19593678c87efbb2f .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/identifiedBy> _:N24431b007efa488086ea41a7eb60d24f .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/classification> _:Nb1ada461636949a9ae6c93073593ff79 .
+_:Nbf0b9e9f13474f23999a4502d186536a <http://id.loc.gov/ontologies/bibframe/derivedFrom> <http://id.loc.gov/resources/works/13105300> .
+_:Ncf0630cfbd0348d8aad13dfa1d31d9a5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/VariantTitle> .
+_:N0b54173f7a974175a3a8784ff2a70f46 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> _:Nda9f800d1ba449f09712a935e2e8109b .
+_:N43f3c039c179401db7fa4f7f6907c6aa <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.loc.gov/mads/rdf/v1#GenreForm> .
+_:N18fcf68bd58a4236a4e18522fef7e531 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+_:N5fa04f9339154fd0a0e5ac04758929ef <http://id.loc.gov/ontologies/bibframe/assigner> _:N4be7fe796cfa4b3793a43e8988256a23 .
+_:Nf238c00b1a4a47fda1452b4d7e0a2d65 <http://www.loc.gov/mads/rdf/v1#authoritativeLabel> "Guides" .
+_:N3a79270e8ba54dcfa661278f2b843ce3 <http://www.loc.gov/mads/rdf/v1#authoritativeLabel> "Parcs nationaux--Utah--Guides" .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/identifiedBy> _:N5fa04f9339154fd0a0e5ac04758929ef .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/title> _:Ncfb5f34e4206422e8d90c5ef98e5204f .
+_:Nce721af40d94480a90fdc09a5d4eab63 <http://id.loc.gov/ontologies/bflc/aap-normalized> "canyonlandsnationalpark(utah)guides" .
+_:Ndbcead2c52dc4ec387e73837c106c2fd <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Topic> .
+_:N24431b007efa488086ea41a7eb60d24f <http://www.w3.org/1999/02/22-rdf-syntax-ns#value> "1540-3823" .
+_:N7830b701ba78468d97b6697edd72f2e0 <http://www.loc.gov/mads/rdf/v1#authoritativeLabel> "Guides" .
+_:Nce721af40d94480a90fdc09a5d4eab63 <http://www.loc.gov/mads/rdf/v1#componentList> _:N1721c1cdf2004050b2410fb491e528d6 .
+_:Ne9a1755c7b7546c8808cdde2912a49fc <http://id.loc.gov/ontologies/bibframe/source> <http://id.loc.gov/vocabulary/subjectSchemes/rvm> .
+_:Nd86bfe2f490b4294a0fea67430af2a75 <http://id.loc.gov/ontologies/bibframe/mainTitle> "Moon handbooks" .
+_:Ndca197e46b594b5ba870b2755d5356df <http://id.loc.gov/ontologies/bibframe/source> <http://id.loc.gov/vocabulary/subjectSchemes/aat> .
+_:Nb1ada461636949a9ae6c93073593ff79 <http://id.loc.gov/ontologies/bibframe/classificationPortion> "F832.Z8" .
+_:Nb1ada461636949a9ae6c93073593ff79 <http://id.loc.gov/ontologies/bibframe/itemPortion> "M66" .
+_:Nd09d01da73f6442c968973fff50b26b2 <http://www.w3.org/2000/01/rdf-schema#label> "Voyages--Guides" .
+_:Nbf0b9e9f13474f23999a4502d186536a <http://id.loc.gov/ontologies/bibframe/status> <http://id.loc.gov/vocabulary/mstatus/c> .
+_:N4d463d53ff384cde8a828f148c5b6f50 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.loc.gov/mads/rdf/v1#Topic> .
+_:N0fa676c5d97d49b99c693c43c0b2357d <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> _:N43f3c039c179401db7fa4f7f6907c6aa .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bflc/aap> "Moon handbooks. Zion & Bryce" .
+_:N39ad3203f2ee47fd970f3b38160e1991 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Topic> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/geographicCoverage> <http://id.loc.gov/vocabulary/geographicAreas/n-us-ut> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/classification> _:N16e07ef2a4c94d488ef5053f2af3f276 .
+_:N01f8ad45a4b247548dd99ab57330210a <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Note> .
+_:N43f3c039c179401db7fa4f7f6907c6aa <http://www.loc.gov/mads/rdf/v1#authoritativeLabel> "Guides" .
+_:N16e07ef2a4c94d488ef5053f2af3f276 <http://id.loc.gov/ontologies/bibframe/edition> "abridged" .
+_:N2381ff3bd2a447ba82f2993002ebc988 <http://id.loc.gov/ontologies/bibframe/mainTitle> "Moon handbooks. Zion & Bryce" .
+_:Ne9a1755c7b7546c8808cdde2912a49fc <http://www.loc.gov/mads/rdf/v1#componentList> _:N4feb4fafbcf041c6aa642616149ac105 .
+_:Ndbcead2c52dc4ec387e73837c106c2fd <http://id.loc.gov/ontologies/bibframe/source> <http://id.loc.gov/vocabulary/subjectSchemes/rvm> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/subject> _:Ne9a1755c7b7546c8808cdde2912a49fc .
+_:Nce721af40d94480a90fdc09a5d4eab63 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.loc.gov/mads/rdf/v1#ComplexSubject> .
+_:Nd09d01da73f6442c968973fff50b26b2 <http://id.loc.gov/ontologies/bflc/aap-normalized> "voyagesguides" .
+_:Nae675531281940efba0ee26e1b1ca1ef <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Source> .
+_:Ndbcead2c52dc4ec387e73837c106c2fd <http://www.loc.gov/mads/rdf/v1#componentList> _:N793d6dfd0bb34a23996fe20e01c18546 .
+_:N1721c1cdf2004050b2410fb491e528d6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:Naca15203a35c4460882ad3a9119864b6 .
+_:N3a79270e8ba54dcfa661278f2b843ce3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Topic> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/subject> _:N3a79270e8ba54dcfa661278f2b843ce3 .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/subject> _:Ndbcead2c52dc4ec387e73837c106c2fd .
+_:Nd49889637a644fdc968579733fae7a48 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+_:Ndbcead2c52dc4ec387e73837c106c2fd <http://www.w3.org/2000/01/rdf-schema#label> "Arches National Park (Utah)--Guides" .
+_:N96779a784a91459881879c0b869c4cf1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/VariantTitle> .
+_:N39ad3203f2ee47fd970f3b38160e1991 <http://id.loc.gov/ontologies/bibframe/source> <http://id.loc.gov/vocabulary/subjectSchemes/rvm> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/hasInstance> <https://stage.bcld.info/instances/5edfc93c-7272-4853-833b-568bfe825bef> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/subject> <http://id.worldcat.org/fast/1204563> .
+_:Nd09d01da73f6442c968973fff50b26b2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Topic> .
+_:N16e07ef2a4c94d488ef5053f2af3f276 <http://id.loc.gov/ontologies/bibframe/assigner> <http://id.loc.gov/vocabulary/organizations/dlc> .
+_:Nce721af40d94480a90fdc09a5d4eab63 <http://id.loc.gov/ontologies/bibframe/source> <http://id.loc.gov/vocabulary/subjectSchemes/rvm> .
+_:N3a79270e8ba54dcfa661278f2b843ce3 <http://id.loc.gov/ontologies/bflc/aap-normalized> "parcsnationauxutahguides" .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/subject> <http://id.loc.gov/authorities/subjects/sh85090104> .
+_:N96779a784a91459881879c0b869c4cf1 <http://id.loc.gov/ontologies/bibframe/mainTitle> "Zion & Bryce" .
+_:Nbf0b9e9f13474f23999a4502d186536a <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/AdminMetadata> .
+_:N91087b0ee19f4ae8b8d004a2667359ac <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Work> .
+_:N07d00e167cf0490b9e04d722401d30cc <http://id.loc.gov/ontologies/bibframe/partName> "Zion and Bryce" .
+_:N5fa04f9339154fd0a0e5ac04758929ef <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Issn> .
+_:N39ad3203f2ee47fd970f3b38160e1991 <http://www.w3.org/2000/01/rdf-schema#label> "Zion National Park (Utah)--Guides" .
+_:Ncfb5f34e4206422e8d90c5ef98e5204f <http://id.loc.gov/ontologies/bibframe/mainTitle> "Moon Zion and Bryce" .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/subject> <http://id.worldcat.org/fast/1243987> .
+_:Nbf0b9e9f13474f23999a4502d186536a <http://id.loc.gov/ontologies/bibframe/agent> <http://id.loc.gov/vocabulary/organizations/cbc> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/adminMetadata> _:Nbf0b9e9f13474f23999a4502d186536a .
+_:N1721c1cdf2004050b2410fb491e528d6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <http://id.loc.gov/authorities/subjects/sh85019837> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/genreForm> _:Nd627b3bfa4914574b6c7861bc6783c45 .
+_:Nda9f800d1ba449f09712a935e2e8109b <http://www.loc.gov/mads/rdf/v1#authoritativeLabel> "Parcs nationaux" .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/title> _:N2381ff3bd2a447ba82f2993002ebc988 .
+_:Naca15203a35c4460882ad3a9119864b6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> _:N1ecdfd20166c4f738b49a7347f7ccb19 .
+_:Nd09d01da73f6442c968973fff50b26b2 <http://www.loc.gov/mads/rdf/v1#authoritativeLabel> "Voyages--Guides" .
+_:N2381ff3bd2a447ba82f2993002ebc988 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/KeyTitle> .
+_:N16e07ef2a4c94d488ef5053f2af3f276 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/ClassificationDdc> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/genreForm> <http://id.worldcat.org/fast/1423871> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/subject> _:Nce721af40d94480a90fdc09a5d4eab63 .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/subject> <http://id.worldcat.org/fast/1260187> .
+_:N16e07ef2a4c94d488ef5053f2af3f276 <http://id.loc.gov/ontologies/bibframe/source> _:Nae675531281940efba0ee26e1b1ca1ef .
+_:Ndbcead2c52dc4ec387e73837c106c2fd <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.loc.gov/mads/rdf/v1#ComplexSubject> .
+_:Nd627b3bfa4914574b6c7861bc6783c45 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.loc.gov/mads/rdf/v1#GenreForm> .
+_:N39ad3203f2ee47fd970f3b38160e1991 <http://id.loc.gov/ontologies/bflc/aap-normalized> "zionnationalpark(utah)guides" .
+_:Ndbcead2c52dc4ec387e73837c106c2fd <http://id.loc.gov/ontologies/bflc/aap-normalized> "archesnationalpark(utah)guides" .
+_:N4d463d53ff384cde8a828f148c5b6f50 <http://www.loc.gov/mads/rdf/v1#authoritativeLabel> "Voyages" .
+_:N0fa676c5d97d49b99c693c43c0b2357d <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+_:N71084b14eaea4183aa8933afe6d73316 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/AdminMetadata> .
+_:N251afd378b034322b0eeae6621875123 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/VariantTitle> .
+_:N39ad3203f2ee47fd970f3b38160e1991 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.loc.gov/mads/rdf/v1#ComplexSubject> .
+_:N9dc11654e9fc437180a0cef80cecac36 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <http://id.loc.gov/authorities/subjects/sh85149885> .
+_:N55bcfab6709d4122be40b6bae8d3c052 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> _:N4d463d53ff384cde8a828f148c5b6f50 .
+_:Nd86bfe2f490b4294a0fea67430af2a75 <http://id.loc.gov/ontologies/bibframe/partName> "Zion & Bryce" .
+_:Ndbcead2c52dc4ec387e73837c106c2fd <http://www.loc.gov/mads/rdf/v1#authoritativeLabel> "Arches National Park (Utah)--Guides" .
+_:Nd627b3bfa4914574b6c7861bc6783c45 <http://www.w3.org/2000/01/rdf-schema#label> "Nonfiction" .
+_:Ne9a1755c7b7546c8808cdde2912a49fc <http://www.w3.org/2000/01/rdf-schema#label> "Bryce Canyon National Park (Utah)--Guides" .
+_:N3a79270e8ba54dcfa661278f2b843ce3 <http://www.loc.gov/mads/rdf/v1#componentList> _:N0b54173f7a974175a3a8784ff2a70f46 .
+_:N55bcfab6709d4122be40b6bae8d3c052 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:Nd49889637a644fdc968579733fae7a48 .
+_:Ne9a1755c7b7546c8808cdde2912a49fc <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.loc.gov/mads/rdf/v1#ComplexSubject> .
+_:N96779a784a91459881879c0b869c4cf1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/vocabulary/vartitletype/por> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Text> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/title> _:Ncf0630cfbd0348d8aad13dfa1d31d9a5 .
+_:Nce721af40d94480a90fdc09a5d4eab63 <http://www.w3.org/2000/01/rdf-schema#label> "Canyonlands National Park (Utah)--Guides" .
+_:Nd627b3bfa4914574b6c7861bc6783c45 <http://www.loc.gov/mads/rdf/v1#authoritativeLabel> "Nonfiction" .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/notation> <http://id.loc.gov/vocabulary/mscript/a> .
+_:N5fa04f9339154fd0a0e5ac04758929ef <http://www.w3.org/1999/02/22-rdf-syntax-ns#value> "1540-3823" .
+_:Ndca197e46b594b5ba870b2755d5356df <http://id.loc.gov/ontologies/bflc/aap-normalized> "travelguidebooks" .
+_:Naca15203a35c4460882ad3a9119864b6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+_:Ncfb5f34e4206422e8d90c5ef98e5204f <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/VariantTitle> .
+_:N1ecdfd20166c4f738b49a7347f7ccb19 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.loc.gov/mads/rdf/v1#GenreForm> .
+_:N4be7fe796cfa4b3793a43e8988256a23 <http://id.loc.gov/ontologies/bibframe/code> "1" .
+_:N3a79270e8ba54dcfa661278f2b843ce3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.loc.gov/mads/rdf/v1#ComplexSubject> .
+_:N39ad3203f2ee47fd970f3b38160e1991 <http://www.loc.gov/mads/rdf/v1#authoritativeLabel> "Zion National Park (Utah)--Guides" .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/subject> <http://id.worldcat.org/fast/1033642> .
+_:Nd627b3bfa4914574b6c7861bc6783c45 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/GenreForm> .
+_:Nf238c00b1a4a47fda1452b4d7e0a2d65 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.loc.gov/mads/rdf/v1#GenreForm> .
+_:N0b54173f7a974175a3a8784ff2a70f46 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:Nae370f88f86f45f3b40920f8e2cd32cd .
+_:N793d6dfd0bb34a23996fe20e01c18546 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <http://id.loc.gov/authorities/subjects/sh85006537> .
+_:Nce721af40d94480a90fdc09a5d4eab63 <http://www.loc.gov/mads/rdf/v1#authoritativeLabel> "Canyonlands National Park (Utah)--Guides" .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/language> <http://id.loc.gov/vocabulary/languages/eng> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/title> _:N96779a784a91459881879c0b869c4cf1 .
+_:N8b6d28bcde8d4b9ba43b30b3da21b796 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.loc.gov/mads/rdf/v1#GenreForm> .
+_:N71084b14eaea4183aa8933afe6d73316 <http://id.loc.gov/ontologies/bibframe/date> "2026-09-12" .
+_:N3a79270e8ba54dcfa661278f2b843ce3 <http://id.loc.gov/ontologies/bibframe/source> <http://id.loc.gov/vocabulary/subjectSchemes/rvm> .
+<https://stage.bcld.info/works/6a6a9253-8d9b-4b99-a483-571644f372e0> <http://id.loc.gov/ontologies/bibframe/subject> <http://id.loc.gov/authorities/subjects/sh91004723> .
+_:Nd09d01da73f6442c968973fff50b26b2 <http://www.loc.gov/mads/rdf/v1#componentList> _:N55bcfab6709d4122be40b6bae8d3c052 .

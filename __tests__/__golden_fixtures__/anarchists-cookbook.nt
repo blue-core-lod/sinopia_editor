@@ -1,0 +1,61 @@
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://id.loc.gov/ontologies/bibframe/adminMetadata> _:N17fd6e7322c64e35acfe322f2d4e9fe8 .
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://id.loc.gov/ontologies/bibframe/title> _:N62c6f13e5b1a459a81a5af97e27aee18 .
+_:Nac60f0fd9a0f4c908e4308ec997bfaf9 <http://id.loc.gov/ontologies/bibframe/relationship> <http://id.loc.gov/vocabulary/relationship/series> .
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://id.loc.gov/ontologies/bibframe/contribution> _:N2fce5790f4eb4802958351c8ac17aaf2 .
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://id.loc.gov/ontologies/bibframe/genreForm> <http://id.loc.gov/authorities/genreForms/gf2014026339> .
+_:N35e960bc87914af2a5780b245c6dbe88 <http://id.loc.gov/ontologies/bibframe/assigner> <http://id.loc.gov/vocabulary/organizations/dlc> .
+_:N9eb1fb13b2e946e098f5eaec8255696d <http://id.loc.gov/ontologies/bibframe/mainTitle> "Dungeon crawler Carl" .
+_:N81c63b87f99d48188b84229025d8c542 <http://id.loc.gov/ontologies/bibframe/assigner> <http://id.loc.gov/vocabulary/organizations/dlc> .
+_:N81c63b87f99d48188b84229025d8c542 <http://id.loc.gov/ontologies/bibframe/source> _:Nebec0f8b33044c92bb0c56ee3a091cdc .
+_:N7fd27cf9cc874021a8396523896b8d2f <http://id.loc.gov/ontologies/bibframe/descriptionLevel> <http://id.loc.gov/ontologies/bibframe-2-6-0/> .
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Monograph> .
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://id.loc.gov/ontologies/bibframe/hasInstance> <https://stage.bcld.info/instances/98477d00-9e6d-41c1-baa5-f528435b6114> .
+_:N9eb1fb13b2e946e098f5eaec8255696d <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Title> .
+_:N7fd27cf9cc874021a8396523896b8d2f <http://id.loc.gov/ontologies/bibframe/descriptionAuthentication> <http://id.loc.gov/vocabulary/marcauthen/pcc> .
+_:N35e960bc87914af2a5780b245c6dbe88 <http://id.loc.gov/ontologies/bibframe/itemPortion> "D85 2024" .
+_:N17fd6e7322c64e35acfe322f2d4e9fe8 <http://id.loc.gov/ontologies/bibframe/date> "2026-09-11T20:57:57.593465+00:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+_:Nac60f0fd9a0f4c908e4308ec997bfaf9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Relation> .
+_:N2fce5790f4eb4802958351c8ac17aaf2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/PrimaryContribution> .
+_:Nc40359192a594dbb90b6195234061674 <http://id.loc.gov/ontologies/bibframe/title> _:N9eb1fb13b2e946e098f5eaec8255696d .
+_:Nc40359192a594dbb90b6195234061674 <http://id.loc.gov/ontologies/bibframe/status> <http://id.loc.gov/vocabulary/mstatus/t> .
+_:N7fd27cf9cc874021a8396523896b8d2f <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/AdminMetadata> .
+_:N81c63b87f99d48188b84229025d8c542 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/ClassificationDdc> .
+_:Nac60f0fd9a0f4c908e4308ec997bfaf9 <http://id.loc.gov/ontologies/bibframe/seriesEnumeration> "Book three" .
+_:N35e960bc87914af2a5780b245c6dbe88 <http://id.loc.gov/ontologies/bibframe/status> <http://id.loc.gov/vocabulary/mstatus/uba> .
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Text> .
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Work> .
+_:N7fd27cf9cc874021a8396523896b8d2f <http://id.loc.gov/ontologies/bflc/catalogerId> "Unknown" .
+_:N2fce5790f4eb4802958351c8ac17aaf2 <http://id.loc.gov/ontologies/bibframe/agent> <http://id.loc.gov/rwo/agents/no2023085548> .
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://id.loc.gov/ontologies/bibframe/language> <http://id.loc.gov/vocabulary/languages/eng> .
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://id.loc.gov/ontologies/bibframe/relation> _:Nac60f0fd9a0f4c908e4308ec997bfaf9 .
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://id.loc.gov/ontologies/bibframe/genreForm> <http://id.loc.gov/authorities/genreForms/gf2023026123> .
+_:Nc40359192a594dbb90b6195234061674 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bflc/Uncontrolled> .
+_:N17fd6e7322c64e35acfe322f2d4e9fe8 <http://id.loc.gov/ontologies/bibframe/derivedFrom> <http://id.loc.gov/resources/works/23655353> .
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://id.loc.gov/ontologies/bflc/aap-normalized> "dinnimanmattthedungeonanarchist'scookbook" .
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://id.loc.gov/ontologies/bibframe/content> <http://id.loc.gov/vocabulary/contentTypes/txt> .
+_:N28d2e390cc0d490597596a48502c7f69 <http://www.w3.org/2000/01/rdf-schema#label> "\"Welcome to the Gun Show! The top ten list is populated. The sponsorship program is open. The difficulty is ramping up. The first three floors were nothing compared to what Carl and Donut now face. The Iron Tangle. An impossibly-complicated subway system built out of the world's subterranean railway systems, all combined and then tied together into a knot. Up is down. Down is up. Close is far. The cars are filled with monsters, the railway stations are less than safe, and the exit is always just a few stops away. But there is hope. For the first time, the crawlers are all working together. The loot is better than ever. And the secret to unraveling it all may be hidden in the pages of a seemingly-useless book. Welcome, crawlers. Welcome to the fourth floor of the dungeon\"-- Provided by publisher." .
+_:N2fce5790f4eb4802958351c8ac17aaf2 <http://id.loc.gov/ontologies/bibframe/role> <http://id.loc.gov/vocabulary/relators/aut> .
+_:N17fd6e7322c64e35acfe322f2d4e9fe8 <http://id.loc.gov/ontologies/bibframe/agent> <http://id.loc.gov/vocabulary/organizations/cbc> .
+_:N62c6f13e5b1a459a81a5af97e27aee18 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Title> .
+_:Nac60f0fd9a0f4c908e4308ec997bfaf9 <http://id.loc.gov/ontologies/bibframe/associatedResource> _:Nc40359192a594dbb90b6195234061674 .
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://id.loc.gov/ontologies/bibframe/adminMetadata> _:N7fd27cf9cc874021a8396523896b8d2f .
+_:N62c6f13e5b1a459a81a5af97e27aee18 <http://id.loc.gov/ontologies/bibframe/mainTitle> "The dungeon anarchist's cookbook" .
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://id.loc.gov/ontologies/bibframe/summary> _:N28d2e390cc0d490597596a48502c7f69 .
+_:Nebec0f8b33044c92bb0c56ee3a091cdc <http://id.loc.gov/ontologies/bibframe/code> "23/eng/20240423" .
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://id.loc.gov/ontologies/bibframe/genreForm> <http://id.loc.gov/authorities/genreForms/gf2015026020> .
+_:N2fce5790f4eb4802958351c8ac17aaf2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Contribution> .
+_:N35e960bc87914af2a5780b245c6dbe88 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/ClassificationLcc> .
+_:N35e960bc87914af2a5780b245c6dbe88 <http://id.loc.gov/ontologies/bibframe/classificationPortion> "PS3604.I49" .
+_:N17fd6e7322c64e35acfe322f2d4e9fe8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/AdminMetadata> .
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://id.loc.gov/ontologies/bibframe/classification> _:N35e960bc87914af2a5780b245c6dbe88 .
+_:Nebec0f8b33044c92bb0c56ee3a091cdc <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Source> .
+_:N7fd27cf9cc874021a8396523896b8d2f <http://id.loc.gov/ontologies/bibframe/descriptionLanguage> <http://id.loc.gov/vocabulary/languages/eng> .
+_:N17fd6e7322c64e35acfe322f2d4e9fe8 <http://id.loc.gov/ontologies/bibframe/status> <http://id.loc.gov/vocabulary/mstatus/c> .
+_:N81c63b87f99d48188b84229025d8c542 <http://id.loc.gov/ontologies/bibframe/classificationPortion> "813/.6" .
+_:N28d2e390cc0d490597596a48502c7f69 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Summary> .
+_:N62c6f13e5b1a459a81a5af97e27aee18 <http://id.loc.gov/ontologies/bflc/nonSortNum> "4" .
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://id.loc.gov/ontologies/bflc/aap> "Dinniman, Matt. The dungeon anarchist's cookbook" .
+_:N7fd27cf9cc874021a8396523896b8d2f <http://id.loc.gov/ontologies/bibframe/date> "2026-09-11" .
+_:Nc40359192a594dbb90b6195234061674 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://id.loc.gov/ontologies/bibframe/Series> .
+_:N81c63b87f99d48188b84229025d8c542 <http://id.loc.gov/ontologies/bibframe/edition> "full" .
+<https://stage.bcld.info/works/a55a6b0f-bb05-4ab2-8574-31789654f486> <http://id.loc.gov/ontologies/bibframe/classification> _:N81c63b87f99d48188b84229025d8c542 .
