@@ -337,16 +337,26 @@ export const postTransfer = (body, keycloak) => {
 const userUrlFor = (userId) =>
   `${Config.sinopiaApiBase}/user/${encodeURI(userId)}`
 
+const SINOPIA_CREATION_DATE = "http://sinopia.io/vocabulary/creationDate"
 const SINOPIA_LAST_MODIFIED = "http://sinopia.io/vocabulary/lastModified"
 
-// Stamps a template (profile) with the time of this save (sinopia:lastModified,
-// see issue #285); other resources are not stamped. The system owns this value,
-// so any earlier one -- carried in with the unused RDF or entered through a
-// template property -- is replaced.
-const setLastModified = (dataset, resourceTerm) => {
-  const predicate = rdf.namedNode(SINOPIA_LAST_MODIFIED)
+// Sets a system-owned date on the root subject, replacing any earlier value --
+// carried in with the unused RDF or entered through a template property.
+const setSystemDate = (dataset, resourceTerm, predicateUri, date) => {
+  const predicate = rdf.namedNode(predicateUri)
   dataset.removeMatches(resourceTerm, predicate)
-  dataset.add(rdf.quad(resourceTerm, predicate, rdf.literal(edtfDateTime())))
+  dataset.add(rdf.quad(resourceTerm, predicate, rdf.literal(date)))
+}
+
+// Stamps a template (profile) with the time of this save: sinopia:lastModified
+// on every save (issue #285) and sinopia:creationDate on the first, a new
+// resource (issue #284). An existing template keeps the creationDate it was
+// loaded with, which comes back in the unused RDF. Other resources are not
+// stamped.
+const setTemplateDates = (dataset, resourceTerm, isNew) => {
+  const now = edtfDateTime()
+  if (isNew) setSystemDate(dataset, resourceTerm, SINOPIA_CREATION_DATE, now)
+  setSystemDate(dataset, resourceTerm, SINOPIA_LAST_MODIFIED, now)
 }
 
 const saveBodyForResource = (
@@ -380,7 +390,9 @@ const saveBodyForResource = (
 
   return mergeUnused
     .then(() => {
-      if (isTemplate(resource)) setLastModified(dataset, builder.resourceTerm)
+      // A new resource is POSTed with a blank node subject (postResource).
+      if (isTemplate(resource))
+        setTemplateDates(dataset, builder.resourceTerm, useBlankNode)
     })
     .then(() => jsonldFromDataset(dataset))
     .then((jsonld) =>
