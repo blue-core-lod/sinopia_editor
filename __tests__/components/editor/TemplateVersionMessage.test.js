@@ -60,7 +60,23 @@ describe("<TemplateVersionMessage />", () => {
     renderMessage(state)
 
     expect(republishButton()).toBeDisabled()
-    screen.getByText("Save your changes before re-publishing.")
+    screen.getByText(
+      "Recent changes were made to this resource. Save your changes before re-publishing.",
+    )
+  })
+
+  it("names a Work with unsaved changes and makes the save-first text bold", () => {
+    const state = stateWithCheck({})
+    state.entities.subjects.t9zVwg2zO.changed = true
+    state.entities.subjectTemplates["ld4p:RT:bf2:Title:AbbrTitle"].class =
+      "http://id.loc.gov/ontologies/bibframe/Work"
+
+    renderMessage(state)
+
+    const text = screen.getByText(
+      "Recent changes were made to this Work. Save your changes before re-publishing.",
+    )
+    expect(text.tagName).toEqual("STRONG")
   })
 
   it("does not let someone who can't edit the resource re-publish it", () => {
@@ -210,7 +226,9 @@ describe("<TemplateVersionMessage />", () => {
       expect(
         screen.getByRole("button", { name: "Open with latest template" }),
       ).toBeDisabled()
-      screen.getByText("Save your changes before re-publishing.")
+      screen.getByText(
+        "Recent changes were made to this resource. Save your changes before re-publishing.",
+      )
       expect(
         screen.getByRole("button", { name: "Keep version id 7" }),
       ).toBeEnabled()

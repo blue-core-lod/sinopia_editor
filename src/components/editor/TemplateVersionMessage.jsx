@@ -10,7 +10,9 @@ import {
   selectPickSubject,
   selectTemplateVersionCheck,
 } from "selectors/resources"
+import { selectSubjectTemplateForSubject } from "selectors/templates"
 import { versionIdFromUri } from "utilities/Utilities"
+import { isBfWork, isBfInstance } from "utilities/Bibframe"
 import usePermissions from "hooks/usePermissions"
 import useAlerts from "hooks/useAlerts"
 import { useKeycloak } from "../../KeycloakContext"
@@ -32,6 +34,9 @@ const TemplateVersionMessage = ({ resourceKey }) => {
   )
   const hasChanges = useSelector((state) =>
     resourceHasChangesSinceLastSave(state, resourceKey),
+  )
+  const resourceClass = useSelector(
+    (state) => selectSubjectTemplateForSubject(state, resourceKey)?.class,
   )
   const { canEdit } = usePermissions()
 
@@ -71,8 +76,12 @@ const TemplateVersionMessage = ({ resourceKey }) => {
   // Re-publishing refetches the stored resource (dropping unsaved edits) and
   // leaves a resource to save under its existing group, so both have to be ok.
   let blockedReason = null
-  if (hasChanges) blockedReason = "Save your changes before re-publishing."
-  else if (!canEdit(resource))
+  if (hasChanges) {
+    let resourceType = "resource"
+    if (isBfWork([resourceClass])) resourceType = "Work"
+    else if (isBfInstance([resourceClass])) resourceType = "Instance"
+    blockedReason = `Recent changes were made to this ${resourceType}. Save your changes before re-publishing.`
+  } else if (!canEdit(resource))
     blockedReason = "You don't have permission to re-publish this resource."
 
   // On success this resource is swapped out, and this component with it.
@@ -101,7 +110,7 @@ const TemplateVersionMessage = ({ resourceKey }) => {
     </button>
   )
   const blockedText = blockedReason && (
-    <span className="ms-2">{blockedReason}</span>
+    <strong className="ms-2">{blockedReason}</strong>
   )
 
   let body
