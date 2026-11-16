@@ -1,16 +1,19 @@
 /* Copyright 2020 Stanford University see LICENSE for license */
 
 // Sinopia variables
-$resource-tab-active-bg: $blue;
-$heading-icon-color: $blue;
+$resource-tab-active-bg: $core-blue;
+$heading-icon-color: $core-blue;
 
 $prop-heading-bg: $white;
-$prop-heading-color: black;
+$prop-heading-color: $black-100;
 $prop-panel-bg: $white;
 
 $lookup-value-bg: $swirl;
 $lookup-value-border: $nobel;
 
 $lookup-search-result-bg: $pampas;
+
+// Full-bleed bands (header, sub-nav, footer) cancel the body's side margin
+$page-gutter: 20px;
 
 $sidebar-collapse-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path fill='none' stroke='rgba(0,0,0,.5)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 14l6-6-6-6'/></svg>");

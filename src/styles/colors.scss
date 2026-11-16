@@ -1,16 +1,18 @@
 /* Copyright 2020 Stanford University see LICENSE for license */
 
-// Color palette:
-$orient: #00548f;
+// Blue Core palette (Figma: BLUE-CORE, Sinopia dashboard)
+$core-blue: #003caf; // Core/Core Blue: links, icons, nav, primary buttons, rules
+$digital-blue: #006cb8; // Web Interactive/Digital blue/Base: primary button border
+$sinopia-wordmark: #4368ae; // "| SINOPIA" app name in the header
+$black-100: #2e2d29; // Primary/Black 100: body text
+$black-70: #6d6c69; // Primary/Black 70: placeholder and secondary text
+$black-40: #ababa9; // Primary/Black 40: table rules, input borders
+$mist: #f0f4f7; // Sub-navigation and footer bands
+
+// Legacy palette, still used by editor-specific components:
 $bright-red: #b1020f;
 $reno-sand: #b26f16;
-$solitude: #e8ecf4;
-$spring-wood: #f8f6ef;
 $pampas: #f7f4f1;
 $white-linen: #f0eae1;
 $swirl: #d7cec4;
-$double-spanish-white: #cfc2a8;
 $nobel: #989898;
-$greyblue: #e8ecf4;
-$bluecore-header: #b9c8e8;
-$bluecore-bkgrd: #ebeefa;

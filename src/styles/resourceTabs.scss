@@ -8,7 +8,8 @@
   margin-top: 10px;
 
   .nav-item {
-    border: 1px solid $gray-600;
+    border: 1px solid $black-40;
+    border-radius: 2px;
     margin-bottom: 5px;
     margin-right: 10px;
     height: $tab-height;
@@ -18,7 +19,7 @@
       display: inline-block;
       border: 0;
       border-radius: 0;
-      color: $gray-600;
+      color: $black-70;
       text-decoration: none;
       margin: 5px;
 
