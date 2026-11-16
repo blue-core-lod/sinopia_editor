@@ -1,8 +1,10 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
+import rdf from "rdf-ext"
 import {
   datasetFromJsonld,
   datasetFromN3,
+  edtfDateTime,
   hasUnknownTemplateVersion,
   jsonldFromDataset,
 } from "utilities/Utilities"
@@ -335,6 +337,18 @@ export const postTransfer = (body, keycloak) => {
 const userUrlFor = (userId) =>
   `${Config.sinopiaApiBase}/user/${encodeURI(userId)}`
 
+const SINOPIA_LAST_MODIFIED = "http://sinopia.io/vocabulary/lastModified"
+
+// Stamps a template (profile) with the time of this save (sinopia:lastModified,
+// see issue #285); other resources are not stamped. The system owns this value,
+// so any earlier one -- carried in with the unused RDF or entered through a
+// template property -- is replaced.
+const setLastModified = (dataset, resourceTerm) => {
+  const predicate = rdf.namedNode(SINOPIA_LAST_MODIFIED)
+  dataset.removeMatches(resourceTerm, predicate)
+  dataset.add(rdf.quad(resourceTerm, predicate, rdf.literal(edtfDateTime())))
+}
+
 const saveBodyForResource = (
   resource,
   user,
@@ -353,7 +367,8 @@ const saveBodyForResource = (
       ),
     )
 
-  const dataset = new GraphBuilder(resource, useBlankNode).graph
+  const builder = new GraphBuilder(resource, useBlankNode)
+  const dataset = builder.graph
 
   // Merge back any triples that the template did not cover on load so they are
   // preserved rather than stripped on save. See issue #134.
@@ -364,6 +379,9 @@ const saveBodyForResource = (
     : Promise.resolve()
 
   return mergeUnused
+    .then(() => {
+      if (isTemplate(resource)) setLastModified(dataset, builder.resourceTerm)
+    })
     .then(() => jsonldFromDataset(dataset))
     .then((jsonld) =>
       JSON.stringify({

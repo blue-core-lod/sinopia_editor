@@ -185,6 +185,12 @@ export const generateMD5 = (message) => CryptoJS.MD5(message).toString()
 export const hasUnknownTemplateVersion = (subjectTemplate) =>
   !!subjectTemplate.profileUri && !subjectTemplate.versionUri
 
+// A moment as an EDTF (level 0) date and time in UTC, e.g.
+// "2026-09-11T20:09:54+00:00". EDTF has no fractional seconds, so the
+// milliseconds toISOString gives are dropped.
+export const edtfDateTime = (date = new Date()) =>
+  date.toISOString().replace(/\.\d{3}Z$/, "+00:00")
+
 // The id at the end of a profile version URI (.../version/{id}). It is the
 // API's global Version.id, not an ordinal, so it is shown as "version id N".
 export const versionIdFromUri = (uri) =>

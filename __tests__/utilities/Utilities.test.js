@@ -10,6 +10,7 @@ import {
   resourceIdFromUri,
   uriFromResourceId,
   findRootResourceTemplateId,
+  edtfDateTime,
 } from "utilities/Utilities"
 import timezoneMock from "timezone-mock"
 
@@ -264,6 +265,14 @@ describe("Utilities", () => {
 <${uri}> <http://sinopia.io/vocabulary/hasResourceTemplate> "bluecore:bf2:Monograph:Work" .`,
       )
       expect(findRootResourceTemplateId(uri, dataset)).toBeNull()
+    })
+  })
+
+  describe("edtfDateTime()", () => {
+    it("formats a moment as an EDTF date and time in UTC, without milliseconds", () => {
+      expect(edtfDateTime(new Date("2026-09-11T20:09:54.123Z"))).toBe(
+        "2026-09-11T20:09:54+00:00",
+      )
     })
   })
 })
