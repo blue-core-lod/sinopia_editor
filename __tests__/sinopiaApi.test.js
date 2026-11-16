@@ -181,21 +181,25 @@ describe("fetchResource", () => {
     })
 
     it("says the resource couldn't be parsed, naming the context", async () => {
-      global.fetch = jest.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: jest.fn().mockResolvedValue({
-          data: {
-            "@context": "https://example.com/context.jsonld",
-            "@id": uri,
-          },
-        }),
-      })
+      global.fetch = jest.fn().mockImplementation((url) =>
+        url.startsWith(uri)
+          ? Promise.resolve({
+              ok: true,
+              status: 200,
+              json: jest.fn().mockResolvedValue({
+                data: {
+                  "@context": "https://example.com/context.jsonld",
+                  "@id": uri,
+                },
+              }),
+            })
+          : Promise.reject(new TypeError("Failed to fetch")),
+      )
 
       const err = await loadError(fetchResource(uri))
       expect(err.kind).toBe("parse")
       expect(err.message).toBe(
-        `Couldn't parse ${uri}: Failed to load remote context https://example.com/context.jsonld: the editor only uses its bundled JSON-LD contexts and the API's own`,
+        `Couldn't parse ${uri}: Failed to load remote context https://example.com/context.jsonld: Failed to fetch`,
       )
     })
   })
