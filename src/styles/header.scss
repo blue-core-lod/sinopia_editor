@@ -1,11 +1,11 @@
 /** Shared Blue Core header / footer (bluecore-stack's custom elements) **/
-// Full width, as in the Figma, by cancelling the body margin (20px, see
+// Full width, as in the Figma, by cancelling the body margin ($page-gutter, see
 // bootstrap-override.scss) and the .container-fluid gutter around the app.
 bluecore-header,
 bluecore-footer {
   display: block;
-  margin-left: calc(-20px - var(--bs-gutter-x, 1.5rem) * 0.5);
-  margin-right: calc(-20px - var(--bs-gutter-x, 1.5rem) * 0.5);
+  margin-left: calc(-#{$page-gutter} - var(--bs-gutter-x, 1.5rem) * 0.5);
+  margin-right: calc(-#{$page-gutter} - var(--bs-gutter-x, 1.5rem) * 0.5);
 }
 
 // Pin the footer to the bottom of the window on short pages; on long pages it
@@ -20,23 +20,32 @@ bluecore-footer {
   margin-top: auto;
 }
 
-/** For header tabs **/
+/** Sub-navigation band **/
 .navbar.editor-navtabs {
-  color: #2f2424;
+  background-color: $mist;
+  color: $core-blue;
+  margin: 0 (-$page-gutter) 1.5rem;
+  padding: 1rem $page-gutter;
 
   a.nav-link {
-    padding-left: 1rem;
-    padding-right: 1rem;
-    padding-top: 0rem;
+    color: $core-blue;
+    padding: 0 1rem;
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+  }
+
+  .nav-item:first-child a.nav-link {
+    padding-left: 0;
   }
 
   a.nav-link.active {
-    font-weight: 900;
-    text-decoration: underline;
+    font-weight: 700;
+    text-decoration: none;
   }
 
   a.nav-link:hover {
-    color: #2f2424;
+    color: $core-blue;
+    text-decoration-style: solid;
   }
 
   .hover {
@@ -44,8 +53,49 @@ bluecore-footer {
   }
 
   a {
-    color: #2f2424;
-    font-weight: 500;
+    color: $core-blue;
+    font-weight: 400;
+  }
+
+  .dropdown-menu {
+    border-color: $black-40;
+    border-radius: 2px;
+  }
+
+  .dropdown-item {
+    color: $core-blue;
+  }
+
+  // Search: one bordered field, select | input | blue button
+  .input-group {
+    margin-bottom: 0 !important;
+    align-items: center;
+
+    .col-form-label {
+      color: $black-100;
+    }
+
+    .form-select,
+    .form-control {
+      font-family: $font-family-controls;
+      color: $black-100;
+      border-color: $black-40;
+    }
+
+    .form-control::placeholder {
+      font-family: $font-family-sans-serif;
+      font-style: italic;
+      color: $black-70;
+    }
+
+    .btn {
+      @include button-variant($core-blue, $digital-blue);
+      border-radius: 4px !important;
+      font-family: $font-family-controls;
+      font-size: 0.875rem;
+      margin-left: 0.25rem !important;
+      padding: 0.125rem 0.5rem;
+    }
   }
 
   #searchType {

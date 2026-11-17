@@ -5,23 +5,54 @@
 
 // Colors
 $white: #fff;
-$blue: $orient;
+$blue: $core-blue;
 
 // Color Themes
 $danger: $bright-red;
 
 // Options
-$enable-shadows: true;
+$enable-shadows: false;
 $enable-validation-icons: false;
 
 // Body
-$body-bg: $bluecore-bkgrd;
+$body-bg: $white;
+$body-color: $black-100;
 
 // Links
-$link-color: $orient;
+$link-color: $core-blue;
+$link-hover-color: $core-blue;
+
+// Typography
+$font-family-sans-serif: "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-family-controls: "Source Sans 3", "Source Sans Pro", sans-serif;
+$font-weight-light: 300;
+$headings-font-weight: 400;
+$headings-color: $black-100;
+$h1-font-size: 1.875rem; // 30px, BC H1
+$h2-font-size: 1.125rem; // 18px, BC H2
+$h3-font-size: 1.125rem;
+$h4-font-size: 1rem;
+$h5-font-size: 1rem;
+$h6-font-size: 0.875rem;
+
+// Borders
+$border-color: $black-40;
 
 // Tables
 $table-bg: $white;
+$table-border-color: $black-40;
+$table-cell-padding-y: 0.5rem;
 
 // Forms
 $input-bg: $white;
+$input-color: $black-100;
+$input-border-color: $black-40;
+$input-border-radius: 2px;
+$input-border-radius-sm: 2px;
+$input-border-radius-lg: 2px;
+$input-font-family: $font-family-controls;
+$input-placeholder-color: $black-70;
+$form-select-border-radius: 2px;
+
+// Buttons
+$btn-font-family: $font-family-controls;

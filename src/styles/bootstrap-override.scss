@@ -1,17 +1,22 @@
 /* Copyright 2020 Stanford University see LICENSE for license */
 
-// So that the primary button matches the links, rather than $reno-sand
+// Primary: Core Blue fill, Digital Blue border, 4px radius (Figma "Button")
 .btn-primary {
-  @include button-variant($orient, $orient);
+  @include button-variant(
+    $core-blue,
+    $digital-blue,
+    $hover-background: darken($core-blue, 7.5%),
+    $hover-border: $digital-blue
+  );
 }
 
 .btn-secondary {
   background-color: transparent;
   text-decoration: underline;
-  @include button-outline-variant(map-get($theme-colors, "primary"));
+  @include button-outline-variant($core-blue);
 }
 
-$primary-disabled: lighten(map-get($theme-colors, "secondary"), 20%);
+$primary-disabled: $black-40;
 
 .btn-primary:disabled {
   @include button-variant($primary-disabled, $primary-disabled);
@@ -22,12 +27,13 @@ $primary-disabled: lighten(map-get($theme-colors, "secondary"), 20%);
 }
 
 .btn-link:hover {
-  text-decoration: underline;
+  text-decoration: underline dotted;
 }
 
 body {
-  font-family: "Source Sans Pro", sans-serif;
-  margin: 0 20px;
+  font-family: $font-family-sans-serif;
+  color: $black-100;
+  margin: 0 $page-gutter;
 }
 
 a {
@@ -35,14 +41,23 @@ a {
 }
 
 a:hover {
-  text-decoration: underline;
+  text-decoration: underline dotted;
+}
+
+h1,
+.h1 {
+  font-weight: $font-weight-light;
+}
+
+th {
+  font-weight: 700;
 }
 
 pre {
   background-color: $white;
-  border: 1px solid #ccc;
+  border: 1px solid $black-40;
 }
 
 .table-light {
-  --bs-table-bg: #eaeaea;
+  --bs-table-bg: #{$mist};
 }

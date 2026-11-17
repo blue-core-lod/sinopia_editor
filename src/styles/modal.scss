@@ -23,8 +23,8 @@
   outline: none;
 
   .card {
-    background: $bluecore-bkgrd;
-    border-color: $nobel;
+    background: $white;
+    border-color: $black-40;
     border-radius: 2px;
   }
 
@@ -63,10 +63,10 @@
 
   .btn-transfer {
     @include button-variant(
-      $bluecore-header,
-      $bluecore-header,
-      $hover-background: $orient,
-      $hover-border: $orient
+      $core-blue,
+      $digital-blue,
+      $hover-background: darken($core-blue, 7.5%),
+      $hover-border: $digital-blue
     );
   }
 }
