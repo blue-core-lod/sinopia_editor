@@ -22,7 +22,6 @@ import { datasetFromJsonld } from "utilities/Utilities"
 import rdf from "rdf-ext"
 
 import Config from "Config"
-import rdf from "rdf-ext"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({
