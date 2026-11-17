@@ -44,9 +44,8 @@ describe("searching and view relationships for a resource", () => {
       )
       await screen.findByTestId(`Hide relationships for ${uri}`)
 
-      screen.getByText("Works", { selector: "h5" })
-      screen.getByText(/Work1/)
-      screen.getByText("Work", { selector: "span.resource-label" })
+      // One line per related resource, e.g. "Work: <label>"
+      screen.getByText(/^Work: .*Work1/)
     }, 10000)
   })
 })

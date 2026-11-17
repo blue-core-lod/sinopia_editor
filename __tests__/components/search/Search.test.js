@@ -11,6 +11,9 @@ jest.mock("KeycloakContext", () => ({
 
 featureSetup()
 
+// The current page in the search results page's text-style paging
+const currentPageSelector = 'button[aria-current="page"]'
+
 describe("<Search />", () => {
   jest.spyOn(sinopiaApi, "putUserHistory").mockResolvedValue()
 
@@ -182,9 +185,10 @@ describe("<Search />", () => {
       selector: "button.active",
     })
 
-    fireEvent.click(screen.getByText("›"))
+    // Paging is rendered above and below the table, so use the first one
+    fireEvent.click(screen.getAllByText("Next >")[0])
 
-    await screen.findByText("2", { selector: "li.active > button" })
+    await screen.findAllByText("2", { selector: currentPageSelector })
     screen.getByText("Modified date, newest first", {
       selector: "button.active",
     })
@@ -244,17 +248,17 @@ describe("<Search />", () => {
       target: { value: "foo" },
     })
     fireEvent.click(screen.getByTestId("Submit search"))
-    await screen.findByText("1", { selector: "li.active > button" })
+    await screen.findAllByText("1", { selector: currentPageSelector })
 
-    fireEvent.click(screen.getByText("›"))
-    await screen.findByText("2", { selector: "li.active > button" })
+    fireEvent.click(screen.getAllByText("Next >")[0])
+    await screen.findAllByText("2", { selector: currentPageSelector })
 
     // Skip ahead, the jump that used to land back on page 1.
-    fireEvent.click(screen.getByText("6", { selector: "button" }))
-    await screen.findByText("6", { selector: "li.active > button" })
+    fireEvent.click(screen.getAllByText("6", { selector: "button" })[0])
+    await screen.findAllByText("6", { selector: currentPageSelector })
 
-    fireEvent.click(screen.getByText("10", { selector: "button" }))
-    await screen.findByText("10", { selector: "li.active > button" })
+    fireEvent.click(screen.getAllByText("10", { selector: "button" })[0])
+    await screen.findAllByText("10", { selector: currentPageSelector })
 
     expect(
       mockGetSearchResults.mock.calls.map(([query, options]) => [

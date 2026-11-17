@@ -1,8 +1,9 @@
 import React from "react"
 import PropTypes from "prop-types"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faEye } from "@fortawesome/free-solid-svg-icons"
 import LoadingButton from "./LoadingButton"
+
+// Figma "image 86": document with a magnifying glass (no FontAwesome match)
+const viewIcon = require("../../styles/view-icon.png")
 
 const ViewButton = ({ label, handleClick, isLoading = false, size = "lg" }) => {
   if (isLoading) return <LoadingButton />
@@ -15,7 +16,7 @@ const ViewButton = ({ label, handleClick, isLoading = false, size = "lg" }) => {
       data-testid={`View ${label}`}
       onClick={handleClick}
     >
-      <FontAwesomeIcon icon={faEye} className={`icon-${size}`} />
+      <img src={viewIcon} alt="" className={`view-icon icon-${size}`} />
     </button>
   )
 }

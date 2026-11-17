@@ -7,7 +7,7 @@ import rdf from "rdf-ext"
 import { labelFromDataset } from "utilities/Bibframe"
 import useAlerts from "hooks/useAlerts"
 import usePermissions from "hooks/usePermissions"
-import SearchResultRow from "./SearchResultRow"
+import RelationshipResultRow from "./RelationshipResultRow"
 import { addError } from "actions/errors"
 import _ from "lodash"
 
@@ -72,50 +72,34 @@ const RelationshipResults = ({ uri }) => {
     })
   }, [relationships, isMounted, errorKey, dispatch])
 
-  const relationshipList = (label, refs) => {
-    if (_.isEmpty(refs)) return null
-    const refRows = refs.map((ref) => {
+  const relationshipRows = (kind, refs) =>
+    (refs ?? []).map((ref) => {
       const row = resourceRowMap[ref]
       if (!row) return null
       return (
-        <SearchResultRow
+        <RelationshipResultRow
           key={row.uri}
+          kind={kind}
           row={row}
           canCreate={canCreate}
           canEdit={canEdit(row)}
-          withRelationships={false}
         />
       )
     })
-    return (
-      <div className="search-relationship">
-        <h5 className="ps-3">{label}</h5>
-        <table className="table table-bordered table-light mb-0">
-          <colgroup>
-            <col span="1" />
-            <col span="1" style={{ width: "30%" }} />
-            <col span="1" style={{ width: "10%" }} />
-            <col span="1" style={{ width: "10%" }} />
-          </colgroup>
-          <tbody>{refRows}</tbody>
-        </table>
-      </div>
-    )
-  }
 
   if (_.isEmpty(relationships)) return null
 
   if (_.isEmpty(resourceRowMap)) {
-    return <div>Loading ...</div>
+    return <div className="search-relationship-list">Loading ...</div>
   }
 
   return (
-    <div>
-      {relationshipList("Works", relationships.bfWorkRefs)}
-      {relationshipList("Instances", relationships.bfInstanceRefs)}
-      {relationshipList("Items", relationships.bfItemRefs)}
-      {relationshipList("Admin Metadata", relationships.bfAdminMetadataRefs)}
-    </div>
+    <ul className="search-relationship-list">
+      {relationshipRows("Work", relationships.bfWorkRefs)}
+      {relationshipRows("Instance", relationships.bfInstanceRefs)}
+      {relationshipRows("Item", relationships.bfItemRefs)}
+      {relationshipRows("Admin Metadata", relationships.bfAdminMetadataRefs)}
+    </ul>
   )
 }
 

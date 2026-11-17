@@ -20,7 +20,7 @@ describe("loading new resource", () => {
     screen.getByText("resourceTemplate:testing:uber1")
     screen.getByText("http://id.loc.gov/ontologies/bibframe/Uber1")
     screen.getAllByText("Justin Littman")
-    screen.getByText("Jul 27, 2020")
+    screen.getByText("2020-07-27")
 
     // Click the resource template
     fireEvent.click(screen.getByTestId("Create resource for Uber template1"))

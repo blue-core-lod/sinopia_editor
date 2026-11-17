@@ -76,7 +76,7 @@ describe("<SinopiaSearchResults />", () => {
       expect(
         screen.queryByText(/https:\/\/api.sinopia.io\/resource\/some\/path/),
       ).not.toBeInTheDocument()
-      screen.queryByText("Oct 23, 2019")
+      screen.queryByText("2019-10-23")
       screen.queryByText("http://schema.org/Thing")
     })
   })
