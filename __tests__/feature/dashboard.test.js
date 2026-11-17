@@ -17,6 +17,7 @@ describe("viewing the dashboard", () => {
 
       fireEvent.click(screen.getByText("Linked Data Editor", { selector: "a" }))
 
+      screen.getByRole("heading", { level: 1, name: "Sinopia dashboard" })
       screen.getByText(/Welcome to Sinopia/)
     })
   }, 10000)
@@ -47,6 +48,7 @@ describe("viewing the dashboard", () => {
       await screen.findByText("Recent templates")
 
       expect(screen.queryByText(/Welcome to Sinopia/)).not.toBeInTheDocument()
+      screen.getByRole("heading", { level: 1, name: "Sinopia dashboard" })
 
       // The result
       screen.getByText(/Uber template1/)
@@ -82,6 +84,7 @@ describe("viewing the dashboard", () => {
       fireEvent.click(screen.getByText("Dashboard", { selector: "a" }))
 
       screen.getByText("Recent searches")
+      screen.getByRole("heading", { level: 1, name: "Sinopia dashboard" })
 
       // The result
       screen.getByText("Sinopia resources")
@@ -118,6 +121,7 @@ describe("viewing the dashboard", () => {
       fireEvent.click(screen.getByText("Dashboard", { selector: "a" }))
 
       screen.getByText("Recent resources")
+      screen.getByRole("heading", { level: 1, name: "Sinopia dashboard" })
 
       // The result
       screen.getByText(

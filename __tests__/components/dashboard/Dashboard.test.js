@@ -22,6 +22,14 @@ const renderDashboard = (successes = {}) => {
 }
 
 describe("<Dashboard />", () => {
+  it("renders the page heading", () => {
+    renderDashboard()
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Sinopia dashboard" }),
+    ).toBeInTheDocument()
+  })
+
   it("renders success messages for the dashboard alert key", () => {
     renderDashboard({ [dashboardErrorKey]: ["Import is being processed."] })
 

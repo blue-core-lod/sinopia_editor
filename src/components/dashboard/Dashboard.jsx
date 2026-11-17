@@ -63,6 +63,7 @@ const Dashboard = (props) => {
     <AlertsContextProvider value={dashboardErrorKey}>
       <section id="dashboard">
         <Header triggerEditorMenu={props.triggerHandleOffsetMenu} />
+        <h1>Sinopia dashboard</h1>
         <ContextAlert />
         <ContextSuccess />
         <PreviewModal />
