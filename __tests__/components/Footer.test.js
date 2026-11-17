@@ -1,11 +1,40 @@
 import React from "react"
-import { render, screen } from "@testing-library/react"
+import { render, screen, within } from "@testing-library/react"
 import Footer from "components/Footer"
 
 describe("<Footer />", () => {
-  it("renders the shared Blue Core footer", () => {
+  it("opens an email to Blue Core from Contact us", () => {
     render(<Footer />)
 
-    expect(screen.getByTestId("bluecore-footer")).toBeInTheDocument()
+    expect(screen.getByRole("link", { name: "Contact us" })).toHaveAttribute(
+      "href",
+      "mailto:contact@bluecore.info",
+    )
+  })
+
+  it("lists the same applications as the Switch application menu", () => {
+    render(<Footer />)
+
+    const applications = screen.getByRole("navigation", {
+      name: "Applications",
+    })
+    const links = within(applications).getAllByRole("link")
+    expect(
+      links.map((link) => [link.textContent, link.getAttribute("href")]),
+    ).toEqual([
+      ["Search", "/api/search"],
+      ["Marva", "/marva/"],
+      ["Sinopia", "/sinopia/"],
+      ["Toolbox", "/toolbox/"],
+      ["API", "/api/docs"],
+      ["Keycloak", "/keycloak/"],
+      ["Workflows", "/workflows/"],
+    ])
+  })
+
+  it("shows the Blue Core logo", () => {
+    render(<Footer />)
+
+    screen.getByRole("img", { name: "Blue Core" })
   })
 })
