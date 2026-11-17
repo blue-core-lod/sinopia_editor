@@ -286,7 +286,7 @@ describe("sinopia resource search", () => {
     )
 
     // Change the page
-    fireEvent.click(screen.getByText(/Resource Templates/, { selector: "a" }))
+    fireEvent.click(screen.getByText(/Resource templates/, { selector: "a" }))
     await screen.findByText(/Find a resource template/)
 
     expect(screen.getByLabelText("Search")).toHaveValue("foo")

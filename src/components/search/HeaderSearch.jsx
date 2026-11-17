@@ -3,7 +3,7 @@
 import React, { useRef, useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faSearch, faInfoCircle } from "@fortawesome/free-solid-svg-icons"
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons"
 import { Popover } from "bootstrap"
 import { sinopiaSearchUri } from "utilities/authorityConfig"
 import useSearch from "hooks/useSearch"
@@ -81,12 +81,12 @@ const HeaderSearch = () => {
   return (
     <div className="flex-grow-1">
       <div className="input-group mb-2">
-        <label htmlFor="search" className="col-form-label pe-1 ms-5">
+        <label htmlFor="search" className="visually-hidden">
           Search
         </label>
         <a
           href="#tooltip"
-          className="tooltip-heading pt-2"
+          className="tooltip-heading ms-5 me-1"
           tabIndex="0"
           data-bs-toggle="popover"
           data-bs-trigger="focus"
@@ -94,48 +94,49 @@ const HeaderSearch = () => {
         >
           <FontAwesomeIcon className="info-icon" icon={faInfoCircle} />
         </a>
-        <select
-          className="flex-grow-0 form-select"
-          id="searchType"
-          value={uri}
-          onChange={handleUriChange}
-          onBlur={handleUriChange}
-          aria-label="Search type"
-          data-testid="Search type"
-        >
-          <option value={sinopiaSearchUri}>Sinopia</option>
-          <option value={`${sinopiaSearchUri}/Work`}>
-            Sinopia BIBFRAME work resources
-          </option>
-          <option value={`${sinopiaSearchUri}/Instance`}>
-            Sinopia BIBFRAME instance resources
-          </option>
-          <option value={`${sinopiaSearchUri}/Item`}>
-            Sinopia BIBFRAME item resources
-          </option>
-        </select>
-        <input
-          className="flex-grow-1 form-control"
-          type="search"
-          id="search"
-          name="search"
-          // Without this the browser treats the lone unnamed text input on the
-          // page as a fillable field and drops the current page URL into it.
-          autoComplete="off"
-          onChange={handleQueryChange}
-          onBlur={handleQueryBlur}
-          onKeyPress={handleKeyPress}
-          value={query}
-        />
-        <button
-          className="btn btn-outline-secondary"
-          type="button"
-          aria-label="Submit search"
-          data-testid="Submit search"
-          onClick={runSearch}
-        >
-          <FontAwesomeIcon icon={faSearch} />
-        </button>
+        {/* Figma "Search form - small": select | input | button in one box */}
+        <div className="header-search-box">
+          <select
+            className="flex-grow-0 form-select"
+            id="searchType"
+            value={uri}
+            onChange={handleUriChange}
+            onBlur={handleUriChange}
+            aria-label="Search type"
+            data-testid="Search type"
+          >
+            <option value={sinopiaSearchUri}>BIBFRAME - All</option>
+            <option value={`${sinopiaSearchUri}/Work`}>
+              BIBFRAME work resources
+            </option>
+            <option value={`${sinopiaSearchUri}/Instance`}>
+              BIBFRAME instance resources
+            </option>
+          </select>
+          <input
+            className="flex-grow-1 form-control"
+            type="search"
+            id="search"
+            name="search"
+            // Without this the browser treats the lone unnamed text input on the
+            // page as a fillable field and drops the current page URL into it.
+            autoComplete="off"
+            placeholder="Search..."
+            onChange={handleQueryChange}
+            onBlur={handleQueryBlur}
+            onKeyPress={handleKeyPress}
+            value={query}
+          />
+          <button
+            className="btn"
+            type="button"
+            aria-label="Submit search"
+            data-testid="Submit search"
+            onClick={runSearch}
+          >
+            Search
+          </button>
+        </div>
       </div>
     </div>
   )

@@ -55,7 +55,7 @@ describe("switching between multiple resources", () => {
 
     // Open another template
     fireEvent.click(
-      await screen.findByText("Resource Templates", {
+      await screen.findByText("Resource templates", {
         selector: "a",
       }),
     )

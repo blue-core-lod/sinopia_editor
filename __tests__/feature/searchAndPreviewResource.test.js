@@ -134,7 +134,7 @@ describe("searching and preview a resource", () => {
       })
 
       // Make sure nav panel didn't disappear
-      fireEvent.click(screen.getByText("Resource Templates", { selector: "a" }))
+      fireEvent.click(screen.getByText("Resource templates", { selector: "a" }))
       fireEvent.click(
         await screen.findByTestId("Create resource for Title note"),
       )
