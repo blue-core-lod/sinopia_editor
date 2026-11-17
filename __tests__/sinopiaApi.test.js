@@ -18,6 +18,8 @@ import {
 import { selectFullSubject } from "selectors/resources"
 import { selectUser } from "selectors/authenticate"
 import { createState } from "stateUtils"
+import { datasetFromJsonld } from "utilities/Utilities"
+import rdf from "rdf-ext"
 
 import Config from "Config"
 import rdf from "rdf-ext"
@@ -534,6 +536,179 @@ describe("putResource", () => {
       ).rejects.toThrow("did not report a version for template")
       expect(global.fetch).not.toHaveBeenCalled()
     })
+  })
+})
+
+describe("sinopia:lastModified and sinopia:creationDate", () => {
+  const lastModified = "http://sinopia.io/vocabulary/lastModified"
+  const creationDate = "http://sinopia.io/vocabulary/creationDate"
+  const keycloak = {
+    token: "Secret-Token",
+    updateToken: jest.fn().mockResolvedValue(false),
+  }
+
+  beforeEach(() => {
+    // Fake only the clock: the RDF parsers need real timers to finish.
+    jest.useFakeTimers({
+      now: new Date("2026-09-11T20:09:54.123Z"),
+      doNotFake: [
+        "hrtime",
+        "nextTick",
+        "performance",
+        "queueMicrotask",
+        "setImmediate",
+        "clearImmediate",
+        "setInterval",
+        "clearInterval",
+        "setTimeout",
+        "clearTimeout",
+      ],
+    })
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({ uri: "https://bcld.info/works/1" }),
+    })
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  // A template (profile), the only kind of resource that is stamped.
+  const newResourceFixture = () => {
+    const state = createState({ hasResourceWithLiteral: true })
+    const resource = selectFullSubject(state, "t9zVwg2zO")
+    resource.subjectTemplate.id = "sinopia:template:resource"
+    return { resource, currentUser: selectUser(state) }
+  }
+
+  const savedDataset = () =>
+    datasetFromJsonld(
+      JSON.parse(JSON.parse(global.fetch.mock.calls[0][1].body).data),
+    )
+
+  it("does not stamp a resource that is not a template", async () => {
+    const state = createState({ hasResourceWithLiteral: true })
+    const resource = selectFullSubject(state, "t9zVwg2zO")
+    await putResource(resource, selectUser(state), null, null, null, keycloak)
+
+    const quads = (await savedDataset())
+      .match(null, rdf.namedNode(lastModified))
+      .toArray()
+    expect(quads).toEqual([])
+  })
+
+  it("stamps a saved template with the time of the save", async () => {
+    const { resource, currentUser } = newResourceFixture()
+    await putResource(resource, currentUser, null, null, null, keycloak)
+
+    const quads = (await savedDataset())
+      .match(rdf.namedNode(resource.uri), rdf.namedNode(lastModified))
+      .toArray()
+    expect(quads.map((quad) => quad.object.value)).toEqual([
+      "2026-09-11T20:09:54+00:00",
+    ])
+  })
+
+  it("stamps a new template, whose subject is a blank node", async () => {
+    const { resource, currentUser } = newResourceFixture()
+    resource.uri = null
+    await postResource(resource, currentUser, "pcc", [], keycloak)
+
+    const dataset = await savedDataset()
+    const [templateQuad] = dataset
+      .match(
+        null,
+        rdf.namedNode("http://sinopia.io/vocabulary/hasResourceTemplate"),
+      )
+      .toArray()
+    const quads = dataset.match(null, rdf.namedNode(lastModified)).toArray()
+    expect(quads).toHaveLength(1)
+    expect(quads[0].subject.termType).toBe("BlankNode")
+    expect(quads[0].subject.equals(templateQuad.subject)).toBe(true)
+    expect(quads[0].object.value).toBe("2026-09-11T20:09:54+00:00")
+  })
+
+  it("does not give a resource that is not a template a creationDate", async () => {
+    const state = createState({ hasResourceWithLiteral: true })
+    const resource = selectFullSubject(state, "t9zVwg2zO")
+    resource.uri = null
+    await postResource(resource, selectUser(state), "pcc", [], keycloak)
+
+    const quads = (await savedDataset())
+      .match(null, rdf.namedNode(creationDate))
+      .toArray()
+    expect(quads).toEqual([])
+  })
+
+  it("gives a new template a creationDate on its blank node subject", async () => {
+    const { resource, currentUser } = newResourceFixture()
+    resource.uri = null
+    await postResource(resource, currentUser, "pcc", [], keycloak)
+
+    const dataset = await savedDataset()
+    const [templateQuad] = dataset
+      .match(
+        null,
+        rdf.namedNode("http://sinopia.io/vocabulary/hasResourceTemplate"),
+      )
+      .toArray()
+    const quads = dataset.match(null, rdf.namedNode(creationDate)).toArray()
+    expect(quads).toHaveLength(1)
+    expect(quads[0].subject.equals(templateQuad.subject)).toBe(true)
+    expect(quads[0].object.value).toBe("2026-09-11T20:09:54+00:00")
+  })
+
+  it("keeps the creationDate an existing template was loaded with", async () => {
+    const { resource, currentUser } = newResourceFixture()
+    const unusedRDF = `<${resource.uri}> <${creationDate}> "2020-01-01T00:00:00+00:00" .\n`
+    await putResource(
+      resource,
+      currentUser,
+      null,
+      null,
+      null,
+      keycloak,
+      unusedRDF,
+    )
+
+    const quads = (await savedDataset())
+      .match(rdf.namedNode(resource.uri), rdf.namedNode(creationDate))
+      .toArray()
+    expect(quads.map((quad) => quad.object.value)).toEqual([
+      "2020-01-01T00:00:00+00:00",
+    ])
+  })
+
+  it("does not invent a creationDate for an existing template without one", async () => {
+    const { resource, currentUser } = newResourceFixture()
+    await putResource(resource, currentUser, null, null, null, keycloak)
+
+    const quads = (await savedDataset())
+      .match(null, rdf.namedNode(creationDate))
+      .toArray()
+    expect(quads).toEqual([])
+  })
+
+  it("replaces a lastModified carried in with the unused RDF", async () => {
+    const { resource, currentUser } = newResourceFixture()
+    const unusedRDF = `<${resource.uri}> <${lastModified}> "2020-01-01T00:00:00+00:00" .\n`
+    await putResource(
+      resource,
+      currentUser,
+      null,
+      null,
+      null,
+      keycloak,
+      unusedRDF,
+    )
+
+    const quads = (await savedDataset())
+      .match(rdf.namedNode(resource.uri), rdf.namedNode(lastModified))
+      .toArray()
+    expect(quads.map((quad) => quad.object.value)).toEqual([
+      "2026-09-11T20:09:54+00:00",
+    ])
   })
 })
 

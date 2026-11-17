@@ -1,8 +1,10 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
+import rdf from "rdf-ext"
 import {
   datasetFromJsonld,
   datasetFromN3,
+  edtfDateTime,
   hasUnknownTemplateVersion,
   jsonldFromDataset,
 } from "utilities/Utilities"
@@ -390,6 +392,28 @@ export const postTransfer = (body, keycloak) => {
 const userUrlFor = (userId) =>
   `${Config.sinopiaApiBase}/user/${encodeURI(userId)}`
 
+const SINOPIA_CREATION_DATE = "http://sinopia.io/vocabulary/creationDate"
+const SINOPIA_LAST_MODIFIED = "http://sinopia.io/vocabulary/lastModified"
+
+// Sets a system-owned date on the root subject, replacing any earlier value --
+// carried in with the unused RDF or entered through a template property.
+const setSystemDate = (dataset, resourceTerm, predicateUri, date) => {
+  const predicate = rdf.namedNode(predicateUri)
+  dataset.removeMatches(resourceTerm, predicate)
+  dataset.add(rdf.quad(resourceTerm, predicate, rdf.literal(date)))
+}
+
+// Stamps a template (profile) with the time of this save: sinopia:lastModified
+// on every save (issue #285) and sinopia:creationDate on the first, a new
+// resource (issue #284). An existing template keeps the creationDate it was
+// loaded with, which comes back in the unused RDF. Other resources are not
+// stamped.
+const setTemplateDates = (dataset, resourceTerm, isNew) => {
+  const now = edtfDateTime()
+  if (isNew) setSystemDate(dataset, resourceTerm, SINOPIA_CREATION_DATE, now)
+  setSystemDate(dataset, resourceTerm, SINOPIA_LAST_MODIFIED, now)
+}
+
 const saveBodyForResource = (
   resource,
   user,
@@ -408,7 +432,8 @@ const saveBodyForResource = (
       ),
     )
 
-  const dataset = new GraphBuilder(resource, useBlankNode).graph
+  const builder = new GraphBuilder(resource, useBlankNode)
+  const dataset = builder.graph
 
   // Merge back any triples that the template did not cover on load so they are
   // preserved rather than stripped on save. See issue #134.
@@ -419,6 +444,11 @@ const saveBodyForResource = (
     : Promise.resolve()
 
   return mergeUnused
+    .then(() => {
+      // A new resource is POSTed with a blank node subject (postResource).
+      if (isTemplate(resource))
+        setTemplateDates(dataset, builder.resourceTerm, useBlankNode)
+    })
     .then(() => jsonldFromDataset(dataset))
     .then((jsonld) =>
       JSON.stringify({

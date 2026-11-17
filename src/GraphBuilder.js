@@ -57,6 +57,8 @@ export default class GraphBuilder {
       } else {
         resourceTerm = rdf.namedNode("")
       }
+      // Kept so a caller can add to the root subject, even a blank node.
+      this.resourceTerm = resourceTerm
       this.addGeneratedByTriple(resourceTerm, this.resource.subjectTemplate)
       this.buildSubject(this.resource, resourceTerm)
     }
