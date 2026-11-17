@@ -82,21 +82,6 @@
   margin-bottom: 2%;
 }
 
-// Footer band: Mist background, 10px Core Blue rule along the bottom
-#footer {
-  background-color: $mist;
-  border-bottom: 10px solid $core-blue;
-  margin: 3rem (-$page-gutter) 0;
-  padding: 2rem calc(#{$page-gutter} + 5%) 1.5rem;
-  font-weight: $font-weight-light;
-
-  a {
-    color: $core-blue;
-    text-decoration: underline dotted;
-    text-underline-offset: 3px;
-  }
-}
-
 .offcanvas-menu {
   background-color: rgb(55, 66, 79);
   height: 100%;
@@ -162,10 +147,6 @@
   background-color: white;
   margin: 0.5em;
   padding: 0.75em;
-}
-
-#footer-text {
-  padding-left: 2rem;
 }
 
 .editor-logo {
