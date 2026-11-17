@@ -92,6 +92,12 @@ describe("viewing the dashboard", () => {
 
       await screen.findByText("Recent templates")
       screen.getByText("resourceTemplate:testing:uber1")
+
+      // The section collapses from its heading
+      fireEvent.click(screen.getByRole("button", { name: "Recent templates" }))
+      expect(
+        screen.getByText("resourceTemplate:testing:uber1"),
+      ).not.toBeVisible()
     })
   }, 10000)
 

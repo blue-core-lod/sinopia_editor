@@ -12,6 +12,7 @@ import Header from "../Header"
 import ResourceList from "./ResourceList"
 import ResourceTemplateSearchResult from "../templates/ResourceTemplateSearchResult"
 import SearchList from "./SearchList"
+import DashboardSection from "./DashboardSection"
 import _ from "lodash"
 import PreviewModal from "../editor/preview/PreviewModal"
 import AlertsContextProvider from "components/alerts/AlertsContextProvider"
@@ -79,22 +80,19 @@ const Dashboard = (props) => {
           </div>
         )}
         {!_.isEmpty(historicalTemplates) && (
-          <div className="dashboard-section">
-            <h2>Recent templates</h2>
+          <DashboardSection id="recent-templates" title="Recent templates">
             <ResourceTemplateSearchResult results={historicalTemplates} />
-          </div>
+          </DashboardSection>
         )}
         {!_.isEmpty(historicalSearches) && (
-          <div className="dashboard-section">
-            <h2>Recent searches</h2>
+          <DashboardSection id="recent-searches" title="Recent searches">
             <SearchList searches={historicalSearches} />
-          </div>
+          </DashboardSection>
         )}
         {!_.isEmpty(historicalResources) && (
-          <div className="dashboard-section">
-            <h2>Recent resources</h2>
+          <DashboardSection id="recent-resources" title="Recent resources">
             <ResourceList resources={historicalResources} />
-          </div>
+          </DashboardSection>
         )}
       </section>
     </AlertsContextProvider>

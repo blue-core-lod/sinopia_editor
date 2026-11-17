@@ -13,3 +13,36 @@
     margin-bottom: 0;
   }
 }
+
+// The section heading is its own collapse toggle: a Core Blue triangle in the
+// left gutter (pointing down when open) with the title indented past it.
+.dashboard-section-toggle {
+  position: relative;
+  padding: 0 0 0 1.75rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+
+  &::before {
+    // U+FE0E keeps the triangle from rendering as an emoji
+    content: "\25B6\FE0E";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    color: $core-blue;
+    font-size: 0.875rem;
+    transform: translateY(-50%) rotate(90deg);
+    transition: transform 0.1s ease;
+  }
+
+  &.collapsed::before {
+    transform: translateY(-50%);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $core-blue;
+    outline-offset: 2px;
+  }
+}
