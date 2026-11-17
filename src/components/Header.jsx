@@ -26,6 +26,11 @@ const Header = (props) => {
 
   const { keycloak } = useKeycloak()
 
+  const openMenu = (menuName) => (event) => {
+    event.preventDefault()
+    props.triggerEditorMenu?.(menuName)
+  }
+
   return (
     <React.Fragment>
       <div className="editor-navbar">
@@ -45,13 +50,6 @@ const Header = (props) => {
           </div>
           <div className="col-6">
             <ul className="nav pull-right">
-              {props.currentUser && (
-                <li className="nav-item">
-                  <span className="nav-link editor-header-user">
-                    {props.currentUser.username}
-                  </span>
-                </li>
-              )}
               {props.currentUser && <SessionStatus />}
               <div className="nav-link">•</div>
               {props.currentUser && (
@@ -59,9 +57,20 @@ const Header = (props) => {
                   <a
                     href="#"
                     className="nav-link editor-help-resources"
-                    onClick={props.triggerEditorMenu}
+                    onClick={openMenu("help")}
                   >
                     Help
+                  </a>
+                </li>
+              )}
+              {props.currentUser && (
+                <li className="nav-item">
+                  <a
+                    href="#"
+                    className="nav-link editor-switch-applications"
+                    onClick={openMenu("applications")}
+                  >
+                    Switch application
                   </a>
                 </li>
               )}

@@ -1,69 +1,61 @@
 import React from "react"
 import { fireEvent, screen } from "@testing-library/react"
 import Header from "components/Header"
-import { createStore, renderComponent } from "testUtils"
+import AlertsContextProvider from "components/alerts/AlertsContextProvider"
+import {
+  renderComponent,
+  createStore,
+  createHistory,
+} from "../testUtilities/testUtils"
 import { createState } from "stateUtils"
-import { selectUser } from "selectors/authenticate"
-import { useKeycloak } from "KeycloakContext"
 
 jest.mock("KeycloakContext", () => ({
-  useKeycloak: jest.fn(),
+  useKeycloak: jest.fn().mockReturnValue({}),
 }))
 
-jest.mock(
-  "components/SessionStatus",
-  () =>
-    function SessionStatus() {
-      return null
-    },
-)
+const triggerEditorMenu = jest.fn()
+
+const renderHeader = () => {
+  renderComponent(
+    <AlertsContextProvider value="testerrorkey">
+      <Header triggerEditorMenu={triggerEditorMenu} />
+    </AlertsContextProvider>,
+    createStore(createState()),
+    createHistory(),
+  )
+}
 
 describe("<Header />", () => {
-  const keycloak = { logout: jest.fn() }
+  beforeEach(() => triggerEditorMenu.mockClear())
 
-  beforeEach(() => {
-    keycloak.logout.mockClear()
-    useKeycloak.mockReturnValue({ keycloak })
+  it("does not show the user name", () => {
+    renderHeader()
+
+    expect(screen.queryByText("Foo McBar")).not.toBeInTheDocument()
   })
 
-  it("renders the shared Blue Core header for Sinopia", () => {
-    renderComponent(<Header />)
+  it("opens the help menu from Help", () => {
+    renderHeader()
 
-    const header = screen.getByTestId("bluecore-header")
-    expect(header).toHaveAttribute("app-name", "SINOPIA")
-    expect(header).toHaveAttribute("current-app", "sinopia")
-    expect(header).toHaveAttribute("logout", "")
+    fireEvent.click(screen.getByRole("link", { name: "Help" }))
+
+    expect(triggerEditorMenu).toHaveBeenCalledWith("help")
   })
 
-  it("leaves out Logout and Help when no one is signed in", () => {
-    const store = createStore(createState({ notAuthenticated: true }))
-    renderComponent(<Header />, store)
+  it("opens the applications menu from Switch application, after Help", () => {
+    renderHeader()
 
-    expect(screen.getByTestId("bluecore-header")).not.toHaveAttribute("logout")
+    const help = screen.getByRole("link", { name: "Help" })
+    const switchApplication = screen.getByRole("link", {
+      name: "Switch application",
+    })
     expect(
-      screen.queryByRole("button", { name: "Help" }),
-    ).not.toBeInTheDocument()
-  })
+      help.compareDocumentPosition(switchApplication) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
 
-  it("signs out when the shared header fires bluecore-logout", () => {
-    const store = createStore()
-    renderComponent(<Header />, store)
+    fireEvent.click(switchApplication)
 
-    fireEvent(
-      screen.getByTestId("bluecore-header"),
-      new CustomEvent("bluecore-logout", { bubbles: true }),
-    )
-
-    expect(keycloak.logout).toHaveBeenCalledTimes(1)
-    expect(selectUser(store.getState())).toBeUndefined()
-  })
-
-  it("opens the help menu from the Help button", () => {
-    const triggerEditorMenu = jest.fn()
-    renderComponent(<Header triggerEditorMenu={triggerEditorMenu} />)
-
-    fireEvent.click(screen.getByRole("button", { name: "Help" }))
-
-    expect(triggerEditorMenu).toHaveBeenCalledTimes(1)
+    expect(triggerEditorMenu).toHaveBeenCalledWith("applications")
   })
 })

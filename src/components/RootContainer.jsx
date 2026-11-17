@@ -1,9 +1,10 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
-import React, { useState } from "react"
+import React from "react"
 import { BrowserRouter } from "react-router-dom"
 import { Provider } from "react-redux"
 import CanvasMenu from "./menu/CanvasMenu"
+import useSidebarMenu from "hooks/useSidebarMenu"
 import App from "./App"
 import store from "../store"
 import { KeycloakProvider } from "../KeycloakContext"
@@ -35,7 +36,7 @@ const menuStyle = (isMenuOpened) => ({
 })
 
 const RootContainer = () => {
-  const [isMenuOpened, setMenuOpened] = useState(false)
+  const { isOpen: isMenuOpened, menu, toggleMenu, closeMenu } = useSidebarMenu()
 
   const offcanvasClass = isMenuOpened ? "closeMargin" : null
 
@@ -56,13 +57,13 @@ const RootContainer = () => {
                 <Provider store={store}>
                   <App
                     isMenuOpened={isMenuOpened}
-                    handleOffsetMenu={() => setMenuOpened(!isMenuOpened)}
+                    handleOffsetMenu={toggleMenu}
                   />
                 </Provider>
               </BrowserRouter>
             </div>
             <div className="offcanvas-menu" style={menuStyle(isMenuOpened)}>
-              <CanvasMenu closeHandleMenu={() => setMenuOpened(false)} />
+              <CanvasMenu menu={menu} closeHandleMenu={closeMenu} />
             </div>
           </div>
         </div>

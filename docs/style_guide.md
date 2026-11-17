@@ -70,7 +70,6 @@ h1 30px, h2 18px, h3 18px, h4 16px, h5 16px, h6 14px. All headings are weight
 | Footer bottom rule            | 10px solid `$core-blue`      | n/a    |
 | Table row divider             | 1px solid `$black-40`        | n/a    |
 | Inputs, selects               | 1px solid `$black-40`        | 2px    |
-| Outlined button (Help)        | 1px solid `$core-blue`       | 2px    |
 | Primary button                | 1px solid `$digital-blue`    | 4px    |
 | Pill call-to-action ("Contact us") | none, `$core-blue` fill | 20px   |
 | Cards, modals, dropdowns      | 1px solid `$black-40`        | 2px    |
@@ -81,7 +80,7 @@ h1 30px, h2 18px, h3 18px, h4 16px, h5 16px, h6 14px. All headings are weight
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│ [logo] | SINOPIA            [Help▾]  Contact  Switch…  Logout│  white
+│ [logo] | SINOPIA         Help  Switch application  Logout    │  white
 ╞══════════════════════════════════════════════════════════════╡  3px Core Blue
 │ Dashboard  Editor  Resource templates  Actions▾   [search…]  │  Mist band
 └──────────────────────────────────────────────────────────────┘
@@ -167,9 +166,12 @@ One row of controls: select (`BIBFRAME - All`) | text input | **Search** button.
 
 - White background, 3px Core Blue bottom rule.
 - Logo about 30px tall, then "| SINOPIA" in Helvetica Neue Light 24px, `$sinopia-wordmark`.
-- Right side: Help (outlined button with ▾), Contact, Switch applications ▾,
-  Logout. All Core Blue with dotted underlines. The "•" separators are hidden.
-- **Not in the current markup:** Contact, Switch applications, and the ▾ on Help.
+- Right side: Help, Switch application, Logout, all plain Core Blue links with
+  dotted underlines. Help and Switch application open the right sidebar menus.
+  The "•" separators are hidden and the username isn't shown.
+- **Not in the current markup:** Contact, and the ▾ the design shows on Help and
+  Switch applications. The design's outlined Help button was dropped in favor
+  of a plain link.
 
 ### Footer
 
