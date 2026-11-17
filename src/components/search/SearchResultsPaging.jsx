@@ -64,6 +64,55 @@ const SearchResultsPaging = (props) => {
     pageButton(index, index, index, index === currentPage),
   )
 
+  // Figma "pagination": "< Previous | 1 2 3 ... 10 | Next >" as text links
+  if (props.variant === "text") {
+    const textButton = (key, label, page, active) => (
+      <li key={key}>
+        <button
+          type="button"
+          className={active ? "btn btn-link active" : "btn btn-link"}
+          aria-label={key}
+          aria-current={active ? "page" : undefined}
+          disabled={page < 1 || page > lastPage}
+          onClick={(event) => changePage(event, page)}
+        >
+          {label}
+        </button>
+      </li>
+    )
+    const textEllipsis = (key) => (
+      <li key={key} aria-hidden="true">
+        ...
+      </li>
+    )
+    const divider = (key) => (
+      <li key={key} className="search-text-paging-divider" aria-hidden="true">
+        |
+      </li>
+    )
+
+    return (
+      <nav
+        aria-label={props.label || "search results navigation"}
+        className="search-text-paging"
+      >
+        <ul>
+          {textButton("previous", "< Previous", currentPage - 1, false)}
+          {divider("divider-start")}
+          {textButton(1, 1, 1, currentPage === 1)}
+          {startPos > 2 && textEllipsis("ellipsis-start")}
+          {range.map((index) =>
+            textButton(index, index, index, index === currentPage),
+          )}
+          {endPos < lastPage - 1 && textEllipsis("ellipsis-end")}
+          {textButton(lastPage, lastPage, lastPage, currentPage === lastPage)}
+          {divider("divider-end")}
+          {textButton("next", "Next >", currentPage + 1, false)}
+        </ul>
+      </nav>
+    )
+  }
+
   return (
     <div id="search-results-pages" className="row">
       <div className="col">
@@ -90,6 +139,10 @@ SearchResultsPaging.propTypes = {
   totalResults: PropTypes.number.isRequired,
   resultsPerPage: PropTypes.number.isRequired,
   startOfRange: PropTypes.number.isRequired,
+  // "text" renders the Figma text-link style (search results page only)
+  variant: PropTypes.oneOf(["buttons", "text"]),
+  // aria-label for the text variant's <nav>, when a page has more than one
+  label: PropTypes.string,
 }
 
 export default SearchResultsPaging

@@ -3,7 +3,7 @@
 import React from "react"
 import { useSelector } from "react-redux"
 import PropTypes from "prop-types"
-import LongDate from "components/LongDate"
+import IsoDate from "components/IsoDate"
 import usePermissions from "hooks/usePermissions"
 import { selectGroupMap } from "selectors/groups"
 import EditButton from "../buttons/EditButton"
@@ -54,7 +54,7 @@ const ResourceTemplateRow = ({ row }) => {
         {groupMap[row.group] || "Unknown"}
       </td>
       <td>
-        <LongDate datetime={row.date} timeZone="UTC" />
+        <IsoDate datetime={row.date} timeZone="UTC" />
       </td>
       <td style={{ wordBreak: "break-all" }}>{row.remark}</td>
       <td>

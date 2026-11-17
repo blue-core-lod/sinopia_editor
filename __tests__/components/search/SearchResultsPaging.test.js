@@ -192,4 +192,53 @@ describe("<SearchResultsPaging />", () => {
     fireEvent.click(screen.getByLabelText("next"))
     expect(mockChangePage).toHaveBeenCalledWith(15)
   })
+
+  describe("text variant", () => {
+    const renderText = (startOfRange) =>
+      renderComponent(
+        <SearchResultsPaging
+          variant="text"
+          label="top paging"
+          changePage={mockChangePage}
+          totalResults={100}
+          resultsPerPage={10}
+          startOfRange={startOfRange}
+        />,
+      )
+
+    it("renders Previous, the pages and Next as text links", () => {
+      renderText(0)
+
+      screen.getByRole("navigation", { name: "top paging" })
+      expect(
+        screen.getByRole("button", { name: "previous" }),
+      ).toHaveTextContent("< Previous")
+      expect(screen.getByRole("button", { name: "next" })).toHaveTextContent(
+        "Next >",
+      )
+      expect(screen.getByRole("button", { name: "1" })).toHaveAttribute(
+        "aria-current",
+        "page",
+      )
+      screen.getByRole("button", { name: "10" })
+      expect(screen.queryByLabelText("first")).not.toBeInTheDocument()
+      expect(screen.queryByLabelText("last")).not.toBeInTheDocument()
+    })
+
+    it("disables Previous on the first page", () => {
+      renderText(0)
+
+      expect(screen.getByRole("button", { name: "previous" })).toBeDisabled()
+    })
+
+    it("pages by offset", () => {
+      renderText(20)
+
+      fireEvent.click(screen.getByRole("button", { name: "next" }))
+      expect(mockChangePage).toHaveBeenCalledWith(30)
+
+      fireEvent.click(screen.getByRole("button", { name: "previous" }))
+      expect(mockChangePage).toHaveBeenCalledWith(10)
+    })
+  })
 })

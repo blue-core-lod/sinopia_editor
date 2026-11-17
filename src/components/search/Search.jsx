@@ -42,20 +42,28 @@ const Search = (props) => {
     fetchSearchResults(queryString, searchOptions, startOfRange, keycloak)
   }
 
+  const paging = (label) => (
+    <SearchResultsPaging
+      variant="text"
+      label={label}
+      resultsPerPage={searchOptions.resultsPerPage}
+      startOfRange={searchOptions.startOfRange}
+      totalResults={totalResults}
+      changePage={changeSearchPage}
+    />
+  )
+
   return (
     <AlertsContextProvider value={searchErrorKey}>
       <div id="search">
         <Header triggerEditorMenu={props.triggerHandleOffsetMenu} />
         <ContextAlert />
         <PreviewModal />
+        <h1 className="search-results-heading">Search results</h1>
         <TemplateGuessSearchResults />
+        {paging("search results pages, top")}
         <SinopiaSearchResults />
-        <SearchResultsPaging
-          resultsPerPage={searchOptions.resultsPerPage}
-          startOfRange={searchOptions.startOfRange}
-          totalResults={totalResults}
-          changePage={changeSearchPage}
-        />
+        {paging("search results pages, bottom")}
         <SearchResultsMessage />
       </div>
     </AlertsContextProvider>

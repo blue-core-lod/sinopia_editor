@@ -249,6 +249,13 @@ button.collapse-heading.collapsed::before {
   font-size: 20px;
 }
 
+// ViewButton's PNG icon, sized like the FontAwesome icons next to it
+img.view-icon {
+  height: 1.15em;
+  width: auto;
+  vertical-align: -0.2em;
+}
+
 .btn-nested-resource {
   padding-left: 2px;
   padding-right: 2px;
@@ -379,27 +386,96 @@ div.rbt div {
   background-color: $mist;
 }
 
-.search-relationship {
-  h5 {
-    font-weight: bold;
-    font-size: var(--bs-body-font-size);
+/** Search results page (Figma: "Search results") **/
+.search-results-heading {
+  font-size: 30px; // BC H1: 30px light
+  font-weight: $font-weight-light;
+  margin: 2.5rem 0 1.5rem;
+}
+
+// "< Previous | 1 2 3 ... 10 | Next >"
+.search-text-paging ul {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.9rem;
+  list-style: none;
+  margin: 0.5rem 0 1rem;
+  padding: 0;
+  font-size: 14px;
+  color: $core-blue;
+
+  .btn-link {
+    padding: 0;
+    border: 0;
+    font-size: 14px;
+    color: $core-blue;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline dotted;
+    }
+
+    &.active {
+      font-weight: 700;
+      color: $black-100;
+    }
+
+    &:disabled {
+      color: $black-40;
+    }
   }
 
-  .table > :not(:first-child) {
-    border-top: 2px dotted currentColor;
+  .search-text-paging-divider {
+    color: $black-100;
   }
 }
 
-td.search-no-border {
-  border: none;
+.search-results-list {
+  td {
+    font-size: 14px; // BC Paragraph: 14px light, 25px leading
+    line-height: 25px;
+  }
+
+  td.search-result-modified {
+    font-size: 16px;
+  }
+
+  .search-result-classes {
+    list-style: disc;
+    padding-left: 1.3rem;
+  }
 }
 
-.search-no-bottom-border {
-  border-bottom: none;
+// Unbulleted outside the search results table (e.g. the dashboard)
+.search-result-classes {
+  list-style: none;
+  margin: 0;
+  padding-left: 0;
 }
 
-.search-no-top-border {
-  border-top: none;
+.search-relationships-toggle {
+  padding: 0;
+  border: 0;
+  font-size: 16px;
+  text-decoration: none;
+
+  svg {
+    margin-right: 0.4rem;
+  }
+}
+
+// One line per related resource: "Instance: <label>" then its actions
+.search-relationship-list {
+  list-style: none;
+  margin: 0.25rem 0 0;
+  padding-left: 0.6rem;
+
+  .search-relationship-row {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
 }
 
 .metrics-card {

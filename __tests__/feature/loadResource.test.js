@@ -31,7 +31,7 @@ describe("loading saved resource", () => {
       // The result
       await screen.findByText(uri)
       screen.getByText("Fixture", { selector: "span.resource-label" })
-      screen.getByText("Jul 15, 2020")
+      screen.getByText("2020-07-15")
 
       // Click edit
       fireEvent.click(screen.getByTestId(`Edit ${uri}`))
@@ -97,7 +97,7 @@ describe("loading saved resource", () => {
       // The result
       await screen.findByText(uri)
       screen.getByText("Fixture", { selector: "span.resource-label" })
-      screen.getByText("Jul 15, 2020")
+      screen.getByText("2020-07-15")
 
       // Click edit
       fireEvent.click(screen.getByTestId(`Edit ${uri}`))

@@ -211,8 +211,8 @@ describe("sinopia resource search", () => {
         Promise.resolve({ json: () => successResultPage2 }),
       )
 
-    // confirm moving to the next page works
-    fireEvent.click(screen.getByLabelText("2", { selector: "button" }))
+    // confirm moving to the next page works (paging is above and below the table)
+    fireEvent.click(screen.getAllByLabelText("2", { selector: "button" })[0])
     await screen.findByText(/Displaying 3 - 3 of 3/)
     await screen.findByText(/baz/)
   })
