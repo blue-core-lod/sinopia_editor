@@ -123,7 +123,7 @@ bluecore-footer {
   }
 
   #searchType {
-    width: 19rem; // So that we can fully display "Sinopia BIBFRAME instance resources"
+    width: auto; // Native select sizes to its longest option ("BIBFRAME instance resources")
   }
 
   // Figma "Help button": outlined in Core Blue. The --bluecore-* variables come
