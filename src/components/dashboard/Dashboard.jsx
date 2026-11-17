@@ -70,7 +70,7 @@ const Dashboard = (props) => {
         <MarcModal />
         <ResourceTemplateChoiceModal choose={chooseResourceTemplate} />
         {showWelcome && (
-          <div>
+          <div className="dashboard-section">
             <h2>Welcome to Sinopia.</h2>
             <p>
               As you use Sinopia, your most recently used templates, resources,
@@ -79,19 +79,19 @@ const Dashboard = (props) => {
           </div>
         )}
         {!_.isEmpty(historicalTemplates) && (
-          <div>
+          <div className="dashboard-section">
             <h2>Recent templates</h2>
             <ResourceTemplateSearchResult results={historicalTemplates} />
           </div>
         )}
         {!_.isEmpty(historicalSearches) && (
-          <div>
+          <div className="dashboard-section">
             <h2>Recent searches</h2>
             <SearchList searches={historicalSearches} />
           </div>
         )}
         {!_.isEmpty(historicalResources) && (
-          <div>
+          <div className="dashboard-section">
             <h2>Recent resources</h2>
             <ResourceList resources={historicalResources} />
           </div>
