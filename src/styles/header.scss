@@ -8,7 +8,18 @@
   .editor-logo img {
     height: 38px;
     width: auto;
-    vertical-align: middle;
+  }
+
+  // Spacing from the Figma header: ~36px logo to bar, ~28px bar to name
+  .editor-logo-divider {
+    margin: 0 1.75rem 0 2.25rem;
+  }
+
+  // Trim the line box to the capitals so the all-caps name centers on the
+  // logo instead of riding high over unused descender space.
+  .editor-logo-divider,
+  .editor-logo-name {
+    text-box: trim-both cap alphabetic;
   }
 
   .nav {

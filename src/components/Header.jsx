@@ -33,8 +33,13 @@ const Header = (props) => {
           <div className="col-6">
             <a href="/">
               <h1 className="editor-logo">
-                <img src={bcLogo} alt="Blue Core Logo"></img> | Sinopia
-                {`${Config.sinopiaEnv}`}
+                <img src={bcLogo} alt="Blue Core Logo"></img>
+                <span className="editor-logo-divider" aria-hidden="true">
+                  |
+                </span>
+                <span className="editor-logo-name">
+                  Sinopia{`${Config.sinopiaEnv}`}
+                </span>
               </h1>
             </a>
           </div>
