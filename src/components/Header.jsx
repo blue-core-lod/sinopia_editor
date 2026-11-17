@@ -1,7 +1,9 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
-import React from "react"
+import React, { useEffect, useRef } from "react"
 import PropTypes from "prop-types"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faCaretDown } from "@fortawesome/free-solid-svg-icons"
 import { NavLink, useLocation } from "react-router-dom"
 import Config from "Config"
 import { connect } from "react-redux"
@@ -14,8 +16,6 @@ import usePermissions from "hooks/usePermissions"
 import HeaderSearch from "./search/HeaderSearch"
 import SessionStatus from "./SessionStatus"
 
-const bcLogo = require("../styles/bluecore-small.png")
-
 const Header = (props) => {
   const { canCreate } = usePermissions()
   const location = useLocation()
@@ -25,61 +25,31 @@ const Header = (props) => {
     location.pathname.startsWith("/metrics/")
 
   const { keycloak } = useKeycloak()
+  const { signOut } = props
+
+  // <bluecore-header> fires `bluecore-logout` (bubbles) when its Logout button
+  // is clicked; listening on the element works before and after it upgrades.
+  const bluecoreHeaderRef = useRef(null)
+  useEffect(() => {
+    const el = bluecoreHeaderRef.current
+    if (!el) return undefined
+    const onLogout = () => signOut(keycloak)
+    el.addEventListener("bluecore-logout", onLogout)
+    return () => el.removeEventListener("bluecore-logout", onLogout)
+  }, [signOut, keycloak])
 
   return (
     <React.Fragment>
-      <div className="editor-navbar">
-        <div className="row">
-          <div className="col-6">
-            <a href="/">
-              <h1 className="editor-logo">
-                <img
-                  src={bcLogo}
-                  alt="Blue Core Logo"
-                  style={{ paddingBottom: "8px" }}
-                ></img>{" "}
-                | Sinopia{`${Config.sinopiaEnv}`}
-              </h1>
-            </a>
-          </div>
-          <div className="col-6">
-            <ul className="nav pull-right">
-              {props.currentUser && (
-                <li className="nav-item">
-                  <span className="nav-link editor-header-user">
-                    {props.currentUser.username}
-                  </span>
-                </li>
-              )}
-              {props.currentUser && <SessionStatus />}
-              <div className="nav-link">•</div>
-              {props.currentUser && (
-                <li className="nav-item">
-                  <a
-                    href="#"
-                    className="nav-link editor-help-resources"
-                    onClick={props.triggerEditorMenu}
-                  >
-                    Help
-                  </a>
-                </li>
-              )}
-              <div className="nav-link">•</div>
-              {props.currentUser && (
-                <li className="nav-item">
-                  <a
-                    href="#"
-                    className="nav-link editor-header-logout"
-                    onClick={() => props.signOut(keycloak)}
-                  >
-                    Logout
-                  </a>
-                </li>
-              )}
-            </ul>
-          </div>
-        </div>
-      </div>
+      {/* The shared Blue Core header, defined by bluecore-stack's
+          /assets/bluecore/bluecore-header-footer.js (loaded in index.html). */}
+      <bluecore-header
+        ref={bluecoreHeaderRef}
+        data-testid="bluecore-header"
+        app-name={`SINOPIA${Config.sinopiaEnv}`}
+        current-app="sinopia"
+        logout={props.currentUser ? "" : undefined}
+      ></bluecore-header>
+      {props.currentUser && <SessionStatus />}
       <nav className="navbar navbar-expand-lg editor-navtabs">
         <ul className="navbar-nav">
           {/* Navlinks enable highlighting the appropriate tab based on route, active style is defined in css */}
@@ -147,6 +117,15 @@ const Header = (props) => {
           </li>
         </ul>
         <HeaderSearch />
+        {props.currentUser && (
+          <button
+            type="button"
+            className="sinopia-help-button"
+            onClick={props.triggerEditorMenu}
+          >
+            Help <FontAwesomeIcon icon={faCaretDown} />
+          </button>
+        )}
       </nav>
     </React.Fragment>
   )

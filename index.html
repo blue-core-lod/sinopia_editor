@@ -3,6 +3,9 @@
   <head>
     <title>Sinopia Linked Data Editor</title>
     <script src="env-config.js"></script>
+    <!-- Served by bluecore-stack's nginx: defines <bluecore-header> and <bluecore-footer>
+         and loads their CSS. Without the stack it 404s and the elements stay empty. -->
+    <script src="/assets/bluecore/bluecore-header-footer.js"></script>
   </head>
   <body>
     <div id="modal"></div>

@@ -9,7 +9,6 @@
  * babel, so it cannot require an ES module.
  */
 
-// Same source of truth as the version in the footer (src/components/Footer.jsx).
 const Package = require("../package.json")
 
 const healthPayload = () => ({ status: "ok", version: Package.version })

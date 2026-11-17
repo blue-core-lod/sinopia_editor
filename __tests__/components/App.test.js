@@ -48,14 +48,6 @@ describe("<App />", () => {
     await waitFor(() => store.getState().entities.languages.size > 0)
   })
 
-  it("sets app version", async () => {
-    renderApp()
-
-    fireEvent.click(screen.getByText("Linked Data Editor"))
-
-    screen.getByText(/v\d+\.\d+\.\d+/)
-  })
-
   //! Once https://github.com/blue-core-lod/bluecore_api/issues/105 and
   //! Sinopia Editor is updated to use this endpoint, this test
   //! should be enabled.

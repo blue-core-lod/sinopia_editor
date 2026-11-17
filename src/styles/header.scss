@@ -1,5 +1,23 @@
-.editor-navbar {
-  background-color: $bluecore-header;
+/** Shared Blue Core header / footer (bluecore-stack's custom elements) **/
+// Full width, as in the Figma, by cancelling the body margin (20px, see
+// bootstrap-override.scss) and the .container-fluid gutter around the app.
+bluecore-header,
+bluecore-footer {
+  display: block;
+  margin-left: calc(-20px - var(--bs-gutter-x, 1.5rem) * 0.5);
+  margin-right: calc(-20px - var(--bs-gutter-x, 1.5rem) * 0.5);
+}
+
+// Pin the footer to the bottom of the window on short pages; on long pages it
+// follows the content as before.
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+bluecore-footer {
+  margin-top: auto;
 }
 
 /** For header tabs **/
@@ -32,5 +50,26 @@
 
   #searchType {
     width: 19rem; // So that we can fully display "Sinopia BIBFRAME instance resources"
+  }
+
+  // Figma "Help button": outlined in Core Blue. The --bluecore-* variables come
+  // from bluecore-stack's bluecore-header-footer.css.
+  .sinopia-help-button {
+    margin-left: 1rem;
+    padding: 2px 9px;
+    border: 1px solid var(--bluecore-blue, #003caf);
+    border-radius: 2px;
+    background-color: white;
+    color: var(--bluecore-blue, #003caf);
+    font-family: var(--bluecore-font, "Helvetica Neue", Helvetica, sans-serif);
+    font-size: 16px;
+    font-weight: 500;
+    white-space: nowrap;
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--bluecore-blue-dark, #002b80);
+      color: var(--bluecore-blue-dark, #002b80);
+    }
   }
 }
