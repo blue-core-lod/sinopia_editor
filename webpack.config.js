@@ -108,6 +108,13 @@ module.exports = {
   devtool: "source-map",
   devServer: {
     static: "./dist",
+    // /sinopia/ is served from dist/index.html on disk (via `static`), so write
+    // the generated HTML pages there on every compile. Otherwise a stale
+    // dist/index.html from an old build keeps being served after index.html
+    // changes (e.g. a new <script> tag). The JS bundle stays in memory.
+    devMiddleware: {
+      writeToDisk: (filePath) => /\.html$/.test(filePath),
+    },
     historyApiFallback: true,
     hot: true,
     port: 8888,
