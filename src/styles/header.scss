@@ -104,20 +104,59 @@
     color: $core-blue;
   }
 
-  // Search: one bordered field, select | input | blue button
-  .input-group {
-    margin-bottom: 0 !important;
+  // Search (Figma "Search form small"): one 36px white box with a Black 40
+  // border; the type select is divided from the query by a rule, and the
+  // Search button sits inset at the right.
+  .header-search {
+    max-width: 42rem;
+    height: 36px;
+    margin-left: auto;
     align-items: center;
+    flex-wrap: nowrap;
+    background-color: $white;
+    border: 1px solid $black-40;
+    border-radius: 2px;
 
-    .col-form-label {
-      color: $black-100;
+    &:focus-within {
+      outline: 2px solid $core-blue;
+      outline-offset: 1px;
     }
 
     .form-select,
     .form-control {
+      height: 100%;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      background-color: transparent;
       font-family: $font-family-controls;
+      font-size: 1rem;
       color: $black-100;
-      border-color: $black-40;
+    }
+
+    // The box shows focus for the whole control, so the parts don't add rings
+    .form-select:focus,
+    .form-control:focus {
+      box-shadow: none;
+    }
+
+    .form-select {
+      // Wide enough to fully display "Sinopia BIBFRAME instance resources"
+      // beside the caret
+      flex: 0 0 19rem;
+      width: 19rem;
+      height: 28px;
+      margin-left: 0.5rem;
+      padding: 0 2.25rem 0 0.25rem;
+      border-right: 1px solid $black-40;
+      // Filled Core Blue triangle in place of Bootstrap's chevron
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 8'><path fill='%23003CAF' d='M4.79 7.64.24 1.77C-.3 1.08.14 0 .95 0h9.1c.81 0 1.25 1.08.71 1.77L6.22 7.63a.9.9 0 0 1-1.43 0z'/></svg>");
+      background-position: right 0.75rem center;
+      background-size: 11px 8px;
+    }
+
+    .form-control {
+      padding: 0 0.625rem;
     }
 
     .form-control::placeholder {
@@ -128,15 +167,13 @@
 
     .btn {
       @include button-variant($core-blue, $digital-blue);
+      flex: 0 0 auto;
+      margin: 0 0.3125rem 0 0.25rem !important;
+      padding: 0.125rem 0.375rem;
       border-radius: 4px !important;
       font-family: $font-family-controls;
       font-size: 0.875rem;
-      margin-left: 0.25rem !important;
-      padding: 0.125rem 0.5rem;
+      line-height: 1.5;
     }
-  }
-
-  #searchType {
-    width: 19rem; // So that we can fully display "Sinopia BIBFRAME instance resources"
   }
 }

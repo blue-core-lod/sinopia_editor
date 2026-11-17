@@ -31,6 +31,22 @@ describe("<HeaderSearch />", () => {
     expect(screen.getByLabelText("Search")).toHaveValue("")
   })
 
+  it("shows a placeholder and a Search button instead of a visible label", () => {
+    renderHeaderSearch()
+
+    expect(screen.getByLabelText("Search")).toHaveAttribute(
+      "placeholder",
+      "Search...",
+    )
+    expect(screen.getByText("Search", { selector: "label" })).toHaveClass(
+      "visually-hidden",
+    )
+    expect(
+      screen.getByRole("button", { name: "Submit search" }),
+    ).toHaveTextContent("Search")
+    expect(screen.queryByRole("link")).not.toBeInTheDocument()
+  })
+
   it("opts the query input out of browser autofill", () => {
     renderHeaderSearch()
 
@@ -39,17 +55,5 @@ describe("<HeaderSearch />", () => {
       "autocomplete",
       "off",
     )
-  })
-
-  it("shows a placeholder and a labeled Search button", () => {
-    renderHeaderSearch()
-
-    expect(screen.getByLabelText("Search")).toHaveAttribute(
-      "placeholder",
-      "Search...",
-    )
-    expect(
-      screen.getByRole("button", { name: "Submit search" }),
-    ).toHaveTextContent("Search")
   })
 })

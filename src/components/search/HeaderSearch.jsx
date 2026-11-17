@@ -1,10 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 
-import React, { useRef, useEffect, useState } from "react"
+import React, { useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons"
-import { Popover } from "bootstrap"
 import { sinopiaSearchUri } from "utilities/authorityConfig"
 import useSearch from "hooks/useSearch"
 import { useKeycloak } from "../../KeycloakContext"
@@ -18,23 +15,12 @@ const HeaderSearch = () => {
   const { keycloak } = useKeycloak()
   const [uri, setUri] = useState(currentSearch.uri)
   const [query, setQuery] = useState(currentSearch.query || "")
-  const popoverRef = useRef()
   const errorKey = useAlerts()
   const {
     fetchNewSearchResults,
     fetchTemplateGuessSearchResults,
     clearTemplateGuessSearchResults,
   } = useSearch(errorKey)
-
-  useEffect(() => {
-    const popover = new Popover(popoverRef.current, {
-      content:
-        'Sinopia search: use * as wildcard; default operator for multiple terms is AND; use | (pipe) as OR operator; use quotation marks for exact match. For more details see <a href="https://github.com/LD4P/sinopia/wiki/Searching-in-Sinopia">Searching in Sinopia</a>',
-      html: true,
-    })
-
-    return () => popover.hide
-  }, [popoverRef])
 
   const handleQueryChange = (event) => {
     setQuery(event.target.value)
@@ -80,63 +66,53 @@ const HeaderSearch = () => {
 
   return (
     <div className="flex-grow-1">
-      <div className="input-group mb-2">
+      <div className="input-group header-search">
         <label htmlFor="search" className="visually-hidden">
           Search
         </label>
-        <a
-          href="#tooltip"
-          className="tooltip-heading ms-5 me-1"
-          tabIndex="0"
-          data-bs-toggle="popover"
-          data-bs-trigger="focus"
-          ref={popoverRef}
+        <select
+          className="flex-grow-0 form-select"
+          id="searchType"
+          value={uri}
+          onChange={handleUriChange}
+          onBlur={handleUriChange}
+          aria-label="Search type"
+          data-testid="Search type"
         >
-          <FontAwesomeIcon className="info-icon" icon={faInfoCircle} />
-        </a>
-        {/* Figma "Search form - small": select | input | button in one box */}
-        <div className="header-search-box">
-          <select
-            className="flex-grow-0 form-select"
-            id="searchType"
-            value={uri}
-            onChange={handleUriChange}
-            onBlur={handleUriChange}
-            aria-label="Search type"
-            data-testid="Search type"
-          >
-            <option value={sinopiaSearchUri}>BIBFRAME - All</option>
-            <option value={`${sinopiaSearchUri}/Work`}>
-              BIBFRAME work resources
-            </option>
-            <option value={`${sinopiaSearchUri}/Instance`}>
-              BIBFRAME instance resources
-            </option>
-          </select>
-          <input
-            className="flex-grow-1 form-control"
-            type="search"
-            id="search"
-            name="search"
-            // Without this the browser treats the lone unnamed text input on the
-            // page as a fillable field and drops the current page URL into it.
-            autoComplete="off"
-            placeholder="Search..."
-            onChange={handleQueryChange}
-            onBlur={handleQueryBlur}
-            onKeyPress={handleKeyPress}
-            value={query}
-          />
-          <button
-            className="btn"
-            type="button"
-            aria-label="Submit search"
-            data-testid="Submit search"
-            onClick={runSearch}
-          >
-            Search
-          </button>
-        </div>
+          <option value={sinopiaSearchUri}>Sinopia</option>
+          <option value={`${sinopiaSearchUri}/Work`}>
+            Sinopia BIBFRAME work resources
+          </option>
+          <option value={`${sinopiaSearchUri}/Instance`}>
+            Sinopia BIBFRAME instance resources
+          </option>
+          <option value={`${sinopiaSearchUri}/Item`}>
+            Sinopia BIBFRAME item resources
+          </option>
+        </select>
+        <input
+          className="flex-grow-1 form-control"
+          type="search"
+          id="search"
+          name="search"
+          placeholder="Search..."
+          // Without this the browser treats the lone unnamed text input on the
+          // page as a fillable field and drops the current page URL into it.
+          autoComplete="off"
+          onChange={handleQueryChange}
+          onBlur={handleQueryBlur}
+          onKeyPress={handleKeyPress}
+          value={query}
+        />
+        <button
+          className="btn btn-primary btn-sm"
+          type="button"
+          aria-label="Submit search"
+          data-testid="Submit search"
+          onClick={runSearch}
+        >
+          Search
+        </button>
       </div>
     </div>
   )
