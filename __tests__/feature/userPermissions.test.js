@@ -24,7 +24,7 @@ describe("user permissions", () => {
     expect(screen.queryByText("Load RDF")).not.toBeInTheDocument()
 
     // No new template button
-    fireEvent.click(screen.getByText("Resource Templates", { selector: "a" }))
+    fireEvent.click(screen.getByText("Resource templates", { selector: "a" }))
     await screen.findByText("Uber template1")
     expect(screen.queryByText("New template")).not.toBeInTheDocument()
 
@@ -64,7 +64,7 @@ describe("user permissions", () => {
     screen.getByText("Load RDF")
 
     // New template button
-    fireEvent.click(screen.getByText("Resource Templates", { selector: "a" }))
+    fireEvent.click(screen.getByText("Resource templates", { selector: "a" }))
     await screen.findByText("New template")
 
     // Can create a new resource
@@ -105,7 +105,7 @@ describe("user permissions", () => {
     screen.getByText("Load RDF")
 
     // New template button
-    fireEvent.click(screen.getByText("Resource Templates", { selector: "a" }))
+    fireEvent.click(screen.getByText("Resource templates", { selector: "a" }))
     await screen.findByText("New template")
 
     // Can create a new resource

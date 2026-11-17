@@ -40,4 +40,16 @@ describe("<HeaderSearch />", () => {
       "off",
     )
   })
+
+  it("shows a placeholder and a labeled Search button", () => {
+    renderHeaderSearch()
+
+    expect(screen.getByLabelText("Search")).toHaveAttribute(
+      "placeholder",
+      "Search...",
+    )
+    expect(
+      screen.getByRole("button", { name: "Submit search" }),
+    ).toHaveTextContent("Search")
+  })
 })

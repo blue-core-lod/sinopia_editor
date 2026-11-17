@@ -13,7 +13,7 @@ describe("loading new resource", () => {
     renderApp()
 
     fireEvent.click(screen.getByText("Linked Data Editor", { selector: "a" }))
-    fireEvent.click(screen.getByText("Resource Templates", { selector: "a" }))
+    fireEvent.click(screen.getByText("Resource templates", { selector: "a" }))
 
     // The result
     await screen.findByText(/Uber template1/)

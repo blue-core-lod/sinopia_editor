@@ -13,7 +13,7 @@ describe("creating new resource template ", () => {
     renderApp()
 
     fireEvent.click(screen.getByText("Linked Data Editor", { selector: "a" }))
-    fireEvent.click(screen.getByText("Resource Templates", { selector: "a" }))
+    fireEvent.click(screen.getByText("Resource templates", { selector: "a" }))
 
     // Click the new resource template button
     fireEvent.click(screen.getByText("New template"))

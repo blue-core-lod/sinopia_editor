@@ -67,7 +67,7 @@ const Header = (props) => {
           )}
           <li className="nav-item">
             <NavLink className="nav-link" to="/templates">
-              Resource Templates
+              Resource templates
             </NavLink>
           </li>
           <li className="nav-item dropdown">

@@ -64,7 +64,7 @@ describe("searching and opening a resource", () => {
     await act(() => promise)
 
     // return to the RT list
-    const rtLink = await screen.findByText("Resource Templates", {
+    const rtLink = await screen.findByText("Resource templates", {
       selector: "a",
     })
     fireEvent.click(rtLink)

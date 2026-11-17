@@ -23,7 +23,7 @@ describe("preview within editor", () => {
 
     // Open the editor and then the templates tab
     fireEvent.click(screen.getByText("Linked Data Editor", { selector: "a" }))
-    fireEvent.click(screen.getByText("Resource Templates", { selector: "a" }))
+    fireEvent.click(screen.getByText("Resource templates", { selector: "a" }))
 
     // Click an existing resource template
     await screen.findByText(/Uber template1/)
