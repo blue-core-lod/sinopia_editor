@@ -19,8 +19,8 @@ describe("viewing the dashboard", () => {
 
       screen.getByRole("heading", { level: 1, name: "Sinopia dashboard" })
       screen.getByText(/Welcome to Sinopia/)
-    })
-  }, 10000)
+    }, 10000)
+  })
 
   describe("when user uses a source template", () => {
     it("lists the resource template", async () => {
@@ -56,8 +56,8 @@ describe("viewing the dashboard", () => {
       screen.getByText("http://id.loc.gov/ontologies/bibframe/Uber1")
       screen.getAllByText("Justin Littman")
       screen.getByText("Jul 27, 2020")
-    })
-  }, 10000)
+    }, 10000)
+  })
 
   describe("when user views a template", () => {
     it("lists the template", async () => {
@@ -73,8 +73,8 @@ describe("viewing the dashboard", () => {
 
       await screen.findByText("Recent templates")
       screen.getByText("resourceTemplate:testing:uber1")
-    })
-  }, 10000)
+    }, 10000)
+  })
 
   describe("when user edits a template", () => {
     it("lists the template", async () => {
@@ -98,8 +98,8 @@ describe("viewing the dashboard", () => {
       expect(
         screen.getByText("resourceTemplate:testing:uber1"),
       ).not.toBeVisible()
-    })
-  }, 10000)
+    }, 10000)
+  })
 
   describe("when user performs a search", () => {
     it("lists the search and allows performing search", async () => {
@@ -131,8 +131,8 @@ describe("viewing the dashboard", () => {
       // The result
       screen.getByText("Sinopia resources")
       screen.getByText("asdfqwerty")
-    })
-  }, 10000)
+    }, 10000)
+  })
 
   describe("when user uses a resource", () => {
     it("lists the resource", async () => {
@@ -170,6 +170,6 @@ describe("viewing the dashboard", () => {
         "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
         { selector: "table.resource-list td" },
       )
-    })
-  }, 10000)
+    }, 10000)
+  })
 })
