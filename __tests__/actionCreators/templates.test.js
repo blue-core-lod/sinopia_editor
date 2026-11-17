@@ -103,7 +103,7 @@ describe("loadResourceTemplate()", () => {
           payload: {
             errorKey: "testerrorkey",
             error:
-              "Error retrieving ld4p:RT:bf2:xxx: Error parsing resource: Error retrieving resource: Not Found",
+              "Error retrieving ld4p:RT:bf2:xxx: Error retrieving resource: Not Found",
           },
         },
       ])

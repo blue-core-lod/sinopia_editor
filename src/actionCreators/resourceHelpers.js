@@ -35,6 +35,12 @@ const isRelationshipProperty = (property) =>
  * Helper methods that should only be used in 'actionCreators/resources'
  */
 
+// A ResourceLoadError from fetchResource already names the URL that failed.
+export const loadErrorMessage = (uri, err) =>
+  err.name === "ResourceLoadError"
+    ? err.message
+    : `Error retrieving ${uri}: ${err.message || err}`
+
 /**
  * A thunk that loads an existing resource from Sinopia API and adds to state.
  * @return {[resource, unusedDataset]} if successful
@@ -83,9 +89,7 @@ export const loadResource =
       })
       .catch((err) => {
         console.error(err)
-        dispatch(
-          addError(errorKey, `Error retrieving ${uri}: ${err.message || err}`),
-        )
+        dispatch(addError(errorKey, loadErrorMessage(uri, err)))
         return false
       })
   }

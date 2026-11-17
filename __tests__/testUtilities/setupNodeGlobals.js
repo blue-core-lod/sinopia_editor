@@ -21,7 +21,7 @@ global.crypto = nodeCrypto.webcrypto
  * (via @fetch-mock/jest) builds real Response objects whose body is a
  * ReadableStream, so without these any resp.json()/resp.text() on a mocked
  * response throws "ReadableStream is not defined" — which sinopiaApi.js then
- * relabels as "Error parsing resource".
+ * reports as a parse error.
  */
 global.ReadableStream = ReadableStream
 global.WritableStream = WritableStream

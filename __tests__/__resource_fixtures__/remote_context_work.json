@@ -1,0 +1,176 @@
+{
+  "id": 357059,
+  "type": "works",
+  "data": {
+    "@context": "https://bibframe-json.org/v0.1/context/bibframe.jsonld",
+    "@id": "https://stage.bcld.info/works/0d9986a7-28f0-49d8-a1c0-fd2f86a1f4ae",
+    "@type": ["Monograph", "Work", "Text"],
+    "bflc:aap": ["Luscombe, Tim. Jane Austen's persuasion"],
+    "bflc:aap-normalized": ["luscombetimjaneausten'spersuasion"],
+    "adminMetadata": [
+      {
+        "@type": ["AdminMetadata"],
+        "agent": [{ "@id": "http://id.loc.gov/vocabulary/organizations/cbc" }],
+        "date": [
+          {
+            "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+            "@value": "2026-09-11T21:16:22.231102+00:00"
+          }
+        ],
+        "derivedFrom": [
+          { "@id": "http://id.loc.gov/resources/works/23983503" }
+        ],
+        "status": [
+          {
+            "@id": "http://id.loc.gov/vocabulary/mstatus/c",
+            "@type": ["Status"],
+            "rdfs:label": ["changed"]
+          }
+        ]
+      },
+      {
+        "@type": ["AdminMetadata"],
+        "bflc:catalogerId": ["Unknown"],
+        "date": ["2026-09-11"],
+        "descriptionAuthentication": [
+          { "@id": "http://id.loc.gov/vocabulary/marcauthen/pcc" }
+        ],
+        "descriptionLanguage": [
+          {
+            "@id": "http://id.loc.gov/vocabulary/languages/eng",
+            "@type": ["Language"],
+            "rdfs:label": ["English"]
+          }
+        ],
+        "descriptionLevel": ["http://id.loc.gov/ontologies/bibframe-2-6-0/"]
+      }
+    ],
+    "classification": [
+      {
+        "@type": ["ClassificationLcc"],
+        "assigner": [
+          {
+            "@id": "http://id.loc.gov/vocabulary/organizations/dlc",
+            "@type": ["Organization", "Agent"],
+            "code": [
+              {
+                "@type": "http://id.loc.gov/datatypes/orgs/code",
+                "@value": "DLC"
+              },
+              {
+                "@type": "http://id.loc.gov/datatypes/orgs/normalized",
+                "@value": "dlc"
+              },
+              {
+                "@type": "http://id.loc.gov/datatypes/orgs/iso15511",
+                "@value": "US-dlc"
+              }
+            ],
+            "rdfs:label": ["United States, Library of Congress"]
+          }
+        ],
+        "classificationPortion": ["PR6112.U826"],
+        "status": [
+          {
+            "@id": "http://id.loc.gov/vocabulary/mstatus/uba",
+            "@type": ["Status"],
+            "code": ["uba"],
+            "rdfs:label": ["used by assigner"]
+          }
+        ]
+      }
+    ],
+    "content": [
+      {
+        "@id": "http://id.loc.gov/vocabulary/contentTypes/txt",
+        "@type": ["Content"],
+        "rdfs:label": ["text"]
+      }
+    ],
+    "contribution": [
+      {
+        "@type": ["Contribution", "PrimaryContribution"],
+        "agent": [
+          {
+            "@id": "http://id.loc.gov/rwo/agents/no2005060391",
+            "@type": ["Agent", "Person"],
+            "bflc:marcKey": ["1001 $aLuscombe, Tim"],
+            "rdfs:label": ["Luscombe, Tim"]
+          }
+        ],
+        "role": [
+          {
+            "@id": "http://id.loc.gov/vocabulary/relators/aut",
+            "@type": ["Role"],
+            "code": ["aut"],
+            "rdfs:label": ["author"]
+          }
+        ]
+      }
+    ],
+    "genreForm": [
+      {
+        "@id": "http://id.loc.gov/authorities/genreForms/gf2014026297",
+        "@type": ["GenreForm"],
+        "bflc:marcKey": ["155  $aDrama"],
+        "source": [{ "@id": "http://id.loc.gov/authorities/genreForms" }],
+        "rdfs:label": [{ "@language": "en", "@value": "Drama" }]
+      }
+    ],
+    "hasInstance": [
+      {
+        "@id": "https://stage.bcld.info/instances/fc5ee684-cb42-474b-ae1c-125b11ee76b9",
+        "rdfs:label": ["Jane Austen's persuasion"]
+      }
+    ],
+    "language": [
+      {
+        "@id": "http://id.loc.gov/vocabulary/languages/eng",
+        "@type": ["Language"],
+        "rdfs:label": ["English"]
+      }
+    ],
+    "relation": [
+      {
+        "@type": ["Relation"],
+        "associatedResource": [
+          {
+            "@id": "https://stage.bcld.info/works/d00eac8e-7667-475e-96af-762954901d5c"
+          }
+        ],
+        "relationship": [
+          {
+            "@id": "http://id.loc.gov/vocabulary/relationship/otherphysicalformat",
+            "@type": ["Relationship"],
+            "code": ["otherphysicalformat"],
+            "rdfs:label": ["other physical format"]
+          },
+          { "@type": ["Relationship"], "rdfs:label": ["Print Version"] }
+        ]
+      },
+      {
+        "@type": ["Relation"],
+        "associatedResource": [
+          {
+            "@id": "https://stage.bcld.info/hubs/571905c1-e48a-4b1d-86b2-7ad219d78d55"
+          }
+        ],
+        "relationship": [
+          {
+            "@id": "http://id.loc.gov/vocabulary/relationship/relatedwork",
+            "@type": ["Relationship"],
+            "code": ["relatedwork"],
+            "rdfs:label": ["related work"]
+          }
+        ]
+      }
+    ],
+    "title": [{ "@type": ["Title"], "mainTitle": ["Jane Austen's persuasion"] }]
+  },
+  "uri": "https://stage.bcld.info/works/0d9986a7-28f0-49d8-a1c0-fd2f86a1f4ae",
+  "uuid": "0d9986a7-28f0-49d8-a1c0-fd2f86a1f4ae",
+  "created_at": "2026-09-11T14:16:22.329677",
+  "updated_at": "2026-09-11T14:16:22.329677",
+  "hub_id": null,
+  "is_expanded": false
+}
