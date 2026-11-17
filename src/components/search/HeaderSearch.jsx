@@ -105,12 +105,12 @@ const HeaderSearch = () => {
             aria-label="Search type"
             data-testid="Search type"
           >
-            <option value={sinopiaSearchUri}>Sinopia</option>
+            <option value={sinopiaSearchUri}>BIBFRAME - All</option>
             <option value={`${sinopiaSearchUri}/Work`}>
-              Sinopia BIBFRAME work resources
+              BIBFRAME work resources
             </option>
             <option value={`${sinopiaSearchUri}/Instance`}>
-              Sinopia BIBFRAME instance resources
+              BIBFRAME instance resources
             </option>
           </select>
           <input
