@@ -88,6 +88,14 @@ bluecore-footer {
         border-radius: 0;
         padding-top: 0;
         padding-bottom: 0;
+
+        // Lift the focused field so its focus ring isn't painted over by the
+        // next field (Bootstrap's .input-group only does this for direct
+        // children, and these sit inside .header-search-box)
+        &:focus {
+          position: relative;
+          z-index: 1;
+        }
       }
 
       .form-select {
