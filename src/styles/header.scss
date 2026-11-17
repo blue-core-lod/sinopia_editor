@@ -1,23 +1,50 @@
-/** Shared Blue Core header / footer (bluecore-stack's custom elements) **/
-// Full width, as in the Figma, by cancelling the body margin ($page-gutter, see
-// bootstrap-override.scss) and the .container-fluid gutter around the app.
-bluecore-header,
-bluecore-footer {
-  display: block;
-  margin-left: calc(-#{$page-gutter} - var(--bs-gutter-x, 1.5rem) * 0.5);
-  margin-right: calc(-#{$page-gutter} - var(--bs-gutter-x, 1.5rem) * 0.5);
-}
+// Top bar: white, 3px Core Blue rule underneath, full-bleed
+.editor-navbar {
+  background-color: $white;
+  border-bottom: 3px solid $core-blue;
+  margin: 0 (-$page-gutter);
+  padding: 0.5rem $page-gutter 0.25rem;
 
-// Pin the footer to the bottom of the window on short pages; on long pages it
-// follows the content as before.
-#app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
+  .editor-logo img {
+    height: 38px;
+    width: auto;
+    vertical-align: middle;
+  }
 
-bluecore-footer {
-  margin-top: auto;
+  .nav {
+    justify-content: flex-end;
+    align-items: center;
+    height: 100%;
+  }
+
+  // The "•" separators are not part of the Blue Core header
+  .nav > div.nav-link {
+    display: none;
+  }
+
+  .nav-link {
+    color: $core-blue;
+    padding: 0.25rem 0.75rem;
+  }
+
+  a.nav-link {
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+  }
+
+  .editor-header-user {
+    color: $black-100;
+  }
+
+  // Help renders as a small outlined button
+  a.nav-link.editor-help-resources {
+    border: 1px solid $core-blue;
+    border-radius: 2px;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 0.125rem 0.5rem;
+    margin: 0 0.75rem;
+  }
 }
 
 /** Sub-navigation band **/
@@ -71,32 +98,8 @@ bluecore-footer {
     margin-bottom: 0 !important;
     align-items: center;
 
-    // The box around select | input | button (Figma "Search form - small")
-    .header-search-box {
-      display: flex;
-      flex: 1 1 auto;
-      align-items: center;
-      height: 36px;
-      padding: 0 4px 0 5px;
-      background-color: $white;
-      border: 1px solid $black-40;
-      border-radius: 2px;
-
-      .form-select,
-      .form-control {
-        border: 0;
-        border-radius: 0;
-        padding-top: 0;
-        padding-bottom: 0;
-      }
-
-      .form-select {
-        border-right: 1px solid $black-40;
-      }
-
-      .form-control {
-        min-width: 0;
-      }
+    .col-form-label {
+      color: $black-100;
     }
 
     .form-select,
@@ -123,27 +126,6 @@ bluecore-footer {
   }
 
   #searchType {
-    width: auto; // Native select sizes to its longest option ("BIBFRAME instance resources")
-  }
-
-  // Figma "Help button": outlined in Core Blue. The --bluecore-* variables come
-  // from bluecore-stack's bluecore-header-footer.css.
-  .sinopia-help-button {
-    margin-left: 1rem;
-    padding: 2px 9px;
-    border: 1px solid var(--bluecore-blue, #003caf);
-    border-radius: 2px;
-    background-color: white;
-    color: var(--bluecore-blue, #003caf);
-    font-family: var(--bluecore-font, "Helvetica Neue", Helvetica, sans-serif);
-    font-size: 16px;
-    font-weight: 500;
-    white-space: nowrap;
-
-    &:hover,
-    &:focus-visible {
-      border-color: var(--bluecore-blue-dark, #002b80);
-      color: var(--bluecore-blue-dark, #002b80);
-    }
+    width: 19rem; // So that we can fully display "Sinopia BIBFRAME instance resources"
   }
 }

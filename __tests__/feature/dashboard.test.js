@@ -64,7 +64,7 @@ describe("viewing the dashboard", () => {
       renderApp()
 
       fireEvent.click(screen.getByText("Linked Data Editor", { selector: "a" }))
-      fireEvent.click(screen.getByText("Resource Templates", { selector: "a" }))
+      fireEvent.click(screen.getByText("Resource templates", { selector: "a" }))
 
       fireEvent.click(await screen.findByTestId("View Uber template1"))
       await screen.findByRole("dialog")
@@ -81,7 +81,7 @@ describe("viewing the dashboard", () => {
       renderApp()
 
       fireEvent.click(screen.getByText("Linked Data Editor", { selector: "a" }))
-      fireEvent.click(screen.getByText("Resource Templates", { selector: "a" }))
+      fireEvent.click(screen.getByText("Resource templates", { selector: "a" }))
 
       fireEvent.click(await screen.findByTestId("Edit Uber template1"))
       await screen.findByText("Uber template1", {
