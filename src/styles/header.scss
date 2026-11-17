@@ -1,24 +1,77 @@
+// Top bar: white, 3px Core Blue rule underneath, full-bleed
 .editor-navbar {
-  background-color: $bluecore-header;
-}
+  background-color: $white;
+  border-bottom: 3px solid $core-blue;
+  margin: 0 (-$page-gutter);
+  padding: 0.5rem $page-gutter 0.25rem;
 
-/** For header tabs **/
-.navbar.editor-navtabs {
-  color: #2f2424;
+  .editor-logo img {
+    height: 30px;
+    width: auto;
+  }
+
+  .nav {
+    justify-content: flex-end;
+    align-items: center;
+    height: 100%;
+  }
+
+  // The "•" separators are not part of the Blue Core header
+  .nav > div.nav-link {
+    display: none;
+  }
+
+  .nav-link {
+    color: $core-blue;
+    padding: 0.25rem 0.75rem;
+  }
 
   a.nav-link {
-    padding-left: 1rem;
-    padding-right: 1rem;
-    padding-top: 0rem;
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+  }
+
+  .editor-header-user {
+    color: $black-100;
+  }
+
+  // Help renders as a small outlined button
+  a.nav-link.editor-help-resources {
+    border: 1px solid $core-blue;
+    border-radius: 2px;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 0.125rem 0.5rem;
+    margin: 0 0.75rem;
+  }
+}
+
+/** Sub-navigation band **/
+.navbar.editor-navtabs {
+  background-color: $mist;
+  color: $core-blue;
+  margin: 0 (-$page-gutter) 1.5rem;
+  padding: 1rem $page-gutter;
+
+  a.nav-link {
+    color: $core-blue;
+    padding: 0 1rem;
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+  }
+
+  .nav-item:first-child a.nav-link {
+    padding-left: 0;
   }
 
   a.nav-link.active {
-    font-weight: 900;
-    text-decoration: underline;
+    font-weight: 700;
+    text-decoration: none;
   }
 
   a.nav-link:hover {
-    color: #2f2424;
+    color: $core-blue;
+    text-decoration-style: solid;
   }
 
   .hover {
@@ -26,8 +79,49 @@
   }
 
   a {
-    color: #2f2424;
-    font-weight: 500;
+    color: $core-blue;
+    font-weight: 400;
+  }
+
+  .dropdown-menu {
+    border-color: $black-40;
+    border-radius: 2px;
+  }
+
+  .dropdown-item {
+    color: $core-blue;
+  }
+
+  // Search: one bordered field, select | input | blue button
+  .input-group {
+    margin-bottom: 0 !important;
+    align-items: center;
+
+    .col-form-label {
+      color: $black-100;
+    }
+
+    .form-select,
+    .form-control {
+      font-family: $font-family-controls;
+      color: $black-100;
+      border-color: $black-40;
+    }
+
+    .form-control::placeholder {
+      font-family: $font-family-sans-serif;
+      font-style: italic;
+      color: $black-70;
+    }
+
+    .btn {
+      @include button-variant($core-blue, $digital-blue);
+      border-radius: 4px !important;
+      font-family: $font-family-controls;
+      font-size: 0.875rem;
+      margin-left: 0.25rem !important;
+      padding: 0.125rem 0.5rem;
+    }
   }
 
   #searchType {

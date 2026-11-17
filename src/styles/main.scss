@@ -5,7 +5,7 @@
 @import "variables";
 @import "~bootstrap/scss/bootstrap";
 @import "bootstrap-override";
-@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600&display=swap");
 
 .left-space {
   margin-left: 3px;
@@ -21,7 +21,7 @@
 
 .banner {
   background-size: cover;
-  background-color: $bluecore-header;
+  background-color: $mist;
 }
 
 .editor-save {
@@ -82,9 +82,19 @@
   margin-bottom: 2%;
 }
 
+// Footer band: Mist background, 10px Core Blue rule along the bottom
 #footer {
-  float: right;
-  padding: 3% 10% 0 3%;
+  background-color: $mist;
+  border-bottom: 10px solid $core-blue;
+  margin: 3rem (-$page-gutter) 0;
+  padding: 2rem calc(#{$page-gutter} + 5%) 1.5rem;
+  font-weight: $font-weight-light;
+
+  a {
+    color: $core-blue;
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+  }
 }
 
 .offcanvas-menu {
@@ -155,14 +165,17 @@
 }
 
 #footer-text {
-  padding-left: 10%;
+  padding-left: 2rem;
 }
 
 .editor-logo {
   text-decoration: none;
   text-transform: uppercase;
-  font-family: "Copperplate Gothic Light";
-  color: #2f2424;
+  font-family: $font-family-sans-serif;
+  font-size: 1.5rem;
+  font-weight: $font-weight-light;
+  line-height: 1;
+  color: $sinopia-wordmark;
   margin-top: 5px;
   padding-left: 25px;
   margin-bottom: 0px;
@@ -186,19 +199,19 @@
 
 /** For lookup menu headers **/
 .dropdown-header {
-  font-weight: 800;
-  color: #333;
-  background-color: #d3d3d3;
+  font-weight: 700;
+  color: $black-100;
+  background-color: $mist;
 }
 
 .dropdown-empty,
 .dropdown-error {
   font-weight: 400;
-  color: #999999;
+  color: $black-70;
 }
 
 .dropdown-item.active {
-  color: #000000;
+  color: $black-100;
 }
 
 button.collapse-heading {
@@ -206,9 +219,12 @@ button.collapse-heading {
 }
 
 button.collapse-heading::before {
-  content: "❯";
+  content: "▶";
+  color: $core-blue;
+  font-size: 0.75em;
   position: absolute;
-  left: -5px;
+  left: -8px;
+  top: 0.55em;
   transform: rotate(90deg);
 }
 
@@ -234,7 +250,7 @@ button.collapse-heading.collapsed::before {
 
 .separator-circle {
   margin-top: 0.4em;
-  color: #004372;
+  color: $core-blue;
 }
 
 .editor-action-close {
@@ -261,8 +277,8 @@ button.collapse-heading.collapsed::before {
   padding-left: 20px;
   padding-right: 20px;
   margin-right: 5px;
-  background-color: $link-color;
-  border-color: $link-color;
+  background-color: $core-blue;
+  border-color: $digital-blue;
 }
 
 .view-resource-buttons {
@@ -294,18 +310,54 @@ button.collapse-heading.collapsed::before {
   button {
     border: none;
     padding: 5px 12px 5px 12px;
-    color: $orient;
+    color: $core-blue;
     background-color: $lookup-value-bg;
   }
 }
 
+// Data tables: no fill, no vertical rules, 1px Black 40 rule under every row
 .search-list,
 .resource-template-list,
 .search-results-list,
 .resource-list {
-  thead {
-    background-color: $double-spanish-white;
+  --bs-table-bg: transparent;
+  border-color: $black-40;
+  font-weight: $font-weight-light;
+
+  > :not(caption) > * {
+    border-width: 0;
   }
+
+  > :not(caption) > * > * {
+    border-width: 0 0 1px;
+  }
+
+  > :not(:first-child) {
+    border-top: 0;
+  }
+
+  thead th {
+    background-color: transparent;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #000;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+
+  td {
+    line-height: 1.5625; // 25px at 16px
+    vertical-align: top;
+  }
+
+  .btn-link {
+    color: $core-blue;
+  }
+}
+
+.resource-template-list td {
+  font-size: 0.875rem; // BC Paragraph: 14px light, 25px leading
+  line-height: 25px;
 }
 
 .input-group {
@@ -326,23 +378,24 @@ div.rbt div {
 }
 
 .expanding-section {
-  border-color: $nobel;
-  background-color: $solitude;
+  border-color: $black-40;
+  border-radius: 2px;
+  background-color: $mist;
 }
 
 .rdf-display-panel {
-  background-color: $greyblue;
-  border: 1px solid #979797;
+  background-color: $mist;
+  border: 1px solid $black-40;
   padding: 1rem;
   margin-bottom: 1rem;
 }
 
 .rdf-display-panel table th {
-  background-color: $greyblue;
+  background-color: $mist;
 }
 
 .rdf-display-panel table td {
-  background-color: $greyblue;
+  background-color: $mist;
 }
 
 .search-relationship {
