@@ -59,6 +59,42 @@ describe("viewing the dashboard", () => {
     })
   }, 10000)
 
+  describe("when user views a template", () => {
+    it("lists the template", async () => {
+      renderApp()
+
+      fireEvent.click(screen.getByText("Linked Data Editor", { selector: "a" }))
+      fireEvent.click(screen.getByText("Resource Templates", { selector: "a" }))
+
+      fireEvent.click(await screen.findByTestId("View Uber template1"))
+      await screen.findByRole("dialog")
+
+      fireEvent.click(screen.getByText("Dashboard", { selector: "a" }))
+
+      await screen.findByText("Recent templates")
+      screen.getByText("resourceTemplate:testing:uber1")
+    })
+  }, 10000)
+
+  describe("when user edits a template", () => {
+    it("lists the template", async () => {
+      renderApp()
+
+      fireEvent.click(screen.getByText("Linked Data Editor", { selector: "a" }))
+      fireEvent.click(screen.getByText("Resource Templates", { selector: "a" }))
+
+      fireEvent.click(await screen.findByTestId("Edit Uber template1"))
+      await screen.findByText("Uber template1", {
+        selector: resourceHeaderSelector,
+      })
+
+      fireEvent.click(screen.getByText("Dashboard", { selector: "a" }))
+
+      await screen.findByText("Recent templates")
+      screen.getByText("resourceTemplate:testing:uber1")
+    })
+  }, 10000)
+
   describe("when user performs a search", () => {
     it("lists the search and allows performing search", async () => {
       const noResult = {

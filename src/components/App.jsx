@@ -105,7 +105,7 @@ const App = (props) => {
             )
             navigate("/editor")
           } else {
-            dispatch(dispatchResourceForPreview(result))
+            dispatch(dispatchResourceForPreview(result, keycloak))
             dispatch(showModal("PreviewModal"))
             navigate("/dashboard")
           }
@@ -126,7 +126,7 @@ const App = (props) => {
           if (canEdit(resource)) {
             dispatch(dispatchResourceForEditor(result, uri, {}, keycloak))
           } else {
-            dispatch(dispatchResourceForPreview(result))
+            dispatch(dispatchResourceForPreview(result, keycloak))
             dispatch(showModal("PreviewModal"))
             navigate("/dashboard")
           }
