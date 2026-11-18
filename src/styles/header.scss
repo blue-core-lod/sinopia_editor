@@ -1,11 +1,6 @@
-// Top bar: white, 3px Core Blue rule underneath, full-bleed
-.editor-navbar {
-  background-color: $white;
-  border-bottom: 3px solid $core-blue;
-  margin: 0 (-$page-gutter);
-  padding: 0.5rem $page-gutter 0.25rem;
-
-  .editor-logo img {
+// Logo lockup shared by the editor and home page headers
+.editor-logo {
+  img {
     height: 38px;
     width: auto;
   }
@@ -21,6 +16,14 @@
   .editor-logo-name {
     text-box: trim-both cap alphabetic;
   }
+}
+
+// Top bar: white, 3px Core Blue rule underneath, full-bleed
+.editor-navbar {
+  background-color: $white;
+  border-bottom: 3px solid $core-blue;
+  margin: 0 (-$page-gutter);
+  padding: 0.5rem $page-gutter 0.25rem;
 
   .nav {
     justify-content: flex-end;
@@ -127,10 +130,9 @@
     }
 
     .form-select {
-      // Wide enough to fully display "Sinopia BIBFRAME instance resources"
-      // beside the caret
-      flex: 0 0 19rem;
-      width: 19rem;
+      // Native select sizes to its longest option beside the caret
+      flex: 0 0 auto;
+      width: auto;
       height: 28px;
       margin-left: 0.5rem;
       padding: 0 2.25rem 0 0.25rem;
