@@ -63,6 +63,25 @@ describe("checkTemplateVersion", () => {
     ])
   })
 
+  it("records nothing when the resource was closed before the check came back", async () => {
+    let resolveValidate
+    jest.spyOn(sinopiaApi, "validateProfile").mockReturnValue(
+      new Promise((resolve) => {
+        resolveValidate = resolve
+      }),
+    )
+    const state = versionedState()
+    const store = mockStore(state)
+
+    const pending = store.dispatch(checkTemplateVersion(resourceKey, keycloak))
+    // The cataloger closes the resource while the check is in flight.
+    delete state.entities.subjects[resourceKey]
+    resolveValidate(olderCheck)
+    await pending
+
+    expect(store.getActions()).toEqual([])
+  })
+
   it("records nothing when the resource is on the latest version", async () => {
     jest
       .spyOn(sinopiaApi, "validateProfile")

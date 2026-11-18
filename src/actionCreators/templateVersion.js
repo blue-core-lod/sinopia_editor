@@ -46,7 +46,12 @@ export const checkTemplateVersion =
     return validateProfile(profileUri, keycloak, {
       resourceUri: resource.uri,
     }).then((check) => {
-      if (check?.is_latest === false)
+      // The check doesn't block the open, so the resource may have been closed
+      // by the time it comes back. Don't re-add state for it.
+      if (
+        check?.is_latest === false &&
+        getState().entities.subjects[resourceKey]
+      )
         dispatch(setTemplateVersionCheck(resourceKey, check))
       return check
     })
