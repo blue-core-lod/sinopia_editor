@@ -198,6 +198,13 @@ describe("re-publishing a resource with the latest template version", () => {
     expect(selectErrors(state, resourceEditErrorKey(newKey))).toEqual([
       expect.stringMatching(/^Error saving:/),
     ])
+    // The original is gone, so the warning and Re-publish button have to come
+    // back on the rebuilt resource or the cataloger has no way to retry.
+    expect(state.entities.subjects[oldKey]).toBeUndefined()
+    expect(selectTemplateVersionCheck(state, newKey)).toMatchObject({
+      is_latest: false,
+      current_version_uri: v2Uri,
+    })
   })
 
   it("does not re-check the template version during re-publish", async () => {

@@ -127,7 +127,13 @@ export const republishWithLatestTemplate =
       return dispatch(
         saveResource(newKey, group, editGroups, saveErrorKey, keycloak),
       ).then(() => {
-        if (!_.isEmpty(selectErrors(getState(), saveErrorKey))) return false
+        if (!_.isEmpty(selectErrors(getState(), saveErrorKey))) {
+          // The original is gone and the rebuilt resource is marked unchanged
+          // (Save disabled), so bring back the warning and Re-publish button
+          // to let the cataloger retry. The server still has the old version.
+          dispatch(setTemplateVersionCheck(newKey, check))
+          return false
+        }
         dispatch(
           setTemplateVersionCheck(newKey, { ...check, republished: true }),
         )
