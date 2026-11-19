@@ -1,10 +1,12 @@
 // Spacing from the Blue Core dashboard design: 56px below the page title,
-// 48px from the last row of one list to the next list's heading.
-#dashboard {
-  > h1 {
-    margin-bottom: 3.5rem;
-  }
+// 48px from the last row of one list to the next list's heading. The
+// resource templates page shares the page title spacing.
+#dashboard > h1,
+#resourceTemplate > h1 {
+  margin-bottom: 3.5rem;
+}
 
+#dashboard {
   .dashboard-section + .dashboard-section {
     margin-top: 3rem;
   }
