@@ -25,7 +25,7 @@ describe("user authentication", () => {
     const store = createStore(state)
 
     renderApp(store)
-    screen.getByText(/Foo McBar/) // user Foo McBar should be logged in already when using default test redux store
+    screen.getByText("Logout", { selector: "a" }) // user Foo McBar should be logged in already when using default test redux store
 
     // logout, and confirm that the UI gets rid of the old user name
     // and removes elements that require authentication to view

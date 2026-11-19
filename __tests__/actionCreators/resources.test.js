@@ -16,6 +16,7 @@ import { thunk } from "redux-thunk"
 import { createState } from "stateUtils"
 import { nanoid } from "nanoid"
 import { safeAction } from "actionUtils"
+import StateResourceBuilder from "stateResourceBuilderUtils"
 import expectedExpandPropertyAddValueAction from "../__action_fixtures__/expandProperty-ADD_VALUE"
 import expectedExpandPropertyAddPropertyAction from "../__action_fixtures__/expandProperty-ADD_PROPERTY"
 import expectedAddSiblingAddValueAction from "../__action_fixtures__/addSiblingValueSubject-ADD_VALUE"
@@ -44,6 +45,42 @@ afterAll(() => {
 jest.spyOn(Config, "useResourceTemplateFixtures", "get").mockReturnValue(true)
 
 const mockStore = configureMockStore([thunk])
+
+const build = new StateResourceBuilder()
+
+// The template fixture with the template's own id filled in, so that saving
+// it can record the template in the user's history.
+const createTemplateState = () => {
+  const state = createState({ hasTemplateWithLiteral: true })
+  const propertyTemplate = build.propertyTemplate({
+    subjectTemplateKey: "sinopia:template:resource",
+    label: "Template ID",
+    uris: { "http://sinopia.io/vocabulary/hasResourceId": "Template ID" },
+    type: "literal",
+    component: "InputLiteral",
+  })
+  state.entities.subjectTemplates[
+    "sinopia:template:resource"
+  ].propertyTemplateKeys.push(propertyTemplate.key)
+  state.entities.propertyTemplates[propertyTemplate.key] = propertyTemplate
+  state.entities.subjects["8VrbxGPeF"].propertyKeys.push("rTiDpRoP01")
+  state.entities.properties.rTiDpRoP01 = build.property({
+    key: "rTiDpRoP01",
+    subjectKey: "8VrbxGPeF",
+    propertyTemplateKey: propertyTemplate.key,
+    valueKeys: ["rTiDvAlU01"],
+    labels: ["Resource Template", "Template ID"],
+  })
+  state.entities.values.rTiDvAlU01 = build.literalValue({
+    key: "rTiDvAlU01",
+    literal: "test:template:id",
+    lang: null,
+    rootSubjectKey: "8VrbxGPeF",
+    propertyKey: "rTiDpRoP01",
+    propertyUri: "http://sinopia.io/vocabulary/hasResourceId",
+  })
+  return state
+}
 
 describe("expandProperty", () => {
   describe("expand a nested resource", () => {
@@ -234,6 +271,60 @@ describe("saveNewResource", () => {
       "http://localhost:3000/resource/abcdeghij23455",
       keycloak,
     )
+    expect(sinopiaApi.putUserHistory).not.toHaveBeenCalledWith(
+      expect.anything(),
+      "template",
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    )
+  })
+
+  it("adds a new template to the template history", async () => {
+    const templateUri = "http://localhost:3000/profiles/new-template"
+    sinopiaApi.putUserHistory.mockClear()
+    sinopiaApi.postResource = jest.fn().mockResolvedValue(templateUri)
+    sinopiaSearch.getTemplateSearchResultsByIds = jest
+      .fn()
+      .mockResolvedValue({ results: [] })
+    const keycloak = { token: "test-token" }
+    // A mock store never applies SET_BASE_URL, so give the stored resource the
+    // URI the save will have assigned it.
+    const state = createTemplateState()
+    state.entities.subjects["8VrbxGPeF"].uri = templateUri
+    const store = mockStore(state)
+
+    await store.dispatch(
+      saveNewResource(
+        "8VrbxGPeF",
+        "stanford",
+        ["cornell"],
+        "testerror",
+        keycloak,
+      ),
+    )
+
+    expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
+      "Foo McBar",
+      "template",
+      expect.any(String),
+      "test:template:id",
+      keycloak,
+    )
+    expect(sinopiaSearch.getTemplateSearchResultsByIds).toHaveBeenCalledWith([
+      "test:template:id",
+    ])
+    expect(store.getActions()).toHaveAction("ADD_TEMPLATE_HISTORY_BY_RESULT", {
+      id: "test:template:id",
+      resourceLabel: "Resource Template",
+      resourceURI: undefined,
+      uri: templateUri,
+      author: undefined,
+      remark: undefined,
+      date: undefined,
+      group: "stanford",
+      editGroups: ["cornell"],
+    })
   })
 
   it("error when saving a new resource", async () => {
@@ -291,6 +382,59 @@ describe("saveResource", () => {
       "3eb9f1444e9ec984fb165fc9c4de826a",
       "https://api.sinopia.io/resource/0894a8b3",
       keycloak,
+    )
+  })
+
+  it("adds an edited template to the template history", async () => {
+    sinopiaApi.putUserHistory.mockClear()
+    sinopiaApi.putResource = jest.fn().mockResolvedValue("8VrbxGPeF")
+    sinopiaSearch.getTemplateSearchResultsByIds = jest.fn().mockResolvedValue({
+      results: [{ id: "test:template:id", resourceLabel: "From search" }],
+    })
+    const store = mockStore(createTemplateState())
+    const keycloak = { token: "test-token" }
+
+    await store.dispatch(
+      saveResource("8VrbxGPeF", "stanford", ["cornell"], "testerror", keycloak),
+    )
+
+    expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
+      "Foo McBar",
+      "template",
+      expect.any(String),
+      "test:template:id",
+      keycloak,
+    )
+    expect(store.getActions()).toHaveAction("ADD_TEMPLATE_HISTORY_BY_RESULT", {
+      id: "test:template:id",
+      resourceLabel: "From search",
+    })
+  })
+
+  it("does not add a template without a template ID to the template history", async () => {
+    sinopiaApi.putUserHistory.mockClear()
+    sinopiaApi.putResource = jest.fn().mockResolvedValue("8VrbxGPeF")
+    sinopiaSearch.getTemplateSearchResultsByIds = jest.fn()
+    // The template fixture before createTemplateState() fills in its ID
+    const store = mockStore(createState({ hasTemplateWithLiteral: true }))
+    const keycloak = { token: "test-token" }
+
+    await store.dispatch(
+      saveResource("8VrbxGPeF", "stanford", ["cornell"], "testerror", keycloak),
+    )
+    const actions = store.getActions()
+
+    expect(actions).toHaveAction("SAVE_RESOURCE_FINISHED")
+    expect(sinopiaApi.putUserHistory).not.toHaveBeenCalledWith(
+      expect.anything(),
+      "template",
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    )
+    expect(sinopiaSearch.getTemplateSearchResultsByIds).not.toHaveBeenCalled()
+    expect(actions.map((action) => action.type)).not.toContain(
+      "ADD_TEMPLATE_HISTORY_BY_RESULT",
     )
   })
 

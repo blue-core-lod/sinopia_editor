@@ -3,6 +3,8 @@ import {
   loadSearchHistory,
   loadResourceHistory,
   addResourceHistory,
+  addTemplateHistoryForResource,
+  templateIdForResource,
 } from "actionCreators/history"
 import Config from "Config"
 import configureMockStore from "redux-mock-store"
@@ -195,6 +197,142 @@ describe("addResourceHistory()", () => {
           },
         },
       ])
+    })
+  })
+})
+
+describe("templateIdForResource()", () => {
+  const property = (defaultUri, value) => ({
+    propertyTemplate: { defaultUri },
+    values: value ? [value] : [],
+  })
+
+  it("returns the template's resource id", () => {
+    const resource = {
+      properties: [
+        property("http://sinopia.io/vocabulary/hasResourceId", {
+          literal: "ld4p:RT:bf2:Title:AbbrTitle",
+        }),
+      ],
+    }
+
+    expect(templateIdForResource(resource)).toEqual(
+      "ld4p:RT:bf2:Title:AbbrTitle",
+    )
+  })
+
+  it("returns undefined when the id has no value", () => {
+    const resource = {
+      properties: [property("http://sinopia.io/vocabulary/hasResourceId")],
+    }
+
+    expect(templateIdForResource(resource)).toBeUndefined()
+  })
+})
+
+describe("addTemplateHistoryForResource()", () => {
+  const templateId = "ld4p:RT:bf2:Title:AbbrTitle"
+  const uri = "http://localhost:3000/profiles/abc-123"
+  const literalProperty = (defaultUri, literal) => ({
+    propertyTemplate: { defaultUri },
+    values: [{ literal }],
+  })
+  const resource = {
+    uri,
+    group: "stanford",
+    editGroups: ["cornell"],
+    properties: [
+      literalProperty("http://sinopia.io/vocabulary/hasResourceId", templateId),
+      literalProperty(
+        "http://www.w3.org/2000/01/rdf-schema#label",
+        "Abbreviated Title",
+      ),
+      {
+        propertyTemplate: {
+          defaultUri: "http://sinopia.io/vocabulary/hasClass",
+        },
+        values: [
+          { uri: "http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle" },
+        ],
+      },
+      literalProperty("http://sinopia.io/vocabulary/hasAuthor", "LD4P"),
+      literalProperty("http://sinopia.io/vocabulary/hasRemark", "A remark"),
+      literalProperty("http://sinopia.io/vocabulary/hasDate", "2026-11-17"),
+    ],
+  }
+  const resultFromResource = {
+    id: templateId,
+    resourceLabel: "Abbreviated Title",
+    resourceURI: "http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle",
+    uri,
+    author: "LD4P",
+    remark: "A remark",
+    date: "2026-11-17",
+    group: "stanford",
+    editGroups: ["cornell"],
+  }
+
+  describe("result found", () => {
+    it("dispatches the search result", async () => {
+      sinopiaSearch.getTemplateSearchResultsByIds = jest
+        .fn()
+        .mockResolvedValue({
+          results: [{ id: templateId, resourceLabel: "From search" }],
+        })
+
+      const store = mockStore(createState())
+      await store.dispatch(addTemplateHistoryForResource(resource, templateId))
+
+      expect(store.getActions()).toEqual([
+        {
+          type: "ADD_TEMPLATE_HISTORY_BY_RESULT",
+          payload: { id: templateId, resourceLabel: "From search" },
+        },
+      ])
+      expect(sinopiaSearch.getTemplateSearchResultsByIds).toHaveBeenCalledWith([
+        templateId,
+      ])
+    })
+  })
+
+  describe("result not found", () => {
+    it("dispatches a result built from the template resource", async () => {
+      sinopiaSearch.getTemplateSearchResultsByIds = jest
+        .fn()
+        .mockResolvedValue({ results: [] })
+
+      const store = mockStore(createState())
+      await store.dispatch(addTemplateHistoryForResource(resource, templateId))
+
+      expect(store.getActions()).toEqual([
+        {
+          type: "ADD_TEMPLATE_HISTORY_BY_RESULT",
+          payload: resultFromResource,
+        },
+      ])
+    })
+  })
+
+  describe("search error", () => {
+    it("logs the error and dispatches a result built from the template resource", async () => {
+      const consoleError = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => {})
+      sinopiaSearch.getTemplateSearchResultsByIds = jest
+        .fn()
+        .mockResolvedValue({ results: [], error: "500: Server Error" })
+
+      const store = mockStore(createState())
+      await store.dispatch(addTemplateHistoryForResource(resource, templateId))
+
+      expect(consoleError).toHaveBeenCalledWith("500: Server Error")
+      expect(store.getActions()).toEqual([
+        {
+          type: "ADD_TEMPLATE_HISTORY_BY_RESULT",
+          payload: resultFromResource,
+        },
+      ])
+      consoleError.mockRestore()
     })
   })
 })

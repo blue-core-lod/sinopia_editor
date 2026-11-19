@@ -17,9 +17,10 @@ describe("viewing the dashboard", () => {
 
       fireEvent.click(screen.getByText("Linked Data Editor", { selector: "a" }))
 
+      screen.getByRole("heading", { level: 1, name: "Sinopia dashboard" })
       screen.getByText(/Welcome to Sinopia/)
-    })
-  }, 10000)
+    }, 10000)
+  })
 
   describe("when user uses a source template", () => {
     it("lists the resource template", async () => {
@@ -47,6 +48,7 @@ describe("viewing the dashboard", () => {
       await screen.findByText("Recent templates")
 
       expect(screen.queryByText(/Welcome to Sinopia/)).not.toBeInTheDocument()
+      screen.getByRole("heading", { level: 1, name: "Sinopia dashboard" })
 
       // The result
       screen.getByText(/Uber template1/)
@@ -54,8 +56,50 @@ describe("viewing the dashboard", () => {
       screen.getByText("http://id.loc.gov/ontologies/bibframe/Uber1")
       screen.getAllByText("Justin Littman")
       screen.getByText("Jul 27, 2020")
-    })
-  }, 10000)
+    }, 10000)
+  })
+
+  describe("when user views a template", () => {
+    it("lists the template", async () => {
+      renderApp()
+
+      fireEvent.click(screen.getByText("Linked Data Editor", { selector: "a" }))
+      fireEvent.click(screen.getByText("Resource templates", { selector: "a" }))
+
+      fireEvent.click(await screen.findByTestId("View Uber template1"))
+      await screen.findByRole("dialog")
+
+      fireEvent.click(screen.getByText("Dashboard", { selector: "a" }))
+
+      await screen.findByText("Recent templates")
+      screen.getByText("resourceTemplate:testing:uber1")
+    }, 10000)
+  })
+
+  describe("when user edits a template", () => {
+    it("lists the template", async () => {
+      renderApp()
+
+      fireEvent.click(screen.getByText("Linked Data Editor", { selector: "a" }))
+      fireEvent.click(screen.getByText("Resource templates", { selector: "a" }))
+
+      fireEvent.click(await screen.findByTestId("Edit Uber template1"))
+      await screen.findByText("Uber template1", {
+        selector: resourceHeaderSelector,
+      })
+
+      fireEvent.click(screen.getByText("Dashboard", { selector: "a" }))
+
+      await screen.findByText("Recent templates")
+      screen.getByText("resourceTemplate:testing:uber1")
+
+      // The section collapses from its heading
+      fireEvent.click(screen.getByRole("button", { name: "Recent templates" }))
+      expect(
+        screen.getByText("resourceTemplate:testing:uber1"),
+      ).not.toBeVisible()
+    }, 10000)
+  })
 
   describe("when user performs a search", () => {
     it("lists the search and allows performing search", async () => {
@@ -82,12 +126,13 @@ describe("viewing the dashboard", () => {
       fireEvent.click(screen.getByText("Dashboard", { selector: "a" }))
 
       screen.getByText("Recent searches")
+      screen.getByRole("heading", { level: 1, name: "Sinopia dashboard" })
 
       // The result
       screen.getByText("Sinopia resources")
       screen.getByText("asdfqwerty")
-    })
-  }, 10000)
+    }, 10000)
+  })
 
   describe("when user uses a resource", () => {
     it("lists the resource", async () => {
@@ -118,12 +163,13 @@ describe("viewing the dashboard", () => {
       fireEvent.click(screen.getByText("Dashboard", { selector: "a" }))
 
       screen.getByText("Recent resources")
+      screen.getByRole("heading", { level: 1, name: "Sinopia dashboard" })
 
       // The result
       screen.getByText(
         "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
         { selector: "table.resource-list td" },
       )
-    })
-  }, 10000)
+    }, 10000)
+  })
 })

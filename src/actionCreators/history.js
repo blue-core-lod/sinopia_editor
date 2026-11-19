@@ -77,6 +77,56 @@ export const loadResourceHistory = (resourceUris) => (dispatch) => {
     .catch((err) => console.error(err))
 }
 
+const templateValueFor = (resource, propertyUri) =>
+  resource.properties.find(
+    (property) => property.propertyTemplate.defaultUri === propertyUri,
+  )?.values?.[0]
+
+// Builds the same shape as a template search result from the template
+// resource itself, for a template the search index does not have yet.
+const templateResultFor = (resource, templateId) => ({
+  id: templateId,
+  resourceLabel: templateValueFor(
+    resource,
+    "http://www.w3.org/2000/01/rdf-schema#label",
+  )?.literal,
+  resourceURI: templateValueFor(
+    resource,
+    "http://sinopia.io/vocabulary/hasClass",
+  )?.uri,
+  uri: resource.uri,
+  author: templateValueFor(resource, "http://sinopia.io/vocabulary/hasAuthor")
+    ?.literal,
+  remark: templateValueFor(resource, "http://sinopia.io/vocabulary/hasRemark")
+    ?.literal,
+  date: templateValueFor(resource, "http://sinopia.io/vocabulary/hasDate")
+    ?.literal,
+  group: resource.group,
+  editGroups: resource.editGroups,
+})
+
+export const templateIdForResource = (resource) =>
+  templateValueFor(resource, "http://sinopia.io/vocabulary/hasResourceId")
+    ?.literal
+
+export const addTemplateHistoryForResource =
+  (resource, templateId) => (dispatch) =>
+    // Try to find it by search. If not available, just use the resource.
+    getTemplateSearchResultsByIds([templateId])
+      .then((response) => {
+        // A failed search still leaves the resource to build the result from
+        if (response.error) console.error(response.error)
+        const result = response.results.find(
+          (checkResult) => checkResult.id === templateId,
+        )
+        dispatch(
+          addTemplateHistoryByResult(
+            result || templateResultFor(resource, templateId),
+          ),
+        )
+      })
+      .catch((err) => console.error(err))
+
 export const addResourceHistory =
   (resourceUri, type, group, modified) => (dispatch) => {
     // Try to find it by search. If not available, just use the resource.

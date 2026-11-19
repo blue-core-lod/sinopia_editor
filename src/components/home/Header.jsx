@@ -22,25 +22,20 @@ const Header = (props) => {
       <div className="navbar-header">
         <a className="navbar-brand" href={`${Config.sinopiaUrl}`}>
           <h1 className="editor-logo">
-            <img
-              src={bcLogo}
-              alt="Blue Core Logo"
-              style={{ paddingBottom: "8px" }}
-            ></img>{" "}
-            | Sinopia{`${Config.sinopiaEnv}`}
+            <img src={bcLogo} alt="Blue Core Logo"></img>
+            <span className="editor-logo-divider" aria-hidden="true">
+              |
+            </span>
+            <span className="editor-logo-name">
+              Sinopia{`${Config.sinopiaEnv}`}
+            </span>
           </h1>
         </a>
       </div>
       <ul className="nav">
         {props.currentUser && (
           <React.Fragment>
-            <li className="nav-item">
-              <span className="nav-link editor-header-user">
-                {props.currentUser.username}
-              </span>
-            </li>
             <SessionStatus />
-            <div className="nav-link">•</div>
             <li className="nav-item">
               <Link to="/dashboard" className="nav-link">
                 Linked Data Editor
@@ -64,7 +59,10 @@ const Header = (props) => {
             <a
               href="#"
               className="nav-link editor-header-logout"
-              onClick={() => props.signOut(keycloak)}
+              onClick={(event) => {
+                event.preventDefault()
+                props.signOut(keycloak)
+              }}
             >
               Logout
             </a>

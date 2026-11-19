@@ -89,7 +89,7 @@ describe("<App />", () => {
     const store = createStore(state)
     renderApp(store)
 
-    await screen.findByText("Foo McBar")
+    await screen.findByText("Logout", { selector: "a" })
   })
 
   describe("when user is not authenticated", () => {

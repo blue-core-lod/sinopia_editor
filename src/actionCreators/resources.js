@@ -47,12 +47,28 @@ import {
   addTemplateHistory as addUserTemplateHistory,
   addResourceHistory as addUserResourceHistory,
 } from "actionCreators/user"
-import { addResourceHistory } from "actionCreators/history"
+import {
+  addResourceHistory,
+  addTemplateHistoryForResource,
+  templateIdForResource,
+} from "actionCreators/history"
 import _ from "lodash"
 import { setCurrentComponent } from "actions/index"
 import { loadRelationships } from "./relationships"
 import { loadTemplateUsage } from "./templateUsage"
 import { isTemplate } from "utilities/SinopiaApiHelper"
+
+// A template is itself a resource, so viewing, editing or saving one is a use
+// of that template and belongs in the user's recent templates.
+const addTemplateResourceHistory = (resource, keycloak) => (dispatch) => {
+  if (!isTemplate(resource)) return
+  const templateId = templateIdForResource(resource)
+  // Not redundant: a template resource can lack a Template ID value (e.g. a
+  // profile created outside Sinopia), and there is nothing to record without it.
+  if (!templateId) return
+  dispatch(addUserTemplateHistory(templateId, keycloak))
+  dispatch(addTemplateHistoryForResource(resource, templateId))
+}
 
 /**
  * A thunk that loads an existing resource from Sinopia API and adds to state.
@@ -189,6 +205,7 @@ export const dispatchResourceForEditor =
           keycloak,
         ),
       )
+      dispatch(addTemplateResourceHistory(resource, keycloak))
       dispatch(loadResourceFinished(resource.key))
     }
     return true
@@ -252,16 +269,21 @@ export const completeResourceLoadingWithTemplate =
   }
 
 export const loadResourceForPreview =
-  (uri, errorKey, { version = null, defaultResourceTemplateId = null } = {}) =>
+  (
+    uri,
+    errorKey,
+    { version = null, defaultResourceTemplateId = null, keycloak } = {},
+  ) =>
   (dispatch) =>
     dispatch(
       loadResource(uri, errorKey, { version, defaultResourceTemplateId }),
-    ).then((result) => dispatch(dispatchResourceForPreview(result)))
+    ).then((result) => dispatch(dispatchResourceForPreview(result, keycloak)))
 
-export const dispatchResourceForPreview = (result) => (dispatch) => {
+export const dispatchResourceForPreview = (result, keycloak) => (dispatch) => {
   if (!result) return false
   const [, resource] = result
   dispatch(setCurrentPreviewResource(resource.key))
+  dispatch(addTemplateResourceHistory(resource, keycloak))
   return true
 }
 
@@ -430,6 +452,12 @@ export const saveNewResource =
             group,
           ),
         )
+        dispatch(
+          addTemplateResourceHistory(
+            selectFullSubject(getState(), resourceKey),
+            keycloak,
+          ),
+        )
       })
       .catch((err) => {
         console.error(err)
@@ -473,6 +501,7 @@ export const saveResource =
             resource.group,
           ),
         )
+        dispatch(addTemplateResourceHistory(resource, keycloak))
         dispatch(clearVersions(resourceKey))
       })
       .catch((err) => {

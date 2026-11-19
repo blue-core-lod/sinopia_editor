@@ -92,7 +92,9 @@ const useResource = (
       dispatch(showModal("PreviewModal"))
     } else {
       setStatus("loading view")
-      dispatch(loadResourceForPreview(resourceURI, errorKey)).then((result) => {
+      dispatch(
+        loadResourceForPreview(resourceURI, errorKey, { keycloak }),
+      ).then((result) => {
         setStatus("ready")
         if (result) dispatch(showModal("PreviewModal"))
       })
