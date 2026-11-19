@@ -86,9 +86,6 @@ const HeaderSearch = () => {
           <option value={`${sinopiaSearchUri}/Instance`}>
             BIBFRAME instance resources
           </option>
-          <option value={`${sinopiaSearchUri}/Item`}>
-            BIBFRAME item resources
-          </option>
         </select>
         <input
           className="flex-grow-1 form-control"

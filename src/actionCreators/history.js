@@ -114,10 +114,8 @@ export const addTemplateHistoryForResource =
     // Try to find it by search. If not available, just use the resource.
     getTemplateSearchResultsByIds([templateId])
       .then((response) => {
-        if (response.error) {
-          console.error(response.error)
-          return
-        }
+        // A failed search still leaves the resource to build the result from
+        if (response.error) console.error(response.error)
         const result = response.results.find(
           (checkResult) => checkResult.id === templateId,
         )

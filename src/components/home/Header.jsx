@@ -59,7 +59,10 @@ const Header = (props) => {
             <a
               href="#"
               className="nav-link editor-header-logout"
-              onClick={() => props.signOut(keycloak)}
+              onClick={(event) => {
+                event.preventDefault()
+                props.signOut(keycloak)
+              }}
             >
               Logout
             </a>

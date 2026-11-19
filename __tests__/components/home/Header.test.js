@@ -1,5 +1,5 @@
 import React from "react"
-import { screen } from "@testing-library/react"
+import { fireEvent, screen } from "@testing-library/react"
 import Header from "components/home/Header"
 import {
   renderComponent,
@@ -7,6 +7,7 @@ import {
   createHistory,
 } from "../../testUtilities/testUtils"
 import { createState } from "stateUtils"
+import { useKeycloak } from "KeycloakContext"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -34,5 +35,16 @@ describe("<Header /> (home page)", () => {
     screen.getByAltText("Blue Core Logo")
     expect(screen.getByText("|")).toHaveClass("editor-logo-divider")
     expect(screen.getByText(/^Sinopia/)).toHaveClass("editor-logo-name")
+  })
+
+  it("signs out from Logout without following the # link", () => {
+    const keycloak = { logout: jest.fn() }
+    useKeycloak.mockReturnValueOnce({ keycloak })
+    renderHeader()
+
+    const notPrevented = fireEvent.click(screen.getByText("Logout"))
+
+    expect(notPrevented).toBe(false)
+    expect(keycloak.logout).toHaveBeenCalledTimes(1)
   })
 })

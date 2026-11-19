@@ -63,6 +63,8 @@ import { isTemplate } from "utilities/SinopiaApiHelper"
 const addTemplateResourceHistory = (resource, keycloak) => (dispatch) => {
   if (!isTemplate(resource)) return
   const templateId = templateIdForResource(resource)
+  // Not redundant: a template resource can lack a Template ID value (e.g. a
+  // profile created outside Sinopia), and there is nothing to record without it.
   if (!templateId) return
   dispatch(addUserTemplateHistory(templateId, keycloak))
   dispatch(addTemplateHistoryForResource(resource, templateId))

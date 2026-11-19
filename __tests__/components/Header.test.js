@@ -8,6 +8,7 @@ import {
   createHistory,
 } from "../testUtilities/testUtils"
 import { createState } from "stateUtils"
+import { useKeycloak } from "KeycloakContext"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -57,5 +58,16 @@ describe("<Header />", () => {
     fireEvent.click(switchApplication)
 
     expect(triggerEditorMenu).toHaveBeenCalledWith("applications")
+  })
+
+  it("signs out from Logout without following the # link", () => {
+    const keycloak = { logout: jest.fn() }
+    useKeycloak.mockReturnValueOnce({ keycloak })
+    renderHeader()
+
+    const notPrevented = fireEvent.click(screen.getByText("Logout"))
+
+    expect(notPrevented).toBe(false)
+    expect(keycloak.logout).toHaveBeenCalledTimes(1)
   })
 })

@@ -260,6 +260,17 @@ describe("addTemplateHistoryForResource()", () => {
       literalProperty("http://sinopia.io/vocabulary/hasDate", "2026-11-17"),
     ],
   }
+  const resultFromResource = {
+    id: templateId,
+    resourceLabel: "Abbreviated Title",
+    resourceURI: "http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle",
+    uri,
+    author: "LD4P",
+    remark: "A remark",
+    date: "2026-11-17",
+    group: "stanford",
+    editGroups: ["cornell"],
+  }
 
   describe("result found", () => {
     it("dispatches the search result", async () => {
@@ -296,26 +307,17 @@ describe("addTemplateHistoryForResource()", () => {
       expect(store.getActions()).toEqual([
         {
           type: "ADD_TEMPLATE_HISTORY_BY_RESULT",
-          payload: {
-            id: templateId,
-            resourceLabel: "Abbreviated Title",
-            resourceURI:
-              "http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle",
-            uri,
-            author: "LD4P",
-            remark: "A remark",
-            date: "2026-11-17",
-            group: "stanford",
-            editGroups: ["cornell"],
-          },
+          payload: resultFromResource,
         },
       ])
     })
   })
 
   describe("search error", () => {
-    it("dispatches nothing", async () => {
-      jest.spyOn(console, "error").mockImplementation(() => {})
+    it("logs the error and dispatches a result built from the template resource", async () => {
+      const consoleError = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => {})
       sinopiaSearch.getTemplateSearchResultsByIds = jest
         .fn()
         .mockResolvedValue({ results: [], error: "500: Server Error" })
@@ -323,7 +325,14 @@ describe("addTemplateHistoryForResource()", () => {
       const store = mockStore(createState())
       await store.dispatch(addTemplateHistoryForResource(resource, templateId))
 
-      expect(store.getActions()).toEqual([])
+      expect(consoleError).toHaveBeenCalledWith("500: Server Error")
+      expect(store.getActions()).toEqual([
+        {
+          type: "ADD_TEMPLATE_HISTORY_BY_RESULT",
+          payload: resultFromResource,
+        },
+      ])
+      consoleError.mockRestore()
     })
   })
 })

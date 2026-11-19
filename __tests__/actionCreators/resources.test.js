@@ -411,6 +411,33 @@ describe("saveResource", () => {
     })
   })
 
+  it("does not add a template without a template ID to the template history", async () => {
+    sinopiaApi.putUserHistory.mockClear()
+    sinopiaApi.putResource = jest.fn().mockResolvedValue("8VrbxGPeF")
+    sinopiaSearch.getTemplateSearchResultsByIds = jest.fn()
+    // The template fixture before createTemplateState() fills in its ID
+    const store = mockStore(createState({ hasTemplateWithLiteral: true }))
+    const keycloak = { token: "test-token" }
+
+    await store.dispatch(
+      saveResource("8VrbxGPeF", "stanford", ["cornell"], "testerror", keycloak),
+    )
+    const actions = store.getActions()
+
+    expect(actions).toHaveAction("SAVE_RESOURCE_FINISHED")
+    expect(sinopiaApi.putUserHistory).not.toHaveBeenCalledWith(
+      expect.anything(),
+      "template",
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    )
+    expect(sinopiaSearch.getTemplateSearchResultsByIds).not.toHaveBeenCalled()
+    expect(actions.map((action) => action.type)).not.toContain(
+      "ADD_TEMPLATE_HISTORY_BY_RESULT",
+    )
+  })
+
   it("error when trying to save existing resource", async () => {
     sinopiaApi.putResource = jest.fn().mockRejectedValue(new Error("Messed-up"))
     const store = mockStore(createState({ hasResourceWithLiteral: true }))
