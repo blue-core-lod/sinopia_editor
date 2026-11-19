@@ -93,3 +93,29 @@ describe("ResourceTemplateRow actions", () => {
     })
   })
 })
+
+describe("ResourceTemplateSearchResult group column", () => {
+  const renderResults = (props) =>
+    renderComponent(
+      <ResourceTemplateSearchResult results={[row]} {...props} />,
+      createStore(createState()),
+    )
+
+  it("shows the group column by default", () => {
+    renderResults()
+
+    expect(
+      screen.getByRole("columnheader", { name: "Group" }),
+    ).toBeInTheDocument()
+    expect(screen.getAllByRole("cell")).toHaveLength(7)
+  })
+
+  it("hides the group column when showGroup is false", () => {
+    renderResults({ showGroup: false })
+
+    expect(
+      screen.queryByRole("columnheader", { name: "Group" }),
+    ).not.toBeInTheDocument()
+    expect(screen.getAllByRole("cell")).toHaveLength(6)
+  })
+})

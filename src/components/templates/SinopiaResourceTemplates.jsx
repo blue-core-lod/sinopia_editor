@@ -25,13 +25,17 @@ const SinopiaResourceTemplates = () => {
         label="Most recently used templates"
         id="historicalTemplates"
         results={historicalTemplates}
+        showGroup={false}
       />
       {_.isEmpty(searchResults) ? (
         <div className="alert alert-warning" id="no-rt-warning">
           No resource templates match.
         </div>
       ) : (
-        <ResourceTemplateSearchResult results={searchResults} />
+        <ResourceTemplateSearchResult
+          results={searchResults}
+          showGroup={false}
+        />
       )}
     </section>
   )

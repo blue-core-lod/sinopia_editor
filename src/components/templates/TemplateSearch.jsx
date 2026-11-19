@@ -113,7 +113,7 @@ const TemplateSearch = () => {
                   className="font-weight-bold col-form-label"
                   htmlFor="searchInput"
                 >
-                  Find a resource template
+                  Search for resource templates
                 </label>
                 &nbsp;
                 <input
