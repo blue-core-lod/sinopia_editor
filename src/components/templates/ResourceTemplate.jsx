@@ -13,6 +13,7 @@ const ResourceTemplate = (props) => (
   <AlertsContextProvider value={templateErrorKey}>
     <section id="resourceTemplate">
       <Header triggerEditorMenu={props.triggerHandleOffsetMenu} />
+      <h1>Resource templates</h1>
       <ContextAlert />
       <PreviewModal />
       <TemplateSearch />

@@ -215,7 +215,7 @@ describe("<App />", () => {
       const history = createHistory(["/templates"])
       renderApp(null, history)
 
-      await screen.findByText("Find a resource template")
+      await screen.findByText("Search for resource templates")
     })
 
     it("renders search results for /search", () => {

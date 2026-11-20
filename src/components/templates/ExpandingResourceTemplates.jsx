@@ -5,7 +5,7 @@ import PropTypes from "prop-types"
 import ResourceTemplateSearchResult from "./ResourceTemplateSearchResult"
 import _ from "lodash"
 
-const ExpandingResourceTemplates = ({ results, id, label }) => {
+const ExpandingResourceTemplates = ({ results, id, label, showGroup }) => {
   if (_.isEmpty(results)) return null
 
   return (
@@ -22,7 +22,7 @@ const ExpandingResourceTemplates = ({ results, id, label }) => {
         </h3>
       </div>
       <div id={id} className="collapse" style={{ padding: "5px" }}>
-        <ResourceTemplateSearchResult results={results} />
+        <ResourceTemplateSearchResult results={results} showGroup={showGroup} />
       </div>
     </div>
   )
@@ -32,6 +32,7 @@ ExpandingResourceTemplates.propTypes = {
   results: PropTypes.array,
   label: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
+  showGroup: PropTypes.bool,
 }
 
 export default ExpandingResourceTemplates

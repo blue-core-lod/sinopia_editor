@@ -7,9 +7,9 @@ import ResourceTemplateRow from "./ResourceTemplateRow"
 /**
  * This is the list view of all the templates
  */
-const ResourceTemplateSearchResult = ({ results }) => {
+const ResourceTemplateSearchResult = ({ results, showGroup = true }) => {
   const rows = results.map((row) => (
-    <ResourceTemplateRow key={row.id} row={row} />
+    <ResourceTemplateRow key={row.id} row={row} showGroup={showGroup} />
   ))
 
   return (
@@ -18,10 +18,11 @@ const ResourceTemplateSearchResult = ({ results }) => {
         <table className="table table-bordered resource-template-list">
           <thead>
             <tr>
-              <th style={{ width: "28%" }}>Label</th>
+              {/* Label takes the Group column's width when it is hidden */}
+              <th style={{ width: showGroup ? "28%" : "36%" }}>Label</th>
               <th style={{ width: "18%" }}>Resource URI</th>
               <th style={{ width: "10%" }}>Author</th>
-              <th style={{ width: "8%" }}>Group</th>
+              {showGroup && <th style={{ width: "8%" }}>Group</th>}
               <th style={{ width: "10%" }}>Date</th>
               <th style={{ width: "22%" }}>Guiding statement</th>
               <th style={{ width: "4%" }} data-testid="action-col-header">
@@ -38,6 +39,7 @@ const ResourceTemplateSearchResult = ({ results }) => {
 
 ResourceTemplateSearchResult.propTypes = {
   results: PropTypes.array,
+  showGroup: PropTypes.bool,
 }
 
 export default ResourceTemplateSearchResult

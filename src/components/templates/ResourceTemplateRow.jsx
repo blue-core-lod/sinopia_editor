@@ -16,7 +16,7 @@ import useAlerts from "hooks/useAlerts"
 /**
  * This is the list view of all the templates
  */
-const ResourceTemplateRow = ({ row }) => {
+const ResourceTemplateRow = ({ row, showGroup = true }) => {
   const { canCreate, canEdit, hasRole } = usePermissions()
   // Templates are managed by role: anyone may view, but copying and editing a
   // template are each gated on a Keycloak realm role in addition to the
@@ -50,9 +50,11 @@ const ResourceTemplateRow = ({ row }) => {
       </td>
       <td style={{ wordBreak: "break-all" }}>{row.resourceURI}</td>
       <td style={{ wordBreak: "break-all" }}>{row.author}</td>
-      <td style={{ wordBreak: "break-all" }}>
-        {groupMap[row.group] || "Unknown"}
-      </td>
+      {showGroup && (
+        <td style={{ wordBreak: "break-all" }}>
+          {groupMap[row.group] || "Unknown"}
+        </td>
+      )}
       <td>
         <LongDate datetime={row.date} timeZone="UTC" />
       </td>
@@ -93,6 +95,7 @@ const ResourceTemplateRow = ({ row }) => {
 
 ResourceTemplateRow.propTypes = {
   row: PropTypes.object,
+  showGroup: PropTypes.bool,
 }
 
 export default ResourceTemplateRow
