@@ -1,4 +1,4 @@
-import { addTemplateHistory } from "actions/history"
+import { addTemplateHistory, addResourceHistoryByResult } from "actions/history"
 import { clearErrors, addError } from "actions/errors"
 import { showModal } from "actions/modals"
 import {
@@ -48,10 +48,11 @@ import {
   addResourceHistory as addUserResourceHistory,
 } from "actionCreators/user"
 import {
-  addResourceHistory,
   addTemplateHistoryForResource,
   templateIdForResource,
 } from "actionCreators/history"
+import { resultFromDataset } from "utilities/Bibframe"
+import GraphBuilder from "GraphBuilder"
 import _ from "lodash"
 import { setCurrentComponent } from "actions/index"
 import { loadRelationships } from "./relationships"
@@ -144,7 +145,7 @@ export const loadResource =
               ),
             )
             dispatch(loadRelationships(resource.key, uri, errorKey))
-            return [response, resource, unusedDataset]
+            return [response, resource, unusedDataset, dataset]
           })
           .catch((err) => {
             // ResourceTemplateErrors have already been dispatched.
@@ -189,7 +190,7 @@ export const dispatchResourceForEditor =
   ) =>
   (dispatch) => {
     if (!result) return false
-    const [response, resource] = result
+    const [response, resource, , dataset] = result
     dispatch(
       setCurrentComponent(
         resource.key,
@@ -211,14 +212,10 @@ export const dispatchResourceForEditor =
       )
     if (!asNewResource) {
       dispatch(addUserResourceHistory(uri, keycloak))
+      // Built from the resource just fetched, so it is not fetched again
       dispatch(
-        addResourceHistory(
-          resource.uri,
-          resource.subjectTemplate.class,
-          response.group,
-          // The Blue Core API calls this field updated_at.
-          response.timestamp ?? response.updated_at,
-          keycloak,
+        addResourceHistoryByResult(
+          resultFromDataset(resource.uri, dataset, response),
         ),
       )
       dispatch(addTemplateResourceHistory(resource, keycloak))
@@ -269,7 +266,7 @@ export const completeResourceLoadingWithTemplate =
           ),
         )
         dispatch(loadRelationships(resource.key, uri, errorKey))
-        const result = [response, resource, unusedDataset]
+        const result = [response, resource, unusedDataset, dataset]
         return dispatch(
           dispatchResourceForEditor(result, uri, { asNewResource }, keycloak),
         )
@@ -441,6 +438,15 @@ export const newResourceFromDataset =
       })
   }
 
+// The history entry for a resource just saved, built from the editor's copy
+// rather than fetching the resource back
+const savedResourceResult = (resource, group, editGroups) =>
+  resultFromDataset(resource.uri, new GraphBuilder(resource).graph, {
+    group,
+    editGroups,
+    updated_at: new Date().toISOString(),
+  })
+
 // A thunk that publishes (saves) a new resource
 export const saveNewResource =
   (resourceKey, group, editGroups, errorKey, keycloak) =>
@@ -466,10 +472,12 @@ export const saveNewResource =
         dispatch(saveResourceFinished(resourceKey))
         dispatch(addUserResourceHistory(resourceUrl, keycloak))
         dispatch(
-          addResourceHistory(
-            resourceUrl,
-            resource.subjectTemplate.class,
-            group,
+          addResourceHistoryByResult(
+            savedResourceResult(
+              { ...resource, uri: resourceUrl },
+              group,
+              editGroups,
+            ),
           ),
         )
         dispatch(
@@ -515,10 +523,8 @@ export const saveResource =
         dispatch(saveResourceFinished(resourceKey))
         dispatch(addUserResourceHistory(resource.uri, keycloak))
         dispatch(
-          addResourceHistory(
-            resource.uri,
-            resource.subjectTemplate.class,
-            resource.group,
+          addResourceHistoryByResult(
+            savedResourceResult(resource, group, editGroups),
           ),
         )
         dispatch(addTemplateResourceHistory(resource, keycloak))

@@ -5,11 +5,8 @@ import {
   getLookupResult,
   getSearchResultsWithFacets,
   getTemplateSearchResultsByIds,
-  getSearchResultsByUris,
 } from "sinopiaSearch"
 import { findAuthorityConfig } from "utilities/authorityConfig"
-import * as sinopiaApi from "sinopiaApi"
-import rdf from "rdf-ext"
 
 // Blue Core API format for resource search results
 const blueCoreResourceResult = {
@@ -628,78 +625,6 @@ describe("getTemplateSearchResultsByIds", () => {
         method: "GET",
       },
     )
-  })
-})
-
-describe("getSearchResultsByUris", () => {
-  const workUri = "http://localhost:3000/works/3d831f47"
-  const missingUri = "http://localhost:3000/works/0000"
-
-  // A fetched work titled "Cat jokes"
-  const workDataset = () => {
-    const title = rdf.blankNode()
-    return rdf.dataset([
-      rdf.quad(
-        rdf.namedNode(workUri),
-        rdf.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-        rdf.namedNode("http://id.loc.gov/ontologies/bibframe/Work"),
-      ),
-      rdf.quad(
-        rdf.namedNode(workUri),
-        rdf.namedNode("http://id.loc.gov/ontologies/bibframe/title"),
-        title,
-      ),
-      rdf.quad(
-        title,
-        rdf.namedNode("http://id.loc.gov/ontologies/bibframe/mainTitle"),
-        rdf.literal("Cat jokes"),
-      ),
-    ])
-  }
-
-  beforeEach(() => {
-    jest.spyOn(sinopiaApi, "fetchResource").mockImplementation((uri) =>
-      uri === workUri
-        ? Promise.resolve([
-            workDataset(),
-            {
-              updated_at: "2020-10-05T14:31:16.563Z",
-              group: "blue core",
-              editGroups: ["blue core"],
-            },
-          ])
-        : Promise.reject(new Error("Not found")),
-    )
-  })
-
-  afterEach(() => jest.restoreAllMocks())
-
-  it("fetches each resource and labels it with its title", async () => {
-    const results = await getSearchResultsByUris([workUri, missingUri])
-
-    expect(sinopiaApi.fetchResource).toHaveBeenCalledWith(workUri)
-    expect(sinopiaApi.fetchResource).toHaveBeenCalledWith(missingUri)
-    // The resource that failed to load is left out
-    expect(results).toEqual({
-      totalHits: 1,
-      results: [
-        {
-          uri: workUri,
-          label: "Cat jokes",
-          type: ["http://id.loc.gov/ontologies/bibframe/Work"],
-          modified: "2020-10-05T14:31:16.563Z",
-          group: "blue core",
-          editGroups: ["blue core"],
-        },
-      ],
-      error: undefined,
-    })
-  })
-
-  it("returns an error when no resource could be loaded", async () => {
-    const results = await getSearchResultsByUris([missingUri])
-
-    expect(results).toEqual({ totalHits: 0, results: [], error: "Not found" })
   })
 })
 

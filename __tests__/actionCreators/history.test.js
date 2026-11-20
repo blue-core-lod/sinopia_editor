@@ -2,7 +2,6 @@ import {
   loadTemplateHistory,
   loadSearchHistory,
   loadResourceHistory,
-  addResourceHistory,
   addTemplateHistoryForResource,
   templateIdForResource,
 } from "actionCreators/history"
@@ -11,6 +10,7 @@ import configureMockStore from "redux-mock-store"
 import { thunk } from "redux-thunk"
 import { createState } from "stateUtils"
 import * as sinopiaSearch from "sinopiaSearch"
+import * as sinopiaApi from "sinopiaApi"
 
 // This forces Sinopia server to use fixtures
 jest.spyOn(Config, "useResourceTemplateFixtures", "get").mockReturnValue(true)
@@ -110,10 +110,10 @@ describe("loadResourceHistory()", () => {
   const uri2 =
     "http://localhost:3000/resource/65753d03-8202-463e-8cef-3e5f6f3897a4"
 
-  sinopiaSearch.getSearchResultsByUris = jest
+  sinopiaApi.fetchResourceResults = jest
     .fn()
     .mockResolvedValue({ results: [{ uri: uri1 }, { uri: uri2 }] })
-  it("fetches from search and dispatches", async () => {
+  it("fetches each resource and dispatches", async () => {
     const store = mockStore(createState())
     await store.dispatch(loadResourceHistory([uri1, uri2]))
 
@@ -132,104 +132,7 @@ describe("loadResourceHistory()", () => {
       },
     ])
 
-    expect(sinopiaSearch.getSearchResultsByUris).toHaveBeenCalledWith([
-      uri1,
-      uri2,
-    ])
-  })
-})
-
-describe("addResourceHistory()", () => {
-  const uri =
-    "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f"
-
-  describe("result found", () => {
-    it("dispatches", async () => {
-      sinopiaSearch.getSearchResultsByUris = jest
-        .fn()
-        .mockResolvedValue({ results: [{ uri }] })
-
-      const store = mockStore(createState())
-      await store.dispatch(
-        addResourceHistory(
-          uri,
-          "http://id.loc.gov/ontologies/bibframe/Work",
-          "stanford",
-        ),
-      )
-
-      expect(store.getActions()).toEqual([
-        {
-          type: "ADD_RESOURCE_HISTORY_BY_RESULT",
-          payload: {
-            uri,
-          },
-        },
-      ])
-
-      expect(sinopiaSearch.getSearchResultsByUris).toHaveBeenCalledWith([uri])
-    })
-  })
-
-  describe("lookup error", () => {
-    it("logs and still dispatches with the URI", async () => {
-      sinopiaSearch.getSearchResultsByUris = jest
-        .fn()
-        .mockResolvedValue({ totalHits: 0, results: [], error: "Not found" })
-      const errorSpy = jest.spyOn(console, "error").mockImplementation()
-
-      const store = mockStore(createState())
-      await store.dispatch(
-        addResourceHistory(
-          uri,
-          "http://id.loc.gov/ontologies/bibframe/Work",
-          "stanford",
-        ),
-      )
-
-      expect(errorSpy).toHaveBeenCalledWith("Not found")
-      expect(store.getActions()).toEqual([
-        {
-          type: "ADD_RESOURCE_HISTORY",
-          payload: {
-            resourceUri: uri,
-            group: "stanford",
-            type: "http://id.loc.gov/ontologies/bibframe/Work",
-            modified: "2020-08-20T11:34:40.887Z",
-          },
-        },
-      ])
-      errorSpy.mockRestore()
-    })
-  })
-
-  describe("result not found", () => {
-    it("dispatches", async () => {
-      sinopiaSearch.getSearchResultsByUris = jest
-        .fn()
-        .mockResolvedValue({ results: [] })
-
-      const store = mockStore(createState())
-      await store.dispatch(
-        addResourceHistory(
-          uri,
-          "http://id.loc.gov/ontologies/bibframe/Work",
-          "stanford",
-        ),
-      )
-
-      expect(store.getActions()).toEqual([
-        {
-          type: "ADD_RESOURCE_HISTORY",
-          payload: {
-            resourceUri: uri,
-            group: "stanford",
-            type: "http://id.loc.gov/ontologies/bibframe/Work",
-            modified: "2020-08-20T11:34:40.887Z",
-          },
-        },
-      ])
-    })
+    expect(sinopiaApi.fetchResourceResults).toHaveBeenCalledWith([uri1, uri2])
   })
 })
 

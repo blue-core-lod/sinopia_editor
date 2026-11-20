@@ -3,12 +3,9 @@ import {
   addTemplateHistoryByResult,
   addSearchHistory,
   addResourceHistoryByResult,
-  addResourceHistory as addResourceHistoryAction,
 } from "actions/history"
-import {
-  getTemplateSearchResultsByIds,
-  getSearchResultsByUris,
-} from "sinopiaSearch"
+import { getTemplateSearchResultsByIds } from "sinopiaSearch"
+import { fetchResourceResults } from "sinopiaApi"
 import _ from "lodash"
 import {
   findAuthorityConfig,
@@ -58,7 +55,7 @@ export const loadSearchHistory = (searches, keycloak) => (dispatch) => {
 
 export const loadResourceHistory = (resourceUris) => (dispatch) => {
   if (_.isEmpty(resourceUris)) return
-  getSearchResultsByUris(resourceUris)
+  fetchResourceResults(resourceUris)
     .then((response) => {
       if (response.error) {
         console.error(response.error)
@@ -126,26 +123,3 @@ export const addTemplateHistoryForResource =
         )
       })
       .catch((err) => console.error(err))
-
-export const addResourceHistory =
-  (resourceUri, type, group, modified) => (dispatch) => {
-    // Try to find it by search. If not available, just use the resource.
-    getSearchResultsByUris([resourceUri])
-      .then((response) => {
-        // A failed lookup still leaves the URI to record the resource by
-        if (response.error) console.error(response.error)
-        if (response.results.length !== 1) {
-          dispatch(
-            addResourceHistoryAction(
-              resourceUri,
-              type,
-              group,
-              modified || new Date().toISOString(),
-            ),
-          )
-        } else {
-          dispatch(addResourceHistoryByResult(response.results[0]))
-        }
-      })
-      .catch((err) => console.error(err))
-  }

@@ -53,18 +53,6 @@ export const addSearchHistory = (state, action) => ({
 export const addResourceHistoryByResult = (state, action) =>
   addResourceResult(state, action.payload)
 
-export const addResourceHistory = (state, action) => {
-  const result = {
-    uri: action.payload.resourceUri,
-    label: action.payload.resourceUri,
-    type: [action.payload.type],
-    modified: action.payload.modified,
-    group: action.payload.group,
-    editGroups: action.payload.editGroups,
-  }
-  return addResourceResult(state, result)
-}
-
 const addResourceResult = (state, result) => ({
   ...state,
   resources: addToHistory(

@@ -21,16 +21,6 @@ export const addSearchHistory = (
   }
 }
 
-export const addResourceHistory = (resourceUri, type, group, modified) => ({
-  type: "ADD_RESOURCE_HISTORY",
-  payload: {
-    resourceUri,
-    type,
-    group,
-    modified,
-  },
-})
-
 export const addResourceHistoryByResult = (result) => ({
   type: "ADD_RESOURCE_HISTORY_BY_RESULT",
   payload: result,

@@ -59,7 +59,6 @@ import {
   addTemplateHistory,
   addTemplateHistoryByResult,
   addSearchHistory,
-  addResourceHistory,
   addResourceHistoryByResult,
   removeResourceHistory,
   removeTemplateHistory,
@@ -174,7 +173,6 @@ const entityHandlers = {
 }
 
 const historyHandlers = {
-  ADD_RESOURCE_HISTORY: addResourceHistory,
   ADD_RESOURCE_HISTORY_BY_RESULT: addResourceHistoryByResult,
   ADD_SEARCH_HISTORY: addSearchHistory,
   ADD_TEMPLATE_HISTORY: addTemplateHistory,
