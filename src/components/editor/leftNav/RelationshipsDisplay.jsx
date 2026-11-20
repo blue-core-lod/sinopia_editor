@@ -3,29 +3,13 @@
 import React, { useState, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import PropTypes from "prop-types"
-import PreviewModal from "../preview/PreviewModal"
 import { selectRelationships } from "selectors/relationships"
 import { fetchResource } from "sinopiaApi"
-import rdf from "rdf-ext"
-import { labelFromDataset } from "utilities/Bibframe"
+import { resultFromDataset } from "utilities/Bibframe"
 import { addError } from "actions/errors"
 import RelationshipRow from "./RelationshipRow"
 import useAlerts from "hooks/useAlerts"
 import _ from "lodash"
-
-const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-
-const rowFromDataset = (uri, dataset, response) => ({
-  uri,
-  label: labelFromDataset(uri, dataset) ?? uri,
-  type: dataset
-    .match(rdf.namedNode(uri), rdf.namedNode(RDF_TYPE), null)
-    .toArray()
-    .map((q) => q.object.value),
-  modified: response.timestamp,
-  group: response.group,
-  editGroups: response.editGroups ?? [],
-})
 
 const RelationshipsDisplay = ({ resourceKey, displayActions = true }) => {
   const dispatch = useDispatch()
@@ -52,7 +36,7 @@ const RelationshipsDisplay = ({ resourceKey, displayActions = true }) => {
       uris.map((refUri) =>
         fetchResource(refUri)
           .then(([dataset, response]) =>
-            rowFromDataset(refUri, dataset, response),
+            resultFromDataset(refUri, dataset, response),
           )
           .catch((err) => {
             dispatch(
@@ -114,8 +98,6 @@ const RelationshipsDisplay = ({ resourceKey, displayActions = true }) => {
 
   return (
     <React.Fragment>
-      {displayActions && <PreviewModal errorKey={errorKey} />}
-
       <div className="relationships-nav">
         {relationshipList("Works", bfWorkRefs)}
         {relationshipList("Instances", bfInstanceRefs)}

@@ -6,6 +6,8 @@ import {
   addSearchHistory,
   addResourceHistoryByResult,
   addResourceHistory,
+  removeResourceHistory,
+  removeTemplateHistory,
 } from "reducers/history"
 import { createState } from "stateUtils"
 import Config from "Config"
@@ -203,6 +205,38 @@ describe("addResourceHistory", () => {
         group: "stanford",
         editGroups: ["cornell"],
       },
+    ])
+  })
+})
+
+describe("removeResourceHistory", () => {
+  it("removes the resource with the uri", () => {
+    const state = createState()
+    state.history.resources = [
+      { uri: "http://localhost:3000/works/1", label: "One" },
+      { uri: "http://localhost:3000/works/2", label: "Two" },
+    ]
+    const newState = removeResourceHistory(state.history, {
+      payload: "http://localhost:3000/works/1",
+    })
+    expect(newState.resources).toEqual([
+      { uri: "http://localhost:3000/works/2", label: "Two" },
+    ])
+  })
+})
+
+describe("removeTemplateHistory", () => {
+  it("removes the template with the id", () => {
+    const state = createState()
+    state.history.templates = [
+      { id: "resourceTemplate:bf2:Work", resourceLabel: "Work" },
+      { id: "resourceTemplate:bf2:Instance", resourceLabel: "Instance" },
+    ]
+    const newState = removeTemplateHistory(state.history, {
+      payload: "resourceTemplate:bf2:Work",
+    })
+    expect(newState.templates).toEqual([
+      { id: "resourceTemplate:bf2:Instance", resourceLabel: "Instance" },
     ])
   })
 })

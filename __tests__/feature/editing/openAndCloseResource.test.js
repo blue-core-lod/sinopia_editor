@@ -67,37 +67,37 @@ describe("switching between multiple resources", () => {
       selector: resourceHeaderSelector,
     })
 
-    // Instance tab is active
-    const instanceTab = screen.getByText("BF Instance", {
-      selector: ".nav-item.active .resource-label",
+    // The unsaved Title note is in recently opened; the shown Instance is not.
+    // (Their templates are there too, as RT boxes.)
+    const openSelector =
+      ".recently-opened-item:not(.recently-opened-template) .recently-opened-label"
+    const titleNoteChip = screen.getByText("Title note", {
+      selector: openSelector,
     })
-
-    // Title note tab is inactive
-    const titleNoteTab = screen.getByText("Title note", {
-      selector: ".nav-item:not(.active) .resource-label",
-    })
+    expect(
+      screen.queryByText("BF Instance", { selector: openSelector }),
+    ).not.toBeInTheDocument()
 
     // It does not have the the 'template' class for header color
     expect(screen.queryAllByTestId("template")).toHaveLength(0)
 
-    // Click Title note tab
-    fireEvent.click(titleNoteTab)
+    // Click the Title note box
+    fireEvent.click(titleNoteChip)
 
-    // Title note is now the active resource and Instance is now the inactive resource
+    // Title note is now shown and the Instance is in recently opened
     await screen.findByText("Title note", { selector: resourceHeaderSelector })
-    await screen.findByText("BF Instance", {
-      selector: ".nav-item:not(.active) .resource-label",
-    })
+    await screen.findByText("BF Instance", { selector: openSelector })
 
-    // Closing the active tab will reveal the inactive resource as the one shown
+    // Closing the shown resource reveals the other one
     fireEvent.click(screen.getAllByText("Close", { selector: "button" })[0])
     await screen.findByText("BF Instance", {
       selector: resourceHeaderSelector,
     })
 
-    // No nav tabs displayed
-    expect(instanceTab).not.toBeInTheDocument()
-    expect(titleNoteTab).not.toBeInTheDocument()
+    // Nothing else is open
+    expect(
+      screen.queryByText("Title note", { selector: openSelector }),
+    ).not.toBeInTheDocument()
 
     // Closing the only shown resource will direct to the resource templates page
     fireEvent.click(screen.getAllByText("Close", { selector: "button" })[0])
