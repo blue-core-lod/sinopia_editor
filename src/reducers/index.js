@@ -61,6 +61,8 @@ import {
   addSearchHistory,
   addResourceHistory,
   addResourceHistoryByResult,
+  removeResourceHistory,
+  removeTemplateHistory,
 } from "./history"
 import { clearSearchResults, setSearchResults, setHeaderSearch } from "./search"
 import { lookupOptionsRetrieved } from "./lookups"
@@ -177,6 +179,8 @@ const historyHandlers = {
   ADD_SEARCH_HISTORY: addSearchHistory,
   ADD_TEMPLATE_HISTORY: addTemplateHistory,
   ADD_TEMPLATE_HISTORY_BY_RESULT: addTemplateHistoryByResult,
+  REMOVE_RESOURCE_HISTORY: removeResourceHistory,
+  REMOVE_TEMPLATE_HISTORY: removeTemplateHistory,
 }
 
 const searchHandlers = {

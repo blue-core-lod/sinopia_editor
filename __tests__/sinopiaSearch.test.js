@@ -8,6 +8,8 @@ import {
   getSearchResultsByUris,
 } from "sinopiaSearch"
 import { findAuthorityConfig } from "utilities/authorityConfig"
+import * as sinopiaApi from "sinopiaApi"
+import rdf from "rdf-ext"
 
 // Blue Core API format for resource search results
 const blueCoreResourceResult = {
@@ -630,54 +632,74 @@ describe("getTemplateSearchResultsByIds", () => {
 })
 
 describe("getSearchResultsByUris", () => {
-  const singleResourceResult = {
-    total: 1,
-    results: [
-      {
-        uri: "http://localhost:3000/resource/3d831f47-e686-4b8f-9086-11383b2af762",
-        data: {
-          "@type": ["TableOfContents"],
-          title: {
-            mainTitle:
-              "http://localhost:3000/resource/3d831f47-e686-4b8f-9086-11383b2af762",
-          },
-        },
-        created_at: undefined,
-        updated_at: "2020-10-05T14:31:16.563Z",
-      },
-    ],
-    links: null,
+  const workUri = "http://localhost:3000/works/3d831f47"
+  const missingUri = "http://localhost:3000/works/0000"
+
+  // A fetched work titled "Cat jokes"
+  const workDataset = () => {
+    const title = rdf.blankNode()
+    return rdf.dataset([
+      rdf.quad(
+        rdf.namedNode(workUri),
+        rdf.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
+        rdf.namedNode("http://id.loc.gov/ontologies/bibframe/Work"),
+      ),
+      rdf.quad(
+        rdf.namedNode(workUri),
+        rdf.namedNode("http://id.loc.gov/ontologies/bibframe/title"),
+        title,
+      ),
+      rdf.quad(
+        title,
+        rdf.namedNode("http://id.loc.gov/ontologies/bibframe/mainTitle"),
+        rdf.literal("Cat jokes"),
+      ),
+    ])
   }
 
-  it("performs a search and returns results", async () => {
-    global.fetch = jest
-      .fn()
-      .mockImplementation(() =>
-        Promise.resolve({ json: () => singleResourceResult }),
-      )
+  beforeEach(() => {
+    jest.spyOn(sinopiaApi, "fetchResource").mockImplementation((uri) =>
+      uri === workUri
+        ? Promise.resolve([
+            workDataset(),
+            {
+              updated_at: "2020-10-05T14:31:16.563Z",
+              group: "blue core",
+              editGroups: ["blue core"],
+            },
+          ])
+        : Promise.reject(new Error("Not found")),
+    )
+  })
 
-    const results = await getSearchResultsByUris([
-      "http://localhost:3000/resource/3d831f47-e686-4b8f-9086-11383b2af762",
-    ])
+  afterEach(() => jest.restoreAllMocks())
+
+  it("fetches each resource and labels it with its title", async () => {
+    const results = await getSearchResultsByUris([workUri, missingUri])
+
+    expect(sinopiaApi.fetchResource).toHaveBeenCalledWith(workUri)
+    expect(sinopiaApi.fetchResource).toHaveBeenCalledWith(missingUri)
+    // The resource that failed to load is left out
     expect(results).toEqual({
       totalHits: 1,
       results: [
         {
-          uri: "http://localhost:3000/resource/3d831f47-e686-4b8f-9086-11383b2af762",
-          label:
-            "http://localhost:3000/resource/3d831f47-e686-4b8f-9086-11383b2af762",
-          created: undefined,
+          uri: workUri,
+          label: "Cat jokes",
+          type: ["http://id.loc.gov/ontologies/bibframe/Work"],
           modified: "2020-10-05T14:31:16.563Z",
-          type: ["http://id.loc.gov/ontologies/bibframe/TableOfContents"],
           group: "blue core",
           editGroups: ["blue core"],
         },
       ],
-      options: undefined,
+      error: undefined,
     })
-    expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/search/", {
-      method: "GET",
-    })
+  })
+
+  it("returns an error when no resource could be loaded", async () => {
+    const results = await getSearchResultsByUris([missingUri])
+
+    expect(results).toEqual({ totalHits: 0, results: [], error: "Not found" })
   })
 })
 

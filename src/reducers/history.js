@@ -74,6 +74,16 @@ const addResourceResult = (state, result) => ({
   ),
 })
 
+export const removeResourceHistory = (state, action) => ({
+  ...state,
+  resources: state.resources.filter((item) => item.uri !== action.payload),
+})
+
+export const removeTemplateHistory = (state, action) => ({
+  ...state,
+  templates: state.templates.filter((item) => item.id !== action.payload),
+})
+
 const addToHistory = (historyItems, newItem, compareFunc) => {
   const filteredHistoryItems = historyItems.filter((checkItem) =>
     compareFunc(newItem, checkItem),

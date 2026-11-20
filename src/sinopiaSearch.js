@@ -1,5 +1,7 @@
 // Copyright 2019 Stanford University see LICENSE for license
 import Config from "Config"
+import { fetchResource } from "sinopiaApi"
+import { resultFromDataset } from "utilities/Bibframe"
 /* eslint-disable n/no-unpublished-import */
 import {
   getFixtureTemplateSearchResults,
@@ -96,25 +98,26 @@ export const getSearchResultsByUris = (resourceUris) => {
   )
     return Promise.resolve(resourceSearchResults(resourceUris[0])[0])
 
-  /*
-   * BUG: `body` below is built but never sent. fetchSearchResultsFromUrl issues
-   * a bare GET, so `resourceUris` is discarded and this returns the first hit of
-   * an unfiltered search rather than the requested URIs. Callers affected:
-   * actionCreators/history.js (loadResourceHistory, addResourceHistory).
-   * Retained rather than deleted because it documents the intended query shape;
-   * fixing it requires the Blue Core API's search contract for filtering by URI.
-   */
-  // eslint-disable-next-line no-unused-vars
-  const body = {
-    query: {
-      terms: {
-        uri: resourceUris,
-      },
-    },
-    size: resourceUris.length,
-  }
-  const url = `${Config.sinopiaApiBase}/search/`
-  return fetchSearchResultsFromUrl(url, null).then((results) => results[0])
+  // The search API cannot filter by URI, so each resource is fetched by its
+  // URI instead. A resource that fails to load is left out, as a search would.
+  return Promise.all(
+    resourceUris.map((uri) =>
+      fetchResource(uri).then(
+        ([dataset, response]) => resultFromDataset(uri, dataset, response),
+        (err) => ({ error: err.message || String(err) }),
+      ),
+    ),
+  ).then((fetched) => {
+    const results = fetched.filter((result) => !result.error)
+    const failed = fetched.find((result) => result.error)
+    return {
+      totalHits: results.length,
+      results,
+      // Only an error when nothing could be loaded, so callers can tell a
+      // failed lookup from a partial one
+      error: results.length === 0 && failed ? failed.error : undefined,
+    }
+  })
 }
 
 const fetchSearchResultsFromUrl = (url, keycloak, options) =>

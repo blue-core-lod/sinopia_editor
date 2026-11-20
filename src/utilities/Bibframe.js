@@ -28,6 +28,25 @@ export const labelFromDataset = (uri, dataset) => {
   return null
 }
 
+const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+
+/**
+ * Builds a resource result, in the shape search results take, from a fetched
+ * resource (see fetchResource).
+ */
+export const resultFromDataset = (uri, dataset, response) => ({
+  uri,
+  label: labelFromDataset(uri, dataset) ?? uri,
+  type: dataset
+    .match(rdf.namedNode(uri), rdf.namedNode(RDF_TYPE), null)
+    .toArray()
+    .map((q) => q.object.value),
+  // The Blue Core API calls this field updated_at.
+  modified: response.timestamp ?? response.updated_at,
+  group: response.group,
+  editGroups: response.editGroups ?? [],
+})
+
 export const isBfInstance = (classes) => {
   if (!classes) return false
   return classes.includes("http://id.loc.gov/ontologies/bibframe/Instance")

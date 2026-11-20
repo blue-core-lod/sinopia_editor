@@ -171,6 +171,38 @@ describe("addResourceHistory()", () => {
     })
   })
 
+  describe("lookup error", () => {
+    it("logs and still dispatches with the URI", async () => {
+      sinopiaSearch.getSearchResultsByUris = jest
+        .fn()
+        .mockResolvedValue({ totalHits: 0, results: [], error: "Not found" })
+      const errorSpy = jest.spyOn(console, "error").mockImplementation()
+
+      const store = mockStore(createState())
+      await store.dispatch(
+        addResourceHistory(
+          uri,
+          "http://id.loc.gov/ontologies/bibframe/Work",
+          "stanford",
+        ),
+      )
+
+      expect(errorSpy).toHaveBeenCalledWith("Not found")
+      expect(store.getActions()).toEqual([
+        {
+          type: "ADD_RESOURCE_HISTORY",
+          payload: {
+            resourceUri: uri,
+            group: "stanford",
+            type: "http://id.loc.gov/ontologies/bibframe/Work",
+            modified: "2020-08-20T11:34:40.887Z",
+          },
+        },
+      ])
+      errorSpy.mockRestore()
+    })
+  })
+
   describe("result not found", () => {
     it("dispatches", async () => {
       sinopiaSearch.getSearchResultsByUris = jest

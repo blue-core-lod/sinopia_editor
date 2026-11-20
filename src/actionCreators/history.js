@@ -132,10 +132,8 @@ export const addResourceHistory =
     // Try to find it by search. If not available, just use the resource.
     getSearchResultsByUris([resourceUri])
       .then((response) => {
-        if (response.error) {
-          console.error(response.error)
-          return
-        }
+        // A failed lookup still leaves the URI to record the resource by
+        if (response.error) console.error(response.error)
         if (response.results.length !== 1) {
           dispatch(
             addResourceHistoryAction(
