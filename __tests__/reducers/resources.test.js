@@ -30,6 +30,7 @@ import {
   setValuePropertyURI,
   setPropertyPropertyURI,
   setResourceChanged,
+  setTemplateVersionCheck,
 } from "reducers/resources"
 
 import { createState } from "stateUtils"
@@ -71,6 +72,7 @@ const editorReducers = {
   SAVE_RESOURCE_FINISHED: saveResourceFinishedEditor,
   SET_CURRENT_EDIT_RESOURCE: setCurrentEditResource,
   SET_CURRENT_PREVIEW_RESOURCE: setCurrentPreviewResource,
+  SET_TEMPLATE_VERSION_CHECK: setTemplateVersionCheck,
   SET_UNUSED_RDF: setUnusedRDF,
 }
 
@@ -992,6 +994,50 @@ describe("clearResourceFromEditor()", () => {
     expect(newState.errors["resourceedit-t9zVwg2zO"]).toBe(undefined)
     expect(newState.currentResource).toBe(null)
     expect(newState.resources).toStrictEqual([])
+  })
+
+  it("removes the template version check", () => {
+    const oldState = createState({ hasResourceWithLiteral: true })
+    oldState.editor.templateVersionCheck = {
+      t9zVwg2zO: { is_latest: false },
+      other: { is_latest: false },
+    }
+
+    const newState = editorReducer(oldState.editor, {
+      type: "CLEAR_RESOURCE",
+      payload: "t9zVwg2zO",
+    })
+    expect(newState.templateVersionCheck).toStrictEqual({
+      other: { is_latest: false },
+    })
+  })
+
+  // A resource can be loaded into state without being opened (e.g. one
+  // re-built against a newer template version and then discarded).
+  it("leaves the open resources alone when clearing one that isn't open", () => {
+    const oldState = createState()
+    oldState.editor.resources = ["a", "b"]
+    oldState.editor.currentResource = "b"
+
+    const newState = editorReducer(oldState.editor, {
+      type: "CLEAR_RESOURCE",
+      payload: "x",
+    })
+    expect(newState.resources).toStrictEqual(["a", "b"])
+    expect(newState.currentResource).toBe("b")
+  })
+})
+
+describe("setTemplateVersionCheck()", () => {
+  it("records the check for the resource", () => {
+    const oldState = createState()
+    const check = { is_latest: false, compatible: true }
+
+    const newState = editorReducer(oldState.editor, {
+      type: "SET_TEMPLATE_VERSION_CHECK",
+      payload: { resourceKey: "abc123", check },
+    })
+    expect(newState.templateVersionCheck.abc123).toStrictEqual(check)
   })
 })
 

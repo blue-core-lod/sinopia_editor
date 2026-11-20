@@ -6,6 +6,7 @@ import PanelResource from "./property/PanelResource"
 import CopyToNewMessage from "./CopyToNewMessage"
 import ResourceURIMessage from "./ResourceURIMessage"
 import TemplateUsageMessage from "./TemplateUsageMessage"
+import TemplateVersionMessage from "./TemplateVersionMessage"
 import PermissionsAction from "./actions/PermissionsAction"
 import SaveAlert from "./SaveAlert"
 import {
@@ -68,6 +69,7 @@ const ResourceComponent = () => {
           </div>
         </div>
         <TemplateUsageMessage resourceKey={resourceKey} />
+        <TemplateVersionMessage resourceKey={resourceKey} />
         <SaveAlert />
       </section>
       <div id="sticky-beacon" />

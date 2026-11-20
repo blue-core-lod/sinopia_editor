@@ -30,6 +30,7 @@ export const initialState = {
     resourceValidation: {}, // Show validation {<resourceKey>: boolean}
     unusedRDF: {}, // {<resourceKey>: rdf}
     templateUsage: {}, // {<resourceKey>: {copied, ...profile validation response}}
+    templateVersionCheck: {}, // {<resourceKey>: {...resource_uri validation response, needsFields, republished, dismissed}}
     marc: null, // marc record for display
     currentHeaderSearch: {
       query: null,

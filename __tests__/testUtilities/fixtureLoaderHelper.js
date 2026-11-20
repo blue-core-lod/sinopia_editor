@@ -108,6 +108,9 @@ const profileTemplateFilenames = {
   "3db30d3a-7a3e-4762-a28c-1a0efc244345": "versioned_title_v2.json",
   "3db30d3a-7a3e-4762-a28c-1a0efc244345/version/1": "versioned_title_v1.json",
   "3db30d3a-7a3e-4762-a28c-1a0efc244345/version/2": "versioned_title_v2.json",
+  // v2 with Subtitle required, for re-publishing data that would not pass
+  // validation (#210). The unversioned key stays on v2.
+  "3db30d3a-7a3e-4762-a28c-1a0efc244345/version/3": "versioned_title_v3.json",
   // A mutual cycle expressed entirely in version URIs.
   "11111111-1111-4111-8111-111111111111/version/1": "versioned_cycle_a.json",
   "22222222-2222-4222-8222-222222222222/version/1": "versioned_cycle_b.json",

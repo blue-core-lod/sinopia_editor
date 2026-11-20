@@ -276,13 +276,25 @@ export const putResource = (
 export const validateProfile = (
   profileUri,
   keycloak,
-  { resource = null, unusedRDF = null } = {},
+  { resource = null, unusedRDF = null, resourceUri = null } = {},
 ) => {
   if (Config.useResourceTemplateFixtures || !keycloak?.updateToken)
     return Promise.resolve(null)
-  const bodyPromise = resource
-    ? saveBodyForResource(resource, null, null, null, false, unusedRDF)
-    : Promise.resolve(undefined)
+  // With resourceUri, the API checks only that stored Work or Instance against
+  // the profile's latest version (blue-core-lod/bluecore_api#395).
+  let bodyPromise = Promise.resolve(undefined)
+  if (resourceUri) {
+    bodyPromise = Promise.resolve(JSON.stringify({ resource_uri: resourceUri }))
+  } else if (resource) {
+    bodyPromise = saveBodyForResource(
+      resource,
+      null,
+      null,
+      null,
+      false,
+      unusedRDF,
+    )
+  }
   return bodyPromise
     .then((body) =>
       sendResourceBody(`${profileUri}/validate`, body, "POST", keycloak),

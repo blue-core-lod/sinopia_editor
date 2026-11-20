@@ -56,6 +56,8 @@ import _ from "lodash"
 import { setCurrentComponent } from "actions/index"
 import { loadRelationships } from "./relationships"
 import { loadTemplateUsage } from "./templateUsage"
+// Renamed so it doesn't collide with dispatchResourceForEditor's option.
+import { checkTemplateVersion as checkTemplateVersionThunk } from "./templateVersion"
 import { isTemplate } from "utilities/SinopiaApiHelper"
 
 // A template is itself a resource, so viewing, editing or saving one is a use
@@ -90,6 +92,11 @@ export const loadResource =
       // Fetching one of those for a diff or a preview would otherwise
       // dead-end in the ResourceTemplateChoiceModal, returning false.
       defaultResourceTemplateId = null,
+      // Template to parse the payload with instead of the one it names, e.g.
+      // the latest version of its profile when re-publishing (#210). The
+      // payload's own sinopia:hasResourceTemplate triple is still consumed by
+      // addResourceFromDataset, so it doesn't become unused RDF.
+      resourceTemplateId: overrideResourceTemplateId = null,
     } = {},
   ) =>
   (dispatch) => {
@@ -98,6 +105,7 @@ export const loadResource =
       .then(([dataset, response]) => {
         if (!dataset) return false
         const resourceTemplateId =
+          overrideResourceTemplateId ||
           resourceTemplateIdFromDataset(uri, dataset) ||
           defaultResourceTemplateId
 
@@ -170,7 +178,15 @@ export const loadResourceForEditor =
     )
 
 export const dispatchResourceForEditor =
-  (result, uri, { asNewResource = false } = {}, keycloak) =>
+  (
+    result,
+    uri,
+    // checkTemplateVersion is false when re-publishing with the latest
+    // template: that reload must not fire its own version check, which could
+    // land after the re-publish and replace its success with the warning.
+    { asNewResource = false, checkTemplateVersion = true } = {},
+    keycloak,
+  ) =>
   (dispatch) => {
     if (!result) return false
     const [response, resource] = result
@@ -207,6 +223,10 @@ export const dispatchResourceForEditor =
       )
       dispatch(addTemplateResourceHistory(resource, keycloak))
       dispatch(loadResourceFinished(resource.key))
+      // Not awaited either: the older template version warning (#210) never
+      // holds up opening the resource.
+      if (checkTemplateVersion && !isTemplate(resource))
+        dispatch(checkTemplateVersionThunk(resource.key, keycloak))
     }
     return true
   }

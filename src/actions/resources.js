@@ -51,6 +51,11 @@ export const setTemplateUsage = (resourceKey, usage) => ({
   payload: { resourceKey, usage },
 })
 
+export const setTemplateVersionCheck = (resourceKey, check) => ({
+  type: "SET_TEMPLATE_VERSION_CHECK",
+  payload: { resourceKey, check },
+})
+
 export const showProperty = (propertyKey) => ({
   type: "SHOW_PROPERTY",
   payload: propertyKey,
