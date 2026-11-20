@@ -5,7 +5,6 @@ import {
   getLookupResult,
   getSearchResultsWithFacets,
   getTemplateSearchResultsByIds,
-  getSearchResultsByUris,
 } from "sinopiaSearch"
 import { findAuthorityConfig } from "utilities/authorityConfig"
 
@@ -626,58 +625,6 @@ describe("getTemplateSearchResultsByIds", () => {
         method: "GET",
       },
     )
-  })
-})
-
-describe("getSearchResultsByUris", () => {
-  const singleResourceResult = {
-    total: 1,
-    results: [
-      {
-        uri: "http://localhost:3000/resource/3d831f47-e686-4b8f-9086-11383b2af762",
-        data: {
-          "@type": ["TableOfContents"],
-          title: {
-            mainTitle:
-              "http://localhost:3000/resource/3d831f47-e686-4b8f-9086-11383b2af762",
-          },
-        },
-        created_at: undefined,
-        updated_at: "2020-10-05T14:31:16.563Z",
-      },
-    ],
-    links: null,
-  }
-
-  it("performs a search and returns results", async () => {
-    global.fetch = jest
-      .fn()
-      .mockImplementation(() =>
-        Promise.resolve({ json: () => singleResourceResult }),
-      )
-
-    const results = await getSearchResultsByUris([
-      "http://localhost:3000/resource/3d831f47-e686-4b8f-9086-11383b2af762",
-    ])
-    expect(results).toEqual({
-      totalHits: 1,
-      results: [
-        {
-          uri: "http://localhost:3000/resource/3d831f47-e686-4b8f-9086-11383b2af762",
-          label:
-            "http://localhost:3000/resource/3d831f47-e686-4b8f-9086-11383b2af762",
-          created: undefined,
-          modified: "2020-10-05T14:31:16.563Z",
-          type: ["http://id.loc.gov/ontologies/bibframe/TableOfContents"],
-          group: "blue core",
-          editGroups: ["blue core"],
-        },
-      ],
-      options: undefined,
-    })
-    expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/search/", {
-      method: "GET",
-    })
   })
 })
 

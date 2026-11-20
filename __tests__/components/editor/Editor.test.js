@@ -31,9 +31,9 @@ jest.mock(
     },
 )
 jest.mock(
-  "components/editor/ResourcesNav",
+  "components/editor/RecentlyOpened",
   () =>
-    function ResourcesNav() {
+    function RecentlyOpened() {
       return null
     },
 )

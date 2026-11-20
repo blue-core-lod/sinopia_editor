@@ -9,7 +9,7 @@ import GroupChoiceModal from "./GroupChoiceModal"
 import EditorActions from "./EditorActions"
 import ErrorMessages from "./ErrorMessages"
 import ContextSuccess from "components/alerts/ContextSuccess"
-import ResourcesNav from "./ResourcesNav"
+import RecentlyOpened from "./RecentlyOpened"
 import {
   displayResourceValidations,
   hasValidationErrors as hasValidationErrorsSelector,
@@ -17,6 +17,8 @@ import {
 import { selectCurrentResourceKey, selectResourceId } from "selectors/resources"
 import { useNavigate, useMatch } from "react-router-dom"
 import EditorPreviewModal from "./preview/EditorPreviewModal"
+// Previews a related resource or a template from the recently opened row
+import PreviewModal from "./preview/PreviewModal"
 import { selectSubjectTemplateForSubject } from "selectors/templates"
 import AlertsContextProvider from "components/alerts/AlertsContextProvider"
 import ContextAlert from "components/alerts/ContextAlert"
@@ -84,6 +86,7 @@ const Editor = (props) => {
       <div id="editor">
         <Header triggerEditorMenu={props.triggerHandleOffsetMenu} />
         <EditorPreviewModal />
+        <PreviewModal />
         <ContextAlert />
         <ContextSuccess />
         {displayErrors && hasValidationErrors && (
@@ -93,7 +96,7 @@ const Editor = (props) => {
         <TemplateVersionWarningModal />
         <MarcModal />
         <InputLang />
-        <ResourcesNav />
+        <RecentlyOpened />
         <EditorActions />
         <ResourceComponent />
       </div>
