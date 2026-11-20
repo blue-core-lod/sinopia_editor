@@ -1,7 +1,5 @@
 // Copyright 2019 Stanford University see LICENSE for license
 import Config from "Config"
-import { fetchResource } from "sinopiaApi"
-import { resultFromDataset } from "utilities/Bibframe"
 /* eslint-disable n/no-unpublished-import */
 import {
   getFixtureTemplateSearchResults,
@@ -88,36 +86,6 @@ export const getSearchResultsWithFacets = async (
   //   }
   // }
   return fetchSearchResultsFromUrl(url, keycloak, options)
-}
-
-export const getSearchResultsByUris = (resourceUris) => {
-  if (
-    Config.useResourceTemplateFixtures &&
-    resourceUris.length === 1 &&
-    hasFixtureResource(resourceUris[0])
-  )
-    return Promise.resolve(resourceSearchResults(resourceUris[0])[0])
-
-  // The search API cannot filter by URI, so each resource is fetched by its
-  // URI instead. A resource that fails to load is left out, as a search would.
-  return Promise.all(
-    resourceUris.map((uri) =>
-      fetchResource(uri).then(
-        ([dataset, response]) => resultFromDataset(uri, dataset, response),
-        (err) => ({ error: err.message || String(err) }),
-      ),
-    ),
-  ).then((fetched) => {
-    const results = fetched.filter((result) => !result.error)
-    const failed = fetched.find((result) => result.error)
-    return {
-      totalHits: results.length,
-      results,
-      // Only an error when nothing could be loaded, so callers can tell a
-      // failed lookup from a partial one
-      error: results.length === 0 && failed ? failed.error : undefined,
-    }
-  })
 }
 
 const fetchSearchResultsFromUrl = (url, keycloak, options) =>

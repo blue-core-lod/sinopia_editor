@@ -5,7 +5,6 @@ import {
   addTemplateHistoryByResult,
   addSearchHistory,
   addResourceHistoryByResult,
-  addResourceHistory,
   removeResourceHistory,
   removeTemplateHistory,
 } from "reducers/history"
@@ -178,34 +177,6 @@ describe("addResourceHistoryByResult", () => {
     })
 
     expect(newState.resources).toEqual([result])
-  })
-})
-
-describe("addResourceHistory", () => {
-  const resource = {
-    resourceUri:
-      "http://localhost:3000/resource/f383bfff-5364-47a3-a081-8c9e2d79f43f",
-    type: "http://id.loc.gov/ontologies/bibframe/TableOfContents",
-    group: "stanford",
-    editGroups: ["cornell"],
-    modified: "2020-10-05T14:38:19.704Z",
-  }
-
-  it("transforms to a result", () => {
-    const state = createState()
-    const newState = addResourceHistory(state.history, { payload: resource })
-
-    expect(newState.resources).toEqual([
-      {
-        uri: "http://localhost:3000/resource/f383bfff-5364-47a3-a081-8c9e2d79f43f",
-        label:
-          "http://localhost:3000/resource/f383bfff-5364-47a3-a081-8c9e2d79f43f",
-        type: ["http://id.loc.gov/ontologies/bibframe/TableOfContents"],
-        modified: "2020-10-05T14:38:19.704Z",
-        group: "stanford",
-        editGroups: ["cornell"],
-      },
-    ])
   })
 })
 
