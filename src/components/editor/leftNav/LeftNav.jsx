@@ -1,78 +1,42 @@
-import React, { useState } from "react"
+import React from "react"
 import { useSelector } from "react-redux"
 import PropTypes from "prop-types"
 import PanelResourceNav from "./PanelResourceNav"
 import Versions from "./Versions"
 import Relationships from "./Relationships"
+import NavSection from "./NavSection"
 import { hasRelationships as hasRelationshipsSelector } from "selectors/relationships"
 
+// The property navigation, followed by collapsed Relationships and Versions
+// boxes for a saved resource (Figma: BLUE-CORE, edit resource).
 const LeftNav = ({ resource }) => {
-  const [currentTab, setCurrentTab] = useState("nav")
   const hasRelationships = useSelector((state) =>
     hasRelationshipsSelector(state, resource.key),
   )
 
-  const handleTabClick = (event, tab) => {
-    event.preventDefault()
-    setCurrentTab(tab)
-  }
-
-  const tabClasses = (tab) => {
-    const tabClasses = ["nav-link"]
-    if (tab === currentTab) tabClasses.push("active")
-    return tabClasses.join(" ")
-  }
-
-  let pills = null
-  if (resource.uri)
-    /* eslint-disable jsx-a11y/anchor-is-valid */
-    pills = (
-      <ul className="nav nav-pills">
-        <li className="nav-item" key="nav">
-          <a
-            className={tabClasses("nav")}
-            href="#"
-            onClick={(event) => handleTabClick(event, "nav")}
-          >
-            Navigation
-          </a>
-        </li>
-        {resource.uri && (
-          <li className="nav-item" key="versions">
-            <a
-              className={tabClasses("versions")}
-              href="#"
-              onClick={(event) => handleTabClick(event, "versions")}
-            >
-              Versions
-            </a>
-          </li>
-        )}
-        {hasRelationships && (
-          <li className="nav-item" key="relationships">
-            <a
-              className={tabClasses("relationships")}
-              href="#"
-              onClick={(event) => handleTabClick(event, "relationships")}
-            >
-              Relationships
-            </a>
-          </li>
-        )}
-      </ul>
-    )
-
+  // Keyed by resource so each resource opens with its boxes collapsed
   return (
-    <React.Fragment>
-      {pills}
-      <div className="col-md-5 col-lg-4 col-xl-3 left-nav">
-        {currentTab === "nav" && <PanelResourceNav resource={resource} />}
-        {currentTab === "versions" && <Versions resource={resource} />}
-        {currentTab === "relationships" && (
+    <div className="col-md-5 col-lg-4 col-xl-3 left-nav">
+      <PanelResourceNav resource={resource} />
+      {resource.uri && hasRelationships && (
+        <NavSection
+          key={`relationships-${resource.key}`}
+          id="left-nav-relationships"
+          label="Relationships"
+        >
           <Relationships resourceKey={resource.key} />
-        )}
-      </div>
-    </React.Fragment>
+        </NavSection>
+      )}
+      {resource.uri && (
+        <NavSection
+          key={`versions-${resource.key}`}
+          id="left-nav-versions"
+          label="Versions"
+        >
+          <Versions resource={resource} />
+        </NavSection>
+      )}
+    </div>
   )
 }
 

@@ -54,8 +54,8 @@ const PropertySubNav = (props) => {
         <span className={headingClassNames.join(" ")}>
           {propertyTemplate.label}
         </span>
+        <PresenceIndicator valueKeys={property.descUriOrLiteralValueKeys} />
       </button>
-      <PresenceIndicator valueKeys={property.descUriOrLiteralValueKeys} />
       {subNavForProperty()}
     </li>
   )

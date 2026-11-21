@@ -67,6 +67,7 @@ const ActivePanelPropertyNav = (props) => {
           handleClick={handleToggleClick}
           isExpanded={isExpanded}
           label={toggleLabel}
+          variant="caret"
         />
       )}
       <button
@@ -78,6 +79,11 @@ const ActivePanelPropertyNav = (props) => {
       >
         <h5 className={headingClassNames.join(" ")}>
           {propertyTemplate.label}
+          {propertyTemplate.required && (
+            <span className="left-nav-required" aria-hidden="true">
+              *
+            </span>
+          )}
         </h5>
         <PresenceIndicator valueKeys={property.descUriOrLiteralValueKeys} />
       </button>

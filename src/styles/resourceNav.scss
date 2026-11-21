@@ -1,13 +1,31 @@
-.left-nav {
-  .resource-nav-list-group {
-    position: sticky;
-    top: 0;
-    overflow-y: auto;
-    height: 100vh;
-    padding: 0.375rem;
+// Editor left navigation (Figma: BLUE-CORE, edit resource): a scrolling list
+// of properties, then collapsed boxes for relationships and versions.
+$left-nav-toggle-width: 1.25rem;
 
-    & > ul {
+.left-nav {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-self: flex-start;
+  max-height: 100vh;
+  padding-bottom: 0.5rem;
+
+  .resource-nav-list-group {
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0 0.375rem 0 0;
+
+    ul {
+      margin: 0;
       padding-left: 0;
+    }
+
+    // Nested levels indent under their parent's label
+    ul ul {
+      padding-left: $left-nav-toggle-width;
     }
 
     // Templates have a different color than
@@ -19,30 +37,111 @@
     }
 
     li {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
       list-style-type: none;
+
+      // The row rule sits under the label, not the nested rows
+      > .btn-toggle,
+      > .property-nav {
+        border-bottom: 1px solid $gray-200;
+      }
+
+      > ul {
+        flex-basis: 100%;
+      }
     }
 
-    .left-nav-header {
-      display: inline;
-      margin-right: 0.4em;
-    }
-
-    .current {
-      color: $body-color;
+    .btn-toggle {
+      display: flex;
+      flex: 0 0 $left-nav-toggle-width;
+      align-items: center;
+      align-self: stretch;
+      padding: 0;
+      border-radius: 0;
+      color: $core-blue;
+      font-size: 0.75rem;
     }
 
     .property-nav {
       @extend .btn;
-      color: $link-color;
-      padding: 0.25rem 0.25rem 0.25rem 0.25rem;
+      display: flex;
+      flex: 1 1 0;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      min-width: 0;
+      padding: 0.3125rem 0.25rem 0.3125rem 0;
+      border-radius: 0;
+      color: $core-blue;
+      font-size: 0.8125rem;
+      line-height: 1.25;
       text-align: left;
-      h5 {
-        font-weight: bold;
+
+      &:hover .left-nav-header {
+        text-decoration: underline;
       }
     }
 
-    .fa-circle {
-      font-size: 60%;
+    // Rows without a toggle line up with the labels of rows that have one
+    li > .property-nav:first-child {
+      margin-left: $left-nav-toggle-width;
     }
+
+    .left-nav-header {
+      display: inline;
+      margin: 0;
+      font-size: inherit;
+      font-weight: $font-weight-normal;
+      line-height: inherit;
+    }
+
+    .current .left-nav-header {
+      font-weight: $font-weight-bold;
+    }
+
+    .left-nav-required {
+      color: $bright-red;
+    }
+
+    .fa-circle {
+      font-size: 0.5rem;
+    }
+  }
+}
+
+.left-nav-section {
+  flex: 0 0 auto;
+  border: 1px solid $black-40;
+  border-radius: 3px;
+  font-size: 0.8125rem;
+
+  .left-nav-section-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.5rem 0.625rem;
+    border: 0;
+    background: none;
+    color: $black-100;
+    text-align: left;
+
+    svg {
+      color: $core-blue;
+      font-size: 0.75rem;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $core-blue;
+      outline-offset: -2px;
+    }
+  }
+
+  .left-nav-section-body {
+    max-height: 40vh;
+    overflow-y: auto;
+    padding: 0 0.625rem 0.625rem;
   }
 }

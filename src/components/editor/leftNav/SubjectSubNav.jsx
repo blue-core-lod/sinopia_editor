@@ -50,6 +50,7 @@ const SubjectSubNav = (props) => {
           handleClick={handleToggleClick}
           isExpanded={isExpanded}
           label={toggleLabel}
+          variant="caret"
         />
       )}
       <button
@@ -62,8 +63,8 @@ const SubjectSubNav = (props) => {
         <span className={headingClassNames.join(" ")}>
           {subjectTemplate.label}
         </span>
+        <PresenceIndicator valueKeys={subject.descUriOrLiteralValueKeys} />
       </button>
-      <PresenceIndicator valueKeys={subject.descUriOrLiteralValueKeys} />
       {isExpanded && subNavForSubject}
     </li>
   )

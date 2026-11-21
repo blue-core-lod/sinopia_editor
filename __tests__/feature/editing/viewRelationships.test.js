@@ -39,7 +39,7 @@ describe("relationships", () => {
         selector: resourceHeaderSelector,
       })
 
-      // No relationships pill
+      // No Relationships box in the left nav
       expect(screen.queryByText("Relationships")).not.toBeInTheDocument()
     }, 10000)
   })
