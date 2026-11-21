@@ -141,6 +141,111 @@
   background-color: $body-bg;
 }
 
+// Badge, title and icons, the Work pill, then the links (Figma: BLUE-CORE,
+// edit resource)
+.resource-heading-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.resource-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: $font-weight-normal;
+
+  .btn-link {
+    padding: 0;
+    color: $core-blue;
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+}
+
+.work-view-toggle {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid $digital-blue;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+
+  .work-view-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.125rem;
+    padding: 0.125rem 0.75rem;
+    border: 0;
+    background: $white;
+    color: $core-blue;
+    line-height: 1.25rem;
+
+    &.active {
+      background: $core-blue;
+      color: $white;
+      font-weight: $font-weight-bold;
+    }
+
+    // Not wired up yet, but drawn as in the design rather than greyed out
+    &:disabled {
+      opacity: 1;
+    }
+
+    & + .work-view-option {
+      border-left: 1px solid $digital-blue;
+    }
+  }
+}
+
+.resource-heading-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  font-size: 0.875rem;
+
+  .btn-link {
+    padding: 0;
+    color: $core-blue;
+    font-size: inherit;
+  }
+}
+
+.unused-rdf-toggle {
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.unused-rdf-toggle + .resource-uri::before {
+  content: "|";
+  margin-right: 0.5rem;
+}
+
+.resource-uri {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+
+  a {
+    color: $core-blue;
+  }
+
+  .clipboard-icon-button {
+    font-size: 1rem;
+    line-height: 1;
+  }
+}
+
 .sticky-resource-header {
   @extend .sticky-top;
   background-color: $body-bg;

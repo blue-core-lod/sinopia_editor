@@ -3,7 +3,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import PropTypes from "prop-types"
 import { useDispatch, useSelector } from "react-redux"
-import Config from "Config"
 import {
   selectHistoricalResources,
   selectHistoricalTemplates,
@@ -22,11 +21,9 @@ import useResource from "hooks/useResource"
 import useEditor from "hooks/useEditor"
 import useAlerts from "hooks/useAlerts"
 import usePermissions from "hooks/usePermissions"
+import { kindForSubjectTemplate } from "utilities/resourceKind"
 import CloseResourceModal from "./actions/CloseResourceModal"
-
-const BADGES = { work: "W", instance: "I", template: "RT" }
-
-const BF = "http://id.loc.gov/ontologies/bibframe/"
+import KindBadge from "./KindBadge"
 
 // Blue Core keeps works and instances in their own collections, so a saved
 // resource's kind is in its URI. Anything else (hubs, templates opened as
@@ -36,13 +33,6 @@ const kindForUri = (uri) => {
   if (/\/works\/[^/]+$/.test(uri)) return "work"
   if (/\/instances\/[^/]+$/.test(uri)) return "instance"
   return null
-}
-
-const kindForSubjectTemplate = (subjectTemplate) => {
-  if (subjectTemplate?.id === Config.rootResourceTemplateId) return "template"
-  if (subjectTemplate?.class === `${BF}Work`) return "work"
-  if (subjectTemplate?.class === `${BF}Instance`) return "instance"
-  return "other"
 }
 
 const ArrowIcon = () => (
@@ -65,11 +55,7 @@ const Chip = ({ kind, label, onOpen, onRemove, removeLabel, isLoading }) => (
       onClick={onOpen}
       aria-busy={isLoading || undefined}
     >
-      {BADGES[kind] && (
-        <span className="recently-opened-badge" aria-hidden="true">
-          <span>{BADGES[kind]}</span>
-        </span>
-      )}
+      <KindBadge kind={kind} />
       <span className="recently-opened-label">{label}</span>
     </button>
     <button

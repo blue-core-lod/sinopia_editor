@@ -59,7 +59,9 @@ describe("loading new resource", () => {
     ).toHaveLength(2)
 
     // Save button is enabled (we have defaults)
-    expect(screen.getAllByText("Save", { selector: "button" })[0]).toBeEnabled()
+    expect(
+      screen.getAllByText("Save resource", { selector: "button" })[0],
+    ).toBeEnabled()
 
     // Expand the property in the menu
     fireEvent.click(

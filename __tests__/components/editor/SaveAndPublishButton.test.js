@@ -38,7 +38,7 @@ describe("<SaveAndPublishButton /> for a template with resources", () => {
     const store = createStore(stateWithUsage())
     renderComponent(<SaveAndPublishButton />, store)
 
-    fireEvent.click(screen.getByLabelText("Save"))
+    fireEvent.click(screen.getByRole("button", { name: "Save resource" }))
 
     await waitFor(() =>
       expect(store.getState().editor.currentModal).toEqual([
@@ -54,7 +54,7 @@ describe("<SaveAndPublishButton /> for a template with resources", () => {
     const store = createStore(stateWithUsage())
     renderComponent(<SaveAndPublishButton />, store)
 
-    fireEvent.click(screen.getByLabelText("Save"))
+    fireEvent.click(screen.getByRole("button", { name: "Save resource" }))
 
     await waitFor(() => expect(saveSpy).toHaveBeenCalled())
     expect(store.getState().editor.currentModal).toEqual([])
@@ -64,7 +64,7 @@ describe("<SaveAndPublishButton /> for a template with resources", () => {
     mockCheck(null)
     renderComponent(<SaveAndPublishButton />, createStore(stateWithUsage()))
 
-    fireEvent.click(screen.getByLabelText("Save"))
+    fireEvent.click(screen.getByRole("button", { name: "Save resource" }))
 
     await waitFor(() => expect(saveSpy).toHaveBeenCalled())
   })
@@ -76,7 +76,7 @@ describe("<SaveAndPublishButton /> for a template with resources", () => {
       createStore(stateWithUsage({ instance_count: 0 })),
     )
 
-    fireEvent.click(screen.getByLabelText("Save"))
+    fireEvent.click(screen.getByRole("button", { name: "Save resource" }))
 
     expect(checkSpy).not.toHaveBeenCalled()
     expect(saveSpy).toHaveBeenCalled()
@@ -96,7 +96,7 @@ describe("<SaveAndPublishButton /> for a new resource", () => {
     const store = createStore(state)
     renderComponent(<SaveAndPublishButton />, store)
 
-    fireEvent.click(screen.getByLabelText("Save"))
+    fireEvent.click(screen.getByRole("button", { name: "Save resource" }))
 
     expect(saveNewSpy).toHaveBeenCalledWith(
       "t9zVwg2zO",

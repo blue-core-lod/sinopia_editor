@@ -25,7 +25,9 @@ describe("saving a resource", () => {
         selector: resourceHeaderSelector,
       })
 
-      const saveBtn = screen.getAllByText("Save", { selector: "button" })[0] // there are multiple save buttons, grab the first
+      const saveBtn = screen.getAllByText("Save resource", {
+        selector: "button",
+      })[0] // there are multiple save buttons, grab the first
       const copyBtn = await screen.getAllByTestId(
         "Copy this resource to a new resource",
       )[0]
@@ -48,7 +50,7 @@ describe("saving a resource", () => {
       fireEvent.click(saveBtn)
 
       // The resource is saves and is assigned a URI
-      await screen.findAllByText(/URI for this resource/)
+      await screen.findAllByText("URI:")
 
       // The copy resource button is active
       expect(copyBtn).not.toBeDisabled()

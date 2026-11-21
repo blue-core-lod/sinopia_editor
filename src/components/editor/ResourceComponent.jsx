@@ -7,6 +7,9 @@ import CopyToNewMessage from "./CopyToNewMessage"
 import ResourceURIMessage from "./ResourceURIMessage"
 import TemplateUsageMessage from "./TemplateUsageMessage"
 import TemplateVersionMessage from "./TemplateVersionMessage"
+import ResourceHeading from "./ResourceHeading"
+import WorkViewToggle from "./WorkViewToggle"
+import UnusedRDFToggle from "./UnusedRDFToggle"
 import SaveAlert from "./SaveAlert"
 import {
   selectCurrentResourceKey,
@@ -16,9 +19,6 @@ import UnusedRDFDisplay from "./UnusedRDFDisplay"
 import { isInViewport } from "utilities/Utilities"
 import CloseButton from "./actions/CloseButton"
 import SaveAndPublishButton from "./actions/SaveAndPublishButton"
-import CopyToNewButton from "./actions/CopyToNewButton"
-import PreviewButton from "./actions/PreviewButton"
-import ResourceTitle from "./ResourceTitle"
 import TopButton from "./actions/TopButton"
 
 /**
@@ -28,6 +28,10 @@ const ResourceComponent = () => {
   const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
   const resource = useSelector((state) => selectNormSubject(state, resourceKey))
   const [isHeaderInViewport, setHeaderInViewport] = useState(true)
+  const [isUnusedRDFOpen, setUnusedRDFOpen] = useState(false)
+
+  // Each resource opens with its unused triples collapsed
+  useEffect(() => setUnusedRDFOpen(false), [resourceKey])
 
   useEffect(() => {
     const onScroll = () => {
@@ -53,13 +57,18 @@ const ResourceComponent = () => {
   return (
     <div id="resourceTemplate">
       <section className="resource-header">
-        <h3 id="resource-header">
-          <ResourceTitle resource={resource} />
-          <CopyToNewButton />
-          <PreviewButton />
-        </h3>
+        <div className="resource-heading-row">
+          <ResourceHeading resource={resource} id="resource-header" />
+          <WorkViewToggle resourceKey={resourceKey} />
+          <div className="resource-heading-links">
+            <UnusedRDFToggle
+              isOpen={isUnusedRDFOpen}
+              onToggle={() => setUnusedRDFOpen(!isUnusedRDFOpen)}
+            />
+            <ResourceURIMessage resourceKey={resourceKey} />
+          </div>
+        </div>
         <CopyToNewMessage />
-        <ResourceURIMessage resourceKey={resourceKey} />
         <TemplateUsageMessage resourceKey={resourceKey} />
         <TemplateVersionMessage resourceKey={resourceKey} />
         <SaveAlert />
@@ -68,18 +77,14 @@ const ResourceComponent = () => {
       <section className={stickyClasses.join(" ")} id="sticky-resource-header">
         <div className="row">
           <div className="col-md-9">
-            <h3>
-              <ResourceTitle resource={resource} />
-              <CopyToNewButton />
-              <PreviewButton />
-            </h3>
+            <ResourceHeading resource={resource} />
           </div>
           <div className="col-md-1">
             <TopButton />
           </div>
           <div className="col-md-2">
             <div className="d-flex justify-content-end">
-              <CloseButton css={"editor-action-close"} label={"Close"} />
+              <CloseButton css={"editor-action-close"} label={"Cancel"} />
               <SaveAndPublishButton class="editor-save" />
             </div>
           </div>
@@ -91,7 +96,7 @@ const ResourceComponent = () => {
           </div>
         </div>
       </section>
-      <UnusedRDFDisplay />
+      <UnusedRDFDisplay isOpen={isUnusedRDFOpen} />
       <PanelResource resource={resource} />
     </div>
   )

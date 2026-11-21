@@ -220,7 +220,7 @@ describe("editing a literal property", () => {
       selector: resourceHeaderSelector,
     })
 
-    const saveBtn = screen.getAllByLabelText("Save", {
+    const saveBtn = screen.getAllByText("Save resource", {
       selector: ".editor-save",
     })[0]
     expect(saveBtn).toBeDisabled()

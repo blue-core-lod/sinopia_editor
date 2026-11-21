@@ -19,7 +19,7 @@ const EditorActions = () => {
       <div className="d-flex justify-content-end">
         <MarcButton resourceKey={currentResourceKey} />
         <TransferButtons resourceKey={currentResourceKey} />
-        <CloseButton css={"editor-action-close"} label={"Close"} />
+        <CloseButton css={"editor-action-close"} label={"Cancel"} />
         <SaveAndPublishButton class="editor-save" />
       </div>
     </div>

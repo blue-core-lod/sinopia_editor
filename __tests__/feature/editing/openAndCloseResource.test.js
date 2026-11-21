@@ -89,7 +89,7 @@ describe("switching between multiple resources", () => {
     await screen.findByText("BF Instance", { selector: openSelector })
 
     // Closing the shown resource reveals the other one
-    fireEvent.click(screen.getAllByText("Close", { selector: "button" })[0])
+    fireEvent.click(screen.getAllByText("Cancel", { selector: "button" })[0])
     await screen.findByText("BF Instance", {
       selector: resourceHeaderSelector,
     })
@@ -100,7 +100,7 @@ describe("switching between multiple resources", () => {
     ).not.toBeInTheDocument()
 
     // Closing the only shown resource will direct to the resource templates page
-    fireEvent.click(screen.getAllByText("Close", { selector: "button" })[0])
+    fireEvent.click(screen.getAllByText("Cancel", { selector: "button" })[0])
     expect(
       await screen.findByText("Dashboard", {
         selector: "a",

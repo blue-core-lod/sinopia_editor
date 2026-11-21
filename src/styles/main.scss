@@ -26,6 +26,7 @@
 
 .editor-save {
   margin-left: 11px;
+  border-radius: 3px;
 }
 
 .btn-add,
@@ -313,8 +314,11 @@ button.collapse-heading.collapsed::before {
 
 .editor-action-close {
   margin-left: 1em;
+  border-radius: 3px;
+  text-decoration: none;
 }
 
+@import "kindBadge";
 @import "recentlyOpened";
 @import "resourceNav";
 @import "diff";
