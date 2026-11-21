@@ -37,20 +37,10 @@ describe("saving a resource", () => {
       // Check that the title of the document is set the same as the rdfs:label
       screen.getByText("foo", { selector: resourceHeaderSelector })
 
-      expect(screen.queryByText("Permissions")).not.toBeInTheDocument()
       expect(saveBtn).not.toBeDisabled()
       fireEvent.click(saveBtn)
 
-      // Change the owner
-      const ownerSelect = await screen.findByTestId("Who owns this?")
-      expect(ownerSelect).toHaveValue("stanford")
-      fireEvent.change(ownerSelect, { target: { value: "pcc" } })
-      expect(ownerSelect).toHaveValue("pcc")
-
-      // A modal for group choice and save appears
-      const modalSave = screen.getByRole("button", { name: "Save Group" })
-      fireEvent.click(modalSave)
-      // The resource is saved and is assigned a URI
+      // The resource is saved without asking for a group and is assigned a URI
       await screen.findAllByText(/URI for this resource/)
       screen.getAllByText(/Copy URI/, { selector: "button" })
 
@@ -61,7 +51,11 @@ describe("saving a resource", () => {
         ),
       )
 
-      screen.getByText("Permissions")
+      // Everything is owned by Blue Core
+      const [, , group, editGroups] = sinopiaApi.postResource.mock.calls[0]
+      expect(group).toEqual("blue core")
+      expect(editGroups).toEqual(["blue core"])
+      expect(screen.queryByText("Permissions")).not.toBeInTheDocument()
     }, 10000)
   })
 })

@@ -33,9 +33,6 @@ describe("editing an immutable property", () => {
     expect(saveBtn).not.toBeDisabled()
     fireEvent.click(saveBtn)
 
-    // A modal for group choice and save appears
-    const modalSave = screen.getByRole("button", { name: "Save Group" })
-    fireEvent.click(modalSave)
     // The resource is saved and is assigned a URI
     await screen.findAllByText(/URI for this resource/)
 

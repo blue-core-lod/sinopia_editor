@@ -3,7 +3,11 @@
 import React, { useState } from "react"
 import { useSelector, useDispatch, shallowEqual } from "react-redux"
 import PropTypes from "prop-types"
-import { saveResource as saveResourceAction } from "actionCreators/resources"
+import Config from "Config"
+import {
+  saveNewResource,
+  saveResource as saveResourceAction,
+} from "actionCreators/resources"
 import { checkTemplateChange } from "actionCreators/templateUsage"
 import {
   resourceHasChangesSinceLastSave,
@@ -15,10 +19,7 @@ import {
   displayResourceValidations,
   hasValidationErrors as hasValidationErrorsSelector,
 } from "selectors/errors"
-import {
-  showModal as showModalAction,
-  hideModal as hideModalAction,
-} from "actions/modals"
+import { showModal as showModalAction } from "actions/modals"
 import {
   showValidationErrors as showValidationErrorsAction,
   hideValidationErrors as hideValidationErrorsAction,
@@ -96,9 +97,16 @@ const SaveAndPublishButton = (props) => {
       } else if (isSaved) {
         save()
       } else {
-        // Show group chooser
-        dispatch(hideModalAction())
-        dispatch(showModalAction("GroupChoiceModal"))
+        // Everything is owned by Blue Core, so there is no group to choose.
+        dispatch(
+          saveNewResource(
+            resourceKey,
+            Config.defaultGroup,
+            [Config.defaultGroup],
+            errorKey,
+            keycloak,
+          ),
+        )
       }
     }
   }

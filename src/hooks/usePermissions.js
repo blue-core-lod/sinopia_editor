@@ -10,11 +10,9 @@ const usePermissions = () => {
     userGroups.includes(resource?.group) ||
     !!_.intersection(userGroups, resource?.editGroups).length
 
-  const canChangeGroups = (resource) => userGroups.includes(resource.group)
-
   const hasRole = (role) => userRoles.includes(role)
 
-  return { canCreate: !!userGroups.length, canEdit, canChangeGroups, hasRole }
+  return { canCreate: !!userGroups.length, canEdit, hasRole }
 }
 
 export default usePermissions

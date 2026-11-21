@@ -47,9 +47,6 @@ describe("saving a resource", () => {
       expect(saveBtn).not.toBeDisabled()
       fireEvent.click(saveBtn)
 
-      // A modal for group choice and save appears
-      const modalSave = screen.getByRole("button", { name: "Save Group" })
-      fireEvent.click(modalSave)
       // The resource is saves and is assigned a URI
       await screen.findAllByText(/URI for this resource/)
 
