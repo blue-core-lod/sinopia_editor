@@ -5,7 +5,6 @@ import PropTypes from "prop-types"
 import { useSelector } from "react-redux"
 import ResourceComponent from "./ResourceComponent"
 import Header from "../Header"
-import GroupChoiceModal from "./GroupChoiceModal"
 import EditorActions from "./EditorActions"
 import ErrorMessages from "./ErrorMessages"
 import ContextSuccess from "components/alerts/ContextSuccess"
@@ -89,7 +88,6 @@ const Editor = (props) => {
         {displayErrors && hasValidationErrors && (
           <ErrorMessages resourceKey={resourceKey} />
         )}
-        <GroupChoiceModal />
         <TemplateVersionWarningModal />
         <MarcModal />
         <InputLang />

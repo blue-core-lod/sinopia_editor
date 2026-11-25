@@ -38,13 +38,6 @@ jest.mock(
     },
 )
 jest.mock(
-  "components/editor/GroupChoiceModal",
-  () =>
-    function GroupChoiceModal() {
-      return null
-    },
-)
-jest.mock(
   "components/editor/preview/EditorPreviewModal",
   () =>
     function EditorPreviewModal() {

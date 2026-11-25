@@ -82,3 +82,29 @@ describe("<SaveAndPublishButton /> for a template with resources", () => {
     expect(saveSpy).toHaveBeenCalled()
   })
 })
+
+describe("<SaveAndPublishButton /> for a new resource", () => {
+  afterEach(() => jest.restoreAllMocks())
+
+  it("saves to the default group without asking for one", () => {
+    const saveNewSpy = jest
+      .spyOn(resourceActionCreators, "saveNewResource")
+      .mockReturnValue({ type: "NOOP" })
+    const state = createState({ hasResourceWithLiteral: true })
+    state.entities.subjects.t9zVwg2zO.changed = true
+    state.entities.subjects.t9zVwg2zO.uri = null
+    const store = createStore(state)
+    renderComponent(<SaveAndPublishButton />, store)
+
+    fireEvent.click(screen.getByLabelText("Save"))
+
+    expect(saveNewSpy).toHaveBeenCalledWith(
+      "t9zVwg2zO",
+      "blue core",
+      ["blue core"],
+      expect.anything(),
+      { token: "Secret" },
+    )
+    expect(store.getState().editor.currentModal).toEqual([])
+  })
+})

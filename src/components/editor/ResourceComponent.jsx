@@ -7,7 +7,6 @@ import CopyToNewMessage from "./CopyToNewMessage"
 import ResourceURIMessage from "./ResourceURIMessage"
 import TemplateUsageMessage from "./TemplateUsageMessage"
 import TemplateVersionMessage from "./TemplateVersionMessage"
-import PermissionsAction from "./actions/PermissionsAction"
 import SaveAlert from "./SaveAlert"
 import {
   selectCurrentResourceKey,
@@ -60,14 +59,7 @@ const ResourceComponent = () => {
           <PreviewButton />
         </h3>
         <CopyToNewMessage />
-        <div className="row">
-          <div className="col-md-11">
-            <ResourceURIMessage resourceKey={resourceKey} />
-          </div>
-          <div className="col-md-1">
-            <PermissionsAction />
-          </div>
-        </div>
+        <ResourceURIMessage resourceKey={resourceKey} />
         <TemplateUsageMessage resourceKey={resourceKey} />
         <TemplateVersionMessage resourceKey={resourceKey} />
         <SaveAlert />
