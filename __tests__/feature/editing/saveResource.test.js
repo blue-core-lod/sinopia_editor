@@ -25,7 +25,9 @@ describe("saving a resource", () => {
         selector: resourceHeaderSelector,
       })
 
-      const saveBtn = screen.getAllByText("Save", { selector: "button" })[0] // there are multiple save buttons, grab the first
+      const saveBtn = screen.getAllByText("Save resource", {
+        selector: "button",
+      })[0] // there are multiple save buttons, grab the first
 
       const input = screen.getByPlaceholderText("Note Text")
       fireEvent.change(input, { target: { value: "foo" } })
@@ -41,8 +43,8 @@ describe("saving a resource", () => {
       fireEvent.click(saveBtn)
 
       // The resource is saved without asking for a group and is assigned a URI
-      await screen.findAllByText(/URI for this resource/)
-      screen.getAllByText(/Copy URI/, { selector: "button" })
+      await screen.findAllByText("URI:")
+      screen.getAllByTestId("Copy URI to clipboard")
 
       // URL changes
       await waitFor(() =>

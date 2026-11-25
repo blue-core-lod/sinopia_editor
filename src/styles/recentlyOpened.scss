@@ -1,0 +1,120 @@
+// Editor "Recently opened" row (Figma: BLUE-CORE, edit resource): 210px wide
+// boxes, colored by kind, scrolled with arrows when they overflow.
+.recently-opened {
+  margin: 1rem 0;
+
+  .recently-opened-heading {
+    margin-bottom: 0.4375rem;
+    font-size: 0.875rem;
+    font-weight: $font-weight-light;
+    line-height: 25px;
+  }
+}
+
+.recently-opened-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6875rem;
+}
+
+.recently-opened-list {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 0.6875rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+  // The arrows do the scrolling, so the scrollbar is hidden
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.recently-opened-item {
+  --kind-color: #{$black-40};
+  --kind-background: #{$white};
+
+  display: flex;
+  flex: 0 0 210px;
+  align-items: center;
+  height: 30px;
+  border: 1px solid var(--kind-color);
+  border-radius: 4px;
+  background: var(--kind-background);
+
+  &.recently-opened-work {
+    --kind-color: #{$work-green};
+    --kind-background: #{$work-green-light};
+  }
+
+  &.recently-opened-instance {
+    --kind-color: #{$rhubarb};
+    --kind-background: #{$rhubarb-light};
+  }
+
+  &.recently-opened-template {
+    --kind-color: #{$core-blue};
+    --kind-background: #{$mist};
+  }
+
+  button {
+    border: 0;
+    background: none;
+    color: $black;
+    font-size: 0.875rem;
+    font-weight: $font-weight-light;
+    line-height: 25px;
+
+    &:focus-visible {
+      outline: 2px solid $core-blue;
+      outline-offset: 1px;
+    }
+  }
+}
+
+.recently-opened-open {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  height: 100%;
+  padding: 0 0 0 3px;
+  text-align: left;
+
+  &[aria-busy] {
+    cursor: progress;
+  }
+}
+
+.recently-opened-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recently-opened-remove {
+  flex: 0 0 auto;
+  padding: 0 10px 0 4px;
+  font-size: 1.25rem !important;
+}
+
+.recently-opened-scroll {
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $black-40;
+
+  &:disabled {
+    opacity: 0.4;
+  }
+
+  &.recently-opened-scroll-right svg {
+    transform: scaleX(-1);
+  }
+}

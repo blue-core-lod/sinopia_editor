@@ -53,18 +53,6 @@ export const addSearchHistory = (state, action) => ({
 export const addResourceHistoryByResult = (state, action) =>
   addResourceResult(state, action.payload)
 
-export const addResourceHistory = (state, action) => {
-  const result = {
-    uri: action.payload.resourceUri,
-    label: action.payload.resourceUri,
-    type: [action.payload.type],
-    modified: action.payload.modified,
-    group: action.payload.group,
-    editGroups: action.payload.editGroups,
-  }
-  return addResourceResult(state, result)
-}
-
 const addResourceResult = (state, result) => ({
   ...state,
   resources: addToHistory(
@@ -72,6 +60,16 @@ const addResourceResult = (state, result) => ({
     result,
     (newItem, checkItem) => newItem.uri !== checkItem.uri,
   ),
+})
+
+export const removeResourceHistory = (state, action) => ({
+  ...state,
+  resources: state.resources.filter((item) => item.uri !== action.payload),
+})
+
+export const removeTemplateHistory = (state, action) => ({
+  ...state,
+  templates: state.templates.filter((item) => item.id !== action.payload),
 })
 
 const addToHistory = (historyItems, newItem, compareFunc) => {

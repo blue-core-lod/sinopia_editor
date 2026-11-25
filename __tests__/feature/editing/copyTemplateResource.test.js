@@ -53,9 +53,11 @@ describe("Copying a template resource", () => {
     expect(labels.length).toBe(4)
 
     // But there is no resource URI for the unsaved copy
-    expect(screen.queryByText(/URI for this resource/)).not.toBeInTheDocument()
+    expect(screen.queryByText("URI:")).not.toBeInTheDocument()
 
-    const saveBtn = await screen.findAllByRole("button", { name: "Save" })
+    const saveBtn = await screen.findAllByRole("button", {
+      name: "Save resource template",
+    })
     expect(saveBtn[0]).not.toBeDisabled()
 
     // It has the 'template' class for header color

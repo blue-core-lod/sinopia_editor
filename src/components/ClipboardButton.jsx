@@ -7,8 +7,9 @@ import {
   faClipboard,
   faClipboardCheck,
 } from "@fortawesome/free-solid-svg-icons"
+import { Check, Copy } from "react-bootstrap-icons"
 
-const ClipboardButton = ({ text, label = null }) => {
+const ClipboardButton = ({ text, label = null, iconOnly = false }) => {
   const [isCopying, setCopying] = useState(false)
   const [timerId, setTimerId] = useState(false)
 
@@ -25,6 +26,23 @@ const ClipboardButton = ({ text, label = null }) => {
 
   if (!text) {
     return null
+  }
+
+  // A bare icon, for copying inline next to the text it copies
+  if (iconOnly) {
+    const action = isCopying ? "Copied" : "Copy"
+    return (
+      <button
+        type="button"
+        className="btn btn-link clipboard-icon-button"
+        aria-label={`${action} ${label} to clipboard`}
+        title={`${action} ${label} to clipboard`}
+        data-testid={`${action} ${label} to clipboard`}
+        onClick={handleClick}
+      >
+        {isCopying ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
+      </button>
+    )
   }
 
   if (isCopying)
@@ -56,6 +74,7 @@ const ClipboardButton = ({ text, label = null }) => {
 ClipboardButton.propTypes = {
   text: PropTypes.string,
   label: PropTypes.string.isRequired,
+  iconOnly: PropTypes.bool,
 }
 
 export default ClipboardButton

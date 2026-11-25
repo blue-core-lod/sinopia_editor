@@ -233,7 +233,9 @@ describe("editing a URI property", () => {
     fireEvent.change(input, { target: { value: "foo" } })
     fireEvent.keyDown(input, { key: "Enter", code: 13, charCode: 13 })
 
-    const saveBtn = screen.getAllByText("Save", { selector: "button" })[0] // there are multiple save buttons, grab the first
+    const saveBtn = screen.getAllByText("Save resource", {
+      selector: "button",
+    })[0] // there are multiple save buttons, grab the first
     fireEvent.click(saveBtn)
 
     await screen.findByText("Invalid URI")
@@ -253,7 +255,9 @@ describe("editing a URI property", () => {
     })
     fireEvent.keyDown(input, { key: "Enter", code: 13, charCode: 13 })
 
-    const saveBtn = screen.getAllByText("Save", { selector: "button" })[0] // there are multiple save buttons, grab the first
+    const saveBtn = screen.getAllByText("Save resource", {
+      selector: "button",
+    })[0] // there are multiple save buttons, grab the first
     fireEvent.click(saveBtn)
 
     expect(
@@ -279,7 +283,9 @@ describe("editing a URI property", () => {
     })
     fireEvent.keyDown(labelInput, { key: "Enter", code: 13, charCode: 13 })
 
-    const saveBtn = screen.getAllByText("Save", { selector: "button" })[0] // there are multiple save buttons, grab the first
+    const saveBtn = screen.getAllByText("Save resource", {
+      selector: "button",
+    })[0] // there are multiple save buttons, grab the first
     fireEvent.click(saveBtn)
 
     expect(
@@ -298,7 +304,7 @@ describe("editing a URI property", () => {
       selector: resourceHeaderSelector,
     })
 
-    const saveBtn = screen.getAllByLabelText("Save", {
+    const saveBtn = screen.getAllByText("Save resource", {
       selector: ".editor-save",
     })[0]
     expect(saveBtn).toBeDisabled()
@@ -323,7 +329,7 @@ describe("editing a URI property", () => {
       selector: resourceHeaderSelector,
     })
 
-    const saveBtn = screen.getAllByLabelText("Save", {
+    const saveBtn = screen.getAllByText("Save resource", {
       selector: ".editor-save",
     })[0]
     expect(saveBtn).toBeDisabled()

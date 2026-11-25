@@ -43,13 +43,7 @@ const CloseButton = (props) => {
   return (
     <React.Fragment>
       <CloseResourceModal resourceKey={resourceKey} />
-      <button
-        type="button"
-        className={buttonClasses}
-        aria-label="Close"
-        title="Close"
-        onClick={handleClick}
-      >
+      <button type="button" className={buttonClasses} onClick={handleClick}>
         {buttonLabel}
       </button>
     </React.Fragment>

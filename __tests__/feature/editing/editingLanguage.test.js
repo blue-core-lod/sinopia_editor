@@ -190,7 +190,7 @@ describe("editing a language", () => {
     // Visit foo, which is still tagged en.
     fireEvent.click(screen.getByTestId("Change language for foo"))
     within(screen.getByTestId("new tag row")).getByText("en")
-    fireEvent.click(screen.getByText("Cancel"))
+    fireEvent.click(screen.getByText("Cancel", { selector: ".btn-link" }))
     await waitFor(() =>
       expect(
         screen.queryByRole("heading", { name: "Select language tag for foo" }),

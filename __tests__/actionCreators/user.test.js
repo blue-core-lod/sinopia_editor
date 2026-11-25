@@ -63,7 +63,7 @@ describe("loadUserData()", () => {
     sinopiaSearch.getTemplateSearchResultsByIds = jest
       .fn()
       .mockResolvedValue({ results: [{ id: "template1" }] })
-    sinopiaSearch.getSearchResultsByUris = jest.fn().mockResolvedValue({
+    sinopiaApi.fetchResourceResults = jest.fn().mockResolvedValue({
       results: [
         {
           uri: "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",

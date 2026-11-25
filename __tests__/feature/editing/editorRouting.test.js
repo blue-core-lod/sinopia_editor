@@ -100,7 +100,7 @@ describe("routing in editor", () => {
     it("rebuilds the work URI and opens it in editor", async () => {
       renderApp(null, history)
 
-      await screen.findAllByText(`URI for this resource: <${blueCoreWorkUri}>`)
+      await screen.findAllByRole("link", { name: blueCoreWorkUri })
       expect(history.location.pathname).toEqual(
         "/editor/resource/works/d4e1b2a3-5c6f-4a7b-8c9d-0e1f2a3b4c5d",
       )
@@ -115,7 +115,7 @@ describe("routing in editor", () => {
     it("shows collection/uuid in the editor route", async () => {
       renderApp(null, history)
 
-      await screen.findAllByText(`URI for this resource: <${blueCoreWorkUri}>`)
+      await screen.findAllByRole("link", { name: blueCoreWorkUri })
       await waitFor(() =>
         expect(history.location.pathname).toEqual(
           "/editor/resource/works/d4e1b2a3-5c6f-4a7b-8c9d-0e1f2a3b4c5d",

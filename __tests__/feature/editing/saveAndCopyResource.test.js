@@ -25,7 +25,9 @@ describe("saving a resource", () => {
         selector: resourceHeaderSelector,
       })
 
-      const saveBtn = screen.getAllByText("Save", { selector: "button" })[0] // there are multiple save buttons, grab the first
+      const saveBtn = screen.getAllByText("Save resource", {
+        selector: "button",
+      })[0] // there are multiple save buttons, grab the first
       const copyBtn = await screen.getAllByTestId(
         "Copy this resource to a new resource",
       )[0]
@@ -48,19 +50,17 @@ describe("saving a resource", () => {
       fireEvent.click(saveBtn)
 
       // The resource is saves and is assigned a URI
-      await screen.findAllByText(/URI for this resource/)
+      await screen.findAllByText("URI:")
 
       // The copy resource button is active
       expect(copyBtn).not.toBeDisabled()
       fireEvent.click(copyBtn)
       await screen.findAllByText(/Copied .+ to new resource./)
 
-      // There are nav tabs and a duplicate resource with the same content
-      await screen.findAllByText("foo", {
-        selector: ".nav-item.active .tab-link span",
-      })
-      await screen.findAllByText("foo", {
-        selector: ".nav-item:not(.active) .tab-link span",
+      // The saved original is reachable from recently opened while its copy
+      // is the resource shown
+      await screen.findByText("foo", {
+        selector: ".recently-opened-item .recently-opened-label",
       })
     })
   })

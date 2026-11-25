@@ -56,7 +56,7 @@ describe("loading a resource with untagged literals", () => {
     await screen.findByTestId("Change language for An untagged literal value")
 
     screen
-      .getAllByRole("button", { name: "Save" })
+      .getAllByRole("button", { name: "Save resource" })
       .forEach((btn) => expect(btn).toBeDisabled())
   }, 20000)
 

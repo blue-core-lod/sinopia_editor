@@ -88,35 +88,6 @@ export const getSearchResultsWithFacets = async (
   return fetchSearchResultsFromUrl(url, keycloak, options)
 }
 
-export const getSearchResultsByUris = (resourceUris) => {
-  if (
-    Config.useResourceTemplateFixtures &&
-    resourceUris.length === 1 &&
-    hasFixtureResource(resourceUris[0])
-  )
-    return Promise.resolve(resourceSearchResults(resourceUris[0])[0])
-
-  /*
-   * BUG: `body` below is built but never sent. fetchSearchResultsFromUrl issues
-   * a bare GET, so `resourceUris` is discarded and this returns the first hit of
-   * an unfiltered search rather than the requested URIs. Callers affected:
-   * actionCreators/history.js (loadResourceHistory, addResourceHistory).
-   * Retained rather than deleted because it documents the intended query shape;
-   * fixing it requires the Blue Core API's search contract for filtering by URI.
-   */
-  // eslint-disable-next-line no-unused-vars
-  const body = {
-    query: {
-      terms: {
-        uri: resourceUris,
-      },
-    },
-    size: resourceUris.length,
-  }
-  const url = `${Config.sinopiaApiBase}/search/`
-  return fetchSearchResultsFromUrl(url, null).then((results) => results[0])
-}
-
 const fetchSearchResultsFromUrl = (url, keycloak, options) =>
   fetch(url, {
     method: "GET",

@@ -40,7 +40,7 @@ describe("loading saved resource", () => {
       })
 
       // URI displayed
-      screen.getAllByText(`URI for this resource: <${uri}>`)
+      screen.getAllByRole("link", { name: uri })
 
       // Headings
       screen.getByText("Example Label", { selector: resourceHeaderSelector })

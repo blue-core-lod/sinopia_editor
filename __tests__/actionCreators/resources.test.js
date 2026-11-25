@@ -223,9 +223,6 @@ describe("a version-pinned nested resource", () => {
 describe("saveNewResource", () => {
   const uri = "http://localhost:3000/resource/abcdeghij23455"
   sinopiaApi.putUserHistory = jest.fn().mockResolvedValue()
-  sinopiaSearch.getSearchResultsByUris = jest
-    .fn()
-    .mockResolvedValue({ results: [] })
 
   it("saves a new resource", async () => {
     const store = mockStore(createState({ hasResourceWithLiteral: true }))
@@ -247,11 +244,14 @@ describe("saveNewResource", () => {
     expect(actions).toHaveAction("CLEAR_ERRORS")
     expect(actions).toHaveAction("SET_BASE_URL")
     expect(actions).toHaveAction("SAVE_RESOURCE_FINISHED")
-    expect(actions).toHaveAction("ADD_RESOURCE_HISTORY", {
-      resourceUri: uri,
+    // Built from the saved resource, without fetching it back
+    expect(actions).toHaveAction("ADD_RESOURCE_HISTORY_BY_RESULT", {
+      uri,
+      label: uri,
+      type: ["http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle"],
       modified: "2020-08-20T11:34:40.887Z",
       group: "stanford",
-      type: "http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle",
+      editGroups: ["cornell"],
     })
     expect(actions).toHaveAction("SET_RESOURCE_GROUP", {
       resourceKey: "t9zVwg2zO",
@@ -346,11 +346,9 @@ describe("saveNewResource", () => {
 
 describe("saveResource", () => {
   sinopiaApi.putUserHistory = jest.fn().mockResolvedValue()
-  sinopiaSearch.getSearchResultsByUris = jest
-    .fn()
-    .mockResolvedValue({ results: [] })
 
   it("saves an existing resource", async () => {
+    jest.spyOn(sinopiaApi, "fetchResourceResults")
     sinopiaApi.putResource = jest.fn().mockResolvedValue("t9zVwg2zO")
     const state = createState({ hasResourceWithLiteral: true })
     state.entities.subjects.t9zVwg2zO.group = "stanford"
@@ -364,11 +362,15 @@ describe("saveResource", () => {
 
     expect(actions).toHaveAction("CLEAR_ERRORS")
     expect(actions).toHaveAction("SAVE_RESOURCE_FINISHED")
-    expect(actions).toHaveAction("ADD_RESOURCE_HISTORY", {
-      resourceUri: "https://api.sinopia.io/resource/0894a8b3",
-      type: "http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle",
-      group: "stanford",
+    // Built from the saved resource, without fetching it back
+    expect(sinopiaApi.fetchResourceResults).not.toHaveBeenCalled()
+    expect(actions).toHaveAction("ADD_RESOURCE_HISTORY_BY_RESULT", {
+      uri: "https://api.sinopia.io/resource/0894a8b3",
+      label: "https://api.sinopia.io/resource/0894a8b3",
+      type: ["http://id.loc.gov/ontologies/bibframe/AbbreviatedTitle"],
       modified: "2020-08-20T11:34:40.887Z",
+      group: "stanford",
+      editGroups: ["cornell"],
     })
     expect(actions).toHaveAction("SET_RESOURCE_GROUP", {
       resourceKey: "t9zVwg2zO",
