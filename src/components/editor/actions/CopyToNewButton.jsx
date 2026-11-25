@@ -4,8 +4,7 @@ import React from "react"
 import { useDispatch, useSelector } from "react-redux"
 import PropTypes from "prop-types"
 import { showCopyNewMessage } from "actions/messages"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faCopy } from "@fortawesome/free-solid-svg-icons"
+import { Copy } from "react-bootstrap-icons"
 import {
   selectCurrentResourceKey,
   selectNormSubject,
@@ -33,7 +32,7 @@ const CopyToNewButton = (props) => {
       data-testid="Copy this resource to a new resource"
       aria-label="Copy this resource to a new resource"
     >
-      <FontAwesomeIcon icon={faCopy} className="icon-lg" />
+      <Copy aria-hidden="true" />
     </button>
   )
 }

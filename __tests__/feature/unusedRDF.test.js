@@ -36,9 +36,28 @@ describe("loading RDF with unused triples", () => {
       selector: resourceHeaderSelector,
     })
 
-    // Awaited: the unused-RDF notice arrives in a separate state update, which
+    // Awaited: the unused-RDF link arrives in a separate state update, which
     // React 19 batches rather than flushing with the header render above.
-    await screen.findByText(/Some triples are not editable with this template/)
+    const toggle = await screen.findByRole("button", {
+      name: "View triples not editable with this template",
+    })
+
+    // Collapsed until the link is clicked. toBeVisible checks the hidden panel
+    // the notice sits in.
+    const panel = await screen.findByText(
+      /Some triples are not editable with this template/,
+    )
+    expect(panel).not.toBeVisible()
+    expect(toggle).toHaveAttribute("aria-expanded", "false")
+
+    fireEvent.click(toggle)
+    expect(panel).toBeVisible()
+    expect(toggle).toHaveAttribute("aria-expanded", "true")
+
+    // And collapses again
+    fireEvent.click(toggle)
+    expect(panel).not.toBeVisible()
+    fireEvent.click(toggle)
 
     // Switch to turtle
     fireEvent.change(screen.getByLabelText(/Format/), {

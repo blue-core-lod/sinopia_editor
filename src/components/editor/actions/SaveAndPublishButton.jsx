@@ -15,6 +15,8 @@ import {
   selectCurrentResourceKey,
   selectTemplateUsage,
 } from "selectors/resources"
+import { selectSubjectTemplateForSubject } from "selectors/templates"
+import { kindForSubjectTemplate } from "utilities/resourceKind"
 import {
   displayResourceValidations,
   hasValidationErrors as hasValidationErrorsSelector,
@@ -52,6 +54,12 @@ const SaveAndPublishButton = (props) => {
   // Only template resources have usage, so only they are checked before saving.
   const templateUsage = useSelector((state) =>
     selectTemplateUsage(state, resourceKey),
+  )
+  const isTemplate = useSelector(
+    (state) =>
+      kindForSubjectTemplate(
+        selectSubjectTemplateForSubject(state, resourceKey),
+      ) === "template",
   )
   const [isChecking, setChecking] = useState(false)
 
@@ -115,10 +123,9 @@ const SaveAndPublishButton = (props) => {
     <button
       className={`btn btn-primary ${props.class}`}
       onClick={handleClick}
-      aria-label="Save"
       disabled={isDisabled}
     >
-      Save
+      {isTemplate ? "Save resource template" : "Save resource"}
     </button>
   )
 }

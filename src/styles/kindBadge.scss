@@ -1,0 +1,54 @@
+// Letter badge for a resource kind (Figma: BLUE-CORE, edit resource)
+.kind-badge {
+  --kind-badge-size: 25px;
+
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 var(--kind-badge-size);
+  align-items: center;
+  justify-content: center;
+  width: var(--kind-badge-size);
+  height: var(--kind-badge-size);
+  color: $white;
+  font-size: 0.875rem;
+  font-weight: $font-weight-bold;
+  line-height: 1;
+
+  &::before {
+    content: "";
+    position: absolute;
+    background: var(--kind-color);
+  }
+
+  span {
+    position: relative;
+  }
+
+  &.kind-badge-work {
+    --kind-color: #{$work-green};
+
+    &::before {
+      inset: 0;
+      border-radius: 50%;
+    }
+  }
+
+  // A square turned 45 degrees, its corners touching the box
+  &.kind-badge-instance {
+    --kind-color: #{$rhubarb};
+
+    &::before {
+      width: calc(var(--kind-badge-size) * 0.7071);
+      height: calc(var(--kind-badge-size) * 0.7071);
+      transform: rotate(45deg);
+    }
+  }
+
+  &.kind-badge-template {
+    --kind-color: #{$core-blue};
+
+    &::before {
+      inset: 1px 0.5px 0;
+    }
+  }
+}

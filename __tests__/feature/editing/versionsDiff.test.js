@@ -21,7 +21,7 @@ describe("versions", () => {
         selector: resourceHeaderSelector,
       })
 
-      // Click versions pill
+      // Open the Versions box in the left nav
       fireEvent.click(screen.getByText("Versions"))
 
       await screen.findByText("Compare from/to")
@@ -56,7 +56,7 @@ describe("versions", () => {
         selector: resourceHeaderSelector,
       })
 
-      // Click versions pill
+      // Open the Versions box in the left nav
       fireEvent.click(screen.getByText("Versions"))
 
       await screen.findByText("Compare from/to")

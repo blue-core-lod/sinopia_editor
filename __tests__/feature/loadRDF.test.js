@@ -73,11 +73,6 @@ describe("loading from RDF", () => {
       })
 
       screen.getByText("foo")
-      expect(
-        screen.getAllByText(`Template version: <${versionUri}>`, {
-          exact: false,
-        }).length,
-      ).toBeTruthy()
     })
   })
 

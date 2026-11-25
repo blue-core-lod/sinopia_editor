@@ -24,7 +24,9 @@ describe("editing an immutable property", () => {
       selector: resourceHeaderSelector,
     })
 
-    const saveBtn = screen.getAllByText("Save", { selector: "button" })[0] // there are multiple save buttons, grab the first
+    const saveBtn = screen.getAllByText("Save resource", {
+      selector: "button",
+    })[0] // there are multiple save buttons, grab the first
 
     const input = screen.getByPlaceholderText("Note")
     fireEvent.change(input, { target: { value: "foo" } })
@@ -34,7 +36,7 @@ describe("editing an immutable property", () => {
     fireEvent.click(saveBtn)
 
     // The resource is saved and is assigned a URI
-    await screen.findAllByText(/URI for this resource/)
+    await screen.findAllByText("URI:")
 
     // No longer editable
     expect(screen.queryByPlaceholderText("Note")).not.toBeInTheDocument()

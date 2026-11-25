@@ -1,12 +1,12 @@
 import { checkTemplateVersion } from "actionCreators/templateVersion"
 import { dispatchResourceForEditor } from "actionCreators/resources"
 import * as sinopiaApi from "sinopiaApi"
-import * as sinopiaSearch from "sinopiaSearch"
 import Config from "Config"
 import configureMockStore from "redux-mock-store"
 import { thunk } from "redux-thunk"
 import { createState } from "stateUtils"
 import { selectFullSubject } from "selectors/resources"
+import rdf from "rdf-ext"
 
 jest.mock("KeycloakContext", () => ({
   useKeycloak: jest.fn().mockReturnValue({}),
@@ -150,9 +150,6 @@ describe("checkTemplateVersion", () => {
 describe("dispatchResourceForEditor", () => {
   beforeEach(() => {
     jest.spyOn(sinopiaApi, "putUserHistory").mockResolvedValue()
-    jest
-      .spyOn(sinopiaSearch, "getSearchResultsByUris")
-      .mockResolvedValue({ results: [] })
   })
 
   const open = (state, options) => {
@@ -160,7 +157,8 @@ describe("dispatchResourceForEditor", () => {
     const store = mockStore(state)
     store.dispatch(
       dispatchResourceForEditor(
-        [{ group: "stanford" }, resource],
+        // [response, resource, unusedDataset, dataset]
+        [{ group: "stanford" }, resource, null, rdf.dataset()],
         resource.uri,
         options,
         keycloak,

@@ -1,6 +1,7 @@
 // Copyright 2020 Stanford University see LICENSE for license
 
 import React, { useState, useEffect } from "react"
+import PropTypes from "prop-types"
 import { useSelector } from "react-redux"
 import Alert from "components/alerts/Alert"
 import RDFDisplay from "components/editor/preview/RDFDisplay"
@@ -9,7 +10,8 @@ import { selectUnusedRDF } from "selectors/modals"
 import { datasetFromN3 } from "utilities/Utilities"
 import _ from "lodash"
 
-const UnusedRDFDisplay = () => {
+// Collapsed until opened with UnusedRDFToggle in the resource header
+const UnusedRDFDisplay = ({ isOpen }) => {
   const resourceKey = useSelector((state) => selectCurrentResourceKey(state))
   const unusedRDF = useSelector((state) => selectUnusedRDF(state, resourceKey))
 
@@ -40,7 +42,7 @@ const UnusedRDFDisplay = () => {
   if (!dataset) return null
 
   return (
-    <div className="rdf-display-panel">
+    <div id="unused-rdf" className="rdf-display-panel" hidden={!isOpen}>
       <div className="row mb-3 gx-2">
         <div className="col-auto">
           <strong>
@@ -70,6 +72,10 @@ const UnusedRDFDisplay = () => {
       <RDFDisplay dataset={dataset} format={format} />
     </div>
   )
+}
+
+UnusedRDFDisplay.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
 }
 
 export default UnusedRDFDisplay
