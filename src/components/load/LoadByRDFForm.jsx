@@ -156,7 +156,11 @@ const LoadByRDFForm = () => {
         ),
       )
       navigate("/dashboard")
-      fetch(`${Config.sinopiaApiBase}/works`, {
+      // marc2bibframe mints placeholder example.org URIs for the Work and
+      // Instance, so don't let the API record them as bf:derivedFrom.
+      const worksUrl = new URL(`${Config.sinopiaApiBase}/works`)
+      worksUrl.searchParams.set("record_derived_from", "false")
+      fetch(worksUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
