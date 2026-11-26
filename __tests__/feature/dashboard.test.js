@@ -165,11 +165,8 @@ describe("viewing the dashboard", () => {
       screen.getByText("Recent resources")
       screen.getByRole("heading", { level: 1, name: "Sinopia dashboard" })
 
-      // The result
-      screen.getByText(
-        "http://localhost:3000/resource/c7db5404-7d7d-40ac-b38e-c821d2c3ae3f",
-        { selector: "table.resource-list td" },
-      )
+      // The result, by its label rather than its URI
+      screen.getByText("Example Label", { selector: "table.resource-list td" })
     }, 10000)
   })
 })

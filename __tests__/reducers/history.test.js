@@ -5,7 +5,8 @@ import {
   addTemplateHistoryByResult,
   addSearchHistory,
   addResourceHistoryByResult,
-  addResourceHistory,
+  removeResourceHistory,
+  removeTemplateHistory,
 } from "reducers/history"
 import { createState } from "stateUtils"
 import Config from "Config"
@@ -179,30 +180,34 @@ describe("addResourceHistoryByResult", () => {
   })
 })
 
-describe("addResourceHistory", () => {
-  const resource = {
-    resourceUri:
-      "http://localhost:3000/resource/f383bfff-5364-47a3-a081-8c9e2d79f43f",
-    type: "http://id.loc.gov/ontologies/bibframe/TableOfContents",
-    group: "stanford",
-    editGroups: ["cornell"],
-    modified: "2020-10-05T14:38:19.704Z",
-  }
-
-  it("transforms to a result", () => {
+describe("removeResourceHistory", () => {
+  it("removes the resource with the uri", () => {
     const state = createState()
-    const newState = addResourceHistory(state.history, { payload: resource })
-
+    state.history.resources = [
+      { uri: "http://localhost:3000/works/1", label: "One" },
+      { uri: "http://localhost:3000/works/2", label: "Two" },
+    ]
+    const newState = removeResourceHistory(state.history, {
+      payload: "http://localhost:3000/works/1",
+    })
     expect(newState.resources).toEqual([
-      {
-        uri: "http://localhost:3000/resource/f383bfff-5364-47a3-a081-8c9e2d79f43f",
-        label:
-          "http://localhost:3000/resource/f383bfff-5364-47a3-a081-8c9e2d79f43f",
-        type: ["http://id.loc.gov/ontologies/bibframe/TableOfContents"],
-        modified: "2020-10-05T14:38:19.704Z",
-        group: "stanford",
-        editGroups: ["cornell"],
-      },
+      { uri: "http://localhost:3000/works/2", label: "Two" },
+    ])
+  })
+})
+
+describe("removeTemplateHistory", () => {
+  it("removes the template with the id", () => {
+    const state = createState()
+    state.history.templates = [
+      { id: "resourceTemplate:bf2:Work", resourceLabel: "Work" },
+      { id: "resourceTemplate:bf2:Instance", resourceLabel: "Instance" },
+    ]
+    const newState = removeTemplateHistory(state.history, {
+      payload: "resourceTemplate:bf2:Work",
+    })
+    expect(newState.templates).toEqual([
+      { id: "resourceTemplate:bf2:Instance", resourceLabel: "Instance" },
     ])
   })
 })

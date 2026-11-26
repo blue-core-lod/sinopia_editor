@@ -17,7 +17,12 @@ import {
   getFixtureResourceRelationships,
 } from "../__tests__/testUtilities/fixtureLoaderHelper"
 import GraphBuilder from "GraphBuilder"
-import { isBfWork, isBfInstance, isBfHub } from "utilities/Bibframe"
+import {
+  isBfWork,
+  isBfInstance,
+  isBfHub,
+  resultFromDataset,
+} from "utilities/Bibframe"
 import rtLiteralPropertyAttrs from "../static/templates/rt_literal_property_attrs_doc.json"
 import rtLookupPropertyAttrs from "../static/templates/rt_lookup_property_attrs_doc.json"
 import rtPropertyTemplate from "../static/templates/rt_property_template_doc.json"
@@ -85,6 +90,30 @@ export const fetchResource = (
     ),
   )
 }
+
+/**
+ * Fetches each resource and builds a result from it (see resultFromDataset).
+ * A resource that fails to load is left out.
+ * @return {Promise{Object}} { results, error }, where error is set only when
+ *   no resource could be loaded, so callers can tell a failed lookup from a
+ *   partial one.
+ */
+export const fetchResourceResults = (uris) =>
+  Promise.all(
+    uris.map((uri) =>
+      fetchResource(uri).then(
+        ([dataset, response]) => resultFromDataset(uri, dataset, response),
+        (err) => ({ error: err.message || String(err) }),
+      ),
+    ),
+  ).then((fetched) => {
+    const results = fetched.filter((result) => !result.error)
+    const failed = fetched.find((result) => result.error)
+    return {
+      results,
+      error: results.length === 0 && failed ? failed.error : undefined,
+    }
+  })
 
 /**
  * Why a resource could not be loaded: "fetch" (the API couldn't be reached),

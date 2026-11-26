@@ -96,12 +96,9 @@ describe("searching and opening a resource", () => {
     fireEvent.click(rtLinks[0])
     await screen.findByText("Title note", { selector: resourceHeaderSelector })
 
-    // There are nav tabs and a duplicate resource
-    await screen.findAllByText("Title note", {
-      selector: ".nav-item.active .tab-link span",
-    })
-    await screen.findAllByText("Title note", {
-      selector: ".nav-item:not(.active) .tab-link span",
+    // The first, unsaved Title note is still reachable from recently opened
+    await screen.findByText("Title note", {
+      selector: ".recently-opened-other .recently-opened-label",
     })
   })
 })

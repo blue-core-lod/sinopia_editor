@@ -5,7 +5,6 @@ import {
 } from "actionCreators/resources"
 import mockConsole from "jest-mock-console"
 import * as sinopiaApi from "sinopiaApi"
-import * as sinopiaSearch from "sinopiaSearch"
 import Config from "Config"
 import configureMockStore from "redux-mock-store"
 import { thunk } from "redux-thunk"
@@ -48,10 +47,8 @@ describe("loadResource", () => {
   describe("loading a resource for editor", () => {
     const store = mockStore(createState())
     sinopiaApi.putUserHistory = jest.fn().mockResolvedValue()
-    sinopiaSearch.getSearchResultsByUris = jest
-      .fn()
-      .mockResolvedValue({ results: [] })
     jest.spyOn(relationshipActionCreators, "loadRelationships")
+    jest.spyOn(sinopiaApi, "fetchResourceResults")
 
     it("dispatches actions", async () => {
       const keycloak = { token: "test-token" }
@@ -74,12 +71,16 @@ describe("loadResource", () => {
       expect(actions).toHaveAction("SET_UNUSED_RDF")
       expect(actions).toHaveAction("SET_CURRENT_EDIT_RESOURCE")
       expect(actions).toHaveAction("LOAD_RESOURCE_FINISHED")
-      expect(actions).toHaveAction("ADD_RESOURCE_HISTORY", {
-        resourceUri: uri,
-        type: "http://sinopia.io/testing/Inputs",
-        group: "stanford",
+      // Built from the fetched resource, without searching for it
+      expect(actions).toHaveAction("ADD_RESOURCE_HISTORY_BY_RESULT", {
+        uri,
+        label: uri,
+        type: ["http://sinopia.io/testing/Inputs"],
         modified: "2020-08-20T11:34:40.887Z",
+        group: "stanford",
+        editGroups: ["cornell"],
       })
+      expect(sinopiaApi.fetchResourceResults).not.toHaveBeenCalled()
 
       expect(sinopiaApi.putUserHistory).toHaveBeenCalledWith(
         "Foo McBar",
@@ -305,9 +306,6 @@ describe("loadResource", () => {
       "http://localhost:3000/resource/c7c5f4c0-e7cd-4ca5-a20f-2a37fe1080d7"
     const store = mockStore(createState())
     sinopiaApi.putUserHistory = jest.fn().mockResolvedValue()
-    sinopiaSearch.getSearchResultsByUris = jest
-      .fn()
-      .mockResolvedValue({ results: [] })
     jest.spyOn(relationshipActionCreators, "loadRelationships")
 
     it("dispatches actions", async () => {

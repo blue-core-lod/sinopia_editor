@@ -59,8 +59,9 @@ import {
   addTemplateHistory,
   addTemplateHistoryByResult,
   addSearchHistory,
-  addResourceHistory,
   addResourceHistoryByResult,
+  removeResourceHistory,
+  removeTemplateHistory,
 } from "./history"
 import { clearSearchResults, setSearchResults, setHeaderSearch } from "./search"
 import { lookupOptionsRetrieved } from "./lookups"
@@ -172,11 +173,12 @@ const entityHandlers = {
 }
 
 const historyHandlers = {
-  ADD_RESOURCE_HISTORY: addResourceHistory,
   ADD_RESOURCE_HISTORY_BY_RESULT: addResourceHistoryByResult,
   ADD_SEARCH_HISTORY: addSearchHistory,
   ADD_TEMPLATE_HISTORY: addTemplateHistory,
   ADD_TEMPLATE_HISTORY_BY_RESULT: addTemplateHistoryByResult,
+  REMOVE_RESOURCE_HISTORY: removeResourceHistory,
+  REMOVE_TEMPLATE_HISTORY: removeTemplateHistory,
 }
 
 const searchHandlers = {

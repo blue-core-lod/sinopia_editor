@@ -1,6 +1,7 @@
 // Copyright 2020 Stanford University see LICENSE for license
 import {
   fetchResource,
+  fetchResourceResults,
   postResource,
   putResource,
   getGroups,
@@ -307,6 +308,79 @@ describe("fetchResource", () => {
       ).rejects.toThrow(
         "http://api.sinopia.io/resource/12334 returned 500 Internal Server Error",
       )
+    })
+  })
+})
+
+describe("fetchResourceResults", () => {
+  const workUri = "http://localhost:3000/works/3d831f47"
+  const missingUri = "http://localhost:3000/works/0000"
+
+  // The API has a work titled "Cat jokes" and nothing else
+  beforeEach(() => {
+    global.fetch = jest.fn().mockImplementation((url) =>
+      Promise.resolve(
+        url === `${workUri}?expand=true`
+          ? {
+              ok: true,
+              json: () =>
+                Promise.resolve({
+                  data: [
+                    {
+                      "@id": workUri,
+                      "@type": ["http://id.loc.gov/ontologies/bibframe/Work"],
+                      "http://id.loc.gov/ontologies/bibframe/title": [
+                        { "@id": "_:b1" },
+                      ],
+                    },
+                    {
+                      "@id": "_:b1",
+                      "http://id.loc.gov/ontologies/bibframe/mainTitle": [
+                        { "@value": "Cat jokes" },
+                      ],
+                    },
+                  ],
+                  updated_at: "2020-10-05T14:31:16.563Z",
+                  group: "blue core",
+                  editGroups: ["blue core"],
+                }),
+            }
+          : {
+              ok: false,
+              status: 404,
+              statusText: "Not Found",
+              json: () => Promise.resolve({}),
+            },
+      ),
+    )
+  })
+
+  it("fetches each resource and labels it with its title", async () => {
+    const results = await fetchResourceResults([workUri, missingUri])
+
+    expect(global.fetch).toHaveBeenCalledTimes(2)
+    // The resource that failed to load is left out
+    expect(results).toEqual({
+      results: [
+        {
+          uri: workUri,
+          label: "Cat jokes",
+          type: ["http://id.loc.gov/ontologies/bibframe/Work"],
+          modified: "2020-10-05T14:31:16.563Z",
+          group: "blue core",
+          editGroups: ["blue core"],
+        },
+      ],
+      error: undefined,
+    })
+  })
+
+  it("returns an error when no resource could be loaded", async () => {
+    const results = await fetchResourceResults([missingUri])
+
+    expect(results).toEqual({
+      results: [],
+      error: `${missingUri} was not found`,
     })
   })
 })
